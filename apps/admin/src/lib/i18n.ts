@@ -241,6 +241,20 @@ export const translations = {
       hostname: 'Domain Hostname (e.g. news.airsports.org)',
       dnsInstructions:
         'Add the following TXT record to your DNS provider to complete verification:',
+      manageSite: 'Manage Site',
+      visitSite: 'Visit Live Site',
+      activeDomains: 'Active Domains',
+      publishedArticles: 'Published Articles',
+      systemHealth: 'System Health',
+      allWebsites: 'All Websites',
+      searchPlaceholder: 'Search websites by name, key, or domain...',
+      noSitesFound: 'No websites found matching your query.',
+      backToSites: 'Back to Websites',
+      verified: 'Verified',
+      unverified: 'Pending DNS',
+      generalSettings: 'General Settings',
+      dnsChallenge: 'DNS Verification Challenge',
+      superAdminOnly: 'Super Admin Only',
     },
 
     // Users
@@ -529,6 +543,20 @@ export const translations = {
       hostname: 'ডোমেন হোস্টনেম (যেমন news.airsports.org)',
       dnsInstructions:
         'যাচাইকরণ সম্পন্ন করতে আপনার ডিএনএস প্রদানকারীতে নিম্নলিখিত TXT রেকর্ডটি যুক্ত করুন:',
+      manageSite: 'সাইট পরিচালনা',
+      visitSite: 'লাইভ সাইট দেখুন',
+      activeDomains: 'সক্রিয় ডোমেন',
+      publishedArticles: 'প্রকাশিত আর্টিকেল',
+      systemHealth: 'সিস্টেম স্থিতি',
+      allWebsites: 'সকল ওয়েবসাইট',
+      searchPlaceholder: 'নাম, কী বা ডোমেন দিয়ে ওয়েবসাইট খুঁজুন...',
+      noSitesFound: 'আপনার অনুসন্ধানের সাথে মিল থাকা কোনো ওয়েবসাইট পাওয়া যায়নি।',
+      backToSites: 'ওয়েবসাইটে ফিরে যান',
+      verified: 'যাচাইকৃত',
+      unverified: 'ডিএনএস অপেক্ষমাণ',
+      generalSettings: 'সাধারণ সেটিংস',
+      dnsChallenge: 'ডিএনএস যাচাইকরণ চ্যালেঞ্জ',
+      superAdminOnly: 'শুধুমাত্র সুপার অ্যাডমিন',
     },
 
     // Users

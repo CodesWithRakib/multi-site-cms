@@ -281,7 +281,7 @@ export const cmsApi = platformApi.injectEndpoints({
       { siteId: string; domainId: string }
     >({
       query: ({ siteId, domainId }) => ({
-        path: `/sites/${siteId}/domains/${domainId}/verify-challenge`,
+        path: `/sites/${siteId}/domains/${domainId}/challenge`,
       }),
       transformResponse: (response: ApiSuccess<unknown>) => response.data as VerificationChallenge,
     }),

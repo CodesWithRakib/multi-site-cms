@@ -13,6 +13,11 @@ import {
   Copy,
   Check,
   Loader2,
+  Save,
+  Radio,
+  ExternalLink,
+  Settings,
+  Plus,
 } from 'lucide-react';
 import type { SiteStatus } from '@multi-site-cms/types';
 import { ShellLayout } from '@/components/shell';
@@ -51,7 +56,8 @@ export default function SiteDetailPage() {
 
   // DNS Challenge modal
   const [challengeDomainId, setChallengeDomainId] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
+  const [copiedHost, setCopiedHost] = useState(false);
+  const [copiedValue, setCopiedValue] = useState(false);
 
   // Notification state
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
@@ -173,17 +179,23 @@ export default function SiteDetailPage() {
     }
   };
 
-  const copyToClipboard = (text: string) => {
+  const copyToClipboard = (text: string, type: 'host' | 'value') => {
     navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    if (type === 'host') {
+      setCopiedHost(true);
+      setTimeout(() => setCopiedHost(false), 2000);
+    } else {
+      setCopiedValue(true);
+      setTimeout(() => setCopiedValue(false), 2000);
+    }
   };
 
   if (isLoadingSite) {
     return (
       <ShellLayout superAdminOnly>
-        <div className="flex h-96 items-center justify-center">
-          <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+        <div className="flex h-96 flex-col items-center justify-center gap-3">
+          <Loader2 className="size-8 animate-spin text-emerald-500" />
+          <p className="text-xs font-semibold text-slate-400">Loading website configuration...</p>
         </div>
       </ShellLayout>
     );
@@ -192,86 +204,129 @@ export default function SiteDetailPage() {
   if (!site) {
     return (
       <ShellLayout superAdminOnly>
-        <div className="p-8 text-center text-xs text-slate-400">Site not found.</div>
+        <div className="p-12 text-center text-xs text-slate-400 rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900">
+          Site configuration could not be loaded.
+        </div>
       </ShellLayout>
     );
   }
 
+  const primaryDomain = domains.find((d) => d.isPrimary) || domains[0];
+  const liveUrl = primaryDomain?.hostname
+    ? `http://${primaryDomain.hostname}:3000`
+    : `https://${site.key}.yourdomain.com`;
+
   return (
     <ShellLayout superAdminOnly>
-      <div className="max-w-4xl mx-auto flex flex-col gap-6">
-        {/* Header */}
-        <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
+      <div className="w-full space-y-6 pb-12">
+        {/* 1. Sticky Frosted Header */}
+        <div className="sticky top-0 z-30 flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-xs">
           <div className="flex items-center gap-3">
             <Link
               href="/sites"
-              className="p-1.5 rounded-xl text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              className="p-2 rounded-xl text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shadow-2xs"
+              title={t.sites.backToSites || 'Back to Websites'}
             >
-              <ArrowLeft className="w-5 h-5" />
+              <ArrowLeft className="size-4" />
             </Link>
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2.5">
                 <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
                   {site.name}
                 </h1>
-                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md">
+                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-700">
                   {site.key}
                 </span>
+                <span
+                  className={`inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full ${
+                    site.status === 'active'
+                      ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                  }`}
+                >
+                  <span className="size-1.5 rounded-full bg-current" />
+                  <span className="capitalize">{site.status}</span>
+                </span>
               </div>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Site ID: <span className="font-mono">{site.id}</span>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                Site ID: <span className="font-mono font-medium text-slate-700 dark:text-slate-300">{site.id}</span>
               </p>
             </div>
           </div>
 
-          {/* Navigation Tabs */}
-          <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl text-xs font-semibold">
-            <button
-              type="button"
-              onClick={() => setActiveTab('general')}
-              className={`px-3 py-1.5 rounded-lg transition-colors ${
-                activeTab === 'general'
-                  ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400'
-              }`}
+          <div className="flex items-center gap-2.5">
+            {/* Visit Live Website */}
+            <a
+              href={liveUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:text-emerald-500 hover:border-emerald-300 text-xs font-semibold shadow-2xs transition-colors"
             >
-              General
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab('domains')}
-              className={`px-3 py-1.5 rounded-lg transition-colors ${
-                activeTab === 'domains'
-                  ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400'
-              }`}
-            >
-              Domains ({domains.length})
-            </button>
+              <ExternalLink className="size-3.5" />
+              <span>{t.sites.visitSite || 'Live Website'}</span>
+            </a>
+
+            {/* Quick Tab Switcher */}
+            <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl text-xs font-semibold">
+              <button
+                type="button"
+                onClick={() => setActiveTab('general')}
+                className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                  activeTab === 'general'
+                    ? 'bg-white dark:bg-slate-700 text-[#072423] dark:text-emerald-400 font-bold shadow-xs'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                }`}
+              >
+                {t.sites.generalSettings || 'General'}
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab('domains')}
+                className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                  activeTab === 'domains'
+                    ? 'bg-white dark:bg-slate-700 text-[#072423] dark:text-emerald-400 font-bold shadow-xs'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                }`}
+              >
+                {t.sites.manageDomains || 'Domains'} ({domains.length})
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Notifications */}
+        {/* 2. Notifications */}
         {successMsg && (
-          <div className="flex items-center gap-2 p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 text-xs text-emerald-700 dark:text-emerald-300">
-            <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-            <span>{successMsg}</span>
+          <div className="flex items-center gap-2.5 p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-xs text-emerald-800 dark:text-emerald-300 shadow-2xs">
+            <CheckCircle2 className="size-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+            <span className="font-medium">{successMsg}</span>
           </div>
         )}
         {errorMsg && (
-          <div className="flex items-center gap-2 p-3 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800 text-xs text-rose-700 dark:text-rose-300">
-            <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
-            <span>{errorMsg}</span>
+          <div className="flex items-center gap-2.5 p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-xs text-rose-800 dark:text-rose-300 shadow-2xs">
+            <AlertCircle className="size-4 text-rose-600 dark:text-rose-400 shrink-0" />
+            <span className="font-medium">{errorMsg}</span>
           </div>
         )}
 
-        {/* Tab 1: General Settings */}
+        {/* 3. Tab 1: General Settings */}
         {activeTab === 'general' && (
-          <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-2xs">
-            <form onSubmit={handleSaveGeneral} className="space-y-4">
+          <div className="rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-xs">
+            <div className="flex items-center gap-2.5 mb-5 pb-4 border-b border-slate-100 dark:border-slate-800">
+              <Settings className="size-5 text-emerald-500" />
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Site Name
+                <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
+                  {t.sites.generalSettings || 'General Tenant Configuration'}
+                </h3>
+                <p className="text-xs text-slate-400">
+                  Manage display name, default editorial language, timezone, and operational state.
+                </p>
+              </div>
+            </div>
+
+            <form onSubmit={handleSaveGeneral} className="space-y-5">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                  {t.sites.siteName || 'Site Name'}
                 </label>
                 <input
                   type="text"
@@ -285,14 +340,14 @@ export default function SiteDetailPage() {
                       status: prev?.status ?? currentStatus,
                     }))
                   }
-                  className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 text-slate-900 dark:text-slate-100 focus:outline-hidden focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 shadow-2xs transition-all"
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Timezone
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                    {t.sites.timezone || 'Timezone'}
                   </label>
                   <select
                     value={currentTimezone}
@@ -304,20 +359,20 @@ export default function SiteDetailPage() {
                         status: prev?.status ?? currentStatus,
                       }))
                     }
-                    className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 text-slate-900 dark:text-slate-100 focus:outline-hidden focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 shadow-2xs"
                   >
-                    <option value="UTC">UTC</option>
-                    <option value="Asia/Dhaka">Asia/Dhaka</option>
-                    <option value="America/New_York">America/New_York</option>
-                    <option value="Europe/London">Europe/London</option>
-                    <option value="Europe/Paris">Europe/Paris</option>
-                    <option value="Asia/Tokyo">Asia/Tokyo</option>
+                    <option value="UTC">UTC (Universal Coordinated)</option>
+                    <option value="Asia/Dhaka">Asia/Dhaka (GMT+6)</option>
+                    <option value="America/New_York">America/New_York (EST/EDT)</option>
+                    <option value="Europe/London">Europe/London (GMT/BST)</option>
+                    <option value="Europe/Paris">Europe/Paris (CET)</option>
+                    <option value="Asia/Tokyo">Asia/Tokyo (JST)</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Default Locale
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                    {t.sites.defaultLocale || 'Default Locale'}
                   </label>
                   <select
                     value={currentLocale}
@@ -329,7 +384,7 @@ export default function SiteDetailPage() {
                         status: prev?.status ?? currentStatus,
                       }))
                     }
-                    className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 text-slate-900 dark:text-slate-100 focus:outline-hidden focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 shadow-2xs"
                   >
                     <option value="en">English (en)</option>
                     <option value="bn">Bangla (bn)</option>
@@ -339,8 +394,8 @@ export default function SiteDetailPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Status
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                    Operational Status
                   </label>
                   <select
                     value={currentStatus}
@@ -352,11 +407,11 @@ export default function SiteDetailPage() {
                         status: e.target.value as SiteStatus,
                       }))
                     }
-                    className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 text-slate-900 dark:text-slate-100 focus:outline-hidden focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 shadow-2xs"
                   >
-                    <option value="active">Active</option>
-                    <option value="paused">Paused</option>
-                    <option value="suspended">Suspended</option>
+                    <option value="active">Active (Serving traffic)</option>
+                    <option value="paused">Paused (Under Maintenance)</option>
+                    <option value="suspended">Suspended (Access Disabled)</option>
                   </select>
                 </div>
               </div>
@@ -365,57 +420,84 @@ export default function SiteDetailPage() {
                 <button
                   type="submit"
                   disabled={isUpdatingSite}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-xs transition-colors disabled:opacity-50"
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#00e599] to-[#05f292] text-[#072423] text-xs font-bold shadow-xs hover:brightness-105 active:scale-95 transition-all disabled:opacity-50 cursor-pointer"
                 >
-                  {isUpdatingSite && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-                  <span>Save Changes</span>
+                  {isUpdatingSite ? (
+                    <Loader2 className="size-4 animate-spin text-[#072423]" />
+                  ) : (
+                    <Save className="size-4" />
+                  )}
+                  <span>Save Configuration</span>
                 </button>
               </div>
             </form>
           </div>
         )}
 
-        {/* Tab 2: Domain Management */}
+        {/* 4. Tab 2: Domain Management & DNS */}
         {activeTab === 'domains' && (
           <div className="space-y-6">
             {/* Bound Domains List */}
-            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-2xs">
-              <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 mb-3">
-                Bound Hostnames
-              </h3>
+            <div className="rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-xs">
+              <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800 mb-4">
+                <div className="flex items-center gap-2.5">
+                  <Radio className="size-5 text-emerald-500" />
+                  <div>
+                    <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
+                      Bound Hostnames & Domains
+                    </h3>
+                    <p className="text-xs text-slate-400">
+                      All custom hostnames mapped to this website tenant across the edge network.
+                    </p>
+                  </div>
+                </div>
+                <span className="text-xs font-bold text-slate-400">
+                  {domains.length} {domains.length === 1 ? 'Domain' : 'Domains'}
+                </span>
+              </div>
 
               {domains.length === 0 ? (
-                <p className="text-xs text-slate-400 py-4 text-center">
+                <div className="py-12 text-center text-xs text-slate-400">
                   No domains bound to this site yet.
-                </p>
+                </div>
               ) : (
-                <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                <div className="divide-y divide-slate-100 dark:divide-slate-800/80">
                   {domains.map((dom) => {
                     const isVerified = dom.verifiedAt !== null;
 
                     return (
                       <div
                         key={dom.id}
-                        className="py-3 flex flex-wrap items-center justify-between gap-3 text-xs"
+                        className="py-3.5 flex flex-wrap items-center justify-between gap-3 text-xs"
                       >
-                        <div className="flex items-center gap-2.5">
-                          <Globe className="w-4 h-4 text-slate-400" />
+                        <div className="flex items-center gap-3">
+                          <Globe className="size-4 text-slate-400" />
                           <span className="font-mono font-semibold text-slate-900 dark:text-slate-100">
                             {dom.hostname}
                           </span>
                           {dom.isPrimary && (
-                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
+                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
                               Primary
                             </span>
                           )}
                           <span
-                            className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                            className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1 ${
                               isVerified
-                                ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
-                                : 'bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300'
+                                ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+                                : 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
                             }`}
                           >
-                            {isVerified ? 'Verified' : 'Unverified'}
+                            {isVerified ? (
+                              <>
+                                <CheckCircle2 className="size-3 text-emerald-500" />
+                                <span>Verified</span>
+                              </>
+                            ) : (
+                              <>
+                                <AlertCircle className="size-3 text-amber-500" />
+                                <span>Pending DNS</span>
+                              </>
+                            )}
                           </span>
                         </div>
 
@@ -424,7 +506,7 @@ export default function SiteDetailPage() {
                             <button
                               type="button"
                               onClick={() => setChallengeDomainId(dom.id)}
-                              className="px-2.5 py-1 text-[11px] font-semibold text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/40 rounded-lg"
+                              className="px-3 py-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 rounded-xl border border-emerald-200 dark:border-emerald-800/80 transition-colors cursor-pointer"
                             >
                               DNS Instructions
                             </button>
@@ -434,7 +516,7 @@ export default function SiteDetailPage() {
                             <button
                               type="button"
                               onClick={() => handleSetPrimary(dom.id)}
-                              className="px-2.5 py-1 text-[11px] font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
+                              className="px-3 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer"
                             >
                               Make Primary
                             </button>
@@ -444,10 +526,10 @@ export default function SiteDetailPage() {
                             <button
                               type="button"
                               onClick={() => handleDeleteDomain(dom.id, dom.hostname)}
-                              className="p-1 text-slate-400 hover:text-rose-600 rounded-lg transition-colors"
+                              className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-xl transition-colors cursor-pointer"
                               title="Delete domain"
                             >
-                              <Trash2 className="w-3.5 h-3.5" />
+                              <Trash2 className="size-4" />
                             </button>
                           )}
                         </div>
@@ -459,36 +541,36 @@ export default function SiteDetailPage() {
             </div>
 
             {/* Add Domain Binding */}
-            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-2xs">
+            <div className="rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-xs">
               <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 mb-1">
-                {t.sites.addDomain}
+                {t.sites.addDomain || 'Add Domain Binding'}
               </h3>
-              <p className="text-xs text-slate-500 mb-4">
-                Bind an alias or custom hostname to this site. Normalized automatically.
+              <p className="text-xs text-slate-400 mb-4">
+                Bind an alias or custom hostname to this site. Domains are normalized automatically.
               </p>
 
-              <form onSubmit={handleAddDomain} className="space-y-3">
+              <form onSubmit={handleAddDomain} className="space-y-4">
                 <div>
                   <input
                     type="text"
                     required
                     value={newHostname}
                     onChange={(e) => setNewHostname(e.target.value)}
-                    placeholder={t.sites.hostname}
-                    className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-blue-500 font-mono"
+                    placeholder={t.sites.hostname || 'Domain Hostname (e.g. news.airsports.org)'}
+                    className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 text-slate-900 dark:text-slate-100 focus:outline-hidden focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 font-mono shadow-2xs"
                   />
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2.5">
                   <input
                     id="isPrimary"
                     type="checkbox"
                     checked={isPrimaryDomain}
                     onChange={(e) => setIsPrimaryDomain(e.target.checked)}
-                    className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                    className="size-4 rounded-md border-slate-300 dark:border-slate-700 text-emerald-500 focus:ring-emerald-400/20"
                   />
-                  <label htmlFor="isPrimary" className="text-xs text-slate-600 dark:text-slate-300">
-                    Set as Primary Domain for this site
+                  <label htmlFor="isPrimary" className="text-xs font-medium text-slate-700 dark:text-slate-300 cursor-pointer">
+                    Set as Primary Domain for this website
                   </label>
                 </div>
 
@@ -496,10 +578,14 @@ export default function SiteDetailPage() {
                   <button
                     type="submit"
                     disabled={isAddingDomain}
-                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-xs transition-colors disabled:opacity-50"
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#00e599] to-[#05f292] text-[#072423] text-xs font-bold shadow-xs hover:brightness-105 active:scale-95 transition-all disabled:opacity-50 cursor-pointer"
                   >
-                    {isAddingDomain && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-                    <span>Add Domain</span>
+                    {isAddingDomain ? (
+                      <Loader2 className="size-4 animate-spin text-[#072423]" />
+                    ) : (
+                      <Plus className="size-4 stroke-[2.5]" />
+                    )}
+                    <span>Add Domain Binding</span>
                   </button>
                 </div>
               </form>
@@ -507,83 +593,106 @@ export default function SiteDetailPage() {
           </div>
         )}
 
-        {/* DNS Challenge Modal */}
-        {challengeDomainId && challengeData && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
-            <div className="w-full max-w-lg rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-xl animate-in zoom-in-95">
+        {/* 5. DNS Challenge Modal */}
+        {challengeDomainId && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs">
+            <div className="w-full max-w-lg rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-2xl animate-in zoom-in-95">
               <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 mb-4">
                 <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                  <Shield className="w-4 h-4 text-blue-600" />
-                  <span>Domain DNS Verification Challenge</span>
+                  <Shield className="size-4 text-emerald-500" />
+                  <span>{t.sites.dnsChallenge || 'Domain DNS Verification Challenge'}</span>
                 </h3>
                 <button
                   type="button"
                   onClick={() => setChallengeDomainId(null)}
-                  className="text-slate-400 hover:text-slate-600"
+                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
                 >
                   ✕
                 </button>
               </div>
 
-              <p className="text-xs text-slate-500 mb-4">{t.sites.dnsInstructions}</p>
+              {!challengeData ? (
+                <div className="py-10 flex flex-col items-center justify-center gap-2.5">
+                  <Loader2 className="size-6 animate-spin text-emerald-500" />
+                  <p className="text-xs text-slate-400">Loading DNS challenge records...</p>
+                </div>
+              ) : (
+                <>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">{t.sites.dnsInstructions}</p>
 
-              <div className="space-y-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 p-4 border border-slate-100 dark:border-slate-700/60 text-xs">
-                <div>
-                  <span className="text-[10px] font-bold uppercase text-slate-400">
-                    Record Type
-                  </span>
-                  <p className="font-mono font-bold text-slate-900 dark:text-slate-100">TXT</p>
-                </div>
-                <div>
-                  <span className="text-[10px] font-bold uppercase text-slate-400">
-                    Host / Name
-                  </span>
-                  <p className="font-mono font-bold text-slate-900 dark:text-slate-100 break-all">
-                    {challengeData.recordName}
-                  </p>
-                </div>
-                <div>
-                  <span className="text-[10px] font-bold uppercase text-slate-400">
-                    Record Value
-                  </span>
-                  <div className="flex items-center justify-between gap-2 mt-0.5">
-                    <p className="font-mono font-bold text-blue-600 dark:text-blue-400 break-all">
-                      {challengeData.recordValue}
-                    </p>
+                  <div className="space-y-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 p-4 border border-slate-100 dark:border-slate-700/60 text-xs">
+                    <div>
+                      <span className="text-[10px] font-bold uppercase text-slate-400">
+                        Record Type
+                      </span>
+                      <p className="font-mono font-bold text-slate-900 dark:text-slate-100">TXT</p>
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold uppercase text-slate-400">
+                        Host / Name
+                      </span>
+                      <div className="flex items-center justify-between gap-2 mt-0.5">
+                        <p className="font-mono font-bold text-slate-900 dark:text-slate-100 break-all">
+                          {challengeData.recordName}
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => copyToClipboard(challengeData.recordName, 'host')}
+                          className="p-1.5 rounded-lg text-slate-400 hover:text-emerald-500 shrink-0 cursor-pointer"
+                          title="Copy host name"
+                        >
+                          {copiedHost ? (
+                            <Check className="size-4 text-emerald-500" />
+                          ) : (
+                            <Copy className="size-4" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold uppercase text-slate-400">
+                        Record Value
+                      </span>
+                      <div className="flex items-center justify-between gap-2 mt-0.5">
+                        <p className="font-mono font-bold text-emerald-600 dark:text-emerald-400 break-all">
+                          {challengeData.recordValue}
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => copyToClipboard(challengeData.recordValue, 'value')}
+                          className="p-1.5 rounded-lg text-slate-400 hover:text-emerald-500 shrink-0 cursor-pointer"
+                          title="Copy challenge value"
+                        >
+                          {copiedValue ? (
+                            <Check className="size-4 text-emerald-500" />
+                          ) : (
+                            <Copy className="size-4" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-end gap-2.5 mt-5">
                     <button
                       type="button"
-                      onClick={() => copyToClipboard(challengeData.recordValue)}
-                      className="p-1 rounded text-slate-400 hover:text-slate-700 shrink-0"
-                      title="Copy to clipboard"
+                      onClick={() => setChallengeDomainId(null)}
+                      className="px-4 py-2 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl cursor-pointer"
                     >
-                      {copied ? (
-                        <Check className="w-4 h-4 text-emerald-600" />
-                      ) : (
-                        <Copy className="w-4 h-4" />
-                      )}
+                      Close
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleVerify(challengeData.domainId)}
+                      disabled={isVerifying}
+                      className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-[#00e599] to-[#05f292] text-[#072423] text-xs font-bold shadow-xs hover:brightness-105 active:scale-95 transition-all disabled:opacity-50 cursor-pointer"
+                    >
+                      {isVerifying && <Loader2 className="size-3.5 animate-spin text-[#072423]" />}
+                      <span>Verify DNS Record Now</span>
                     </button>
                   </div>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-end gap-2.5 mt-5">
-                <button
-                  type="button"
-                  onClick={() => setChallengeDomainId(null)}
-                  className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl"
-                >
-                  Close
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleVerify(challengeData.domainId)}
-                  disabled={isVerifying}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-xs transition-colors disabled:opacity-50"
-                >
-                  {isVerifying && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-                  <span>Verify DNS Record</span>
-                </button>
-              </div>
+                </>
+              )}
             </div>
           </div>
         )}
