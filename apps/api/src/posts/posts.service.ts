@@ -1,6 +1,6 @@
 import crypto from 'node:crypto';
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { type DataSource, type Repository } from 'typeorm';
+import { In, type DataSource, type Repository } from 'typeorm';
 
 import type {
   PaginatedResult,
@@ -220,7 +220,10 @@ export class PostsService {
     }
 
     if (query.status) {
-      qb.andWhere('p.status = :status', { status: query.status });
+      qb.andWhere(
+        '(p.status = :status OR EXISTS (SELECT 1 FROM post_publications pp WHERE pp.post_id = p.id AND pp.status = :status))',
+        { status: query.status },
+      );
     }
 
     if (query.authorId) {
@@ -258,12 +261,18 @@ export class PostsService {
 
     const [posts, total] = await qb.skip(skip).take(limit).getManyAndCount();
 
+    const publicationRepo = await this.getPublicationRepo();
+    const postIds = posts.map((p) => p.id);
+    const publications =
+      postIds.length > 0 ? await publicationRepo.find({ where: { postId: In(postIds) } }) : [];
+
     const items: PostItem[] = [];
     for (const post of posts) {
       const latestRev = await revisionRepo.findOne({
         where: { postId: post.id },
         order: { revisionNumber: 'DESC' },
       });
+      const postPubs = publications.filter((pub) => pub.postId === post.id);
       items.push({
         id: post.id,
         authorId: post.authorId,
@@ -275,6 +284,24 @@ export class PostsService {
         updatedAt: post.updatedAt.toISOString(),
         currentRevisionNumber: latestRev?.revisionNumber,
         currentRevision: latestRev ? this.mapRevisionToItem(latestRev) : null,
+        publications: postPubs.map((pub) => ({
+          id: pub.id,
+          siteId: pub.siteId,
+          postId: pub.postId,
+          revisionId: pub.revisionId,
+          slug: pub.slug,
+          status: pub.status,
+          scheduledFor: pub.scheduledFor ? pub.scheduledFor.toISOString() : null,
+          publishedAt: pub.publishedAt ? pub.publishedAt.toISOString() : null,
+          seoTitle: pub.seoTitle,
+          seoDescription: pub.seoDescription,
+          canonicalUrl: pub.canonicalUrl,
+          featuredImageId: pub.featuredImageId,
+          templateKey: pub.templateKey,
+          eventId: pub.eventId,
+          createdAt: pub.createdAt.toISOString(),
+          updatedAt: pub.updatedAt.toISOString(),
+        })),
       });
     }
 

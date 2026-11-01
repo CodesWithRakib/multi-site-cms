@@ -210,9 +210,9 @@ export function PostForm({ initialPost, isCreateMode = false }: PostFormProps) {
   };
 
   return (
-    <div className="flex flex-col gap-6 max-w-5xl mx-auto pb-16">
+    <div className="flex flex-col gap-6 w-full pb-16">
       {/* Top Navigation & Action Header */}
-      <div className="sticky top-0 z-30 flex flex-wrap items-center justify-between gap-4 p-4 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+      <div className="sticky top-0 z-30 flex flex-wrap items-center justify-between gap-4 p-4 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-2xl border border-slate-100 dark:border-slate-800 shadow-xs">
         <div className="flex items-center gap-3">
           <Link
             href="/posts"
@@ -241,7 +241,7 @@ export function PostForm({ initialPost, isCreateMode = false }: PostFormProps) {
             <div className="flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800">
               {autosaveStatus === 'saving' && (
                 <>
-                  <Loader2 className="w-3.5 h-3.5 animate-spin text-blue-500" />
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-500" />
                   <span className="text-slate-600 dark:text-slate-400">Saving...</span>
                 </>
               )}
@@ -271,24 +271,24 @@ export function PostForm({ initialPost, isCreateMode = false }: PostFormProps) {
             <button
               type="button"
               onClick={() => setIsPreviewOpen(true)}
-              className="flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shadow-xs"
+              className="flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors shadow-2xs cursor-pointer"
             >
-              <Eye className="w-4 h-4 text-blue-500" />
+              <Eye className="w-4 h-4 text-emerald-500" />
               <span>Preview</span>
             </button>
           )}
 
-          {/* Save Button */}
+          {/* Save Button (Mint Gradient) */}
           <button
             type="button"
             onClick={handleFormSubmit}
             disabled={isCreating}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-medium text-xs rounded-xl hover:bg-blue-700 disabled:opacity-50 transition-colors shadow-xs"
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#00e599] to-[#05f292] hover:from-[#00d68f] hover:to-[#00e599] text-[#072423] font-bold text-xs rounded-xl disabled:opacity-50 transition-all shadow-xs cursor-pointer"
           >
             {isCreating ? (
               <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
-              <Save className="w-4 h-4" />
+              <Save className="w-4 h-4 stroke-[2.5]" />
             )}
             <span>{isCreateMode ? 'Create Post' : 'Save Changes'}</span>
           </button>
@@ -340,7 +340,7 @@ export function PostForm({ initialPost, isCreateMode = false }: PostFormProps) {
       {/* Metadata Configuration Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Main Content Info (2 columns) */}
-        <div className="md:col-span-2 flex flex-col gap-4 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
+        <div className="md:col-span-2 flex flex-col gap-4 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-xs">
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">
               Post Title *
@@ -354,7 +354,7 @@ export function PostForm({ initialPost, isCreateMode = false }: PostFormProps) {
                 markDirty();
               }}
               placeholder="Enter an engaging, descriptive title..."
-              className="w-full px-4 py-3 text-lg font-bold border rounded-xl border-slate-300 dark:border-slate-700 dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+              className="w-full px-4 py-3 text-lg font-bold border rounded-xl border-slate-200/90 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-hidden focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 transition-all"
             />
           </div>
 
@@ -370,13 +370,13 @@ export function PostForm({ initialPost, isCreateMode = false }: PostFormProps) {
                 markDirty();
               }}
               placeholder="Short lead paragraph or social summary..."
-              className="w-full px-4 py-2.5 text-sm border rounded-xl border-slate-300 dark:border-slate-700 dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+              className="w-full px-4 py-2.5 text-sm border rounded-xl border-slate-200/90 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-hidden focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 transition-all"
             />
           </div>
         </div>
 
         {/* Content Type & Featured Image (1 column) */}
-        <div className="flex flex-col gap-4 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
+        <div className="flex flex-col gap-4 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-xs">
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">
               Content Type
@@ -387,7 +387,7 @@ export function PostForm({ initialPost, isCreateMode = false }: PostFormProps) {
                 setType(e.target.value);
                 markDirty();
               }}
-              className="w-full px-3 py-2 text-sm border rounded-xl border-slate-300 dark:border-slate-700 dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-medium"
+              className="w-full px-3 py-2 text-sm border rounded-xl border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 font-medium focus:outline-hidden focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 transition-all cursor-pointer"
             >
               <option value="article">Standard Article</option>
               <option value="travel_guide">Travel Destination Guide</option>
@@ -408,7 +408,7 @@ export function PostForm({ initialPost, isCreateMode = false }: PostFormProps) {
                 setSourceLocale(e.target.value);
                 markDirty();
               }}
-              className="w-full px-3 py-2 text-sm border rounded-xl border-slate-300 dark:border-slate-700 dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-medium"
+              className="w-full px-3 py-2 text-sm border rounded-xl border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 font-medium focus:outline-hidden focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 transition-all cursor-pointer"
             >
               <option value="en">English (en)</option>
               <option value="bn">Bengali (bn)</option>
@@ -444,9 +444,9 @@ export function PostForm({ initialPost, isCreateMode = false }: PostFormProps) {
                   setMediaTarget('featured');
                   setIsMediaLibraryOpen(true);
                 }}
-                className="w-full flex items-center justify-center gap-2 p-4 border-2 border-dashed rounded-xl border-slate-300 dark:border-slate-700 hover:border-blue-500 text-slate-500 dark:text-slate-400 text-xs font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                className="w-full flex items-center justify-center gap-2 p-4 border-2 border-dashed rounded-xl border-slate-200 dark:border-slate-700 hover:border-emerald-400 text-slate-500 dark:text-slate-400 text-xs font-semibold hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer"
               >
-                <ImageIcon className="w-4 h-4" />
+                <ImageIcon className="w-4 h-4 text-emerald-500" />
                 <span>Select Featured Image</span>
               </button>
             )}
@@ -473,12 +473,12 @@ export function PostForm({ initialPost, isCreateMode = false }: PostFormProps) {
       </div>
 
       {/* Multi-Site Publications Section */}
-      <div className="flex flex-col gap-4 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
+      <div className="flex flex-col gap-4 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-xs">
         <div>
-          <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
+          <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 font-sans">
             Site Publications
           </h3>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-slate-500 mt-0.5">
             Publish this canonical post across independent websites with site-specific slugs and SEO
             configuration.
           </p>
@@ -502,8 +502,8 @@ export function PostForm({ initialPost, isCreateMode = false }: PostFormProps) {
                 key={site.id}
                 className={`flex flex-col p-4 rounded-xl border transition-all ${
                   pub.enabled
-                    ? 'border-blue-500/80 bg-blue-50/20 dark:bg-blue-950/20'
-                    : 'border-slate-200 dark:border-slate-800 bg-slate-50/40 dark:bg-slate-900/40'
+                    ? 'border-emerald-500/80 bg-emerald-50/20 dark:bg-emerald-950/20 shadow-2xs'
+                    : 'border-slate-200/90 dark:border-slate-800 bg-slate-50/40 dark:bg-slate-900/40'
                 }`}
               >
                 <div className="flex items-center justify-between pb-3 border-b border-slate-200/60 dark:border-slate-800">
@@ -517,7 +517,7 @@ export function PostForm({ initialPost, isCreateMode = false }: PostFormProps) {
                           [site.id]: { ...pub, enabled: e.target.checked },
                         }));
                       }}
-                      className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
+                      className="size-4 rounded text-emerald-500 focus:ring-emerald-400"
                     />
                     <span>{site.name}</span>
                   </label>
@@ -544,7 +544,7 @@ export function PostForm({ initialPost, isCreateMode = false }: PostFormProps) {
                               [site.id]: { ...pub, slug: e.target.value },
                             }));
                           }}
-                          className="flex-1 px-2.5 py-1.5 border rounded-lg border-slate-300 dark:border-slate-700 dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+                          className="flex-1 px-2.5 py-1.5 border rounded-lg border-slate-200/90 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-hidden focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20"
                         />
                       </div>
                     </div>
@@ -563,7 +563,7 @@ export function PostForm({ initialPost, isCreateMode = false }: PostFormProps) {
                           }));
                         }}
                         placeholder="Search engine title override"
-                        className="w-full px-2.5 py-1.5 border rounded-lg border-slate-300 dark:border-slate-700 dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+                        className="w-full px-2.5 py-1.5 border rounded-lg border-slate-200/90 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-hidden focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20"
                       />
                     </div>
 

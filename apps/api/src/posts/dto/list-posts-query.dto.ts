@@ -5,9 +5,16 @@ import { IsDateString, IsIn, IsInt, IsOptional, IsString, IsUUID, Max, Min } fro
 import {
   POST_STATUSES,
   POST_TYPES,
+  PUBLICATION_STATUSES,
   type PostStatus,
   type PostType,
+  type PublicationStatus,
 } from '../../database/entities/types';
+
+export const POST_FILTER_STATUSES = Array.from(
+  new Set([...POST_STATUSES, ...PUBLICATION_STATUSES]),
+);
+export type PostFilterStatus = PostStatus | PublicationStatus;
 
 export class ListPostsQueryDto {
   @ApiPropertyOptional({ description: 'Filter by content type', enum: POST_TYPES })
@@ -15,10 +22,10 @@ export class ListPostsQueryDto {
   @IsIn(POST_TYPES)
   type?: PostType;
 
-  @ApiPropertyOptional({ description: 'Filter by editorial post status', enum: POST_STATUSES })
+  @ApiPropertyOptional({ description: 'Filter by editorial or publication status', enum: POST_FILTER_STATUSES })
   @IsOptional()
-  @IsIn(POST_STATUSES)
-  status?: PostStatus;
+  @IsIn(POST_FILTER_STATUSES)
+  status?: PostFilterStatus;
 
   @ApiPropertyOptional({ description: 'Filter by author user ID' })
   @IsOptional()

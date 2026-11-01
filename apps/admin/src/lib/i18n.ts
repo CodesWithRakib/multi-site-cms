@@ -175,6 +175,15 @@ export const translations = {
       noPosts: 'No content found matching your filters.',
       filterByType: 'All Types',
       filterByStatus: 'All Statuses',
+      filterBySite: 'All Websites',
+      allPosts: 'All Posts',
+      totalPosts: 'Total Posts',
+      liveSite: 'Live Site',
+      showing: 'Showing',
+      of: 'of',
+      posts: 'posts',
+      previous: 'Previous',
+      next: 'Next',
     },
 
     // Publishing Dialogs
@@ -456,6 +465,15 @@ export const translations = {
       noPosts: 'আপনার ফিল্টারের সাথে মিলে এমন কোনো বিষয়বস্তু পাওয়া যায়নি।',
       filterByType: 'সকল ধরন',
       filterByStatus: 'সকল অবস্থা',
+      filterBySite: 'সকল ওয়েবসাইট',
+      allPosts: 'সকল পোস্ট',
+      totalPosts: 'মোট পোস্ট',
+      liveSite: 'লাইভ সাইট',
+      showing: 'প্রদর্শিত হচ্ছে',
+      of: 'এর মধ্যে',
+      posts: 'পোস্ট',
+      previous: 'পূর্ববর্তী',
+      next: 'পরবর্তী',
     },
 
     // Publishing Dialogs
