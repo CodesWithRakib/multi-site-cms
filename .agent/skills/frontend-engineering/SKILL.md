@@ -1,3 +1,8 @@
+---
+name: frontend-engineering
+description: Build server-first, accessible, responsive Next.js interfaces with Server and Client components, Tailwind CSS, and proper state boundaries.
+---
+
 # Skill: frontend-engineering
 
 ## Purpose

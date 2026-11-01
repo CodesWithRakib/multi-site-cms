@@ -48,45 +48,43 @@ export function UserMenu() {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-1.5 pr-2.5 text-xs font-semibold text-slate-800 dark:text-slate-100 shadow-2xs hover:bg-slate-50 dark:hover:bg-slate-700/60 transition-colors focus:outline-hidden focus:ring-2 focus:ring-blue-500"
+        className="flex items-center gap-2 rounded-xl border border-border bg-card p-1.5 pr-2.5 text-xs font-semibold text-card-foreground shadow-2xs hover:bg-accent hover:text-accent-foreground transition-colors focus:outline-hidden focus:ring-2 focus:ring-ring"
         aria-haspopup="menu"
         aria-expanded={isOpen}
       >
-        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-600 text-[11px] font-bold text-white shadow-xs">
+        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-[11px] font-bold text-primary-foreground shadow-xs">
           {initials}
         </div>
 
         <div className="hidden sm:flex flex-col items-start text-left leading-tight">
-          <span className="font-bold text-slate-900 dark:text-slate-100 max-w-[120px] truncate">
+          <span className="font-bold text-foreground max-w-[120px] truncate">
             {user.displayName}
           </span>
-          <span className="text-[10px] text-slate-400 font-normal">
+          <span className="text-[10px] text-muted-foreground font-normal">
             {isSuperAdmin ? t.nav.superAdmin : t.nav.siteAdmin}
           </span>
         </div>
 
         <ChevronDown
-          className={`w-3.5 h-3.5 text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          className={`w-3.5 h-3.5 text-muted-foreground transition-transform ${isOpen ? 'rotate-180' : ''}`}
         />
       </button>
 
       {isOpen && (
         <div
           role="menu"
-          className="absolute right-0 mt-1.5 w-60 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-2 shadow-lg z-50 animate-in fade-in zoom-in-95 duration-100"
+          className="absolute right-0 mt-1.5 w-60 rounded-xl border border-border bg-card p-2 shadow-lg z-50 animate-in fade-in zoom-in-95 duration-100"
         >
           {/* User info header */}
-          <div className="px-2.5 py-2 border-b border-slate-100 dark:border-slate-700">
-            <p className="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">
-              {user.displayName}
-            </p>
-            <p className="text-[11px] text-slate-400 truncate mt-0.5">{user.email}</p>
+          <div className="px-2.5 py-2 border-b border-border">
+            <p className="text-xs font-bold text-foreground truncate">{user.displayName}</p>
+            <p className="text-[11px] text-muted-foreground truncate mt-0.5">{user.email}</p>
             <div className="mt-2 flex items-center gap-1.5">
               <span
-                className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border border-border ${
                   isSuperAdmin
-                    ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300'
-                    : 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300'
+                    ? 'bg-secondary text-secondary-foreground'
+                    : 'bg-muted text-muted-foreground'
                 }`}
               >
                 <Shield className="w-2.5 h-2.5" />

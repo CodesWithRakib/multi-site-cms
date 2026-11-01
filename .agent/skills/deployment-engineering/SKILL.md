@@ -1,3 +1,8 @@
+---
+name: deployment-engineering
+description: Guide Docker environments, reproducible deployments, health checks, database operations, and CI/CD pipelines.
+---
+
 # Skill: deployment-engineering
 
 ## Purpose

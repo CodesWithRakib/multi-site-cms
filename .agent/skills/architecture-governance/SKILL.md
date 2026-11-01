@@ -1,3 +1,8 @@
+---
+name: architecture-governance
+description: Maintain package boundaries, monorepo dependency rules, ADRs, and cross-cutting architectural consistency across applications and packages.
+---
+
 # Skill: architecture-governance
 
 ## Purpose

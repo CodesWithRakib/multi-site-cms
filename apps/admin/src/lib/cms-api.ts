@@ -11,6 +11,7 @@ import type {
   CreateTagPayload,
   CreateUserPayload,
   CsrfResponse,
+  DashboardOverviewData,
   LoginResponse,
   MediaAssetItem,
   MediaUploadResponse,
@@ -95,6 +96,11 @@ export interface ListPublicationsParams {
   limit?: number;
 }
 
+export interface DashboardOverviewParams {
+  siteId?: string;
+  days?: number;
+}
+
 export const cmsApi = platformApi.injectEndpoints({
   endpoints: (build) => ({
     // ==========================================
@@ -152,7 +158,21 @@ export const cmsApi = platformApi.injectEndpoints({
     // ==========================================
     listSites: build.query<SiteItem[], void>({
       query: () => ({ path: '/sites' }),
-      transformResponse: (response: ApiSuccess<unknown>) => response.data as SiteItem[],
+      transformResponse: (response: ApiSuccess<unknown>) => {
+        const payload = response.data;
+        if (Array.isArray(payload)) {
+          return payload as SiteItem[];
+        }
+        if (
+          payload &&
+          typeof payload === 'object' &&
+          'items' in payload &&
+          Array.isArray((payload as { items: unknown }).items)
+        ) {
+          return (payload as { items: SiteItem[] }).items;
+        }
+        return [] as SiteItem[];
+      },
       providesTags: (result) =>
         result
           ? [
@@ -337,6 +357,18 @@ export const cmsApi = platformApi.injectEndpoints({
         { type: 'User' as const, id: userId },
         { type: 'User' as const, id: 'LIST' },
       ],
+    }),
+
+    // ==========================================
+    // Dashboard Overview (Phase 14)
+    // ==========================================
+    getDashboardOverview: build.query<DashboardOverviewData, DashboardOverviewParams | void>({
+      query: (params) => ({
+        path: '/dashboard/overview',
+        query: params as Record<string, string | number | boolean | null | undefined> | undefined,
+      }),
+      transformResponse: (response: ApiSuccess<unknown>) => response.data as DashboardOverviewData,
+      providesTags: ['Post', 'Publication', 'Site'],
     }),
 
     // ==========================================
@@ -786,6 +818,9 @@ export const {
   useUpdateUserMutation,
   useAssignRoleMutation,
   useRevokeRoleMutation,
+
+  // Dashboard (Phase 14)
+  useGetDashboardOverviewQuery,
 
   // Posts
   useListPostsQuery,

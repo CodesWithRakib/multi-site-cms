@@ -1,3 +1,8 @@
+---
+name: api-engineering
+description: Keep the HTTP surface consistent with versioned routes, DTO validation, shared envelopes, NestJS guards, and OpenAPI documentation.
+---
+
 # Skill: api-engineering
 
 ## Purpose

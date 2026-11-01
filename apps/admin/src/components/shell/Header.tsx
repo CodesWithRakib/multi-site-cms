@@ -1,10 +1,8 @@
 'use client';
 
 import React from 'react';
-import { Menu, Languages } from 'lucide-react';
+import { Menu, Search, Bell, Globe, ChevronDown } from 'lucide-react';
 import { useAdmin } from '@/lib/admin-context';
-import { SiteSwitcher } from './SiteSwitcher';
-import { UserMenu } from './UserMenu';
 import { ThemeToggle } from '../theme-toggle';
 
 interface HeaderProps {
@@ -19,53 +17,64 @@ export function Header({ onMenuToggle }: HeaderProps) {
   };
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md px-4 sm:px-6">
-      {/* Left side: Hamburger button + Site Switcher */}
-      <div className="flex items-center gap-3 sm:gap-4">
-        <button
-          type="button"
-          onClick={onMenuToggle}
-          className="p-2 rounded-xl text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors lg:hidden focus:outline-hidden focus:ring-2 focus:ring-blue-500"
-          aria-label="Open sidebar menu"
-        >
-          <Menu className="h-5 w-5" />
-        </button>
+    <header className="w-full shrink-0 sticky top-0 z-30 bg-[#f3f6f8]/90 dark:bg-[#071918]/90 backdrop-blur-md border-b border-slate-200/50 dark:border-teal-950/50 flex items-center justify-between gap-4 py-3.5 px-4 sm:px-8">
+      {/* Mobile Hamburger Button */}
+      <button
+        type="button"
+        onClick={onMenuToggle}
+        className="p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-200/50 dark:text-slate-300 dark:hover:bg-slate-800 transition-colors lg:hidden focus:outline-hidden"
+        aria-label="Open sidebar menu"
+      >
+        <Menu className="h-5 w-5" />
+      </button>
 
-        {/* Site Switcher */}
-        <SiteSwitcher />
+      {/* Pill Search Input */}
+      <div className="flex-1 max-w-xl">
+        <div className="relative flex items-center w-full">
+          <Search className="absolute left-4 size-4 text-slate-400 pointer-events-none" />
+          <input
+            type="text"
+            placeholder={t('dashboard.searchPlaceholder')}
+            className="w-full h-11 pl-11 pr-20 rounded-full bg-white dark:bg-slate-900/90 border border-slate-200/90 dark:border-slate-800 text-xs text-slate-700 dark:text-slate-200 placeholder:text-slate-400 shadow-2xs focus:outline-hidden focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 transition-all"
+          />
+          <div className="absolute right-3.5 hidden sm:flex items-center gap-1 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-[10px] font-mono font-semibold text-slate-400">
+            <span>Ctrl</span>
+            <span>+</span>
+            <span>K</span>
+          </div>
+        </div>
       </div>
 
-      {/* Right side: Language Toggle, Health Status Pill, User Menu */}
+      {/* Right Controls: Notifications, Theme Toggle, Language */}
       <div className="flex items-center gap-2.5 sm:gap-3">
-        {/* Theme Toggle */}
+        {/* Notification Bell */}
+        <button
+          type="button"
+          className="relative size-10 rounded-full bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 shadow-2xs transition-colors"
+          title="Notifications"
+          aria-label="Notifications: 3 unread"
+        >
+          <Bell className="size-4" />
+          <span className="absolute -top-1 -right-1 size-4 rounded-full bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center border-2 border-white dark:border-slate-900">
+            3
+          </span>
+        </button>
+
+        {/* Theme Toggle Button */}
         <ThemeToggle />
 
-        {/* Language switcher button */}
+        {/* Language Switcher Pill */}
         <button
           type="button"
           onClick={toggleLanguage}
-          className="flex items-center gap-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-2.5 py-1.5 text-xs font-bold text-slate-700 dark:text-slate-200 shadow-2xs hover:bg-slate-50 dark:hover:bg-slate-700/60 transition-colors focus:outline-hidden focus:ring-2 focus:ring-blue-500"
+          className="h-10 px-3.5 rounded-full bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 shadow-2xs transition-colors cursor-pointer"
           title="Toggle Language (English / বাংলা)"
-          aria-label={`Current language: ${locale === 'en' ? 'English' : 'বাংলা'}. Click to toggle.`}
+          aria-label={`Switch language. Current: ${locale === 'en' ? 'English' : 'Bangla'}`}
         >
-          <Languages className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-          <span>{locale === 'en' ? 'বাংলা' : 'EN'}</span>
+          <Globe className="size-3.5 text-slate-500" />
+          <span className="font-bold">{locale === 'en' ? 'EN' : 'বাং'}</span>
+          <ChevronDown className="size-3 text-slate-400" />
         </button>
-
-        {/* Health status pill */}
-        <div
-          className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 text-[11px] font-semibold"
-          title="Publishing Engine & API Active"
-        >
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-          </span>
-          <span>{t.nav.operationalStatus}</span>
-        </div>
-
-        {/* User Account Menu */}
-        <UserMenu />
       </div>
     </header>
   );

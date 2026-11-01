@@ -1,70 +1,31 @@
 'use client';
 
 import React from 'react';
-import { Moon, Sun, Monitor, Check } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  Button,
-} from '@multi-site-cms/ui';
+import { Moon, Sun } from 'lucide-react';
 import { useTheme } from './theme-provider';
 
 export function ThemeToggle() {
-  const { theme, setTheme, resolvedTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
+
+  const toggleTheme = () => {
+    const nextTheme = resolvedTheme === 'dark' ? 'light' : 'dark';
+    setTheme(nextTheme);
+  };
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="outline"
-          size="sm"
-          className="size-9 p-0 rounded-xl"
-          aria-label="Toggle theme"
-        >
-          {resolvedTheme === 'dark' ? (
-            <Moon className="size-4 text-primary transition-all" />
-          ) : (
-            <Sun className="size-4 text-primary transition-all" />
-          )}
-          <span className="sr-only">Toggle theme</span>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-36">
-        <DropdownMenuItem
-          onClick={() => setTheme('light')}
-          className="flex items-center justify-between"
-        >
-          <div className="flex items-center gap-2">
-            <Sun className="size-4" />
-            <span>Light</span>
-          </div>
-          {theme === 'light' && <Check className="size-3.5" />}
-        </DropdownMenuItem>
-
-        <DropdownMenuItem
-          onClick={() => setTheme('dark')}
-          className="flex items-center justify-between"
-        >
-          <div className="flex items-center gap-2">
-            <Moon className="size-4" />
-            <span>Dark</span>
-          </div>
-          {theme === 'dark' && <Check className="size-3.5" />}
-        </DropdownMenuItem>
-
-        <DropdownMenuItem
-          onClick={() => setTheme('system')}
-          className="flex items-center justify-between"
-        >
-          <div className="flex items-center gap-2">
-            <Monitor className="size-4" />
-            <span>System</span>
-          </div>
-          {theme === 'system' && <Check className="size-3.5" />}
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <button
+      type="button"
+      onClick={toggleTheme}
+      className="size-10 rounded-full bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 shadow-2xs transition-all focus:outline-hidden focus:ring-2 focus:ring-emerald-400"
+      aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
+      title={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
+    >
+      {resolvedTheme === 'dark' ? (
+        <Sun className="size-4 text-amber-400 transition-transform duration-200 hover:rotate-45" />
+      ) : (
+        <Moon className="size-4 text-slate-600 transition-transform duration-200 hover:-rotate-12" />
+      )}
+      <span className="sr-only">Toggle theme</span>
+    </button>
   );
 }

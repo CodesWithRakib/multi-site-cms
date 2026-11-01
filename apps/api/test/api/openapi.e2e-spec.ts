@@ -47,6 +47,7 @@ describe('OpenAPI document', () => {
       `/${env.API_PREFIX}/auth/login`,
       `/${env.API_PREFIX}/auth/logout`,
       `/${env.API_PREFIX}/auth/me`,
+      `/${env.API_PREFIX}/dashboard/overview`,
       `/${env.API_PREFIX}/health`,
       `/${env.API_PREFIX}/health/ready`,
       `/${env.API_PREFIX}/media`,

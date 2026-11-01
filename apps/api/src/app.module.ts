@@ -11,6 +11,7 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { RequestLoggingInterceptor } from './common/interceptors/request-logging.interceptor';
 import { ResponseEnvelopeInterceptor } from './common/interceptors/response-envelope.interceptor';
 import { DatabaseModule } from './database/database.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 import { HealthModule } from './health/health.module';
 import { MediaModule } from './media/media.module';
 import { PostsModule } from './posts/posts.module';
@@ -38,6 +39,7 @@ import { UsersModule } from './users/users.module';
     MediaModule,
     PublishingModule,
     HealthModule,
+    DashboardModule,
   ],
   providers: [
     {

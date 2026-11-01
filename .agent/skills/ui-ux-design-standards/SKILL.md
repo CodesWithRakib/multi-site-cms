@@ -1,3 +1,8 @@
+---
+name: ui-ux-design-standards
+description: Enforce design tokens, spacing scales, typography hierarchy, high-density SaaS layout rules, and accessible component states.
+---
+
 # Skill: ui-ux-design-standards
 
 ## Purpose

@@ -1,3 +1,8 @@
+---
+name: database-engineering
+description: Manage PostgreSQL schemas, TypeORM entities, foreign key constraints, indexes, migrations, and transactions.
+---
+
 # Skill: database-engineering
 
 ## Purpose

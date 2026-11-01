@@ -1,3 +1,8 @@
+---
+name: accessibility-wcag
+description: Guarantee that all admin dashboard pages, components, data tables, dialogs, forms, and navigation controls meet WCAG 2.2 Level AA accessibility standards by default.
+---
+
 # Skill: accessibility-wcag
 
 ## Purpose

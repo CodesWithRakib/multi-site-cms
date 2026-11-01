@@ -588,3 +588,59 @@ export interface ListPublicPostsQuery {
   search?: string;
   featured?: boolean;
 }
+
+// ==========================================
+// Dashboard Overview Contracts (Phase 14)
+// ==========================================
+
+export interface DashboardMetrics {
+  totalContent: number;
+  publishedCount: number;
+  draftsCount: number;
+  scheduledCount: number;
+  archivedCount: number;
+  activeSitesCount: number;
+}
+
+export interface DashboardActivityDataPoint {
+  date: string;
+  published: number;
+  drafts: number;
+  scheduled: number;
+}
+
+export interface DashboardRecentContentItem {
+  id: string;
+  postId: string;
+  title: string;
+  slug: string;
+  type: string;
+  status: string;
+  siteId: string;
+  siteName: string;
+  siteKey: string;
+  updatedAt: string;
+  publishedAt: string | null;
+  scheduledFor: string | null;
+}
+
+export interface DashboardRecentActivityItem {
+  id: string;
+  action: string;
+  entityType: string;
+  entityId: string | null;
+  actorId: string | null;
+  actorName: string;
+  actorEmail?: string | null;
+  siteId: string | null;
+  siteName?: string | null;
+  createdAt: string;
+  summary: string;
+}
+
+export interface DashboardOverviewData {
+  metrics: DashboardMetrics;
+  activitySeries: DashboardActivityDataPoint[];
+  recentContent: DashboardRecentContentItem[];
+  recentActivity: DashboardRecentActivityItem[];
+}

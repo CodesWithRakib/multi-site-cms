@@ -1,3 +1,8 @@
+---
+name: performance-engineering
+description: Optimize query performance, bundle sizes, caching strategies, rendering efficiency, and Core Web Vitals across the platform.
+---
+
 # Skill: performance-engineering
 
 ## Purpose

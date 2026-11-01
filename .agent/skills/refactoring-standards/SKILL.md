@@ -1,3 +1,8 @@
+---
+name: refactoring-standards
+description: Enforce strict discipline for route-by-route refactoring, incremental test-backed changes, and 150-250 lines max per file.
+---
+
 # Skill: refactoring-standards
 
 ## Purpose

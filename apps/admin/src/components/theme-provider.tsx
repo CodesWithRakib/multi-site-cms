@@ -16,7 +16,7 @@ const STORAGE_KEY = 'multi_site_cms_admin_theme';
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(() => {
-    if (typeof window === 'undefined') return 'system';
+    if (typeof window === 'undefined') return 'light';
     try {
       const stored = localStorage.getItem(STORAGE_KEY) as Theme | null;
       if (stored === 'light' || stored === 'dark' || stored === 'system') {
@@ -25,7 +25,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     } catch {
       // LocalStorage unavailable
     }
-    return 'system';
+    return 'light';
   });
   const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('light');
 

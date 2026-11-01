@@ -1,3 +1,8 @@
+---
+name: visual-qa-testing
+description: Standardize visual QA, multi-viewport responsive checks (1440px desktop, 768px tablet, 375px mobile), and dual-theme verification.
+---
+
 # Skill: visual-qa-testing
 
 ## Purpose

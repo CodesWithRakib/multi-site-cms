@@ -1,3 +1,8 @@
+---
+name: shadcn-component-standards
+description: Enforce encapsulation and reuse of @multi-site-cms/ui design primitives built with Radix UI, Tailwind CSS, and CVA variants.
+---
+
 # Skill: shadcn-component-standards
 
 ## Purpose

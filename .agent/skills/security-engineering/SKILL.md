@@ -1,3 +1,8 @@
+---
+name: security-engineering
+description: Enforce platform security baseline including authentication, tenant-scoped authorization (site_id isolation), input validation, and audit logging.
+---
+
 # Skill: security-engineering
 
 ## Purpose

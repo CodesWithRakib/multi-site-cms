@@ -1,3 +1,8 @@
+---
+name: documentation
+description: Maintain accurate documentation, architecture decision records (ADRs), runbooks, and diagrams alongside all code changes.
+---
+
 # Skill: documentation
 
 ## Purpose

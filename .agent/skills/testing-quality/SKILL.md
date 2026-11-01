@@ -1,3 +1,8 @@
+---
+name: testing-quality
+description: Design and execute unit tests in Vitest, integration tests in Jest with supertest, and end-to-end user journeys in Playwright.
+---
+
 # Skill: testing-quality
 
 ## Purpose

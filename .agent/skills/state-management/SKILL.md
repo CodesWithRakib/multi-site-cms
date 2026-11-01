@@ -1,3 +1,8 @@
+---
+name: state-management
+description: Guide state management architecture using Redux Toolkit and RTK Query in admin shell, keeping server and client state cleanly separated.
+---
+
 # Skill: state-management
 
 ## Purpose

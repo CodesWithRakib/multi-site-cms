@@ -20,6 +20,7 @@
     "db:migration:show": "typeorm -d dist/database/data-source.js migration:show",
     "db:migration:generate": "typeorm -d dist/database/data-source.js migration:generate --pretty",
     "db:seed:dev": "node dist/database/seeds/development.seed.js",
+    "db:seed:content": "node dist/database/seeds/content.seed.js",
     "bootstrap:super-admin": "node dist/database/cli/bootstrap-super-admin.js"
   },
   "dependencies": {

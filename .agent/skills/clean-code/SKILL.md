@@ -1,3 +1,8 @@
+---
+name: clean-code
+description: Enforce clean code standards, strict TypeScript modeling, small cohesive functions, naming conventions, and structured error handling.
+---
+
 # Skill: clean-code
 
 ## Purpose
