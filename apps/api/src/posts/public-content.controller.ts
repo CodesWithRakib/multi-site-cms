@@ -171,6 +171,58 @@ export class PublicContentController {
     );
   }
 
+  @Get('events')
+  @ApiOperation({ summary: 'List active public events with published update counts' })
+  @ApiResponse({ status: 200, description: 'Active events' })
+  async listEvents(
+    @Param('siteKey') siteKey: string,
+    @Req() req: Request,
+    @Res() res: Response,
+  ): Promise<void> {
+    const events = await this.publicContentService.listPublishedEvents(siteKey);
+
+    this.sendWithEtag(
+      req,
+      res,
+      events,
+      (requestId) => ({
+        data: events,
+        meta: {
+          requestId,
+          timestamp: new Date().toISOString(),
+        },
+      }),
+      'public, max-age=60, stale-while-revalidate=300',
+    );
+  }
+
+  @Get('events/:slug')
+  @ApiOperation({ summary: 'Get public event detail and timeline updates by slug' })
+  @ApiResponse({ status: 200, description: 'Event detail and updates array' })
+  @ApiResponse({ status: 404, description: 'Event not found' })
+  async getEvent(
+    @Param('siteKey') siteKey: string,
+    @Param('slug') slug: string,
+    @Req() req: Request,
+    @Res() res: Response,
+  ): Promise<void> {
+    const event = await this.publicContentService.getPublishedEventBySlug(siteKey, slug);
+
+    this.sendWithEtag(
+      req,
+      res,
+      event,
+      (requestId) => ({
+        data: event,
+        meta: {
+          requestId,
+          timestamp: new Date().toISOString(),
+        },
+      }),
+      'public, max-age=30, stale-while-revalidate=120',
+    );
+  }
+
   @Get('preview/:postId')
   @ApiOperation({ summary: 'Load authenticated draft preview with signed token' })
   @ApiQuery({ name: 'token', required: true, description: 'Signed preview token' })

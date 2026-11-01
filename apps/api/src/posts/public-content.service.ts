@@ -5,6 +5,8 @@ import type {
   PublicArticleImage,
   PublicArticleSummary,
   PublicCategoryItem,
+  PublicEventDetail,
+  PublicEventSummary,
   PublicSitemapItem,
   PublicTagItem,
   PublicTaxonomyRef,
@@ -14,6 +16,7 @@ import { DataSource, In } from 'typeorm';
 import { ApiException } from '../common/exceptions/api.exception';
 import { DATA_SOURCE } from '../database/database.tokens';
 import { Category } from '../database/entities/category.entity';
+import { Event } from '../database/entities/event.entity';
 import { MediaAsset } from '../database/entities/media-asset.entity';
 import { PostPublicationCategory } from '../database/entities/post-publication-category.entity';
 import { PostPublicationTag } from '../database/entities/post-publication-tag.entity';
@@ -112,6 +115,14 @@ export class PublicContentService {
 
     if (query.type) {
       qb.andWhere('post.type = :postType', { postType: query.type });
+    }
+
+    if (query.templateKey && query.templateKey.trim().length > 0) {
+      qb.andWhere('pub.template_key = :templateKey', { templateKey: query.templateKey.trim() });
+    }
+
+    if (query.eventId && query.eventId.trim().length > 0) {
+      qb.andWhere('pub.event_id = :eventId', { eventId: query.eventId.trim() });
     }
 
     if (query.search && query.search.trim().length > 0) {
@@ -235,6 +246,8 @@ export class PublicContentService {
         title: rev?.title ?? 'Untitled',
         excerpt: rev?.excerpt ?? null,
         type: post?.type ?? 'article',
+        templateKey: pub.templateKey ?? null,
+        eventId: pub.eventId ?? null,
         sourceLocale: post?.sourceLocale ?? 'en',
         publishedAt: pub.publishedAt ? pub.publishedAt.toISOString() : pub.createdAt.toISOString(),
         updatedAt: pub.updatedAt.toISOString(),
@@ -391,6 +404,8 @@ export class PublicContentService {
           title: rRev?.title ?? 'Untitled',
           excerpt: rRev?.excerpt ?? null,
           type: post.type,
+          templateKey: rp.templateKey ?? null,
+          eventId: rp.eventId ?? null,
           sourceLocale: post.sourceLocale,
           publishedAt: rp.publishedAt ? rp.publishedAt.toISOString() : rp.createdAt.toISOString(),
           updatedAt: rp.updatedAt.toISOString(),
@@ -444,6 +459,15 @@ export class PublicContentService {
       nextArticle = { slug: nextPub.slug, title: nRev?.title ?? nextPub.slug };
     }
 
+    let eventRef: { id: string; slug: string; name: string; status: string } | null = null;
+    if (pub.eventId) {
+      const eventRepo = await getInitializedRepository(this.dataSource, Event);
+      const ev = await eventRepo.findOne({ where: { id: pub.eventId, siteId: site.id } });
+      if (ev) {
+        eventRef = { id: ev.id, slug: ev.slug, name: ev.name, status: ev.status };
+      }
+    }
+
     return {
       id: pub.id,
       publicationId: pub.id,
@@ -452,6 +476,8 @@ export class PublicContentService {
       title: revision.title,
       excerpt: revision.excerpt,
       type: post.type,
+      templateKey: pub.templateKey ?? null,
+      eventId: pub.eventId ?? null,
       sourceLocale: post.sourceLocale,
       publishedAt: pub.publishedAt ? pub.publishedAt.toISOString() : pub.createdAt.toISOString(),
       updatedAt: pub.updatedAt.toISOString(),
@@ -464,6 +490,7 @@ export class PublicContentService {
       seoTitle: pub.seoTitle,
       seoDescription: pub.seoDescription,
       canonicalUrl: pub.canonicalUrl,
+      event: eventRef,
       relatedArticles,
       adjacentArticles: {
         prev: prevArticle,
@@ -630,6 +657,8 @@ export class PublicContentService {
       title: previewData.revision.title,
       excerpt: previewData.revision.excerpt,
       type: previewData.post.type,
+      templateKey: previewData.publication?.templateKey ?? null,
+      eventId: previewData.publication?.eventId ?? null,
       sourceLocale: previewData.post.sourceLocale,
       publishedAt: new Date().toISOString(),
       updatedAt: previewData.revision.createdAt,
@@ -642,8 +671,200 @@ export class PublicContentService {
       seoTitle: previewData.publication?.seoTitle ?? previewData.revision.title,
       seoDescription: previewData.publication?.seoDescription ?? previewData.revision.excerpt,
       canonicalUrl: previewData.publication?.canonicalUrl ?? null,
+      event: null,
       relatedArticles: [],
       adjacentArticles: { prev: null, next: null },
+    };
+  }
+
+  /**
+   * Retrieve active events for a site with published update counts.
+   */
+  async listPublishedEvents(siteKey: string): Promise<PublicEventSummary[]> {
+    const site = await this.resolveSite(siteKey);
+    const eventRepo = await getInitializedRepository(this.dataSource, Event);
+    const pubRepo = await getInitializedRepository(this.dataSource, PostPublication);
+    const now = new Date();
+
+    const events = await eventRepo
+      .createQueryBuilder('ev')
+      .where('ev.site_id = :siteId', { siteId: site.id })
+      .orderBy('ev.starts_at', 'DESC')
+      .getMany();
+
+    if (events.length === 0) {
+      return [];
+    }
+
+    const eventIds = events.map((e) => e.id);
+    const countsRaw = await pubRepo
+      .createQueryBuilder('pub')
+      .select('pub.event_id', 'eventId')
+      .addSelect('COUNT(*)', 'cnt')
+      .where('pub.site_id = :siteId', { siteId: site.id })
+      .andWhere('pub.event_id IN (:...eventIds)', { eventIds })
+      .andWhere('pub.status = :status', { status: 'published' })
+      .andWhere('pub.published_at IS NOT NULL AND pub.published_at <= :now', { now })
+      .groupBy('pub.event_id')
+      .getRawMany<{ eventId: string; cnt: string }>();
+
+    const countsMap = new Map<string, number>();
+    for (const r of countsRaw) {
+      countsMap.set(r.eventId, Number.parseInt(r.cnt, 10));
+    }
+
+    return events.map((ev) => ({
+      id: ev.id,
+      slug: ev.slug,
+      name: ev.name,
+      status: ev.status,
+      startsAt: ev.startsAt.toISOString(),
+      endsAt: ev.endsAt ? ev.endsAt.toISOString() : null,
+      description: ev.description,
+      updateCount: countsMap.get(ev.id) ?? 0,
+    }));
+  }
+
+  /**
+   * Retrieve an event by slug along with its published updates (timeline).
+   */
+  async getPublishedEventBySlug(siteKey: string, slug: string): Promise<PublicEventDetail> {
+    const site = await this.resolveSite(siteKey);
+    const eventRepo = await getInitializedRepository(this.dataSource, Event);
+    const now = new Date();
+
+    const event = await eventRepo.findOne({
+      where: {
+        siteId: site.id,
+        slug: slug.toLowerCase().trim(),
+      },
+    });
+
+    if (!event) {
+      throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'post.notFound');
+    }
+
+    const pubRepo = await getInitializedRepository(this.dataSource, PostPublication);
+    const publications = await pubRepo
+      .createQueryBuilder('pub')
+      .innerJoin(
+        Post,
+        'post',
+        'post.id = pub.post_id AND post.deleted_at IS NULL AND post.status != :archived',
+        { archived: 'archived' },
+      )
+      .innerJoin(PostRevision, 'rev', 'rev.id = pub.revision_id')
+      .where('pub.site_id = :siteId', { siteId: site.id })
+      .andWhere('pub.event_id = :eventId', { eventId: event.id })
+      .andWhere('pub.status = :status', { status: 'published' })
+      .andWhere('pub.published_at IS NOT NULL AND pub.published_at <= :now', { now })
+      .orderBy('pub.published_at', 'DESC')
+      .getMany();
+
+    let updates: PublicArticleSummary[] = [];
+    if (publications.length > 0) {
+      const pubIds = publications.map((p) => p.id);
+      const postIds = publications.map((p) => p.postId);
+      const revisionIds = publications.map((p) => p.revisionId);
+      const mediaIds = publications
+        .map((p) => p.featuredImageId)
+        .filter((id): id is string => Boolean(id));
+
+      const postRepo = await getInitializedRepository(this.dataSource, Post);
+      const revisionRepo = await getInitializedRepository(this.dataSource, PostRevision);
+      const userRepo = await getInitializedRepository(this.dataSource, User);
+      const mediaRepo = await getInitializedRepository(this.dataSource, MediaAsset);
+      const pubCatRepo = await getInitializedRepository(this.dataSource, PostPublicationCategory);
+      const pubTagRepo = await getInitializedRepository(this.dataSource, PostPublicationTag);
+
+      const [posts, revisions, mediaList, pubCategories, pubTags] = await Promise.all([
+        postRepo.find({ where: { id: In(postIds) } }),
+        revisionRepo.find({ where: { id: In(revisionIds) } }),
+        mediaIds.length > 0 ? mediaRepo.find({ where: { id: In(mediaIds) } }) : [],
+        pubCatRepo
+          .createQueryBuilder('ppc')
+          .innerJoinAndSelect('ppc.category', 'cat')
+          .where('ppc.publication_id IN (:...pubIds)', { pubIds })
+          .andWhere('ppc.site_id = :siteId', { siteId: site.id })
+          .getMany(),
+        pubTagRepo
+          .createQueryBuilder('ppt')
+          .innerJoinAndSelect('ppt.tag', 'tag')
+          .where('ppt.publication_id IN (:...pubIds)', { pubIds })
+          .andWhere('ppt.site_id = :siteId', { siteId: site.id })
+          .getMany(),
+      ]);
+
+      const postMap = new Map(posts.map((p) => [p.id, p]));
+      const revMap = new Map(revisions.map((r) => [r.id, r]));
+      const mediaMap = new Map(mediaList.map((m) => [m.id, m]));
+
+      const authorIds = posts.map((p) => p.authorId).filter(Boolean);
+      const authors =
+        authorIds.length > 0 ? await userRepo.find({ where: { id: In(authorIds) } }) : [];
+      const authorMap = new Map(authors.map((u) => [u.id, u]));
+
+      const categoriesByPub = new Map<string, PublicTaxonomyRef[]>();
+      for (const pc of pubCategories) {
+        const list = categoriesByPub.get(pc.publicationId) ?? [];
+        if (pc.category) {
+          list.push({ id: pc.category.id, name: pc.category.name, slug: pc.category.slug });
+        }
+        categoriesByPub.set(pc.publicationId, list);
+      }
+
+      const tagsByPub = new Map<string, PublicTaxonomyRef[]>();
+      for (const pt of pubTags) {
+        const list = tagsByPub.get(pt.publicationId) ?? [];
+        if (pt.tag) {
+          list.push({ id: pt.tag.id, name: pt.tag.name, slug: pt.tag.slug });
+        }
+        tagsByPub.set(pt.publicationId, list);
+      }
+
+      updates = publications.map((pub) => {
+        const post = postMap.get(pub.postId);
+        const rev = revMap.get(pub.revisionId);
+        const media = pub.featuredImageId ? (mediaMap.get(pub.featuredImageId) ?? null) : null;
+        const author = post?.authorId ? authorMap.get(post.authorId) : null;
+        const readingTimeMinutes = rev
+          ? calculateReadingTimeMinutes(extractTextFromDoc(rev.body))
+          : 1;
+
+        return {
+          id: pub.id,
+          publicationId: pub.id,
+          postId: pub.postId,
+          slug: pub.slug,
+          title: rev?.title ?? 'Untitled',
+          excerpt: rev?.excerpt ?? null,
+          type: post?.type ?? 'article',
+          templateKey: pub.templateKey ?? null,
+          eventId: pub.eventId ?? null,
+          sourceLocale: post?.sourceLocale ?? 'en',
+          publishedAt: pub.publishedAt
+            ? pub.publishedAt.toISOString()
+            : pub.createdAt.toISOString(),
+          updatedAt: pub.updatedAt.toISOString(),
+          readingTimeMinutes,
+          featuredImage: this.formatMediaImage(media),
+          categories: categoriesByPub.get(pub.id) ?? [],
+          tags: tagsByPub.get(pub.id) ?? [],
+          author: author ? { id: author.id, displayName: author.displayName } : null,
+        };
+      });
+    }
+
+    return {
+      id: event.id,
+      slug: event.slug,
+      name: event.name,
+      status: event.status,
+      startsAt: event.startsAt.toISOString(),
+      endsAt: event.endsAt ? event.endsAt.toISOString() : null,
+      description: event.description,
+      updateCount: updates.length,
+      updates,
     };
   }
 }

@@ -10,6 +10,16 @@ export class ListPublicPostsQueryDto {
   @IsIn(POST_TYPES)
   type?: PostType;
 
+  @ApiPropertyOptional({ description: 'Filter by template key (e.g. breaking)' })
+  @IsOptional()
+  @IsString()
+  templateKey?: string;
+
+  @ApiPropertyOptional({ description: 'Filter by event ID' })
+  @IsOptional()
+  @IsString()
+  eventId?: string;
+
   @ApiPropertyOptional({ description: 'Filter by category slug' })
   @IsOptional()
   @IsString()

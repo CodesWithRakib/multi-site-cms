@@ -65,6 +65,8 @@ describe('OpenAPI document', () => {
       `/${env.API_PREFIX}/public/sites/by-domain/{hostname}`,
       `/${env.API_PREFIX}/public/sites/{key}/config`,
       `/${env.API_PREFIX}/public/sites/{siteKey}/categories`,
+      `/${env.API_PREFIX}/public/sites/{siteKey}/events`,
+      `/${env.API_PREFIX}/public/sites/{siteKey}/events/{slug}`,
       `/${env.API_PREFIX}/public/sites/{siteKey}/posts`,
       `/${env.API_PREFIX}/public/sites/{siteKey}/posts/{slug}`,
       `/${env.API_PREFIX}/public/sites/{siteKey}/preview/{postId}`,

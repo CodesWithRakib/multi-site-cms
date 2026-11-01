@@ -123,6 +123,16 @@ describing future behavior is labelled with its phase.
 - [Performance & Core Web Vitals](sites/travel-blog/performance.md) — Zero-JS body hydration, Next.js Image optimization, and multi-tier HTTP caching.
 - [URL Architecture & Migration](sites/travel-blog/url-migration.md) — Slug immutability, canonical links, and 301 permanent redirect handling.
 
+## Air Sports Public Website
+
+- [Air Sports Architecture](sites/air-sports/architecture.md) — Real-time live sports desk, SSE streaming, and independent identity.
+- [Public Routing & Data Fetching](sites/air-sports/routes.md) — Route table, 30s ISR freshness, and build-time resilience.
+- [Live Updates & Event Timelines](sites/air-sports/live-updates.md) — Breaking news ticker, timeline deduplication, and event timeline blocks.
+- [Real-Time Client & SSE Delivery](sites/air-sports/realtime-client.md) — EventSource hook, reconnection backoff, and 60s fallback polling.
+- [SEO & Structured Data](sites/air-sports/seo.md) — NewsArticle & Event JSON-LD models, sitemaps, and preview protection.
+- [Performance & Core Web Vitals](sites/air-sports/performance.md) — RSC-first delivery, Next.js Image optimization, and telemetry fonts.
+- [Failure Recovery & Resilience](sites/air-sports/failure-recovery.md) — Network partition handling, buffer replay, and degraded states.
+
 ## Security
 
 - [Authentication and authorization](security/authentication.md)

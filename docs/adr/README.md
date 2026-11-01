@@ -27,6 +27,7 @@ earlier one with a new ADR and a `Status` line change, never by rewriting histor
 | [0020](0020-publishing-lifecycle-scheduled-engine-outbox-and-realtime.md) | Publishing lifecycle, scheduled engine, outbox & SSE      | Accepted |
 | [0021](0021-central-admin-dashboard-ui.md)                                | Central admin dashboard UI & multi-site workspaces        | Accepted |
 | [0022](0022-travel-blog-public-website.md)                                | Travel blog public website, SEO, SSR/ISR & DocRenderer    | Accepted |
+| [0023](0023-air-sports-live-website-and-realtime.md)                      | Air sports live website, event timelines, SSE & fallback  | Accepted |
 
 ## Template
 

@@ -5,6 +5,8 @@ import type {
   PublicArticleDetail,
   PublicArticleSummary,
   PublicCategoryItem,
+  PublicEventDetail,
+  PublicEventSummary,
   PublicSitemapItem,
   PublicTagItem,
 } from '@multi-site-cms/types';
@@ -17,6 +19,7 @@ import { AuthorizationService } from '../../src/auth/services/authorization.serv
 import { PasswordService } from '../../src/auth/services/password.service';
 import { configureApp } from '../../src/bootstrap';
 import { Category } from '../../src/database/entities/category.entity';
+import { Event } from '../../src/database/entities/event.entity';
 import { PostPublicationCategory } from '../../src/database/entities/post-publication-category.entity';
 import { PostPublicationTag } from '../../src/database/entities/post-publication-tag.entity';
 import { PostPublication } from '../../src/database/entities/post-publication.entity';
@@ -269,6 +272,16 @@ describe('Public Content Discovery API (/api/v1/public/sites/:siteKey/*)', () =>
     });
 
     // Air Sports Published Post (Different site - must never leak into travel-blog)
+    const eventRepo = dataSource.getRepository(Event);
+    const alpsEvent = await eventRepo.save({
+      siteId: siteAirSportsId,
+      name: 'Alps Paragliding Championship 2026',
+      slug: 'alps-paragliding-2026',
+      status: 'live',
+      startsAt: new Date(Date.now() - 3600000),
+      description: 'Annual cross-country hike & fly race through the European Alps.',
+    });
+
     const postAir = await postRepo.save({
       authorId: authorUserId,
       type: 'live_update',
@@ -298,8 +311,10 @@ describe('Public Content Discovery API (/api/v1/public/sites/:siteKey/*)', () =>
       siteId: siteAirSportsId,
       postId: postAir.id,
       revisionId: revAir.id,
+      eventId: alpsEvent.id,
       slug: 'red-bull-air-race-round-3',
       status: 'published',
+      templateKey: 'breaking',
       publishedAt: new Date(),
     });
 
@@ -395,6 +410,18 @@ describe('Public Content Discovery API (/api/v1/public/sites/:siteKey/*)', () =>
       const body = res.body as ApiSuccess<PublicArticleSummary[]>;
       expect(body.data).toHaveLength(1);
       expect(body.data[0]?.slug).toBe('hidden-fjords-norway');
+    });
+
+    it('filters articles by templateKey=breaking', async () => {
+      const res = await request(app.getHttpServer())
+        .get('/api/v1/public/sites/air-sports/posts?templateKey=breaking')
+        .expect(200);
+
+      const body = res.body as ApiSuccess<PublicArticleSummary[]>;
+      expect(body.data).toHaveLength(1);
+      expect(body.data[0]?.slug).toBe('red-bull-air-race-round-3');
+      expect(body.data[0]?.templateKey).toBe('breaking');
+      expect(body.data[0]?.eventId).toBeDefined();
     });
 
     it('returns 404 for non-existent site', async () => {
@@ -493,6 +520,51 @@ describe('Public Content Discovery API (/api/v1/public/sites/:siteKey/*)', () =>
       await request(app.getHttpServer())
         .get(`/api/v1/public/sites/travel-blog/preview/${draftPostId}?token=invalid-token`)
         .expect(401);
+    });
+  });
+
+  describe('GET /api/v1/public/sites/:siteKey/events', () => {
+    it('returns published events with update count for air-sports', async () => {
+      const res = await request(app.getHttpServer())
+        .get('/api/v1/public/sites/air-sports/events')
+        .expect(200);
+
+      const body = res.body as ApiSuccess<PublicEventSummary[]>;
+      expect(body.data.length).toBeGreaterThanOrEqual(1);
+      const alps = body.data.find((e) => e.slug === 'alps-paragliding-2026');
+      expect(alps).toBeDefined();
+      expect(alps?.status).toBe('live');
+      expect(alps?.updateCount).toBe(1);
+    });
+
+    it('returns empty array when site has no events', async () => {
+      const res = await request(app.getHttpServer())
+        .get('/api/v1/public/sites/travel-blog/events')
+        .expect(200);
+
+      const body = res.body as ApiSuccess<PublicEventSummary[]>;
+      expect(body.data).toHaveLength(0);
+    });
+  });
+
+  describe('GET /api/v1/public/sites/:siteKey/events/:slug', () => {
+    it('returns event detail with its timeline of published updates', async () => {
+      const res = await request(app.getHttpServer())
+        .get('/api/v1/public/sites/air-sports/events/alps-paragliding-2026')
+        .expect(200);
+
+      const body = res.body as ApiSuccess<PublicEventDetail>;
+      expect(body.data.slug).toBe('alps-paragliding-2026');
+      expect(body.data.name).toBe('Alps Paragliding Championship 2026');
+      expect(body.data.status).toBe('live');
+      expect(body.data.updates).toHaveLength(1);
+      expect(body.data.updates[0]?.slug).toBe('red-bull-air-race-round-3');
+    });
+
+    it('returns 404 for non-existent event slug', async () => {
+      await request(app.getHttpServer())
+        .get('/api/v1/public/sites/air-sports/events/non-existent-event-slug')
+        .expect(404);
     });
   });
 });

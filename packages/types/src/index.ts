@@ -509,6 +509,8 @@ export interface PublicArticleSummary {
   title: string;
   excerpt: string | null;
   type: PostType;
+  templateKey: string | null;
+  eventId: string | null;
   sourceLocale: string;
   publishedAt: string;
   updatedAt: string;
@@ -524,6 +526,12 @@ export interface PublicArticleDetail extends PublicArticleSummary {
   seoTitle: string | null;
   seoDescription: string | null;
   canonicalUrl: string | null;
+  event: {
+    id: string;
+    slug: string;
+    name: string;
+    status: string;
+  } | null;
   relatedArticles: PublicArticleSummary[];
   adjacentArticles: {
     prev: { slug: string; title: string } | null;
@@ -548,6 +556,21 @@ export interface PublicTagItem {
   postCount: number;
 }
 
+export interface PublicEventSummary {
+  id: string;
+  slug: string;
+  name: string;
+  status: 'scheduled' | 'live' | 'completed' | 'cancelled';
+  startsAt: string;
+  endsAt: string | null;
+  description: string | null;
+  updateCount: number;
+}
+
+export interface PublicEventDetail extends PublicEventSummary {
+  updates: PublicArticleSummary[];
+}
+
 export interface PublicSitemapItem {
   slug: string;
   updatedAt: string;
@@ -558,6 +581,8 @@ export interface ListPublicPostsQuery {
   page?: number;
   limit?: number;
   type?: string;
+  templateKey?: string;
+  eventId?: string;
   categorySlug?: string;
   tagSlug?: string;
   search?: string;
