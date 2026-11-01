@@ -14,9 +14,11 @@
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand",
     "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
     "test:cov": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage",
+    "test:integration": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.integration.config.cjs --runInBand",
     "db:migration:run": "typeorm -d dist/database/data-source.js migration:run",
     "db:migration:revert": "typeorm -d dist/database/data-source.js migration:revert",
-    "db:migration:show": "typeorm -d dist/database/data-source.js migration:show"
+    "db:migration:show": "typeorm -d dist/database/data-source.js migration:show",
+    "db:seed:dev": "node dist/database/seeds/development.seed.js"
   },
   "dependencies": {
     "@multi-site-cms/types": "workspace:*",

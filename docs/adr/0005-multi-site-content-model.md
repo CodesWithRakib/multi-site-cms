@@ -1,6 +1,6 @@
 # ADR-0005: Canonical posts with per-site publications
 
-- Status: Proposed (requires approval before the Phase 02 schema migration)
+- Status: Accepted (implemented by the Phase 02 migrations)
 - Date: 2026-11-01
 - Owners: platform + database engineering
 

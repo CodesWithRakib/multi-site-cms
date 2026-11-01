@@ -1,6 +1,10 @@
 # Multi-site content model
 
-Status: **design for Phase 02**. No content tables or entities exist in Phase 01.
+Status: **implemented** by the Phase 02 migrations. Tables and constraints are
+documented in the [database ERD](../database/erd.md) and
+[data dictionary](../database/data-dictionary.md); no API or service reads them
+yet. Live events were added as a site-owned `events` table referenced by
+publications, as described below.
 
 ## Core problem
 

@@ -38,17 +38,19 @@ pnpm dev               # all four applications through Turborepo
 
 ## Commands
 
-| Command                | Purpose                                              |
-| ---------------------- | ---------------------------------------------------- |
-| `pnpm dev`             | Run every application in watch mode                  |
-| `pnpm build`           | Production build for every workspace                 |
-| `pnpm lint`            | ESLint across the repository                         |
-| `pnpm typecheck`       | Strict TypeScript check for workspaces plus root E2E |
-| `pnpm test`            | Vitest (packages) and Jest (API) suites              |
-| `pnpm test:e2e`        | Playwright smoke suite against all four applications |
-| `pnpm format`          | Prettier write; `pnpm format:check` for CI parity    |
-| `pnpm db:up`/`db:down` | Start or stop local PostgreSQL 18                    |
-| `pnpm run doctor`      | Local environment diagnostics                        |
+| Command                                              | Purpose                                              |
+| ---------------------------------------------------- | ---------------------------------------------------- |
+| `pnpm dev`                                           | Run every application in watch mode                  |
+| `pnpm build`                                         | Production build for every workspace                 |
+| `pnpm lint`                                          | ESLint across the repository                         |
+| `pnpm typecheck`                                     | Strict TypeScript check for workspaces plus root E2E |     | `pnpm test` | Vitest (packages) and Jest (API) suites |
+| `pnpm --filter @multi-site-cms/api test:integration` | PostgreSQL schema tests (needs a `_test` database)   |
+| `pnpm --filter @multi-site-cms/api db:migration:run` | Apply migrations (build the API first)               |
+| `pnpm --filter @multi-site-cms/api db:seed:dev`      | Idempotent development seed (no user accounts)       |
+| `pnpm test:e2e`                                      | Playwright smoke suite against all four applications |
+| `pnpm format`                                        | Prettier write; `pnpm format:check` for CI parity    |
+| `pnpm db:up`/`db:down`                               | Start or stop local PostgreSQL 18                    |
+| `pnpm run doctor`                                    | Local environment diagnostics                        |
 
 Run a single workspace with `pnpm --filter @multi-site-cms/api <script>`.
 

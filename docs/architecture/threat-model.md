@@ -120,6 +120,34 @@ logging, backup automation.
 4. Local development uses a fixed database password, which is never valid in a
    deployed environment.
 
+## Phase 02 schema controls
+
+| Control                                                    | Status             | Where                                                |
+| ---------------------------------------------------------- | ------------------ | ---------------------------------------------------- |
+| Cross-site references rejected by composite foreign keys   | ✅ 02              | `post_publications`, publication joins               |
+| One publication per post per site                          | ✅ 02              | `UQ_post_publications_site_post`                     |
+| Slug uniqueness scoped per site                            | ✅ 02              | `UQ_post_publications_site_slug`                     |
+| Publication state consistency enforced                     | ✅ 02              | `CHK_post_publications_schedule/published`           |
+| Password hash excluded from default selects                | ✅ 02              | `User.passwordHash` (`select: false`)                |
+| No privileged account created by seeds or an open endpoint | ✅ 02              | Development seed; ADR-0012                           |
+| Audit actor cannot be faked as a user without an id        | ✅ 02              | `CHK_audit_events_actor`                             |
+| Audit append-only at the database-privilege level          | ⏳ deploy          | Application role gets `INSERT`/`SELECT` only         |
+| Row-Level Security                                         | ➖ not implemented | Application authorization is mandatory; see ADR-0009 |
+
+Residual risks accepted in Phase 02:
+
+1. **The database cannot authorize.** It enforces integrity and same-site
+   references, not who may read a projection. A service that omits `site_id` from
+   a predicate still leaks data within the boundaries it queries. Denial-path
+   tests are mandatory in the API phase.
+2. **Platform-scoped media cannot be a featured image.** Guaranteed by the same
+   composite key that blocks cross-site media use. If the product needs it, that
+   is a deliberate schema change, not a service workaround.
+3. **Direct database access bypasses every control.** Deploying with a shared
+   superuser credential would defeat the model; the runtime role must be least
+   privileged and separate from the migration role.
+4. **No RLS yet**, so a bug in a raw query is not contained by the database.
+
 ## Review triggers
 
 Re-open this model when any of these happen: authentication lands, media upload

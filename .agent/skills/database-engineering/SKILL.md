@@ -35,7 +35,8 @@ when a feature needs a new table, column, relationship, or uniqueness rule.
 
 ## Workflow
 
-1. Read `docs/architecture/erd.md` and `docs/database/data-ownership.md`.
+1. Read `docs/database/erd.md`, `docs/database/data-dictionary.md`, and
+   `docs/database/multi-site-data-isolation.md`.
 2. Decide the table, columns, keys, and which application module owns writes.
 3. Check the isolation story: can this row be fetched with a `site_id`
    constraint? If not, redesign it.
@@ -67,8 +68,11 @@ when a feature needs a new table, column, relationship, or uniqueness rule.
 
 ## Project references
 
-- `docs/architecture/erd.md`
-- `docs/architecture/multi-site-content-model.md`
-- `docs/database/data-ownership.md`
-- `apps/api/src/database/data-source.ts`
+- `docs/database/README.md`
+- `docs/database/erd.md`
+- `docs/database/data-dictionary.md`
+- `docs/database/multi-site-data-isolation.md`
+- `docs/database/migrations-and-recovery.md`
+- `apps/api/src/database/database-options.ts`
+- `apps/api/src/database/migrations/`
 - `infrastructure/docker/init/01-extensions.sql`

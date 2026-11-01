@@ -1,0 +1,71 @@
+import { AuditEvent } from './audit-event.entity';
+import { Category } from './category.entity';
+import { Event } from './event.entity';
+import { MediaAsset } from './media-asset.entity';
+import { Permission } from './permission.entity';
+import { Post } from './post.entity';
+import { PostPublication } from './post-publication.entity';
+import { PostPublicationCategory } from './post-publication-category.entity';
+import { PostPublicationMedia } from './post-publication-media.entity';
+import { PostPublicationTag } from './post-publication-tag.entity';
+import { PostRevision } from './post-revision.entity';
+import { Role } from './role.entity';
+import { RolePermission } from './role-permission.entity';
+import { Site } from './site.entity';
+import { SiteDomain } from './site-domain.entity';
+import { Tag } from './tag.entity';
+import { User } from './user.entity';
+import { UserRoleAssignment } from './user-role-assignment.entity';
+
+/**
+ * Explicit entity registry shared by the runtime `DataSource` and the TypeORM CLI.
+ *
+ * Listing is deliberate rather than glob-based: a glob silently picks up a stray
+ * file in a build output directory, and it cannot resolve under every bundler.
+ */
+export const ENTITIES = [
+  // Identity and authorization
+  User,
+  Role,
+  Permission,
+  RolePermission,
+  UserRoleAssignment,
+  // Site registry and site-owned configuration
+  Site,
+  SiteDomain,
+  Category,
+  Tag,
+  Event,
+  // Canonical content and publication
+  Post,
+  PostRevision,
+  PostPublication,
+  PostPublicationCategory,
+  PostPublicationTag,
+  // Media
+  MediaAsset,
+  PostPublicationMedia,
+  // Audit
+  AuditEvent,
+] as const;
+
+export {
+  AuditEvent,
+  Category,
+  Event,
+  MediaAsset,
+  Permission,
+  Post,
+  PostPublication,
+  PostPublicationCategory,
+  PostPublicationMedia,
+  PostPublicationTag,
+  PostRevision,
+  Role,
+  RolePermission,
+  Site,
+  SiteDomain,
+  Tag,
+  User,
+  UserRoleAssignment,
+};

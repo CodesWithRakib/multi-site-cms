@@ -30,8 +30,12 @@ describing future behavior is labelled with its phase.
 
 ## Database
 
-- [ERD](architecture/erd.md) — tables, constraints, index plan.
-- [Data ownership](database/data-ownership.md) — who owns which row, retention, isolation.
+- [Database overview](database/README.md) — technology, conventions, migration and JSONB policy, Super Admin bootstrap.
+- [ERD](database/erd.md) — implemented schema, relationships, query-to-index map.
+- [Data dictionary](database/data-dictionary.md) — every table, constraint, and invariant.
+- [Multi-site isolation](database/multi-site-data-isolation.md) — ownership, composite keys, what the database cannot enforce.
+- [Migrations and recovery](database/migrations-and-recovery.md) — workflow, rollback limits, restore drills.
+- [Data ownership](database/data-ownership.md) — who owns which row, retention, deferred tables.
 
 ## Development
 
