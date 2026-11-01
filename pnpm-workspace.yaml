@@ -7,6 +7,7 @@ packages:
 # packages in the graph with build steps; the allowlist is intentionally small.
 allowBuilds:
   '@parcel/watcher': true
+  '@scarf/scarf': set this to true or false
   '@tailwindcss/oxide': true
   esbuild: true
   sharp: true

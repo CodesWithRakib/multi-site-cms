@@ -17,6 +17,9 @@ earlier one with a new ADR and a `Status` line change, never by rewriting histor
 | [0010](0010-media-metadata-and-storage-abstraction.md)  | Media metadata + opaque storage keys                     | Accepted |
 | [0011](0011-publication-scheduling-model.md)            | Publication state and scheduling without a job table     | Accepted |
 | [0012](0012-super-admin-bootstrap.md)                   | Controlled Super Admin bootstrap                         | Proposed |
+| [0013](0013-api-envelope-and-error-contract.md)         | Single response envelope with structured field errors    | Accepted |
+| [0014](0014-localization-strategy.md)                   | Locale negotiation with a typed message catalog          | Accepted |
+| [0015](0015-liveness-readiness-and-lazy-datasource.md)  | Separate liveness/readiness, lazily opened pool          | Accepted |
 
 ## Template
 

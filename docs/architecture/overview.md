@@ -58,16 +58,20 @@ integrations and must not be represented as implemented.
 
 ### API (`apps/api`, port 4000)
 
-- NestJS with global prefix `/api/v1`.
-- Health is **liveness only**. It answers whether the process can serve HTTP; it
-  does not prove database readiness or dependency health.
-- Every response uses the standard success or error envelope.
+- NestJS with global prefix from `API_PREFIX` (`/api/v1`).
+- `/health` is **liveness**: the process can serve HTTP. `/health/ready` is
+  **readiness**: a 2-second `SELECT 1`, returning 503 when the database is
+  unreachable. The connection pool opens lazily, so boot does not require a
+  database.
+- Every response uses the standard success or error envelope. Errors carry a
+  stable machine code and a message localized from `Accept-Language` (`en`, `bn`).
 - Request IDs are accepted only when they match a bounded safe pattern;
   otherwise the API generates a UUID.
-- Helmet, explicit CORS origins, a 120 request/minute IP throttle, and a strict
-  validation pipe are enabled.
-- TypeORM is configured for CLI migrations only. No database module is imported
-  by the Nest runtime in Phase 01.
+- Helmet, explicit CORS origins, a 120 request/minute IP throttle, a `BODY_LIMIT`
+  body cap, and a strict validation pipe are enabled.
+- TypeORM is wired through `DatabaseModule` for migrations and reads only;
+  `synchronize` is false in every environment.
+- OpenAPI is served at `/api/v1/docs` outside production.
 
 ### Public sites (`apps/sites/travel-blog`, `apps/sites/air-sports`)
 

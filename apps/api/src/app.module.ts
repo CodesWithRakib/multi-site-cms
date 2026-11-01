@@ -3,6 +3,7 @@ import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
+import { RequestLoggingInterceptor } from './common/interceptors/request-logging.interceptor';
 import { ResponseEnvelopeInterceptor } from './common/interceptors/response-envelope.interceptor';
 import { DatabaseModule } from './database/database.module';
 import { HealthModule } from './health/health.module';
@@ -23,6 +24,10 @@ import { HealthModule } from './health/health.module';
     {
       provide: APP_FILTER,
       useClass: AllExceptionsFilter,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: RequestLoggingInterceptor,
     },
     {
       provide: APP_INTERCEPTOR,

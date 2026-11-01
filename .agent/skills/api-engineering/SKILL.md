@@ -14,7 +14,9 @@ error code, or any behavior a client depends on.
 
 1. **Envelope always.** Success is `{ data, meta: { requestId, timestamp } }`;
    failure is `{ error: { code, message, details? }, meta }`. Use the shared
-   types from `@multi-site-cms/types`; never hand-roll a shape.
+   types from `@multi-site-cms/types`; never hand-roll a shape. `details` entries
+   are `{ field, code, message }`. Throw `ApiException` with a stable code and a
+   message _key_ — never a translated sentence, and never a translated code.
 2. **Versioned prefix.** Everything lives under `/api/v1` (set once in
    `bootstrap.ts`). A breaking change requires a new version, not a silent edit.
 3. **Thin controllers.** Parse and validate input, call a service, return data.

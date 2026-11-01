@@ -56,6 +56,15 @@ describing future behavior is labelled with its phase.
 - [Free-tier deployment](deployment/free-tier-deployment.md)
 - [Operations runbook](deployment/operations.md)
 
+## Backend
+
+- [Backend overview](backend/README.md) — module map, request lifecycle, boundaries.
+- [API standards](backend/api-standards.md) — envelopes, errors, validation, localization, OpenAPI.
+- [Configuration](backend/configuration.md) — every environment variable and production rule.
+- [Database integration](backend/database.md) — pooling, lifecycle, readiness, migration commands.
+- [Backend security](backend/security.md) — implemented controls and the Phase 04 boundary.
+- [Backend development](backend/development.md) — commands and the endpoint checklist.
+
 ## Security
 
 - [Authentication and authorization](security/authentication.md)

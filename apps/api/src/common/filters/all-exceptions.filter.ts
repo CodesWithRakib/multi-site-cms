@@ -7,19 +7,13 @@ import {
   HttpStatus,
   Logger,
 } from '@nestjs/common';
-import type { ApiErrorCode, ApiErrorResponse } from '@multi-site-cms/types';
 import type { Response } from 'express';
 
-import { errorCodeForStatus } from '../http/error-code';
-import type { RequestWithId } from '../middleware/request-id.middleware';
-
-interface ExceptionBody {
-  message?: string | string[];
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
+import { ApiException } from '../exceptions/api.exception';
+import { errorCodeForStatus, messageKeyForStatus } from '../http/error-code';
+import { buildErrorResponse, type ErrorResponseInput } from '../http/error-payload';
+import type { RequestContext } from '../http/request-context';
+import { DEFAULT_LOCALE } from '../i18n/locale';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
@@ -28,54 +22,54 @@ export class AllExceptionsFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost): void {
     const http = host.switchToHttp();
     const response = http.getResponse<Response>();
-    const request = http.getRequest<RequestWithId>();
+    const request = http.getRequest<RequestContext>();
 
-    const isHttpException = exception instanceof HttpException;
-    const status = isHttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
-
-    let message = 'An unexpected error occurred.';
-    let details: string[] | undefined;
-
-    if (isHttpException) {
-      const exceptionResponse = exception.getResponse();
-
-      if (typeof exceptionResponse === 'string') {
-        message = exceptionResponse;
-      } else if (isRecord(exceptionResponse)) {
-        const body = exceptionResponse as ExceptionBody;
-
-        if (Array.isArray(body.message)) {
-          message = 'Validation failed.';
-          details = body.message.filter((item): item is string => typeof item === 'string');
-        } else if (typeof body.message === 'string') {
-          message = body.message;
-        }
-      }
-    }
-
-    if (status >= HttpStatus.INTERNAL_SERVER_ERROR) {
-      message = 'An unexpected error occurred.';
-      const stack = exception instanceof Error ? exception.stack : undefined;
-      this.logger.error('Unhandled request failure', stack);
-    }
-
+    const locale = request.locale ?? DEFAULT_LOCALE;
     const requestId =
       request.requestId ?? response.getHeader('x-request-id')?.toString() ?? randomUUID();
-    const code: ApiErrorCode = errorCodeForStatus(status);
 
-    const payload: ApiErrorResponse = {
-      error: {
-        code,
-        message,
-        ...(details && details.length > 0 ? { details } : {}),
-      },
-      meta: {
-        requestId,
-        timestamp: new Date().toISOString(),
-      },
-    };
+    const payload = buildErrorResponse(locale, requestId, this.describe(exception));
 
     response.setHeader('x-request-id', requestId);
-    response.status(status).json(payload);
+    response.status(statusOf(exception)).json(payload);
   }
+
+  private describe(exception: unknown): ErrorResponseInput {
+    if (exception instanceof ApiException) {
+      return {
+        code: exception.code,
+        messageKey: exception.messageKey,
+        params: exception.params,
+        details: exception.details,
+      };
+    }
+
+    if (exception instanceof HttpException) {
+      const status = exception.getStatus();
+
+      // Framework-thrown exceptions (guards, throttling, 404) keep their status and
+      // code, but their own message is not reused: it is often internal English text.
+      if (status >= HttpStatus.INTERNAL_SERVER_ERROR) {
+        this.logger.error('Request failed with a server error', exception.stack);
+      }
+
+      return {
+        code: errorCodeForStatus(status),
+        messageKey: messageKeyForStatus(status),
+      };
+    }
+
+    this.logger.error(
+      'Unhandled request failure',
+      exception instanceof Error ? exception.stack : undefined,
+    );
+
+    return { code: 'INTERNAL_ERROR', messageKey: 'http.internal' };
+  }
+}
+
+function statusOf(exception: unknown): number {
+  return exception instanceof HttpException
+    ? exception.getStatus()
+    : HttpStatus.INTERNAL_SERVER_ERROR;
 }

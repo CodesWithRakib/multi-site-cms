@@ -19,6 +19,7 @@ pnpm test                    # Vitest + Jest through Turborepo
 pnpm --filter @multi-site-cms/api test
 pnpm --filter @multi-site-cms/api test:watch
 pnpm --filter @multi-site-cms/api test:cov
+TEST_DATABASE_URL=… pnpm --filter @multi-site-cms/api test:integration
 pnpm --filter @multi-site-cms/ui test
 pnpm test:e2e:list           # discovery only, no browsers, no servers
 pnpm test:e2e                # full smoke suite
@@ -39,10 +40,13 @@ pnpm test:e2e                # full smoke suite
 4. **Determinism.** Inject time and randomness; never `sleep`.
 5. **Security paths** get a deny test, not only an allow test.
 
-Phase 01 coverage that exists: envelope and correlation on `/health`, unknown-route
-error envelope, `api-client` timeout/error normalization, `validation` and `config`
-parsing, the Redux platform API, the `Button` primitive, and the browser smoke
-suite for the three web applications.
+Coverage that exists: the envelope and correlation on `/health`, unknown-route error
+envelope, `api-client` timeout/error normalization, `validation` and `config`
+parsing, the Redux platform API, the `Button` primitive, and the browser smoke suite
+for the three web applications. Phase 03 adds configuration rules, locale
+negotiation, catalog completeness, error-code mapping, validation field details,
+payload limits, safe 500s, OpenAPI generation and docs routes, database wiring, and
+readiness against both a live and an unreachable PostgreSQL.
 
 ## What does not need a test
 

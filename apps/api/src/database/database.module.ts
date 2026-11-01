@@ -2,21 +2,21 @@ import { Global, Inject, Injectable, Module, type OnApplicationShutdown } from '
 import { DataSource } from 'typeorm';
 
 import { env } from '../config/env';
+import { DatabaseHealthService } from './database-health.service';
 import { buildDataSourceOptions } from './database-options';
+import { DATA_SOURCE } from './database.tokens';
 
-export const DATA_SOURCE = 'DATA_SOURCE';
+export { DATA_SOURCE };
 
 /**
  * Owns the application `DataSource`.
  *
- * The connection is opened lazily, on the first `DataSource` use, rather than at
- * bootstrap. Phase 02 has no query-serving feature yet, and opening a pool at
- * startup would make every local run, CI job, and health check depend on a live
- * database for no benefit. A later phase that adds services should initialize the
- * data source in its own `onModuleInit`, so readiness is still explicit.
+ * The pool is opened lazily, on first use (see `DatabaseHealthService` or a future
+ * repository call), rather than at bootstrap. That keeps local runs, CI, and the
+ * liveness probe independent of database availability while readiness still
+ * reports the real state.
  *
- * `synchronize` stays false through `buildDataSourceOptions`, in every
- * environment.
+ * `synchronize` stays false through `buildDataSourceOptions`, in every environment.
  */
 @Injectable()
 export class DatabaseLifecycle implements OnApplicationShutdown {
@@ -37,7 +37,8 @@ export class DatabaseLifecycle implements OnApplicationShutdown {
       useFactory: (): DataSource => new DataSource(buildDataSourceOptions(env.DATABASE_URL)),
     },
     DatabaseLifecycle,
+    DatabaseHealthService,
   ],
-  exports: [DATA_SOURCE],
+  exports: [DATA_SOURCE, DatabaseHealthService],
 })
 export class DatabaseModule {}

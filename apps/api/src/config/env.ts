@@ -14,10 +14,20 @@ const httpUrl = z
     'URL must use the http or https protocol.',
   );
 
+const LOCAL_HOSTNAMES = new Set(['localhost', '127.0.0.1', '0.0.0.0', '[::1]']);
+
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   HOST: z.string().min(1).default('0.0.0.0'),
   PORT: z.coerce.number().int().min(1).max(65_535).default(4000),
+  /**
+   * Route prefix, without a leading slash. Kept as one segment group so the
+   * version lives in configuration rather than in every controller.
+   */
+  API_PREFIX: z
+    .string()
+    .regex(/^[a-z0-9-]+(\/[a-z0-9-]+)*$/, 'API_PREFIX must be like "api/v1".')
+    .default('api/v1'),
   CORS_ORIGINS: z
     .string()
     .default('http://localhost:3000,http://localhost:3001,http://localhost:3002')
@@ -37,17 +47,81 @@ const envSchema = z.object({
     )
     .default('postgresql://multi_site_cms:multi_site_cms_dev@localhost:5432/multi_site_cms'),
   TRUST_PROXY: z.coerce.number().int().min(0).max(10).default(0),
+  LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error', 'silent']).default('info'),
+  /** Maximum request body size, for example `512kb` or `1mb`. */
+  BODY_LIMIT: z
+    .string()
+    .regex(/^\d{1,6}(b|kb|mb)$/i, 'BODY_LIMIT must look like "100kb" or "1mb".')
+    .default('1mb'),
+  /**
+   * OpenAPI docs are always available outside production. In production they are
+   * opt-in, because the API has no authentication yet and docs disclose the
+   * surface area.
+   */
+  DOCS_ENABLED: z.enum(['true', 'false']).default('false'),
 });
 
-const parsedEnv = envSchema.safeParse(process.env);
+export type Env = z.infer<typeof envSchema>;
 
-if (!parsedEnv.success) {
-  const issues = parsedEnv.error.issues
-    .map((issue) => `${issue.path.join('.') || 'environment'}: ${issue.message}`)
-    .join('\n');
-
-  throw new Error(`Invalid API environment configuration:\n${issues}`);
+export interface ApiConfig extends Env {
+  readonly docsEnabled: boolean;
 }
 
-export type Env = z.infer<typeof envSchema>;
-export const env: Env = parsedEnv.data;
+function formatIssues(error: z.ZodError): string {
+  return error.issues
+    .map((issue) => `${issue.path.join('.') || 'environment'}: ${issue.message}`)
+    .join('\n');
+}
+
+function isLocalhost(origin: string): boolean {
+  try {
+    return LOCAL_HOSTNAMES.has(new URL(origin).hostname);
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Parse and validate configuration from an explicit environment object.
+ *
+ * Exported so tests can exercise invalid input without mutating `process.env` or
+ * touching `.env`. Never include the parsed values in an error message: the object
+ * contains a database URL with credentials.
+ */
+export function parseEnv(input: NodeJS.ProcessEnv): ApiConfig {
+  const parsed = envSchema.safeParse(input);
+
+  if (!parsed.success) {
+    throw new Error(`Invalid API environment configuration:\n${formatIssues(parsed.error)}`);
+  }
+
+  const config = parsed.data;
+
+  // Production must not silently inherit development defaults. `envSchema` applies
+  // them, so the raw input is what proves intent.
+  if (config.NODE_ENV === 'production') {
+    const missing = (['DATABASE_URL', 'CORS_ORIGINS'] as const).filter(
+      (key) => !input[key] || input[key]?.trim() === '',
+    );
+
+    if (missing.length > 0) {
+      throw new Error(
+        `Invalid API environment configuration:\n${missing.join(', ')} must be set explicitly in production.`,
+      );
+    }
+
+    const localOrigins = config.CORS_ORIGINS.filter(isLocalhost);
+    if (localOrigins.length > 0) {
+      throw new Error(
+        'Invalid API environment configuration:\nCORS_ORIGINS must not contain localhost origins in production.',
+      );
+    }
+  }
+
+  return Object.freeze({
+    ...config,
+    docsEnabled: config.NODE_ENV !== 'production' || config.DOCS_ENABLED === 'true',
+  });
+}
+
+export const env: ApiConfig = parseEnv(process.env);

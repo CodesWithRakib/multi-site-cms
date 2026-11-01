@@ -32,7 +32,9 @@ Rules:
 
 - The envelope is applied globally by `ResponseEnvelopeInterceptor`; controllers
   return domain data only.
-- `details` is optional and used for field-level validation messages.
+- `details` is optional and holds structured field errors:
+  `{ field?, code, message }`. `code` is the stable validation constraint (for
+  example `isEmail`), never a sentence.
 - `204 No Content` responses carry no envelope.
 - Never add ad-hoc top-level keys; consumers and the client parser assume two
   keys.
@@ -49,8 +51,10 @@ status so clients can branch without parsing prose:
 | 403   | `FORBIDDEN`            |
 | 404   | `NOT_FOUND`            |
 | 409   | `CONFLICT`             |
+| 413   | `PAYLOAD_TOO_LARGE`    |
 | 422   | `UNPROCESSABLE_ENTITY` |
 | 429   | `RATE_LIMITED`         |
+| 503   | `SERVICE_UNAVAILABLE`  |
 | 500   | `INTERNAL_ERROR`       |
 | other | `HTTP_ERROR`           |
 
@@ -64,6 +68,16 @@ Adding a code is a contract change: update `packages/types`, the mapping in
 - The value is returned in the `X-Request-Id` response header, `meta.requestId`,
   and is the identifier used in logs and audit events.
 - `X-Request-Id` is listed in CORS `exposedHeaders` so browsers can read it.
+
+## Localization
+
+- `Accept-Language` is negotiated per request: `en` (default) and `bn`; q-values
+  are honoured, malformed entries ignored, unsupported languages fall back to `en`.
+- `error.code` and `details[].code` are **never** translated; `message` and
+  `details[].message` are.
+- Messages live in one typed catalog; a locale missing a key fails type checking.
+- Services throw `ApiException` with a message key; translation happens only in the
+  exception filter. Success payloads are data, not prose.
 
 ## Validation
 
@@ -145,5 +159,13 @@ importing another module's internal repository.
 | GET    | `/api/v1/health`       | Liveness only, enveloped |
 | POST   | `POST /api/v1/unknown` | Enveloped `NOT_FOUND`    |
 
-Health is liveness, not readiness. It does not prove database connectivity; do
-not add database checks to it without introducing a separate readiness endpoint.
+```text
+GET /api/v1/health       liveness  — process serves HTTP, always 200 while alive
+GET /api/v1/health/ready readiness — SELECT 1 with a 2s ceiling, 503 when down
+GET /api/v1/docs         OpenAPI UI (not registered in production by default)
+GET /api/v1/docs-json    OpenAPI document
+```
+
+Keep the split: a restart policy pointed at readiness turns a database blip into a
+restart storm, and a traffic router pointed at liveness sends requests to instances
+that cannot query. See ADR-0015.

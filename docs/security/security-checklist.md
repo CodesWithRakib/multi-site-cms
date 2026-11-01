@@ -25,7 +25,8 @@ described as implemented when it is not.
 | DTO validation with whitelist + reject unknown | ✅ 01  | `ValidationPipe`                    |
 | URL schemes restricted to HTTP(S)              | ✅ 01  | `validation`, `config`              |
 | Request ID bounded and validated               | ✅ 01  | `request-id.middleware.ts`          |
-| Body size and pagination caps                  | ⏳ 02  | With the first list/upload endpoint |
+| Body size limits                               | ✅ 03  | `BODY_LIMIT` on JSON and urlencoded |
+| Pagination caps                                | ⏳ 05  | With the first list endpoint        |
 | Rich-text sanitization with an allowlist       | ⏳ 02  | Before rendering user HTML          |
 | Error messages free of stack traces and SQL    | ✅ 01  | `all-exceptions.filter.ts`          |
 
@@ -48,6 +49,8 @@ described as implemented when it is not.
 | Only `.env.example` tracked              | ✅ 01  | `.gitignore`                 |
 | Public env limited to `NEXT_PUBLIC_*`    | ✅ 01  | `config`, env examples       |
 | API env validated at startup, fails fast | ✅ 01  | `apps/api/src/config/env.ts` |
+| Production refuses development defaults  | ✅ 03  | `parseEnv` guards            |
+| Logs redact secrets and omit bodies      | ✅ 03  | `json-logger.ts`             |
 | No secrets in client bundles or logs     | ✅ 01  | Review rule                  |
 | Secret rotation documented               | ⏳ 02  | [secrets.md](secrets.md)     |
 

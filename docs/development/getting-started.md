@@ -59,12 +59,14 @@ initialization only. If you change the init scripts, recreate the volume.
 pnpm dev
 ```
 
-| Application     | URL                                 |
-| --------------- | ----------------------------------- |
-| Admin           | http://localhost:3000               |
-| Travel blog     | http://localhost:3001               |
-| Air sports live | http://localhost:3002               |
-| API health      | http://localhost:4000/api/v1/health |
+| Application     | URL                                       |
+| --------------- | ----------------------------------------- |
+| Admin           | http://localhost:3000                     |
+| Travel blog     | http://localhost:3001                     |
+| Air sports live | http://localhost:3002                     |
+| API liveness    | http://localhost:4000/api/v1/health       |
+| API readiness   | http://localhost:4000/api/v1/health/ready |
+| API docs        | http://localhost:4000/api/v1/docs         |
 
 Or run one workspace:
 
@@ -81,6 +83,8 @@ pnpm lint
 pnpm typecheck
 pnpm test
 pnpm build
+TEST_DATABASE_URL=postgresql://multi_site_cms:multi_site_cms_dev@localhost:5432/multi_site_cms_test \
+  pnpm --filter @multi-site-cms/api test:integration
 pnpm test:e2e:list   # Playwright discovery without starting servers
 pnpm test:e2e        # full smoke suite; starts all four apps
 ```
