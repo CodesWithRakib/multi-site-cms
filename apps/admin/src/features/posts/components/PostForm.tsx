@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import type { Editor } from '@tiptap/react';
 
-import type { MediaAssetItem, PostItem } from '@multi-site-cms/types';
+import type { MediaAssetItem, PostItem, PostPublicationItem } from '@multi-site-cms/types';
 import { RichTextEditor } from '@/features/editor';
 import { MediaLibraryModal } from '@/features/media';
 import {
@@ -28,6 +28,7 @@ import {
 import { useAutosave } from '../hooks/useAutosave';
 import { useDraftRecovery } from '../hooks/useDraftRecovery';
 import { PostPreviewModal } from './PostPreviewModal';
+import { PublishingModal, type PublishingActionType } from './PublishingModal';
 
 export interface PostFormProps {
   initialPost?: PostItem;
@@ -61,6 +62,10 @@ export function PostForm({ initialPost, isCreateMode = false }: PostFormProps) {
   const [isMediaLibraryOpen, setIsMediaLibraryOpen] = useState(false);
   const [mediaTarget, setMediaTarget] = useState<'featured' | 'editor'>('featured');
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [publishingTarget, setPublishingTarget] = useState<{
+    publication: PostPublicationItem;
+    action: PublishingActionType;
+  } | null>(null);
 
   // Editor reference for image insertion
   const editorRef = useRef<Editor | null>(null);
@@ -561,6 +566,89 @@ export function PostForm({ initialPost, isCreateMode = false }: PostFormProps) {
                         className="w-full px-2.5 py-1.5 border rounded-lg border-slate-300 dark:border-slate-700 dark:bg-slate-800 text-slate-900 dark:text-slate-100"
                       />
                     </div>
+
+                    {/* Existing Publication Lifecycle Controls */}
+                    {existingPub && (
+                      <div className="mt-2 pt-2.5 border-t border-slate-200/60 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[10px] uppercase font-bold text-slate-400">
+                            Status:
+                          </span>
+                          <span
+                            className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                              existingPub.status === 'published'
+                                ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
+                                : existingPub.status === 'scheduled'
+                                  ? 'bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300'
+                                  : existingPub.status === 'in_review'
+                                    ? 'bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300'
+                                    : 'bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
+                            }`}
+                          >
+                            {existingPub.status.toUpperCase()}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-1.5">
+                          {existingPub.status !== 'published' && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setPublishingTarget({ publication: existingPub, action: 'publish' })
+                              }
+                              className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[11px] font-semibold transition-colors"
+                            >
+                              Publish Now
+                            </button>
+                          )}
+
+                          {existingPub.status === 'draft' && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setPublishingTarget({
+                                  publication: existingPub,
+                                  action: 'schedule',
+                                })
+                              }
+                              className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[11px] font-semibold transition-colors"
+                            >
+                              Schedule
+                            </button>
+                          )}
+
+                          {existingPub.status === 'scheduled' && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setPublishingTarget({
+                                  publication: existingPub,
+                                  action: 'reschedule',
+                                })
+                              }
+                              className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[11px] font-semibold transition-colors"
+                            >
+                              Reschedule
+                            </button>
+                          )}
+
+                          {existingPub.status === 'published' && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setPublishingTarget({
+                                  publication: existingPub,
+                                  action: 'unpublish',
+                                })
+                              }
+                              className="px-2.5 py-1 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-[11px] font-semibold transition-colors"
+                            >
+                              Unpublish
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -584,6 +672,17 @@ export function PostForm({ initialPost, isCreateMode = false }: PostFormProps) {
           postId={initialPost.id}
           fallbackTitle={title}
           fallbackBodyHtml={bodyHtml}
+        />
+      )}
+
+      {/* Publishing Modal */}
+      {publishingTarget && (
+        <PublishingModal
+          isOpen={Boolean(publishingTarget)}
+          onClose={() => setPublishingTarget(null)}
+          action={publishingTarget.action}
+          publication={publishingTarget.publication}
+          postTitle={title}
         />
       )}
     </div>

@@ -249,11 +249,7 @@ export class PublishingService {
       );
     }
 
-    const { site } = await this.validateContentEligibility(
-      pub.postId,
-      pub.revisionId,
-      siteId,
-    );
+    const { site } = await this.validateContentEligibility(pub.postId, pub.revisionId, siteId);
 
     const scheduledDate = new Date(dto.scheduledFor);
     if (isNaN(scheduledDate.getTime())) {

@@ -2,7 +2,16 @@
 
 import type {
   ApiSuccess,
+  AssignRolePayload,
+  AuthUser,
   CategoryItem,
+  CreateCategoryPayload,
+  CreateDomainPayload,
+  CreateSitePayload,
+  CreateTagPayload,
+  CreateUserPayload,
+  CsrfResponse,
+  LoginResponse,
   MediaAssetItem,
   MediaUploadResponse,
   PaginatedResult,
@@ -10,8 +19,17 @@ import type {
   PostPreviewData,
   PostPublicationItem,
   PreviewTokenResponse,
+  PublishingHealthStats,
+  ReschedulePublicationRequest,
+  SchedulePublicationRequest,
+  SiteDomainItem,
   SiteItem,
   TagItem,
+  UpdateCategoryPayload,
+  UpdateSitePayload,
+  UpdateUserPayload,
+  UserItem,
+  VerificationChallenge,
 } from '@multi-site-cms/types';
 import { platformApi } from './store';
 
@@ -61,15 +79,269 @@ export interface ListMediaParams {
   limit?: number;
 }
 
+export interface ListUsersParams {
+  search?: string;
+  status?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface ListPublicationsParams {
+  siteId: string;
+  status?: string;
+  type?: string;
+  search?: string;
+  page?: number;
+  limit?: number;
+}
+
 export const cmsApi = platformApi.injectEndpoints({
   endpoints: (build) => ({
-    // Sites
+    // ==========================================
+    // Authentication & Current User
+    // ==========================================
+    getCsrf: build.query<CsrfResponse, void>({
+      query: () => ({ path: '/auth/csrf' }),
+      transformResponse: (response: ApiSuccess<unknown>) => response.data as CsrfResponse,
+    }),
+
+    getMe: build.query<AuthUser, void>({
+      query: () => ({ path: '/auth/me' }),
+      transformResponse: (response: ApiSuccess<unknown>) => response.data as AuthUser,
+      providesTags: ['Auth'],
+    }),
+
+    login: build.mutation<LoginResponse, { email: string; password: string }>({
+      query: (body) => ({
+        path: '/auth/login',
+        method: 'POST',
+        body,
+      }),
+      transformResponse: (response: ApiSuccess<unknown>) => response.data as LoginResponse,
+      invalidatesTags: [
+        'Auth',
+        'Post',
+        'Media',
+        'Site',
+        'User',
+        'Publication',
+        'Taxonomy',
+        'Health',
+      ],
+    }),
+
+    logout: build.mutation<void, void>({
+      query: () => ({
+        path: '/auth/logout',
+        method: 'POST',
+      }),
+      invalidatesTags: [
+        'Auth',
+        'Post',
+        'Media',
+        'Site',
+        'User',
+        'Publication',
+        'Taxonomy',
+        'Health',
+      ],
+    }),
+
+    // ==========================================
+    // Sites & Domains
+    // ==========================================
     listSites: build.query<SiteItem[], void>({
       query: () => ({ path: '/sites' }),
       transformResponse: (response: ApiSuccess<unknown>) => response.data as SiteItem[],
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.map((item) => ({ type: 'Site' as const, id: item.id })),
+              { type: 'Site' as const, id: 'LIST' },
+            ]
+          : [{ type: 'Site' as const, id: 'LIST' }],
     }),
 
-    // Posts
+    getSite: build.query<SiteItem, string>({
+      query: (siteId) => ({ path: `/sites/${siteId}` }),
+      transformResponse: (response: ApiSuccess<unknown>) => response.data as SiteItem,
+      providesTags: (_res, _err, id) => [{ type: 'Site' as const, id }],
+    }),
+
+    createSite: build.mutation<SiteItem, CreateSitePayload>({
+      query: (body) => ({
+        path: '/sites',
+        method: 'POST',
+        body,
+      }),
+      transformResponse: (response: ApiSuccess<unknown>) => response.data as SiteItem,
+      invalidatesTags: [{ type: 'Site' as const, id: 'LIST' }],
+    }),
+
+    updateSite: build.mutation<SiteItem, { siteId: string; data: UpdateSitePayload }>({
+      query: ({ siteId, data }) => ({
+        path: `/sites/${siteId}`,
+        method: 'PATCH',
+        body: data,
+      }),
+      transformResponse: (response: ApiSuccess<unknown>) => response.data as SiteItem,
+      invalidatesTags: (_res, _err, { siteId }) => [
+        { type: 'Site' as const, id: siteId },
+        { type: 'Site' as const, id: 'LIST' },
+      ],
+    }),
+
+    deleteSite: build.mutation<void, string>({
+      query: (siteId) => ({
+        path: `/sites/${siteId}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: [{ type: 'Site' as const, id: 'LIST' }],
+    }),
+
+    listDomains: build.query<SiteDomainItem[], string>({
+      query: (siteId) => ({ path: `/sites/${siteId}/domains` }),
+      transformResponse: (response: ApiSuccess<unknown>) => response.data as SiteDomainItem[],
+      providesTags: (_res, _err, siteId) => [{ type: 'Site' as const, id: `DOMAINS_${siteId}` }],
+    }),
+
+    addDomain: build.mutation<SiteDomainItem, { siteId: string; data: CreateDomainPayload }>({
+      query: ({ siteId, data }) => ({
+        path: `/sites/${siteId}/domains`,
+        method: 'POST',
+        body: data,
+      }),
+      transformResponse: (response: ApiSuccess<unknown>) => response.data as SiteDomainItem,
+      invalidatesTags: (_res, _err, { siteId }) => [
+        { type: 'Site' as const, id: `DOMAINS_${siteId}` },
+        { type: 'Site' as const, id: siteId },
+        { type: 'Site' as const, id: 'LIST' },
+      ],
+    }),
+
+    setPrimaryDomain: build.mutation<SiteDomainItem, { siteId: string; domainId: string }>({
+      query: ({ siteId, domainId }) => ({
+        path: `/sites/${siteId}/domains/${domainId}/primary`,
+        method: 'PATCH',
+      }),
+      transformResponse: (response: ApiSuccess<unknown>) => response.data as SiteDomainItem,
+      invalidatesTags: (_res, _err, { siteId }) => [
+        { type: 'Site' as const, id: `DOMAINS_${siteId}` },
+        { type: 'Site' as const, id: siteId },
+        { type: 'Site' as const, id: 'LIST' },
+      ],
+    }),
+
+    deleteDomain: build.mutation<void, { siteId: string; domainId: string }>({
+      query: ({ siteId, domainId }) => ({
+        path: `/sites/${siteId}/domains/${domainId}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: (_res, _err, { siteId }) => [
+        { type: 'Site' as const, id: `DOMAINS_${siteId}` },
+        { type: 'Site' as const, id: siteId },
+        { type: 'Site' as const, id: 'LIST' },
+      ],
+    }),
+
+    verifyDomain: build.mutation<SiteDomainItem, { siteId: string; domainId: string }>({
+      query: ({ siteId, domainId }) => ({
+        path: `/sites/${siteId}/domains/${domainId}/verify`,
+        method: 'POST',
+      }),
+      transformResponse: (response: ApiSuccess<unknown>) => response.data as SiteDomainItem,
+      invalidatesTags: (_res, _err, { siteId }) => [
+        { type: 'Site' as const, id: `DOMAINS_${siteId}` },
+        { type: 'Site' as const, id: siteId },
+      ],
+    }),
+
+    getVerificationChallenge: build.query<
+      VerificationChallenge,
+      { siteId: string; domainId: string }
+    >({
+      query: ({ siteId, domainId }) => ({
+        path: `/sites/${siteId}/domains/${domainId}/verify-challenge`,
+      }),
+      transformResponse: (response: ApiSuccess<unknown>) => response.data as VerificationChallenge,
+    }),
+
+    // ==========================================
+    // Users & Roles
+    // ==========================================
+    listUsers: build.query<PaginatedResult<UserItem>, ListUsersParams | void>({
+      query: (params) => ({
+        path: '/users',
+        query: params as Record<string, string | number | boolean | null | undefined> | undefined,
+      }),
+      transformResponse: (response: ApiSuccess<unknown>) =>
+        response.data as PaginatedResult<UserItem>,
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.items.map((item) => ({ type: 'User' as const, id: item.id })),
+              { type: 'User' as const, id: 'LIST' },
+            ]
+          : [{ type: 'User' as const, id: 'LIST' }],
+    }),
+
+    getUser: build.query<UserItem, string>({
+      query: (userId) => ({ path: `/users/${userId}` }),
+      transformResponse: (response: ApiSuccess<unknown>) => response.data as UserItem,
+      providesTags: (_res, _err, id) => [{ type: 'User' as const, id }],
+    }),
+
+    createUser: build.mutation<UserItem, CreateUserPayload>({
+      query: (body) => ({
+        path: '/users',
+        method: 'POST',
+        body,
+      }),
+      transformResponse: (response: ApiSuccess<unknown>) => response.data as UserItem,
+      invalidatesTags: [{ type: 'User' as const, id: 'LIST' }],
+    }),
+
+    updateUser: build.mutation<UserItem, { userId: string; data: UpdateUserPayload }>({
+      query: ({ userId, data }) => ({
+        path: `/users/${userId}`,
+        method: 'PATCH',
+        body: data,
+      }),
+      transformResponse: (response: ApiSuccess<unknown>) => response.data as UserItem,
+      invalidatesTags: (_res, _err, { userId }) => [
+        { type: 'User' as const, id: userId },
+        { type: 'User' as const, id: 'LIST' },
+      ],
+    }),
+
+    assignRole: build.mutation<UserItem, { userId: string; data: AssignRolePayload }>({
+      query: ({ userId, data }) => ({
+        path: `/users/${userId}/roles`,
+        method: 'POST',
+        body: data,
+      }),
+      transformResponse: (response: ApiSuccess<unknown>) => response.data as UserItem,
+      invalidatesTags: (_res, _err, { userId }) => [
+        { type: 'User' as const, id: userId },
+        { type: 'User' as const, id: 'LIST' },
+      ],
+    }),
+
+    revokeRole: build.mutation<UserItem, { userId: string; assignmentId: string }>({
+      query: ({ userId, assignmentId }) => ({
+        path: `/users/${userId}/roles/${assignmentId}`,
+        method: 'DELETE',
+      }),
+      transformResponse: (response: ApiSuccess<unknown>) => response.data as UserItem,
+      invalidatesTags: (_res, _err, { userId }) => [
+        { type: 'User' as const, id: userId },
+        { type: 'User' as const, id: 'LIST' },
+      ],
+    }),
+
+    // ==========================================
+    // Posts & Revisions
+    // ==========================================
     listPosts: build.query<PaginatedResult<PostItem>, ListPostsParams | void>({
       query: (params) => ({
         path: '/posts',
@@ -123,7 +395,37 @@ export const cmsApi = platformApi.injectEndpoints({
       invalidatesTags: [{ type: 'Post' as const, id: 'LIST' }],
     }),
 
-    // Publications
+    // ==========================================
+    // Publications & Publishing Engine
+    // ==========================================
+    listSitePublications: build.query<PaginatedResult<PostPublicationItem>, ListPublicationsParams>(
+      {
+        query: ({ siteId, ...params }) => ({
+          path: `/sites/${siteId}/publications`,
+          query: params as Record<string, string | number | boolean | null | undefined>,
+        }),
+        transformResponse: (response: ApiSuccess<unknown>) =>
+          response.data as PaginatedResult<PostPublicationItem>,
+        providesTags: (result) =>
+          result
+            ? [
+                ...result.items.map((item) => ({ type: 'Publication' as const, id: item.id })),
+                { type: 'Publication' as const, id: 'LIST' },
+              ]
+            : [{ type: 'Publication' as const, id: 'LIST' }],
+      },
+    ),
+
+    getPublication: build.query<PostPublicationItem, { siteId: string; publicationId: string }>({
+      query: ({ siteId, publicationId }) => ({
+        path: `/sites/${siteId}/publications/${publicationId}`,
+      }),
+      transformResponse: (response: ApiSuccess<unknown>) => response.data as PostPublicationItem,
+      providesTags: (_res, _err, { publicationId }) => [
+        { type: 'Publication' as const, id: publicationId },
+      ],
+    }),
+
     createPublication: build.mutation<
       PostPublicationItem,
       { postId: string; data: CreatePublicationPayload }
@@ -134,10 +436,173 @@ export const cmsApi = platformApi.injectEndpoints({
         body: data,
       }),
       transformResponse: (response: ApiSuccess<unknown>) => response.data as PostPublicationItem,
-      invalidatesTags: (_result, _error, { postId }) => [{ type: 'Post' as const, id: postId }],
+      invalidatesTags: (_result, _error, { postId }) => [
+        { type: 'Post' as const, id: postId },
+        { type: 'Publication' as const, id: 'LIST' },
+      ],
     }),
 
-    // Preview
+    updatePublication: build.mutation<
+      PostPublicationItem,
+      { siteId: string; publicationId: string; data: Partial<CreatePublicationPayload> }
+    >({
+      query: ({ siteId, publicationId, data }) => ({
+        path: `/sites/${siteId}/publications/${publicationId}`,
+        method: 'PATCH',
+        body: data,
+      }),
+      transformResponse: (response: ApiSuccess<unknown>) => response.data as PostPublicationItem,
+      invalidatesTags: (_res, _err, { publicationId }) => [
+        { type: 'Publication' as const, id: publicationId },
+        { type: 'Publication' as const, id: 'LIST' },
+        { type: 'Post' as const, id: 'LIST' },
+      ],
+    }),
+
+    deletePublication: build.mutation<void, { siteId: string; publicationId: string }>({
+      query: ({ siteId, publicationId }) => ({
+        path: `/sites/${siteId}/publications/${publicationId}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: [{ type: 'Publication' as const, id: 'LIST' }],
+    }),
+
+    publishImmediately: build.mutation<
+      PostPublicationItem,
+      { siteId: string; publicationId: string }
+    >({
+      query: ({ siteId, publicationId }) => ({
+        path: `/sites/${siteId}/publications/${publicationId}/publish`,
+        method: 'POST',
+      }),
+      transformResponse: (response: ApiSuccess<unknown>) => response.data as PostPublicationItem,
+      invalidatesTags: (_res, _err, { publicationId }) => [
+        { type: 'Publication' as const, id: publicationId },
+        { type: 'Publication' as const, id: 'LIST' },
+        { type: 'Post' as const, id: 'LIST' },
+      ],
+    }),
+
+    schedulePublication: build.mutation<
+      PostPublicationItem,
+      { siteId: string; publicationId: string; data: SchedulePublicationRequest }
+    >({
+      query: ({ siteId, publicationId, data }) => ({
+        path: `/sites/${siteId}/publications/${publicationId}/schedule`,
+        method: 'POST',
+        body: data,
+      }),
+      transformResponse: (response: ApiSuccess<unknown>) => response.data as PostPublicationItem,
+      invalidatesTags: (_res, _err, { publicationId }) => [
+        { type: 'Publication' as const, id: publicationId },
+        { type: 'Publication' as const, id: 'LIST' },
+        { type: 'Post' as const, id: 'LIST' },
+      ],
+    }),
+
+    reschedulePublication: build.mutation<
+      PostPublicationItem,
+      { siteId: string; publicationId: string; data: ReschedulePublicationRequest }
+    >({
+      query: ({ siteId, publicationId, data }) => ({
+        path: `/sites/${siteId}/publications/${publicationId}/reschedule`,
+        method: 'POST',
+        body: data,
+      }),
+      transformResponse: (response: ApiSuccess<unknown>) => response.data as PostPublicationItem,
+      invalidatesTags: (_res, _err, { publicationId }) => [
+        { type: 'Publication' as const, id: publicationId },
+        { type: 'Publication' as const, id: 'LIST' },
+      ],
+    }),
+
+    cancelSchedule: build.mutation<
+      PostPublicationItem,
+      { siteId: string; publicationId: string; data?: { reason?: string } }
+    >({
+      query: ({ siteId, publicationId, data }) => ({
+        path: `/sites/${siteId}/publications/${publicationId}/cancel-schedule`,
+        method: 'POST',
+        body: data,
+      }),
+      transformResponse: (response: ApiSuccess<unknown>) => response.data as PostPublicationItem,
+      invalidatesTags: (_res, _err, { publicationId }) => [
+        { type: 'Publication' as const, id: publicationId },
+        { type: 'Publication' as const, id: 'LIST' },
+      ],
+    }),
+
+    unpublishPublication: build.mutation<
+      PostPublicationItem,
+      { siteId: string; publicationId: string; data?: { reason?: string } }
+    >({
+      query: ({ siteId, publicationId, data }) => ({
+        path: `/sites/${siteId}/publications/${publicationId}/unpublish`,
+        method: 'POST',
+        body: data,
+      }),
+      transformResponse: (response: ApiSuccess<unknown>) => response.data as PostPublicationItem,
+      invalidatesTags: (_res, _err, { publicationId }) => [
+        { type: 'Publication' as const, id: publicationId },
+        { type: 'Publication' as const, id: 'LIST' },
+        { type: 'Post' as const, id: 'LIST' },
+      ],
+    }),
+
+    archivePublication: build.mutation<
+      PostPublicationItem,
+      { siteId: string; publicationId: string; data?: { reason?: string } }
+    >({
+      query: ({ siteId, publicationId, data }) => ({
+        path: `/sites/${siteId}/publications/${publicationId}/archive`,
+        method: 'POST',
+        body: data,
+      }),
+      transformResponse: (response: ApiSuccess<unknown>) => response.data as PostPublicationItem,
+      invalidatesTags: (_res, _err, { publicationId }) => [
+        { type: 'Publication' as const, id: publicationId },
+        { type: 'Publication' as const, id: 'LIST' },
+      ],
+    }),
+
+    restorePublication: build.mutation<
+      PostPublicationItem,
+      { siteId: string; publicationId: string }
+    >({
+      query: ({ siteId, publicationId }) => ({
+        path: `/sites/${siteId}/publications/${publicationId}/restore`,
+        method: 'POST',
+      }),
+      transformResponse: (response: ApiSuccess<unknown>) => response.data as PostPublicationItem,
+      invalidatesTags: (_res, _err, { publicationId }) => [
+        { type: 'Publication' as const, id: publicationId },
+        { type: 'Publication' as const, id: 'LIST' },
+      ],
+    }),
+
+    submitForReview: build.mutation<PostPublicationItem, { siteId: string; publicationId: string }>(
+      {
+        query: ({ siteId, publicationId }) => ({
+          path: `/sites/${siteId}/publications/${publicationId}/review`,
+          method: 'POST',
+        }),
+        transformResponse: (response: ApiSuccess<unknown>) => response.data as PostPublicationItem,
+        invalidatesTags: (_res, _err, { publicationId }) => [
+          { type: 'Publication' as const, id: publicationId },
+          { type: 'Publication' as const, id: 'LIST' },
+        ],
+      },
+    ),
+
+    getPublishingHealth: build.query<PublishingHealthStats, void>({
+      query: () => ({ path: '/publishing/health' }),
+      transformResponse: (response: ApiSuccess<unknown>) => response.data as PublishingHealthStats,
+      providesTags: [{ type: 'Health', id: 'PUBLISHING' }],
+    }),
+
+    // ==========================================
+    // Preview Tokens
+    // ==========================================
     generatePreviewToken: build.mutation<PreviewTokenResponse, { postId: string; siteId?: string }>(
       {
         query: ({ postId, siteId }) => ({
@@ -160,7 +625,9 @@ export const cmsApi = platformApi.injectEndpoints({
       transformResponse: (response: ApiSuccess<unknown>) => response.data as PostPreviewData,
     }),
 
-    // Media
+    // ==========================================
+    // Media Library
+    // ==========================================
     listMedia: build.query<PaginatedResult<MediaAssetItem>, ListMediaParams | void>({
       query: (params) => ({
         path: '/media',
@@ -214,33 +681,151 @@ export const cmsApi = platformApi.injectEndpoints({
       invalidatesTags: [{ type: 'Media' as const, id: 'LIST' }],
     }),
 
+    // ==========================================
     // Taxonomy
+    // ==========================================
     listCategories: build.query<CategoryItem[], string>({
       query: (siteId) => ({ path: `/sites/${siteId}/categories` }),
       transformResponse: (response: ApiSuccess<unknown>) => response.data as CategoryItem[],
+      providesTags: (_res, _err, siteId) => [
+        { type: 'Taxonomy' as const, id: `CATEGORIES_${siteId}` },
+      ],
+    }),
+
+    createCategory: build.mutation<CategoryItem, { siteId: string; data: CreateCategoryPayload }>({
+      query: ({ siteId, data }) => ({
+        path: `/sites/${siteId}/categories`,
+        method: 'POST',
+        body: data,
+      }),
+      transformResponse: (response: ApiSuccess<unknown>) => response.data as CategoryItem,
+      invalidatesTags: (_res, _err, { siteId }) => [
+        { type: 'Taxonomy' as const, id: `CATEGORIES_${siteId}` },
+      ],
+    }),
+
+    updateCategory: build.mutation<
+      CategoryItem,
+      { siteId: string; categoryId: string; data: UpdateCategoryPayload }
+    >({
+      query: ({ siteId, categoryId, data }) => ({
+        path: `/sites/${siteId}/categories/${categoryId}`,
+        method: 'PATCH',
+        body: data,
+      }),
+      transformResponse: (response: ApiSuccess<unknown>) => response.data as CategoryItem,
+      invalidatesTags: (_res, _err, { siteId }) => [
+        { type: 'Taxonomy' as const, id: `CATEGORIES_${siteId}` },
+      ],
+    }),
+
+    deleteCategory: build.mutation<void, { siteId: string; categoryId: string }>({
+      query: ({ siteId, categoryId }) => ({
+        path: `/sites/${siteId}/categories/${categoryId}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: (_res, _err, { siteId }) => [
+        { type: 'Taxonomy' as const, id: `CATEGORIES_${siteId}` },
+      ],
     }),
 
     listTags: build.query<TagItem[], string>({
       query: (siteId) => ({ path: `/sites/${siteId}/tags` }),
       transformResponse: (response: ApiSuccess<unknown>) => response.data as TagItem[],
+      providesTags: (_res, _err, siteId) => [{ type: 'Taxonomy' as const, id: `TAGS_${siteId}` }],
+    }),
+
+    createTag: build.mutation<TagItem, { siteId: string; data: CreateTagPayload }>({
+      query: ({ siteId, data }) => ({
+        path: `/sites/${siteId}/tags`,
+        method: 'POST',
+        body: data,
+      }),
+      transformResponse: (response: ApiSuccess<unknown>) => response.data as TagItem,
+      invalidatesTags: (_res, _err, { siteId }) => [
+        { type: 'Taxonomy' as const, id: `TAGS_${siteId}` },
+      ],
+    }),
+
+    deleteTag: build.mutation<void, { siteId: string; tagId: string }>({
+      query: ({ siteId, tagId }) => ({
+        path: `/sites/${siteId}/tags/${tagId}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: (_res, _err, { siteId }) => [
+        { type: 'Taxonomy' as const, id: `TAGS_${siteId}` },
+      ],
     }),
   }),
 });
 
 export const {
+  // Auth
+  useGetCsrfQuery,
+  useGetMeQuery,
+  useLoginMutation,
+  useLogoutMutation,
+
+  // Sites & Domains
   useListSitesQuery,
+  useGetSiteQuery,
+  useCreateSiteMutation,
+  useUpdateSiteMutation,
+  useDeleteSiteMutation,
+  useListDomainsQuery,
+  useAddDomainMutation,
+  useSetPrimaryDomainMutation,
+  useDeleteDomainMutation,
+  useVerifyDomainMutation,
+  useGetVerificationChallengeQuery,
+
+  // Users
+  useListUsersQuery,
+  useGetUserQuery,
+  useCreateUserMutation,
+  useUpdateUserMutation,
+  useAssignRoleMutation,
+  useRevokeRoleMutation,
+
+  // Posts
   useListPostsQuery,
   useGetPostQuery,
   useCreatePostMutation,
   useUpdatePostMutation,
   useDeletePostMutation,
+
+  // Publications & Publishing
+  useListSitePublicationsQuery,
+  useGetPublicationQuery,
   useCreatePublicationMutation,
+  useUpdatePublicationMutation,
+  useDeletePublicationMutation,
+  usePublishImmediatelyMutation,
+  useSchedulePublicationMutation,
+  useReschedulePublicationMutation,
+  useCancelScheduleMutation,
+  useUnpublishPublicationMutation,
+  useArchivePublicationMutation,
+  useRestorePublicationMutation,
+  useSubmitForReviewMutation,
+  useGetPublishingHealthQuery,
+
+  // Preview
   useGeneratePreviewTokenMutation,
   useGetPostPreviewQuery,
+
+  // Media
   useListMediaQuery,
   useUploadMediaMutation,
   useUpdateMediaMutation,
   useDeleteMediaMutation,
+
+  // Taxonomy
   useListCategoriesQuery,
+  useCreateCategoryMutation,
+  useUpdateCategoryMutation,
+  useDeleteCategoryMutation,
   useListTagsQuery,
+  useCreateTagMutation,
+  useDeleteTagMutation,
 } = cmsApi;

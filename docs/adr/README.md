@@ -25,6 +25,7 @@ earlier one with a new ADR and a `Status` line change, never by rewriting histor
 | [0018](0018-cms-core-content-publications-and-taxonomy.md)                | CMS Core content, publications, revisions & taxonomy      | Accepted |
 | [0019](0019-tiptap-editor-media-upload-and-preview-system.md)             | Tiptap editor, media uploads, autosave & preview system   | Accepted |
 | [0020](0020-publishing-lifecycle-scheduled-engine-outbox-and-realtime.md) | Publishing lifecycle, scheduled engine, outbox & SSE      | Accepted |
+| [0021](0021-central-admin-dashboard-ui.md)                                | Central admin dashboard UI & multi-site workspaces        | Accepted |
 
 ## Template
 

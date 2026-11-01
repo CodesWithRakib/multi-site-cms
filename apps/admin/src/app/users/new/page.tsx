@@ -1,0 +1,285 @@
+'use client';
+
+import React, { useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import {
+  ArrowLeft,
+  UserPlus,
+  Shield,
+  Globe,
+  Loader2,
+  AlertCircle,
+  Eye,
+  EyeOff,
+} from 'lucide-react';
+import { ShellLayout } from '@/components/shell';
+import { useAdmin } from '@/lib/admin-context';
+import { useCreateUserMutation, useAssignRoleMutation, useListSitesQuery } from '@/lib/cms-api';
+
+export default function NewUserPage() {
+  const router = useRouter();
+  const { t } = useAdmin();
+
+  const [displayName, setDisplayName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [initialRole, setInitialRole] = useState<
+    'none' | 'super_admin' | 'site_admin' | 'site_editor'
+  >('site_admin');
+  const [selectedSiteId, setSelectedSiteId] = useState<string>('');
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  const { data: sitesData } = useListSitesQuery();
+  const [createUser, { isLoading: isCreating }] = useCreateUserMutation();
+  const [assignRole, { isLoading: isAssigning }] = useAssignRoleMutation();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMsg(null);
+
+    if (!displayName.trim() || !email.trim() || !password) {
+      setErrorMsg('Please complete all required fields.');
+      return;
+    }
+
+    if (password.length < 8) {
+      setErrorMsg('Password must be at least 8 characters long.');
+      return;
+    }
+
+    if (initialRole !== 'none' && initialRole !== 'super_admin' && !selectedSiteId) {
+      setErrorMsg('Please select a site for site-scoped roles.');
+      return;
+    }
+
+    try {
+      const createdUser = await createUser({
+        displayName: displayName.trim(),
+        email: email.trim().toLowerCase(),
+        password,
+      }).unwrap();
+
+      if (initialRole !== 'none') {
+        const isPlatform = initialRole === 'super_admin';
+        await assignRole({
+          userId: createdUser.id,
+          data: {
+            roleKey: initialRole,
+            scopeType: isPlatform ? 'platform' : 'site',
+            siteId: isPlatform ? undefined : selectedSiteId || undefined,
+          },
+        }).unwrap();
+      }
+
+      router.push(`/users/${createdUser.id}`);
+    } catch (err: unknown) {
+      const apiErr = err as { data?: { error?: { message?: string } }; message?: string };
+      setErrorMsg(
+        apiErr?.data?.error?.message || apiErr?.message || 'Failed to create administrator.',
+      );
+    }
+  };
+
+  return (
+    <ShellLayout superAdminOnly>
+      <div className="flex flex-col gap-6 max-w-2xl mx-auto pb-12">
+        {/* Navigation & Header */}
+        <div className="flex items-center gap-3 pb-4 border-b border-slate-200 dark:border-slate-800">
+          <Link
+            href="/users"
+            className="p-2 rounded-xl text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Link>
+          <div>
+            <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+              {t('users.createUser')}
+            </h1>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Provision a new administrative account with role-scoped access controls.
+            </p>
+          </div>
+        </div>
+
+        {/* Error Alert */}
+        {errorMsg && (
+          <div className="flex items-center gap-3 p-4 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-900 dark:text-rose-200 text-xs">
+            <AlertCircle className="w-5 h-5 text-rose-600 shrink-0" />
+            <p className="font-semibold">{errorMsg}</p>
+          </div>
+        )}
+
+        {/* User Creation Form */}
+        <form
+          onSubmit={handleSubmit}
+          className="flex flex-col gap-6 bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs"
+        >
+          {/* Display Name */}
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
+              {t('users.displayName')} *
+            </label>
+            <input
+              type="text"
+              required
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              placeholder="e.g. Sarah Jenkins"
+              className="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+            />
+          </div>
+
+          {/* Email */}
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
+              {t('users.email')} *
+            </label>
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="e.g. sjenkins@platform.internal"
+              className="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-mono"
+            />
+          </div>
+
+          {/* Password */}
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
+              {t('users.password')} *
+            </label>
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                required
+                minLength={8}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Minimum 8 characters..."
+                className="w-full pl-4 pr-11 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-mono"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
+            <p className="text-[11px] text-slate-400 mt-1">
+              Argon2id password hashing is applied on transmission.
+            </p>
+          </div>
+
+          {/* Initial Role Assignment */}
+          <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3">
+              Initial Role Assignment
+            </label>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+              <label
+                className={`flex items-start gap-3 p-3.5 rounded-xl border cursor-pointer transition-all ${
+                  initialRole === 'super_admin'
+                    ? 'border-purple-500 bg-purple-50/30 dark:bg-purple-950/20'
+                    : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/40'
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="initialRole"
+                  value="super_admin"
+                  checked={initialRole === 'super_admin'}
+                  onChange={() => setInitialRole('super_admin')}
+                  className="mt-1 text-purple-600 focus:ring-purple-500"
+                />
+                <div>
+                  <div className="flex items-center gap-1.5 font-bold text-xs text-purple-700 dark:text-purple-300">
+                    <Shield className="w-3.5 h-3.5" />
+                    <span>Platform Super Admin</span>
+                  </div>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                    Unrestricted access to all sites, users, roles, and settings.
+                  </p>
+                </div>
+              </label>
+
+              <label
+                className={`flex items-start gap-3 p-3.5 rounded-xl border cursor-pointer transition-all ${
+                  initialRole === 'site_admin'
+                    ? 'border-blue-500 bg-blue-50/30 dark:bg-blue-950/20'
+                    : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/40'
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="initialRole"
+                  value="site_admin"
+                  checked={initialRole === 'site_admin'}
+                  onChange={() => setInitialRole('site_admin')}
+                  className="mt-1 text-blue-600 focus:ring-blue-500"
+                />
+                <div>
+                  <div className="flex items-center gap-1.5 font-bold text-xs text-blue-700 dark:text-blue-300">
+                    <Globe className="w-3.5 h-3.5" />
+                    <span>Site-Scoped Admin</span>
+                  </div>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                    Management restricted to a specific assigned publication website.
+                  </p>
+                </div>
+              </label>
+            </div>
+
+            {/* Site Picker when site-scoped */}
+            {initialRole !== 'super_admin' && initialRole !== 'none' && (
+              <div>
+                <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">
+                  Assigned Site *
+                </label>
+                <select
+                  required
+                  value={selectedSiteId}
+                  onChange={(e) => setSelectedSiteId(e.target.value)}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+                >
+                  <option value="">Select a target site...</option>
+                  {sitesData?.map((site) => (
+                    <option key={site.id} value={site.id}>
+                      {site.name} ({site.key})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
+
+          {/* Form Actions */}
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+            <Link
+              href="/users"
+              className="px-4 py-2 text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300"
+            >
+              {t('actions.cancel')}
+            </Link>
+            <button
+              type="submit"
+              disabled={isCreating || isAssigning}
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-semibold text-xs rounded-xl shadow-xs transition-colors"
+            >
+              {isCreating || isAssigning ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <UserPlus className="w-4 h-4" />
+              )}
+              <span>Create Administrator</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </ShellLayout>
+  );
+}

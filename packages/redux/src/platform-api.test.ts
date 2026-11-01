@@ -56,4 +56,27 @@ describe('platform API store integration', () => {
       },
     );
   });
+
+  it('includes cross-port credentials and registers Phase 09 tagTypes', async () => {
+    const fetchMock = vi.fn<typeof fetch>().mockResolvedValue(
+      jsonResponse({
+        data: { status: 'ok', service: 'api', uptimeSeconds: 12 },
+        meta: { requestId: 'req-cred', timestamp: '2026-01-01T00:00:00.000Z' },
+      }),
+    );
+    const api = createPlatformApi({
+      baseUrl: 'https://api.example.com/api/v1',
+      fetch: fetchMock,
+    });
+    const store = createAppStore(api);
+
+    await store.dispatch(api.endpoints.getHealth.initiate()).unwrap();
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      'https://api.example.com/api/v1/health',
+      expect.objectContaining({
+        credentials: 'include',
+      }),
+    );
+  });
 });

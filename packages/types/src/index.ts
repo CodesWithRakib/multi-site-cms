@@ -401,3 +401,78 @@ export interface ReschedulePublicationRequest {
   scheduledFor: string;
   reason?: string;
 }
+
+export interface VerificationChallenge {
+  domainId: string;
+  hostname: string;
+  verificationToken: string;
+  recordType: string;
+  recordName: string;
+  recordValue: string;
+  expiresAt: string | null;
+  isVerified: boolean;
+}
+
+export interface CreateSitePayload {
+  key: string;
+  name: string;
+  defaultLocale?: string;
+  timezone?: string;
+  settings?: SiteSettings;
+}
+
+export interface UpdateSitePayload {
+  name?: string;
+  defaultLocale?: string;
+  timezone?: string;
+  status?: SiteStatus;
+  settings?: Partial<SiteSettings>;
+}
+
+export interface CreateDomainPayload {
+  hostname: string;
+  isPrimary?: boolean;
+}
+
+export interface CreateUserPayload {
+  email: string;
+  displayName: string;
+  password?: string;
+  roleKey?: string;
+  siteId?: string | null;
+}
+
+export interface UpdateUserPayload {
+  displayName?: string;
+  status?: UserStatus;
+}
+
+export interface AssignRolePayload {
+  roleKey: string;
+  scopeType: RoleScope;
+  siteId?: string | null;
+}
+
+export interface CreateCategoryPayload {
+  name: string;
+  slug: string;
+  description?: string | null;
+  parentId?: string | null;
+  displayOrder?: number;
+  isActive?: boolean;
+}
+
+export interface UpdateCategoryPayload {
+  name?: string;
+  slug?: string;
+  description?: string | null;
+  parentId?: string | null;
+  displayOrder?: number;
+  isActive?: boolean;
+}
+
+export interface CreateTagPayload {
+  name: string;
+  slug: string;
+  description?: string | null;
+}

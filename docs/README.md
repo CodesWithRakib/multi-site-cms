@@ -103,6 +103,17 @@ describing future behavior is labelled with its phase.
 - [Real-Time Updates (SSE)](publishing/realtime-updates.md) — Server-Sent Events, site channel isolation, draft suppression, and client reconnection.
 - [Operations & Disaster Recovery](publishing/operations-and-recovery.md) — Health statistics, downtime recovery, and dead-letter replay procedures.
 
+## Central Admin Dashboard UI
+
+- [Dashboard Architecture](admin/dashboard-architecture.md) — Next.js 16 App Router, React 19, Redux Toolkit/RTK Query, shell layouts, and telemetry.
+- [Navigation & Permissions](admin/navigation-and-permissions.md) — Super Admin vs Site Admin personas, route guards, and unsaved changes interception.
+- [Content Workspace](admin/content-workflow.md) — Canonical source posts, multi-site publication bindings, Tiptap editor, autosave, and recovery.
+- [Publishing Calendar](admin/publishing-calendar.md) — Month and List views, timezone normalization, interactive scheduling modal.
+- [Site Management UI](admin/site-management-ui.md) — Multi-site registry, provisioning form, domain manager, and DNS TXT verification.
+- [User Management UI](admin/user-management-ui.md) — Administrator directory, account status toggles, RBAC assignment, and last Super Admin safeguard.
+- [Internationalization](admin/internationalization.md) — Bilingual dictionary (English & Bangla), dual-access syntax, and timezone-aware formatting.
+- [Testing & Quality Verification](admin/testing.md) — Multi-tier test pyramid, Vitest unit suites, backend integration, and Next.js static builds.
+
 ## Security
 
 - [Authentication and authorization](security/authentication.md)

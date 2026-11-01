@@ -40,7 +40,7 @@ export function createPlatformApi(options: PlatformApiOptions) {
 
   return createApi({
     reducerPath: 'platformApi',
-    tagTypes: ['Post', 'Media'],
+    tagTypes: ['Post', 'Media', 'Site', 'User', 'Publication', 'Taxonomy', 'Health', 'Auth'],
     baseQuery: async (args: PlatformRequestArgs, { signal }) => {
       try {
         const data = await client.request<ApiSuccess<unknown>>(args.path, {
@@ -48,7 +48,7 @@ export function createPlatformApi(options: PlatformApiOptions) {
           body: args.body,
           query: args.query,
           headers: args.headers,
-          credentials: args.credentials,
+          credentials: args.credentials ?? 'include',
           signal,
         });
 

@@ -1,0 +1,463 @@
+'use client';
+
+export type Locale = 'en' | 'bn';
+
+export const translations = {
+  en: {
+    // Navigation & Shell
+    nav: {
+      dashboard: 'Dashboard',
+      content: 'Content',
+      calendar: 'Publishing Calendar',
+      media: 'Media Library',
+      taxonomy: 'Taxonomy',
+      sites: 'Site Registry',
+      users: 'User Management',
+      settings: 'Settings',
+      platform: 'Platform Overview',
+      allSites: 'All Sites (Platform View)',
+      switchSite: 'Select Site',
+      logout: 'Log Out',
+      account: 'Account',
+      superAdmin: 'Super Admin',
+      siteAdmin: 'Site Admin',
+      language: 'Language',
+      theme: 'Theme',
+      operationalStatus: 'System Healthy',
+      unsavedWarning: 'You have unsaved changes. Are you sure you want to navigate away?',
+    },
+
+    // Common Actions
+    actions: {
+      create: 'Create',
+      save: 'Save',
+      saveDraft: 'Save Draft',
+      submitReview: 'Submit for Review',
+      publishNow: 'Publish Now',
+      schedule: 'Schedule',
+      reschedule: 'Reschedule',
+      cancelSchedule: 'Cancel Schedule',
+      unpublish: 'Unpublish',
+      archive: 'Archive',
+      restore: 'Restore',
+      preview: 'Preview',
+      edit: 'Edit',
+      delete: 'Delete',
+      upload: 'Upload',
+      cancel: 'Cancel',
+      confirm: 'Confirm',
+      search: 'Search...',
+      filter: 'Filter',
+      clearFilters: 'Clear Filters',
+      viewLiveSite: 'View Live Site',
+      refresh: 'Refresh',
+      verify: 'Verify Domain',
+      assignRole: 'Assign Role',
+      revokeRole: 'Revoke Role',
+      viewChallenge: 'View DNS Challenge',
+    },
+
+    // Statuses
+    status: {
+      draft: 'Draft',
+      in_review: 'In Review',
+      scheduled: 'Scheduled',
+      published: 'Published',
+      archived: 'Archived',
+      active: 'Active',
+      paused: 'Paused',
+      suspended: 'Suspended',
+      verified: 'Verified',
+      unverified: 'Unverified',
+    },
+
+    // Dashboard Overview
+    dashboard: {
+      title: 'Platform Overview',
+      subtitle: 'Central editorial operations and real-time multi-site publishing telemetry.',
+      totalContent: 'Total Content',
+      drafts: 'Drafts',
+      inReview: 'In Review',
+      scheduledPosts: 'Scheduled',
+      publishedPosts: 'Published',
+      healthTitle: 'Publishing Engine Health',
+      workerActive: 'Scheduled Worker Active',
+      outboxActive: 'Outbox Dispatcher Active',
+      pendingQueue: 'Due Queue',
+      deadLetterQueue: 'Dead-Letter Backlog',
+      upcomingPublications: 'Upcoming Scheduled Publications',
+      noUpcoming: 'No publications currently scheduled.',
+      recentActivity: 'Recent Editorial Activity',
+      quickActions: 'Quick Actions',
+      newPost: '+ New Post',
+      openMedia: 'Media Library',
+      viewCalendar: 'Publishing Calendar',
+    },
+
+    // Content Workspace
+    content: {
+      title: 'Editorial Content Workspace',
+      subtitle: 'Manage canonical articles, destination guides, and live updates.',
+      newPost: 'Create New Post',
+      tableTitle: 'Title & Summary',
+      type: 'Content Type',
+      status: 'Status',
+      author: 'Author',
+      publicationStatus: 'Site Publication',
+      updated: 'Last Updated',
+      actions: 'Actions',
+      noPosts: 'No content found matching your filters.',
+      filterByType: 'All Types',
+      filterByStatus: 'All Statuses',
+    },
+
+    // Publishing Dialogs
+    publishing: {
+      publishTitle: 'Publish Content Immediately',
+      publishDesc:
+        'This will publish the content to the selected site and immediately invalidate the edge cache.',
+      scheduleTitle: 'Schedule Publication',
+      scheduleDesc: 'Queue this publication for automated release at a precise future moment.',
+      targetTime: 'Scheduled Time (Site Timezone)',
+      reasonOptional: 'Editorial Reason (Optional)',
+      unpublishTitle: 'Unpublish Content',
+      unpublishDesc:
+        'This returns the publication to Draft status and evicts it from the public website.',
+      archiveTitle: 'Archive Publication',
+      archiveDesc:
+        'This removes the content from active circulation while preserving its slug reservation and analytics.',
+      restoreTitle: 'Restore Archived Content',
+      restoreDesc: 'This returns the archived publication to Draft status for re-editing.',
+      cancelScheduleTitle: 'Cancel Scheduled Release',
+      cancelScheduleDesc:
+        'This removes the pending schedule timer and returns the publication to Draft.',
+      invalidTimeError: 'The scheduled time must be at least 5 seconds in the future.',
+      successMsg: 'Operation completed successfully.',
+    },
+
+    // Media Library
+    media: {
+      title: 'Media Asset Library',
+      subtitle: 'Centralized storage for destination photography, action banners, and attachments.',
+      uploadTitle: 'Upload Media Asset',
+      dropzoneText: 'Drag and drop files here, or click to browse',
+      supportedFormats: 'JPEG, PNG, WebP, AVIF, GIF, SVG, PDF up to 25MB',
+      editMetadata: 'Edit Media Metadata',
+      altText: 'Alternative Text (Screen Readers)',
+      caption: 'Editorial Caption',
+      storageKey: 'Storage Key',
+      fileDetails: 'File Details',
+      deleteConfirm: 'Are you sure you want to delete this media asset?',
+      inUseWarning: 'Referenced media cannot be deleted while attached to active publications.',
+    },
+
+    // Sites & Domains
+    sites: {
+      title: 'Site Registry & Domains',
+      subtitle: 'Multi-tenant configurations, domain bindings, and branding controls.',
+      createSite: 'Register New Site',
+      siteName: 'Site Name',
+      siteKey: 'Unique Site Key',
+      defaultLocale: 'Default Locale',
+      timezone: 'Timezone',
+      primaryDomain: 'Primary Domain',
+      manageDomains: 'Domains',
+      addDomain: 'Add Domain Binding',
+      hostname: 'Domain Hostname (e.g. news.airsports.org)',
+      dnsInstructions:
+        'Add the following TXT record to your DNS provider to complete verification:',
+    },
+
+    // Users
+    users: {
+      title: 'User & Role Administration',
+      subtitle: 'Platform Super Admins and site-scoped Client Administrators.',
+      createUser: 'Create Administrator',
+      email: 'Email Address',
+      displayName: 'Display Name',
+      password: 'Initial Password',
+      roles: 'Roles & Scopes',
+      lastLogin: 'Last Login',
+      status: 'Account Status',
+      assignRole: 'Assign Role to User',
+      selectRole: 'Select Role',
+      platformRole: 'Platform Super Admin',
+      siteRole: 'Site-Scoped Admin',
+      protectSuperAdmin: 'The last active Super Admin account cannot be deactivated or deleted.',
+    },
+
+    // Taxonomy
+    taxonomy: {
+      title: 'Site Taxonomy Management',
+      subtitle: 'Hierarchical categories and classification tags scoped to this site.',
+      categories: 'Categories',
+      tags: 'Tags',
+      newCategory: 'New Category',
+      newTag: 'New Tag',
+      name: 'Name',
+      slug: 'URL Slug',
+      description: 'Description',
+      parentCategory: 'Parent Category (Optional)',
+      displayOrder: 'Display Order',
+    },
+
+    // Auth
+    auth: {
+      loginTitle: 'Multi-Site CMS Admin Portal',
+      loginSubtitle:
+        'Sign in with your enterprise credentials to access your publication workspace.',
+      emailLabel: 'Email address',
+      passwordLabel: 'Password',
+      signInBtn: 'Sign In',
+      signingIn: 'Signing in...',
+      unauthorizedTitle: 'Access Denied (403)',
+      unauthorizedDesc:
+        'You do not have permission to access this administrative resource or site.',
+      returnHome: 'Return to Dashboard',
+    },
+  },
+
+  bn: {
+    // Navigation & Shell
+    nav: {
+      dashboard: 'ড্যাশবোর্ড',
+      content: 'বিষয়বস্তু',
+      calendar: 'প্রকাশনা ক্যালেন্ডার',
+      media: 'মিডিয়া লাইব্রেরি',
+      taxonomy: 'ট্যাক্সোনমি',
+      sites: 'সাইট রেজিস্ট্রি',
+      users: 'ব্যবহারকারী পরিচালনা',
+      settings: 'সেটিংস',
+      platform: 'প্ল্যাটফর্ম ওভারভিউ',
+      allSites: 'সকল সাইট (প্ল্যাটফর্ম ভিউ)',
+      switchSite: 'সাইট নির্বাচন করুন',
+      logout: 'লগ আউট',
+      account: 'অ্যাকাউন্ট',
+      superAdmin: 'সুপার অ্যাডমিন',
+      siteAdmin: 'সাইট অ্যাডমিন',
+      language: 'ভাষা',
+      theme: 'থিম',
+      operationalStatus: 'সিস্টেম সুস্থ',
+      unsavedWarning:
+        'আপনার কিছু অসংরক্ষিত পরিবর্তন রয়েছে। আপনি কি নিশ্চিত যে আপনি অন্য পৃষ্ঠায় যেতে চান?',
+    },
+
+    // Common Actions
+    actions: {
+      create: 'তৈরি করুন',
+      save: 'সংরক্ষণ করুন',
+      saveDraft: 'খসড়া সংরক্ষণ করুন',
+      submitReview: 'পর্যালোচনার জন্য জমা দিন',
+      publishNow: 'এখনই প্রকাশ করুন',
+      schedule: 'সময় নির্ধারণ করুন',
+      reschedule: 'সময় পরিবর্তন করুন',
+      cancelSchedule: 'সময়সূচী বাতিল করুন',
+      unpublish: 'অপ্রকাশিত করুন',
+      archive: 'আর্কাইভ করুন',
+      restore: 'পুনরুদ্ধার করুন',
+      preview: 'প্রিভিউ',
+      edit: 'সম্পাদনা',
+      delete: 'মুছে ফেলুন',
+      upload: 'আপলোড',
+      cancel: 'বাতিল',
+      confirm: 'নিশ্চিত করুন',
+      search: 'অনুসন্ধান করুন...',
+      filter: 'ফিল্টার',
+      clearFilters: 'ফিল্টার সাফ করুন',
+      viewLiveSite: 'লাইভ সাইট দেখুন',
+      refresh: 'রিফ্রেশ',
+      verify: 'ডোমেন যাচাই করুন',
+      assignRole: 'রোল নির্ধারণ করুন',
+      revokeRole: 'রোল প্রত্যাহার করুন',
+      viewChallenge: 'ডিএনএস চ্যালেঞ্জ দেখুন',
+    },
+
+    // Statuses
+    status: {
+      draft: 'খসড়া',
+      in_review: 'পর্যালোচনাধীন',
+      scheduled: 'নির্ধারিত',
+      published: 'প্রকাশিত',
+      archived: 'আর্কাইভকৃত',
+      active: 'সক্রিয়',
+      paused: 'স্থগিত',
+      suspended: 'স্থগিত',
+      verified: 'যাচাইকৃত',
+      unverified: 'অযাচাইকৃত',
+    },
+
+    // Dashboard Overview
+    dashboard: {
+      title: 'প্ল্যাটফর্ম ওভারভিউ',
+      subtitle: 'কেন্দ্রীয় সম্পাদকীয় পরিচালনা ও রিয়েল-টাইম বহু-সাইট প্রকাশনা টেলিমেট্রি।',
+      totalContent: 'মোট বিষয়বস্তু',
+      drafts: 'খসড়া',
+      inReview: 'পর্যালোচনাধীন',
+      scheduledPosts: 'সময় নির্ধারিত',
+      publishedPosts: 'প্রকাশিত',
+      healthTitle: 'প্রকাশনা ইঞ্জিন স্বাস্থ্য',
+      workerActive: 'শিডিউল্ড কর্মী সক্রিয়',
+      outboxActive: 'আউটবক্স প্রেরণকারী সক্রিয়',
+      pendingQueue: 'প্রক্রিয়াধীন কিউ',
+      deadLetterQueue: 'ব্যর্থ ইভেন্ট কিউ',
+      upcomingPublications: 'আসন্ন নির্ধারিত প্রকাশনা',
+      noUpcoming: 'বর্তমানে কোনো প্রকাশনা নির্ধারিত নেই।',
+      recentActivity: 'সাম্প্রতিক সম্পাদকীয় কার্যকলাপ',
+      quickActions: 'দ্রুত কর্ম',
+      newPost: '+ নতুন পোস্ট',
+      openMedia: 'মিডিয়া লাইব্রেরি',
+      viewCalendar: 'প্রকাশনা ক্যালেন্ডার',
+    },
+
+    // Content Workspace
+    content: {
+      title: 'সম্পাদকীয় বিষয়বস্তু ওয়ার্কস্পেস',
+      subtitle: 'প্রামাণিক নিবন্ধ, গন্তব্য নির্দেশিকা এবং লাইভ আপডেট পরিচালনা করুন।',
+      newPost: 'নতুন পোস্ট তৈরি করুন',
+      tableTitle: 'শিরোনাম ও সারাংশ',
+      type: 'বিষয়বস্তুর ধরন',
+      status: 'অবস্থা',
+      author: 'লেখক',
+      publicationStatus: 'সাইট প্রকাশনা',
+      updated: 'সর্বশেষ আপডেট',
+      actions: 'পদক্ষেপ',
+      noPosts: 'আপনার ফিল্টারের সাথে মিলে এমন কোনো বিষয়বস্তু পাওয়া যায়নি।',
+      filterByType: 'সকল ধরন',
+      filterByStatus: 'সকল অবস্থা',
+    },
+
+    // Publishing Dialogs
+    publishing: {
+      publishTitle: 'অবিলম্বে বিষয়বস্তু প্রকাশ করুন',
+      publishDesc: 'এটি নির্বাচিত সাইটে বিষয়বস্তু প্রকাশ করবে এবং এজ ক্যাশ অবিলম্বে খালি করবে।',
+      scheduleTitle: 'প্রকাশনার সময় নির্ধারণ করুন',
+      scheduleDesc:
+        'ভবিষ্যতের একটি নির্দিষ্ট সময়ে স্বয়ংক্রিয় প্রকাশের জন্য এই পোস্টটি নির্ধারণ করুন।',
+      targetTime: 'নির্ধারিত সময় (সাইট টাইমজোন)',
+      reasonOptional: 'সম্পাদকীয় কারণ (ঐচ্ছিক)',
+      unpublishTitle: 'বিষয়বস্তু অপ্রকাশিত করুন',
+      unpublishDesc:
+        'এটি প্রকাশনাটিকে পুনরায় খসড়া অবস্থায় ফিরিয়ে দেবে এবং পাবলিক ওয়েবসাইট থেকে সরিয়ে দেবে।',
+      archiveTitle: 'প্রকাশনা আর্কাইভ করুন',
+      archiveDesc: 'এটি স্লাগ এবং অ্যানালিটিক্স সংরক্ষণ করে বিষয়বস্তু সরিয়ে ফেলবে।',
+      restoreTitle: 'আর্কাইভকৃত বিষয়বস্তু পুনরুদ্ধার করুন',
+      restoreDesc: 'এটি আর্কাইভকৃত পোস্টকে পুনরায় সম্পাদনার জন্য খসড়া হিসেবে ফিরিয়ে আনবে।',
+      cancelScheduleTitle: 'নির্ধারিত সময় বাতিল করুন',
+      cancelScheduleDesc: 'এটি সময়সূচী বাতিল করে পোস্টটিকে খসড়া অবস্থায় ফিরিয়ে দেবে।',
+      invalidTimeError: 'নির্ধারিত সময় অন্তত ৫ সেকেন্ড ভবিষ্যতে হতে হবে।',
+      successMsg: 'কার্যক্রম সফলভাবে সম্পন্ন হয়েছে।',
+    },
+
+    // Media Library
+    media: {
+      title: 'মিডিয়া সম্পদ লাইব্রেরি',
+      subtitle: 'গন্তব্য ছবি, অ্যাকশন ব্যানার এবং সংযুক্তিগুলির জন্য কেন্দ্রীয় স্টোরেজ।',
+      uploadTitle: 'মিডিয়া ফাইল আপলোড করুন',
+      dropzoneText: 'ফাইলগুলি এখানে টেনে আনুন, অথবা ব্রাউজ করতে ক্লিক করুন',
+      supportedFormats: 'JPEG, PNG, WebP, AVIF, GIF, SVG, PDF (সর্বোচ্চ ২৫ মেগাবাইট)',
+      editMetadata: 'মেটাডেটা সম্পাদনা করুন',
+      altText: 'বিকল্প পাঠ্য (স্ক্রিন রিডার)',
+      caption: 'ক্যাপশন',
+      storageKey: 'স্টোরেজ কী',
+      fileDetails: 'ফাইলের বিবরণ',
+      deleteConfirm: 'আপনি কি নিশ্চিত যে আপনি এই মিডিয়াটি মুছে ফেলতে চান?',
+      inUseWarning: 'সক্রিয় প্রকাশনার সাথে যুক্ত মিডিয়া মুছে ফেলা যাবে না।',
+    },
+
+    // Sites & Domains
+    sites: {
+      title: 'সাইট রেজিস্ট্রি ও ডোমেন',
+      subtitle: 'বহু-সাইট কনফিগারেশন, ডোমেন বাইন্ডিং এবং ব্র্যান্ডিং নিয়ন্ত্রণ।',
+      createSite: 'নতুন সাইট নিবন্ধন করুন',
+      siteName: 'সাইটের নাম',
+      siteKey: 'অনন্য সাইট কী',
+      defaultLocale: 'ডিফল্ট ভাষা',
+      timezone: 'টাইমজোন',
+      primaryDomain: 'প্রধান ডোমেন',
+      manageDomains: 'ডোমেনসমূহ',
+      addDomain: 'ডোমেন বাইন্ডিং যুক্ত করুন',
+      hostname: 'ডোমেন হোস্টনেম (যেমন news.airsports.org)',
+      dnsInstructions:
+        'যাচাইকরণ সম্পন্ন করতে আপনার ডিএনএস প্রদানকারীতে নিম্নলিখিত TXT রেকর্ডটি যুক্ত করুন:',
+    },
+
+    // Users
+    users: {
+      title: 'ব্যবহারকারী ও রোল প্রশাসন',
+      subtitle: 'প্ল্যাটফর্ম সুপার অ্যাডমিন এবং সাইট-নির্দিষ্ট ক্লায়েন্ট প্রশাসকগণ।',
+      createUser: 'প্রশাসক তৈরি করুন',
+      email: 'ইমেল ঠিকানা',
+      displayName: 'নাম',
+      password: 'প্রাথমিক পাসওয়ার্ড',
+      roles: 'রোল ও পরিসর',
+      lastLogin: 'সর্বশেষ লগইন',
+      status: 'অ্যাকাউন্টের অবস্থা',
+      assignRole: 'রোল নির্ধারণ করুন',
+      selectRole: 'রোল নির্বাচন করুন',
+      platformRole: 'প্ল্যাটফর্ম সুপার অ্যাডমিন',
+      siteRole: 'সাইট অ্যাডমিন',
+      protectSuperAdmin: 'সর্বশেষ সক্রিয় সুপার অ্যাডমিন অ্যাকাউন্ট স্থগিত বা মুছে ফেলা যাবে না।',
+    },
+
+    // Taxonomy
+    taxonomy: {
+      title: 'সাইট ট্যাক্সোনমি পরিচালনা',
+      subtitle: 'এই সাইটের জন্য শ্রেণিবদ্ধ বিভাগ এবং ট্যাগ।',
+      categories: 'বিভাগসমূহ',
+      tags: 'ট্যাগসমূহ',
+      newCategory: 'নতুন বিভাগ',
+      newTag: 'নতুন ট্যাগ',
+      name: 'নাম',
+      slug: 'ইউআরএল স্লাগ',
+      description: 'বিবরণ',
+      parentCategory: 'মূল বিভাগ (ঐচ্ছিক)',
+      displayOrder: 'প্রদর্শনের ক্রম',
+    },
+
+    // Auth
+    auth: {
+      loginTitle: 'মাল্টি-সাইট সিএমএস অ্যাডমিন পোর্টাল',
+      loginSubtitle:
+        'আপনার প্রকাশনা ওয়ার্কস্পেস অ্যাক্সেস করতে আপনার শংসাপত্র দিয়ে সাইন ইন করুন।',
+      emailLabel: 'ইমেল ঠিকানা',
+      passwordLabel: 'পাসওয়ার্ড',
+      signInBtn: 'সাইন ইন করুন',
+      signingIn: 'সাইন ইন হচ্ছে...',
+      unauthorizedTitle: 'অনুমতি নেই (৪০৩)',
+      unauthorizedDesc: 'আপনার এই প্রশাসনিক সংস্থান বা সাইটটি অ্যাক্সেস করার অনুমতি নেই।',
+      returnHome: 'ড্যাশবোর্ডে ফিরে যান',
+    },
+  },
+} as const;
+
+export type TranslationDictionary = {
+  [K in keyof typeof translations.en]: {
+    [P in keyof (typeof translations.en)[K]]: string;
+  };
+};
+
+export type TranslateFunction = {
+  (path: string): string;
+} & TranslationDictionary;
+
+export function formatDateTime(
+  dateInput: string | Date | null | undefined,
+  locale: Locale = 'en',
+  timezone = 'UTC',
+): string {
+  if (!dateInput) return '—';
+  try {
+    const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
+    if (isNaN(date.getTime())) return '—';
+    return new Intl.DateTimeFormat(locale === 'bn' ? 'bn-BD' : 'en-US', {
+      timeZone: timezone,
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(date);
+  } catch {
+    return String(dateInput);
+  }
+}
