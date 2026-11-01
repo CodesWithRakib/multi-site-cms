@@ -1,6 +1,6 @@
 # Data dictionary
 
-Schema as implemented by migrations `1793491200000`–`1793491202000`. Types are
+Schema as implemented by migrations `1793491200000`–`1793491205000`. Types are
 PostgreSQL types. "Site-owned" means the row carries `site_id`; "platform" means
 it does not.
 
@@ -100,17 +100,17 @@ not proof of ownership.
 ## categories
 
 Site-owned. Columns: `id`, `site_id` (→ `sites` CASCADE), `slug` (citext),
-`name`, `description`, timestamps.
+`name`, `description`, `parent_id` (→ `categories(id, site_id)` SET NULL),
+`display_order` (integer, default 0), `is_active` (boolean, default true), timestamps.
 
 Unique `(site_id, slug)` and `(id, site_id)`; slug format `^[a-z0-9]+(-[a-z0-9]+)*$`,
-length 1–96. No hierarchy in v1: a parent/child model would add a self-referencing
-constraint that cannot easily stay site-consistent, and no navigation requirement
-exists yet.
+length 1–96. Foreign key `FK_categories_parent` guarantees that parent categories belong
+to the same site. Circular loops and self-referencing are validated and prevented.
 
 ## tags
 
-Same shape and constraints as `categories`, without `description` or
-`updated_at`. Unique `(site_id, slug)`.
+Site-owned keyword metadata. Columns: `id`, `site_id` (→ `sites` CASCADE), `slug` (citext),
+`name`, `description` (text, nullable), timestamps. Unique `(site_id, slug)`.
 
 Both tables are site-owned because a shared taxonomy would need a visibility model
 to prevent one publication's categories appearing in another's navigation.
@@ -131,12 +131,13 @@ No sessions, stages, or participants: a live update is a publication of type
 
 Canonical content identity. Platform-owned; deliberately **no** `site_id`.
 
-| Column       | Type        | Null | Notes                                       |
-| ------------ | ----------- | ---- | ------------------------------------------- |
-| `author_id`  | uuid        | no   | → `users` RESTRICT                          |
-| `type`       | text        | no   | `article`/`guide`/`news`/`live_update`      |
-| `status`     | text        | no   | `draft`/`in_review`/`approved`/`archived`   |
-| `deleted_at` | timestamptz | yes  | Soft delete; must be filtered in every read |
+| Column          | Type        | Null | Notes                                                                                    |
+| --------------- | ----------- | ---- | ---------------------------------------------------------------------------------------- |
+| `author_id`     | uuid        | no   | → `users` RESTRICT                                                                       |
+| `type`          | text        | no   | `article`/`guide`/`news`/`live_update`/`travel_guide`/`air_sports_update`/`event_update` |
+| `status`        | text        | no   | `draft`/`in_review`/`approved`/`archived`                                                |
+| `source_locale` | text        | no   | Default `'en'`                                                                           |
+| `deleted_at`    | timestamptz | yes  | Soft delete; must be filtered in every read                                              |
 
 `post.status` is the editorial state of the content; publication state is per
 site. They are separate on purpose: content can be approved but unpublished, and
@@ -204,20 +205,21 @@ cascades; deleting a category or tag in use is restricted.
 
 Metadata only; bytes live in object storage.
 
-| Column             | Type        | Null | Notes                                       |
-| ------------------ | ----------- | ---- | ------------------------------------------- |
-| `site_id`          | uuid        | yes  | `NULL` only for Super Admin platform assets |
-| `uploaded_by`      | uuid        | yes  | → `users` SET NULL                          |
-| `storage_provider` | text        | no   | `local` initially, then a provider slug     |
-| `storage_key`      | text        | no   | Unique, opaque, never a user filename       |
-| `mime_type`        | text        | no   | `type/subtype` format                       |
-| `byte_size`        | bigint      | no   | `> 0`                                       |
-| `checksum`         | text        | no   | 32–128 characters (SHA-256 hex)             |
-| `width`/`height`   | integer     | yes  | Both set or both null, `> 0`                |
-| `alt_text`         | text        | yes  | Accessibility text                          |
-| `caption`          | text        | yes  |                                             |
-| `status`           | text        | no   | `active`/`archived`                         |
-| `deleted_at`       | timestamptz | yes  | Soft delete pending storage cleanup         |
+| Column              | Type        | Null | Notes                                       |
+| ------------------- | ----------- | ---- | ------------------------------------------- |
+| `site_id`           | uuid        | yes  | `NULL` only for Super Admin platform assets |
+| `uploaded_by`       | uuid        | yes  | → `users` SET NULL                          |
+| `storage_provider`  | text        | no   | `local` initially, then a provider slug     |
+| `storage_key`       | text        | no   | Unique, opaque, never a user filename       |
+| `original_filename` | text        | yes  | Original file name at upload time           |
+| `mime_type`         | text        | no   | `type/subtype` format                       |
+| `byte_size`         | bigint      | no   | `> 0`                                       |
+| `checksum`          | text        | no   | 32–128 characters (SHA-256 hex)             |
+| `width`/`height`    | integer     | yes  | Both set or both null, `> 0`                |
+| `alt_text`          | text        | yes  | Accessibility text                          |
+| `caption`           | text        | yes  |                                             |
+| `status`            | text        | no   | `active`/`archived`                         |
+| `deleted_at`        | timestamptz | yes  | Soft delete pending storage cleanup         |
 
 Never stored: provider credentials, signed upload/download URLs, temporary tokens.
 A signed URL is a capability, not an identifier.

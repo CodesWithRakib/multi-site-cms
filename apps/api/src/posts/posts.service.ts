@@ -1,0 +1,652 @@
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { type DataSource, type Repository } from 'typeorm';
+
+import type { PaginatedResult, PostItem, PostRevisionItem } from '@multi-site-cms/types';
+import type { EffectiveAuthContext } from '../auth/services/authorization.service';
+import { AuditService } from '../common/audit/audit.service';
+import { ApiException } from '../common/exceptions/api.exception';
+import { DATA_SOURCE } from '../database/database.tokens';
+import { getInitializedRepository } from '../database/ensure-connected';
+import { PostPublicationCategory } from '../database/entities/post-publication-category.entity';
+import { PostPublicationTag } from '../database/entities/post-publication-tag.entity';
+import { PostPublication } from '../database/entities/post-publication.entity';
+import { PostRevision } from '../database/entities/post-revision.entity';
+import { Post } from '../database/entities/post.entity';
+import { CreatePostDto, ListPostsQueryDto, RestoreRevisionDto, UpdatePostDto } from './dto';
+import { validateStructuredBody } from './utils/body-validator';
+
+@Injectable()
+export class PostsService {
+  constructor(
+    @Inject(DATA_SOURCE) private readonly dataSource: DataSource,
+    private readonly auditService: AuditService,
+  ) {}
+
+  private async getPostRepo(): Promise<Repository<Post>> {
+    return getInitializedRepository(this.dataSource, Post);
+  }
+
+  private async getRevisionRepo(): Promise<Repository<PostRevision>> {
+    return getInitializedRepository(this.dataSource, PostRevision);
+  }
+
+  private async getPublicationRepo(): Promise<Repository<PostPublication>> {
+    return getInitializedRepository(this.dataSource, PostPublication);
+  }
+
+  private canAccessPost(
+    actor: EffectiveAuthContext,
+    post: Post,
+    publications: PostPublication[],
+  ): boolean {
+    if (actor.isSuperAdmin) return true;
+    if (post.authorId === actor.user.id) return true;
+    return publications.some((pub) => actor.authorizedSiteIds.includes(pub.siteId));
+  }
+
+  async createPost(actor: EffectiveAuthContext, dto: CreatePostDto): Promise<PostItem> {
+    const bodyValidation = validateStructuredBody(dto.body);
+    if (!bodyValidation.isValid) {
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'VALIDATION_ERROR', 'post.invalidBody');
+    }
+
+    if (dto.publications && dto.publications.length > 0) {
+      for (const pub of dto.publications) {
+        if (!actor.isSuperAdmin && !actor.authorizedSiteIds.includes(pub.siteId)) {
+          throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'sites.notFound');
+        }
+      }
+    }
+
+    return this.dataSource.transaction(async (manager) => {
+      const postRepo = manager.getRepository(Post);
+      const revRepo = manager.getRepository(PostRevision);
+      const pubRepo = manager.getRepository(PostPublication);
+      const pubCatRepo = manager.getRepository(PostPublicationCategory);
+      const pubTagRepo = manager.getRepository(PostPublicationTag);
+
+      const post = postRepo.create({
+        authorId: actor.user.id,
+        type: dto.type ?? 'article',
+        status: dto.status ?? 'draft',
+        sourceLocale: dto.sourceLocale?.trim() || 'en',
+        deletedAt: null,
+      });
+      const savedPost = await postRepo.save(post);
+
+      const revision = revRepo.create({
+        postId: savedPost.id,
+        revisionNumber: 1,
+        title: dto.title.trim(),
+        excerpt: dto.excerpt?.trim() || null,
+        body: dto.body,
+        changeSummary: dto.changeSummary?.trim() || 'Initial revision',
+        createdBy: actor.user.id,
+      });
+      const savedRev = await revRepo.save(revision);
+
+      const publications: PostPublication[] = [];
+      if (dto.publications && dto.publications.length > 0) {
+        for (const pubDto of dto.publications) {
+          const pub = pubRepo.create({
+            siteId: pubDto.siteId,
+            postId: savedPost.id,
+            revisionId: savedRev.id,
+            slug: pubDto.slug.trim().toLowerCase(),
+            status: pubDto.status ?? 'draft',
+            seoTitle: pubDto.seoTitle?.trim() || null,
+            seoDescription: pubDto.seoDescription?.trim() || null,
+            canonicalUrl: pubDto.canonicalUrl?.trim() || null,
+            featuredImageId: pubDto.featuredImageId || null,
+            templateKey: pubDto.templateKey?.trim() || null,
+            scheduledFor: pubDto.scheduledFor ? new Date(pubDto.scheduledFor) : null,
+            publishedAt:
+              pubDto.status === 'published'
+                ? pubDto.publishedAt
+                  ? new Date(pubDto.publishedAt)
+                  : new Date()
+                : null,
+          });
+          const savedPub = await pubRepo.save(pub);
+
+          if (pubDto.categoryIds && pubDto.categoryIds.length > 0) {
+            for (const catId of pubDto.categoryIds) {
+              await pubCatRepo.save(
+                pubCatRepo.create({
+                  publicationId: savedPub.id,
+                  categoryId: catId,
+                  siteId: pubDto.siteId,
+                }),
+              );
+            }
+          }
+
+          if (pubDto.tagIds && pubDto.tagIds.length > 0) {
+            for (const tagId of pubDto.tagIds) {
+              await pubTagRepo.save(
+                pubTagRepo.create({
+                  publicationId: savedPub.id,
+                  tagId,
+                  siteId: pubDto.siteId,
+                }),
+              );
+            }
+          }
+
+          publications.push(savedPub);
+        }
+      }
+
+      await this.auditService.record({
+        actorId: actor.user.id,
+        actorType: 'user',
+        action: 'post.create',
+        entityType: 'post',
+        entityId: savedPost.id,
+        metadata: {
+          title: savedRev.title,
+          type: savedPost.type,
+          revisionNumber: 1,
+        },
+      });
+
+      return {
+        id: savedPost.id,
+        authorId: savedPost.authorId,
+        type: savedPost.type,
+        status: savedPost.status,
+        sourceLocale: savedPost.sourceLocale,
+        deletedAt: null,
+        createdAt: savedPost.createdAt.toISOString(),
+        updatedAt: savedPost.updatedAt.toISOString(),
+        currentRevisionNumber: 1,
+        currentRevision: this.mapRevisionToItem(savedRev),
+        publications: publications.map((p) => ({
+          id: p.id,
+          siteId: p.siteId,
+          postId: p.postId,
+          revisionId: p.revisionId,
+          slug: p.slug,
+          status: p.status,
+          scheduledFor: p.scheduledFor ? p.scheduledFor.toISOString() : null,
+          publishedAt: p.publishedAt ? p.publishedAt.toISOString() : null,
+          seoTitle: p.seoTitle,
+          seoDescription: p.seoDescription,
+          canonicalUrl: p.canonicalUrl,
+          featuredImageId: p.featuredImageId,
+          templateKey: p.templateKey,
+          eventId: p.eventId,
+          createdAt: p.createdAt.toISOString(),
+          updatedAt: p.updatedAt.toISOString(),
+        })),
+      };
+    });
+  }
+
+  async listPosts(
+    actor: EffectiveAuthContext,
+    query: ListPostsQueryDto,
+  ): Promise<PaginatedResult<PostItem>> {
+    const page = Math.max(1, query.page ?? 1);
+    const limit = Math.min(100, Math.max(1, query.limit ?? 20));
+    const skip = (page - 1) * limit;
+
+    const postRepo = await this.getPostRepo();
+    const revisionRepo = await this.getRevisionRepo();
+
+    const qb = postRepo.createQueryBuilder('p').where('p.deleted_at IS NULL');
+
+    if (!actor.isSuperAdmin) {
+      if (actor.authorizedSiteIds.length > 0) {
+        qb.andWhere(
+          '(p.author_id = :authorId OR EXISTS (SELECT 1 FROM post_publications pp WHERE pp.post_id = p.id AND pp.site_id IN (:...siteIds)))',
+          { authorId: actor.user.id, siteIds: actor.authorizedSiteIds },
+        );
+      } else {
+        qb.andWhere('p.author_id = :authorId', { authorId: actor.user.id });
+      }
+    }
+
+    if (query.type) {
+      qb.andWhere('p.type = :type', { type: query.type });
+    }
+
+    if (query.status) {
+      qb.andWhere('p.status = :status', { status: query.status });
+    }
+
+    if (query.authorId) {
+      qb.andWhere('p.author_id = :filterAuthor', { filterAuthor: query.authorId });
+    }
+
+    if (query.siteId) {
+      if (!actor.isSuperAdmin && !actor.authorizedSiteIds.includes(query.siteId)) {
+        throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'sites.notFound');
+      }
+      qb.andWhere(
+        'EXISTS (SELECT 1 FROM post_publications pp WHERE pp.post_id = p.id AND pp.site_id = :filterSite)',
+        { filterSite: query.siteId },
+      );
+    }
+
+    if (query.search) {
+      qb.andWhere(
+        'EXISTS (SELECT 1 FROM post_revisions pr WHERE pr.post_id = p.id AND (pr.title ILIKE :search OR pr.excerpt ILIKE :search))',
+        { search: `%${query.search.trim()}%` },
+      );
+    }
+
+    if (query.startDate) {
+      qb.andWhere('p.created_at >= :startDate', { startDate: new Date(query.startDate) });
+    }
+
+    if (query.endDate) {
+      qb.andWhere('p.created_at <= :endDate', { endDate: new Date(query.endDate) });
+    }
+
+    const sortField = query.sortBy === 'updatedAt' ? 'p.updated_at' : 'p.created_at';
+    const sortOrder = query.sortOrder === 'ASC' ? 'ASC' : 'DESC';
+    qb.orderBy(sortField, sortOrder);
+
+    const [posts, total] = await qb.skip(skip).take(limit).getManyAndCount();
+
+    const items: PostItem[] = [];
+    for (const post of posts) {
+      const latestRev = await revisionRepo.findOne({
+        where: { postId: post.id },
+        order: { revisionNumber: 'DESC' },
+      });
+      items.push({
+        id: post.id,
+        authorId: post.authorId,
+        type: post.type,
+        status: post.status,
+        sourceLocale: post.sourceLocale,
+        deletedAt: post.deletedAt ? post.deletedAt.toISOString() : null,
+        createdAt: post.createdAt.toISOString(),
+        updatedAt: post.updatedAt.toISOString(),
+        currentRevisionNumber: latestRev?.revisionNumber,
+        currentRevision: latestRev ? this.mapRevisionToItem(latestRev) : null,
+      });
+    }
+
+    return {
+      items,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit) || 1,
+    };
+  }
+
+  async getPost(actor: EffectiveAuthContext, postId: string): Promise<PostItem> {
+    const postRepo = await this.getPostRepo();
+    const publicationRepo = await this.getPublicationRepo();
+    const revisionRepo = await this.getRevisionRepo();
+
+    const post = await postRepo.findOne({
+      where: { id: postId },
+    });
+
+    if (!post || post.deletedAt) {
+      throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'post.notFound');
+    }
+
+    const publications = await publicationRepo.find({
+      where: { postId },
+    });
+
+    if (!this.canAccessPost(actor, post, publications)) {
+      throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'post.notFound');
+    }
+
+    const latestRev = await revisionRepo.findOne({
+      where: { postId },
+      order: { revisionNumber: 'DESC' },
+    });
+
+    return {
+      id: post.id,
+      authorId: post.authorId,
+      type: post.type,
+      status: post.status,
+      sourceLocale: post.sourceLocale,
+      deletedAt: null,
+      createdAt: post.createdAt.toISOString(),
+      updatedAt: post.updatedAt.toISOString(),
+      currentRevisionNumber: latestRev?.revisionNumber,
+      currentRevision: latestRev ? this.mapRevisionToItem(latestRev) : null,
+      publications: publications.map((p) => ({
+        id: p.id,
+        siteId: p.siteId,
+        postId: p.postId,
+        revisionId: p.revisionId,
+        slug: p.slug,
+        status: p.status,
+        scheduledFor: p.scheduledFor ? p.scheduledFor.toISOString() : null,
+        publishedAt: p.publishedAt ? p.publishedAt.toISOString() : null,
+        seoTitle: p.seoTitle,
+        seoDescription: p.seoDescription,
+        canonicalUrl: p.canonicalUrl,
+        featuredImageId: p.featuredImageId,
+        templateKey: p.templateKey,
+        eventId: p.eventId,
+        createdAt: p.createdAt.toISOString(),
+        updatedAt: p.updatedAt.toISOString(),
+      })),
+    };
+  }
+
+  async updatePost(
+    actor: EffectiveAuthContext,
+    postId: string,
+    dto: UpdatePostDto,
+  ): Promise<PostItem> {
+    return this.dataSource.transaction(async (manager) => {
+      const postRepo = manager.getRepository(Post);
+      const revRepo = manager.getRepository(PostRevision);
+      const pubRepo = manager.getRepository(PostPublication);
+
+      const post = await postRepo.findOne({ where: { id: postId } });
+      if (!post || post.deletedAt) {
+        throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'post.notFound');
+      }
+
+      const publications = await pubRepo.find({ where: { postId } });
+      if (!this.canAccessPost(actor, post, publications)) {
+        throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'post.notFound');
+      }
+
+      const latestRev = await revRepo.findOne({
+        where: { postId },
+        order: { revisionNumber: 'DESC' },
+      });
+
+      if (!latestRev) {
+        throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'revision.notFound');
+      }
+
+      // Optimistic Concurrency Control check
+      if (
+        dto.expectedRevisionNumber !== undefined &&
+        dto.expectedRevisionNumber !== latestRev.revisionNumber
+      ) {
+        throw new ApiException(HttpStatus.CONFLICT, 'CONFLICT', 'post.versionConflict');
+      }
+
+      // Validate body if provided
+      if (dto.body) {
+        const bodyValidation = validateStructuredBody(dto.body);
+        if (!bodyValidation.isValid) {
+          throw new ApiException(HttpStatus.BAD_REQUEST, 'VALIDATION_ERROR', 'post.invalidBody');
+        }
+      }
+
+      const isContentChanged =
+        (dto.title !== undefined && dto.title.trim() !== latestRev.title) ||
+        (dto.excerpt !== undefined && (dto.excerpt?.trim() || null) !== latestRev.excerpt) ||
+        (dto.body !== undefined && JSON.stringify(dto.body) !== JSON.stringify(latestRev.body));
+
+      let activeRev = latestRev;
+      if (isContentChanged) {
+        const newRev = revRepo.create({
+          postId,
+          revisionNumber: latestRev.revisionNumber + 1,
+          title: dto.title?.trim() ?? latestRev.title,
+          excerpt: dto.excerpt !== undefined ? dto.excerpt?.trim() || null : latestRev.excerpt,
+          body: dto.body ?? latestRev.body,
+          changeSummary: dto.changeSummary?.trim() || 'Updated content',
+          createdBy: actor.user.id,
+        });
+        activeRev = await revRepo.save(newRev);
+      }
+
+      if (dto.type) post.type = dto.type;
+      if (dto.status) post.status = dto.status;
+      if (dto.sourceLocale) post.sourceLocale = dto.sourceLocale.trim();
+      post.updatedAt = new Date();
+
+      const savedPost = await postRepo.save(post);
+
+      await this.auditService.record({
+        actorId: actor.user.id,
+        actorType: 'user',
+        action: 'post.update',
+        entityType: 'post',
+        entityId: savedPost.id,
+        metadata: {
+          revisionNumber: activeRev.revisionNumber,
+          isNewRevision: isContentChanged,
+        },
+      });
+
+      return {
+        id: savedPost.id,
+        authorId: savedPost.authorId,
+        type: savedPost.type,
+        status: savedPost.status,
+        sourceLocale: savedPost.sourceLocale,
+        deletedAt: null,
+        createdAt: savedPost.createdAt.toISOString(),
+        updatedAt: savedPost.updatedAt.toISOString(),
+        currentRevisionNumber: activeRev.revisionNumber,
+        currentRevision: this.mapRevisionToItem(activeRev),
+        publications: publications.map((p) => ({
+          id: p.id,
+          siteId: p.siteId,
+          postId: p.postId,
+          revisionId: p.revisionId,
+          slug: p.slug,
+          status: p.status,
+          scheduledFor: p.scheduledFor ? p.scheduledFor.toISOString() : null,
+          publishedAt: p.publishedAt ? p.publishedAt.toISOString() : null,
+          seoTitle: p.seoTitle,
+          seoDescription: p.seoDescription,
+          canonicalUrl: p.canonicalUrl,
+          featuredImageId: p.featuredImageId,
+          templateKey: p.templateKey,
+          eventId: p.eventId,
+          createdAt: p.createdAt.toISOString(),
+          updatedAt: p.updatedAt.toISOString(),
+        })),
+      };
+    });
+  }
+
+  async archivePost(actor: EffectiveAuthContext, postId: string): Promise<void> {
+    const postRepo = await this.getPostRepo();
+    const publicationRepo = await this.getPublicationRepo();
+
+    const post = await postRepo.findOne({ where: { id: postId } });
+    if (!post || post.deletedAt) {
+      throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'post.notFound');
+    }
+
+    const publications = await publicationRepo.find({ where: { postId } });
+    if (!this.canAccessPost(actor, post, publications)) {
+      throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'post.notFound');
+    }
+
+    await this.dataSource.transaction(async (manager) => {
+      post.deletedAt = new Date();
+      post.status = 'archived';
+      await manager.getRepository(Post).save(post);
+
+      await manager.getRepository(PostPublication).update({ postId }, { status: 'archived' });
+
+      await this.auditService.record({
+        actorId: actor.user.id,
+        actorType: 'user',
+        action: 'post.delete',
+        entityType: 'post',
+        entityId: postId,
+        metadata: { status: 'archived' },
+      });
+    });
+  }
+
+  async restorePost(actor: EffectiveAuthContext, postId: string): Promise<PostItem> {
+    if (!actor.isSuperAdmin) {
+      throw new ApiException(HttpStatus.FORBIDDEN, 'FORBIDDEN', 'http.forbidden');
+    }
+
+    const postRepo = await this.getPostRepo();
+    const post = await postRepo.findOne({ where: { id: postId } });
+    if (!post) {
+      throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'post.notFound');
+    }
+
+    if (!post.deletedAt) {
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'VALIDATION_ERROR', 'post.notArchived');
+    }
+
+    post.deletedAt = null;
+    post.status = 'draft';
+    const saved = await postRepo.save(post);
+
+    await this.auditService.record({
+      actorId: actor.user.id,
+      actorType: 'user',
+      action: 'post.update',
+      entityType: 'post',
+      entityId: postId,
+      metadata: { action: 'restored' },
+    });
+
+    return this.getPost(actor, saved.id);
+  }
+
+  async listRevisions(actor: EffectiveAuthContext, postId: string): Promise<PostRevisionItem[]> {
+    const postRepo = await this.getPostRepo();
+    const publicationRepo = await this.getPublicationRepo();
+    const revisionRepo = await this.getRevisionRepo();
+
+    const post = await postRepo.findOne({ where: { id: postId } });
+    if (!post || post.deletedAt) {
+      throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'post.notFound');
+    }
+
+    const publications = await publicationRepo.find({ where: { postId } });
+    if (!this.canAccessPost(actor, post, publications)) {
+      throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'post.notFound');
+    }
+
+    const revisions = await revisionRepo.find({
+      where: { postId },
+      order: { revisionNumber: 'DESC' },
+    });
+
+    return revisions.map((r) => this.mapRevisionToItem(r));
+  }
+
+  async getRevision(
+    actor: EffectiveAuthContext,
+    postId: string,
+    revisionNumber: number,
+  ): Promise<PostRevisionItem> {
+    const postRepo = await this.getPostRepo();
+    const publicationRepo = await this.getPublicationRepo();
+    const revisionRepo = await this.getRevisionRepo();
+
+    const post = await postRepo.findOne({ where: { id: postId } });
+    if (!post || post.deletedAt) {
+      throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'post.notFound');
+    }
+
+    const publications = await publicationRepo.find({ where: { postId } });
+    if (!this.canAccessPost(actor, post, publications)) {
+      throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'post.notFound');
+    }
+
+    const revision = await revisionRepo.findOne({
+      where: { postId, revisionNumber },
+    });
+
+    if (!revision) {
+      throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'revision.notFound');
+    }
+
+    return this.mapRevisionToItem(revision);
+  }
+
+  async restoreRevision(
+    actor: EffectiveAuthContext,
+    postId: string,
+    revisionNumber: number,
+    dto: RestoreRevisionDto,
+  ): Promise<PostRevisionItem> {
+    return this.dataSource.transaction(async (manager) => {
+      const postRepo = manager.getRepository(Post);
+      const revRepo = manager.getRepository(PostRevision);
+      const pubRepo = manager.getRepository(PostPublication);
+
+      const post = await postRepo.findOne({ where: { id: postId } });
+      if (!post || post.deletedAt) {
+        throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'post.notFound');
+      }
+
+      const publications = await pubRepo.find({ where: { postId } });
+      if (!this.canAccessPost(actor, post, publications)) {
+        throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'post.notFound');
+      }
+
+      const targetRev = await revRepo.findOne({
+        where: { postId, revisionNumber },
+      });
+
+      if (!targetRev) {
+        throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'revision.notFound');
+      }
+
+      const latestRev = await revRepo.findOne({
+        where: { postId },
+        order: { revisionNumber: 'DESC' },
+      });
+
+      const nextRevNumber = (latestRev?.revisionNumber ?? revisionNumber) + 1;
+
+      const restoredRev = revRepo.create({
+        postId,
+        revisionNumber: nextRevNumber,
+        title: targetRev.title,
+        excerpt: targetRev.excerpt,
+        body: targetRev.body,
+        changeSummary: dto.changeSummary?.trim() || `Restored from revision #${revisionNumber}`,
+        createdBy: actor.user.id,
+      });
+
+      const savedRev = await revRepo.save(restoredRev);
+
+      post.updatedAt = new Date();
+      await postRepo.save(post);
+
+      await this.auditService.record({
+        actorId: actor.user.id,
+        actorType: 'user',
+        action: 'post.update',
+        entityType: 'post',
+        entityId: postId,
+        metadata: {
+          restoredFromRevision: revisionNumber,
+          newRevisionNumber: nextRevNumber,
+        },
+      });
+
+      return this.mapRevisionToItem(savedRev);
+    });
+  }
+
+  private mapRevisionToItem(rev: PostRevision): PostRevisionItem {
+    return {
+      id: rev.id,
+      postId: rev.postId,
+      revisionNumber: rev.revisionNumber,
+      title: rev.title,
+      excerpt: rev.excerpt,
+      body: rev.body,
+      changeSummary: rev.changeSummary,
+      createdBy: rev.createdBy,
+      createdAt: rev.createdAt.toISOString(),
+    };
+  }
+}

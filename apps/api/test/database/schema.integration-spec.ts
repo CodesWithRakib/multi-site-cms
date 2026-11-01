@@ -146,7 +146,7 @@ describe('migration chain', () => {
       `SELECT "name" FROM "typeorm_migrations" ORDER BY "id"`,
     );
 
-    expect(applied).toHaveLength(5);
+    expect(applied).toHaveLength(6);
   });
 
   it('creates every expected table', async () => {

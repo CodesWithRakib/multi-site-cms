@@ -1,7 +1,7 @@
 # Entity relationship diagram
 
-Status: **implemented** by the Phase 02 migrations
-(`1793491200000`–`1793491202000`). This diagram is the schema as created, not a
+Status: **implemented** by the Phase 02–06 migrations
+(`1793491200000`–`1793491205000`). This diagram is the schema as created, not a
 proposal.
 
 ## Identity, authorization, and site registry

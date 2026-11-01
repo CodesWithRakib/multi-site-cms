@@ -28,7 +28,10 @@ import { User } from './user.entity';
  * publication rows are archived in the same transaction.
  */
 @Entity({ name: 'posts' })
-@Check('CHK_posts_type', "\"type\" IN ('article', 'guide', 'news', 'live_update')")
+@Check(
+  'CHK_posts_type',
+  "\"type\" IN ('article', 'guide', 'news', 'live_update', 'travel_guide', 'air_sports_update', 'event_update')",
+)
 @Check('CHK_posts_status', "\"status\" IN ('draft', 'in_review', 'approved', 'archived')")
 @Index('IDX_posts_author_created', ['authorId', 'createdAt'])
 @Index('IDX_posts_status_updated', ['status', 'updatedAt'])
@@ -44,6 +47,9 @@ export class Post {
 
   @Column({ type: 'text', default: 'draft' })
   status!: PostStatus;
+
+  @Column({ name: 'source_locale', type: 'text', default: 'en' })
+  sourceLocale!: string;
 
   @Column({ name: 'deleted_at', type: 'timestamptz', nullable: true })
   deletedAt!: Date | null;

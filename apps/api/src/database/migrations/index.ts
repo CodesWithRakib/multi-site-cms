@@ -1,4 +1,5 @@
 import { AuthenticationAndSessions1793491203000 } from './1793491203000-AuthenticationAndSessions';
+import { ContentEnhancementsAndTaxonomyHierarchy1793491205000 } from './1793491205000-ContentEnhancementsAndTaxonomyHierarchy';
 import { ContentMediaAndAudit1793491202000 } from './1793491202000-ContentMediaAndAudit';
 import { EnableDatabaseExtensions1793491200000 } from './1793491200000-EnableDatabaseExtensions';
 import { IdentityAndSiteRegistry1793491201000 } from './1793491201000-IdentityAndSiteRegistry';
@@ -16,4 +17,5 @@ export const MIGRATIONS = [
   ContentMediaAndAudit1793491202000,
   AuthenticationAndSessions1793491203000,
   SiteDomainsVerificationAndLifecycle1793491204000,
+  ContentEnhancementsAndTaxonomyHierarchy1793491205000,
 ] as const;

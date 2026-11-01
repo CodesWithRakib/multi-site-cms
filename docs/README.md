@@ -72,6 +72,16 @@ describing future behavior is labelled with its phase.
 - [Site Configuration & Public Discovery](multisite/site-configuration.md) — Branding, acyclic navigation trees, SEO defaults, locales, and public ETag caching.
 - [Multi-Site Authorization Matrix](multisite/site-authorization-matrix.md) — Super Admin vs Site Admin permissions, 404 IDOR protection, and audit logs.
 
+## Content Management System (CMS Core)
+
+- [Canonical Content Model](content/content-model.md) — Source posts, content types, structured editor JSON validation.
+- [Content API Reference](content/content-api.md) — REST endpoints for posts, publications, revisions, taxonomy, and media.
+- [Site Publications](content/site-publications.md) — Multi-site publishing, site-scoped slugs, pinned revisions, and SEO overrides.
+- [Site-Scoped Taxonomy](content/taxonomy.md) — Hierarchical categories, acyclic tree validation, and tag associations.
+- [Revision History & OCC](content/revision-history.md) — Optimistic concurrency control, version snapshots, and safe rollback.
+- [Media Metadata Foundation](content/media-metadata.md) — Abstract storage keys, MIME allowlists, and deletion protection.
+- [Content Authorization & Isolation](content/content-authorization.md) — Multi-tenant boundaries, RBAC permissions, and opaque 404 denials.
+
 ## Security
 
 - [Authentication and authorization](security/authentication.md)

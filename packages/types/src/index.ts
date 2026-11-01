@@ -220,3 +220,107 @@ export interface PublicSiteConfig {
   navigation: PublicNavigationItem[];
   seo: SiteSeo;
 }
+
+export type PostType =
+  | 'article'
+  | 'guide'
+  | 'news'
+  | 'live_update'
+  | 'travel_guide'
+  | 'air_sports_update'
+  | 'event_update';
+
+export type PostStatus = 'draft' | 'in_review' | 'approved' | 'archived';
+export type PublicationStatus = 'draft' | 'scheduled' | 'published' | 'archived';
+export type MediaStatus = 'active' | 'archived';
+export type MediaUsageRole = 'featured' | 'gallery' | 'inline' | 'attachment';
+
+export interface PostRevisionItem {
+  id: string;
+  postId: string;
+  revisionNumber: number;
+  title: string;
+  excerpt: string | null;
+  body: Record<string, unknown>;
+  changeSummary: string | null;
+  createdBy: string;
+  createdAt: string;
+}
+
+export interface PostPublicationItem {
+  id: string;
+  siteId: string;
+  postId: string;
+  revisionId: string;
+  slug: string;
+  status: PublicationStatus;
+  scheduledFor: string | null;
+  publishedAt: string | null;
+  seoTitle: string | null;
+  seoDescription: string | null;
+  canonicalUrl: string | null;
+  featuredImageId: string | null;
+  templateKey: string | null;
+  eventId: string | null;
+  createdAt: string;
+  updatedAt: string;
+  categoryIds?: string[];
+  tagIds?: string[];
+}
+
+export interface PostItem {
+  id: string;
+  authorId: string;
+  type: PostType;
+  status: PostStatus;
+  sourceLocale: string;
+  deletedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  currentRevision?: PostRevisionItem | null;
+  currentRevisionNumber?: number;
+  publications?: PostPublicationItem[];
+}
+
+export interface CategoryItem {
+  id: string;
+  siteId: string;
+  slug: string;
+  name: string;
+  description: string | null;
+  parentId: string | null;
+  displayOrder: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  children?: CategoryItem[];
+}
+
+export interface TagItem {
+  id: string;
+  siteId: string;
+  slug: string;
+  name: string;
+  description: string | null;
+  createdAt: string;
+}
+
+export interface MediaAssetItem {
+  id: string;
+  siteId: string | null;
+  uploadedBy: string | null;
+  storageProvider: string;
+  storageKey: string;
+  originalFilename: string | null;
+  mimeType: string;
+  byteSize: string;
+  checksum: string;
+  width: number | null;
+  height: number | null;
+  altText: string | null;
+  caption: string | null;
+  status: MediaStatus;
+  deletedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}

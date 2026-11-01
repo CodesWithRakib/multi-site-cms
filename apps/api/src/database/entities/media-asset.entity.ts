@@ -56,6 +56,9 @@ export class MediaAsset {
   @Column({ name: 'storage_key', type: 'text', unique: true })
   storageKey!: string;
 
+  @Column({ name: 'original_filename', type: 'text', nullable: true })
+  originalFilename!: string | null;
+
   @Column({ name: 'mime_type', type: 'text' })
   mimeType!: string;
 

@@ -41,6 +41,15 @@ export class Category {
   @Column({ type: 'text', nullable: true })
   description!: string | null;
 
+  @Column({ name: 'parent_id', type: 'uuid', nullable: true })
+  parentId!: string | null;
+
+  @Column({ name: 'display_order', type: 'integer', default: 0 })
+  displayOrder!: number;
+
+  @Column({ name: 'is_active', type: 'boolean', default: true })
+  isActive!: boolean;
+
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt!: Date;
 
@@ -50,4 +59,11 @@ export class Category {
   @ManyToOne(() => Site, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'site_id' })
   site!: Site;
+
+  @ManyToOne(() => Category, { onDelete: 'SET NULL', nullable: true })
+  @JoinColumn([
+    { name: 'parent_id', referencedColumnName: 'id' },
+    { name: 'site_id', referencedColumnName: 'siteId' },
+  ])
+  parent!: Category | null;
 }

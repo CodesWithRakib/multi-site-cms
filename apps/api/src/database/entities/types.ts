@@ -20,7 +20,15 @@ export type SiteStatus = (typeof SITE_STATUSES)[number];
 export const DOMAIN_STATUSES = ['active', 'disabled'] as const;
 export type DomainStatus = (typeof DOMAIN_STATUSES)[number];
 
-export const POST_TYPES = ['article', 'guide', 'news', 'live_update'] as const;
+export const POST_TYPES = [
+  'article',
+  'guide',
+  'news',
+  'live_update',
+  'travel_guide',
+  'air_sports_update',
+  'event_update',
+] as const;
 export type PostType = (typeof POST_TYPES)[number];
 
 /** Editorial state of the canonical content item, independent of any site. */

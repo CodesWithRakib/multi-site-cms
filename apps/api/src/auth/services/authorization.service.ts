@@ -150,7 +150,10 @@ export class AuthorizationService {
       return sitePerms ? sitePerms.includes(permissionKey) : false;
     }
 
-    return context.permissions.includes(permissionKey);
+    return (
+      context.permissions.includes(permissionKey) ||
+      Object.values(context.sitePermissions).some((perms) => perms.includes(permissionKey))
+    );
   }
 
   /**

@@ -12,7 +12,10 @@ import { RequestLoggingInterceptor } from './common/interceptors/request-logging
 import { ResponseEnvelopeInterceptor } from './common/interceptors/response-envelope.interceptor';
 import { DatabaseModule } from './database/database.module';
 import { HealthModule } from './health/health.module';
+import { MediaModule } from './media/media.module';
+import { PostsModule } from './posts/posts.module';
 import { SitesModule } from './sites/sites.module';
+import { TaxonomyModule } from './taxonomy/taxonomy.module';
 import { UsersModule } from './users/users.module';
 
 @Module({
@@ -29,6 +32,9 @@ import { UsersModule } from './users/users.module';
     AuthModule,
     UsersModule,
     SitesModule,
+    PostsModule,
+    TaxonomyModule,
+    MediaModule,
     HealthModule,
   ],
   providers: [

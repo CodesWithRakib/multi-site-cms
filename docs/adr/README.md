@@ -22,6 +22,7 @@ earlier one with a new ADR and a `Status` line change, never by rewriting histor
 | [0015](0015-liveness-readiness-and-lazy-datasource.md)       | Separate liveness/readiness, lazily opened pool           | Accepted |
 | [0016](0016-session-based-authentication-and-rbac.md)        | Session-based authentication and role-based authorization | Accepted |
 | [0017](0017-multi-site-configuration-and-domain-registry.md) | Multi-site configuration and domain registry              | Accepted |
+| [0018](0018-cms-core-content-publications-and-taxonomy.md)   | CMS Core content, publications, revisions & taxonomy      | Accepted |
 
 ## Template
 
