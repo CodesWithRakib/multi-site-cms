@@ -133,6 +133,19 @@ describing future behavior is labelled with its phase.
 - [Performance & Core Web Vitals](sites/air-sports/performance.md) — RSC-first delivery, Next.js Image optimization, and telemetry fonts.
 - [Failure Recovery & Resilience](sites/air-sports/failure-recovery.md) — Network partition handling, buffer replay, and degraded states.
 
+## Production Readiness & Operations
+
+- [Production Readiness Audit](production/production-readiness-audit.md) — Capability-by-capability verification matrix across all 12 domains.
+- [Security Audit](production/security-audit.md) — Comprehensive threat-oriented security review and mitigations.
+- [Deployment Guide](production/deployment-guide.md) — Complete production deployment topologies and release sequences.
+- [Environment Configuration](production/environment-configuration.md) — Environment variables reference and secret handling.
+- [Backup and Recovery](production/backup-and-recovery.md) — Point-in-time restore procedures and verified drill checklist.
+- [Incident Response](production/incident-response.md) — Triage protocols, outbox backlog runbooks, and compromised account isolation.
+- [Performance Baseline](production/performance-baseline.md) — Measured build bundles, ISR caching parameters, and load testing plan.
+- [SEO Migration Checklist](production/seo-migration-checklist.md) — Canonical routing, Schema.org models, and Search Console runbook.
+- [Release and Rollback](production/release-and-rollback.md) — Zero-downtime release workflow and rollback decision criteria.
+- [Known Limitations](production/known-limitations.md) — Technical debt, free-tier limits, and prioritized follow-up backlog.
+
 ## Security
 
 - [Authentication and authorization](security/authentication.md)

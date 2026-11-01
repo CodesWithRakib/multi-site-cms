@@ -1,6 +1,6 @@
 import { defineConfig, devices } from '@playwright/test';
 
-const adminUrl = process.env.E2E_ADMIN_URL ?? 'http://localhost:3000';
+const adminUrl = process.env.E2E_ADMIN_URL ?? 'http://localhost:5000';
 const travelUrl = process.env.E2E_TRAVEL_URL ?? 'http://localhost:3001';
 const airSportsUrl = process.env.E2E_AIR_SPORTS_URL ?? 'http://localhost:3002';
 const apiUrl = process.env.E2E_API_URL ?? 'http://localhost:4000/api/v1';
@@ -33,6 +33,11 @@ export default defineConfig({
       url: `${apiUrl}/health`,
       reuseExistingServer,
       timeout: 180_000,
+      env: {
+        DATABASE_URL:
+          process.env.DATABASE_URL ??
+          'postgresql://multi_site_cms:multi_site_cms_dev@localhost:5433/multi_site_cms',
+      },
     },
     {
       command: 'pnpm --filter @multi-site-cms/admin dev',

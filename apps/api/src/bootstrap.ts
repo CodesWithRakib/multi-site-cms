@@ -51,6 +51,7 @@ export function configureApp(app: NestExpressApplication): NestExpressApplicatio
       'X-Request-Id',
       'X-CSRF-Token',
       'X-XSRF-Token',
+      'Last-Event-ID',
     ],
     exposedHeaders: ['X-Request-Id'],
     maxAge: 600,
