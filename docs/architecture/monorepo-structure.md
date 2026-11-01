@@ -5,11 +5,11 @@
 ```text
 multi-site-cms/
 ├── apps/
-│   ├── admin/                 @multi-site-cms/admin        :3000
+│   ├── admin/                 @multi-site-cms/admin        :5000
 │   ├── api/                   @multi-site-cms/api          :4000
 │   └── sites/
-│       ├── travel-blog/       @multi-site-cms/travel-blog  :3001
-│       └── air-sports/        @multi-site-cms/air-sports   :3002
+│       ├── travel-blog/       @multi-site-cms/travel-blog  :5001
+│       └── air-sports/        @multi-site-cms/air-sports   :5002
 ├── packages/
 │   ├── types/                 contracts, no runtime deps
 │   ├── validation/            Zod schemas

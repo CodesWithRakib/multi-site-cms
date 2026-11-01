@@ -31,9 +31,9 @@ pnpm dev               # all four applications through Turborepo
 
 | Application     | URL                   | Package                       |
 | --------------- | --------------------- | ----------------------------- |
-| Admin           | http://localhost:3000 | `@multi-site-cms/admin`       |
-| Travel blog     | http://localhost:3001 | `@multi-site-cms/travel-blog` |
-| Air sports live | http://localhost:3002 | `@multi-site-cms/air-sports`  |
+| Admin           | http://localhost:5000 | `@multi-site-cms/admin`       |
+| Travel blog     | http://localhost:5001 | `@multi-site-cms/travel-blog` |
+| Air sports live | http://localhost:5002 | `@multi-site-cms/air-sports`  |
 | API (`/api/v1`) | http://localhost:4000 | `@multi-site-cms/api`         |
 
 ## Commands

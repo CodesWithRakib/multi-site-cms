@@ -4,9 +4,9 @@
   "private": true,
   "description": "Independent air sports live-update publication powered by the shared platform.",
   "scripts": {
-    "dev": "next dev -p 3002",
+    "dev": "next dev -p 5002",
     "build": "next build",
-    "start": "next start -p 3002",
+    "start": "next start -p 5002",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"

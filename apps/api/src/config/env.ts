@@ -31,7 +31,7 @@ const envSchema = z.object({
   CORS_ORIGINS: z
     .string()
     .default(
-      'http://localhost:3000,http://localhost:3001,http://localhost:3002,http://localhost:5000',
+      'http://localhost:3000,http://localhost:3001,http://localhost:3002,http://localhost:5000,http://localhost:5001,http://localhost:5002,http://localhost:50001,http://localhost:50002',
     )
     .transform((value) =>
       value

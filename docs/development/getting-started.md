@@ -61,9 +61,9 @@ pnpm dev
 
 | Application     | URL                                       |
 | --------------- | ----------------------------------------- |
-| Admin           | http://localhost:3000                     |
-| Travel blog     | http://localhost:3001                     |
-| Air sports live | http://localhost:3002                     |
+| Admin           | http://localhost:5000                     |
+| Travel blog     | http://localhost:5001                     |
+| Air sports live | http://localhost:5002                     |
 | API liveness    | http://localhost:4000/api/v1/health       |
 | API readiness   | http://localhost:4000/api/v1/health/ready |
 | API docs        | http://localhost:4000/api/v1/docs         |

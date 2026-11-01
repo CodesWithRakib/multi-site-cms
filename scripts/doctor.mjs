@@ -159,9 +159,9 @@ async function main() {
   }
 
   const ports = [
-    [3000, 'admin'],
-    [3001, 'travel-blog'],
-    [3002, 'air-sports'],
+    [5000, 'admin'],
+    [5001, 'travel-blog'],
+    [5002, 'air-sports'],
     [4000, 'api'],
     [5432, 'postgres'],
   ];

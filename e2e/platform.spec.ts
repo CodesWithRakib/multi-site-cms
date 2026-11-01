@@ -1,8 +1,8 @@
 import { expect, test } from '@playwright/test';
 
 const apiUrl = process.env.E2E_API_URL ?? 'http://localhost:4000/api/v1';
-const travelUrl = process.env.E2E_TRAVEL_URL ?? 'http://localhost:3001';
-const airSportsUrl = process.env.E2E_AIR_SPORTS_URL ?? 'http://localhost:3002';
+const travelUrl = process.env.E2E_TRAVEL_URL ?? 'http://localhost:5001';
+const airSportsUrl = process.env.E2E_AIR_SPORTS_URL ?? 'http://localhost:5002';
 
 // -----------------------------------------------------------------------------
 // Scenario A: Initial Platform Setup & Observability

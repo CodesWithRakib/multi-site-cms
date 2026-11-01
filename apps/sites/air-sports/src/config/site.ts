@@ -2,7 +2,7 @@ import { createPublicWebConfig } from '@multi-site-cms/config';
 
 const publicConfig = createPublicWebConfig(
   { NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL },
-  { appUrlFallback: 'http://localhost:3002' },
+  { appUrlFallback: 'http://localhost:5002' },
 );
 
 export const siteConfig = {
