@@ -1,0 +1,4 @@
+{
+  "extends": "@multi-site-cms/tsconfig/react-library.json",
+  "include": ["src/**/*.ts", "src/**/*.tsx", "vitest.config.ts"]
+}

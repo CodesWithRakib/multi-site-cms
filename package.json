@@ -1,0 +1,36 @@
+{
+  "name": "multi-site-cms",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Centralized multi-site publishing platform foundation.",
+  "packageManager": "pnpm@12.4.2",
+  "engines": {
+    "node": ">=24.11.0",
+    "pnpm": ">=12.4.2"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck && tsc --noEmit -p tsconfig.json",
+    "typecheck:root": "tsc --noEmit -p tsconfig.json",
+    "test": "turbo run test",
+    "test:e2e": "playwright test",
+    "test:e2e:list": "playwright test --list",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "db:up": "docker compose -f infrastructure/docker/docker-compose.yml up -d",
+    "db:down": "docker compose -f infrastructure/docker/docker-compose.yml down",
+    "db:reset": "docker compose -f infrastructure/docker/docker-compose.yml down -v",
+    "db:logs": "docker compose -f infrastructure/docker/docker-compose.yml logs -f postgres",
+    "doctor": "node scripts/doctor.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.1",
+    "@types/node": "24.19.2",
+    "eslint": "9.39.5",
+    "prettier": "3.9.10",
+    "turbo": "2.11.10",
+    "typescript": "6.0.3"
+  }
+}

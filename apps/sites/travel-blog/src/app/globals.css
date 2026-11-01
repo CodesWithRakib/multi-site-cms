@@ -1,0 +1,21 @@
+@import 'tailwindcss';
+@import '@multi-site-cms/ui/styles.css';
+
+@source '../../../../../packages/ui/src';
+
+:root {
+  --background: oklch(0.98 0.008 90);
+  --foreground: oklch(0.2 0.025 190);
+  --card: oklch(0.995 0.004 90);
+  --primary: oklch(0.42 0.09 190);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.94 0.025 185);
+  --secondary-foreground: oklch(0.25 0.05 190);
+  --muted: oklch(0.95 0.01 90);
+  --muted-foreground: oklch(0.48 0.03 190);
+  --accent: oklch(0.92 0.04 85);
+  --accent-foreground: oklch(0.28 0.04 85);
+  --border: oklch(0.88 0.02 90);
+  --input: oklch(0.88 0.02 90);
+  --ring: oklch(0.55 0.09 190);
+}

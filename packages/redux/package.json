@@ -1,0 +1,34 @@
+{
+  "name": "@multi-site-cms/redux",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Per-application Redux store factory, RTK Query base API, and typed hooks.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@multi-site-cms/api-client": "workspace:*",
+    "@multi-site-cms/types": "workspace:*",
+    "@reduxjs/toolkit": "2.13.0",
+    "react-redux": "9.3.1"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@multi-site-cms/eslint-config": "workspace:*",
+    "@multi-site-cms/tsconfig": "workspace:*",
+    "@types/react": "19.3.0",
+    "react": "19.3.1",
+    "vitest": "5.0.5"
+  }
+}

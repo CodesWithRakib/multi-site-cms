@@ -1,0 +1,26 @@
+{
+  "name": "@multi-site-cms/validation",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Shared Zod schemas for web-facing configuration and contracts.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@multi-site-cms/eslint-config": "workspace:*",
+    "@multi-site-cms/tsconfig": "workspace:*",
+    "vitest": "5.0.5"
+  }
+}

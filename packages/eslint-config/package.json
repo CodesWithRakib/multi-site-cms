@@ -1,0 +1,23 @@
+{
+  "name": "@multi-site-cms/eslint-config",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Shared ESLint flat configurations and dependency-boundary rules.",
+  "type": "module",
+  "exports": {
+    "./base": "./base.mjs",
+    "./next": "./next.mjs"
+  },
+  "dependencies": {
+    "@eslint/js": "9.39.5",
+    "eslint-config-next": "16.4.3",
+    "globals": "17.13.0",
+    "typescript-eslint": "8.72.1"
+  },
+  "peerDependencies": {
+    "eslint": "^9.39.5"
+  },
+  "devDependencies": {
+    "eslint": "9.39.5"
+  }
+}

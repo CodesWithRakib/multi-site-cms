@@ -1,0 +1,4 @@
+{
+  "extends": "@multi-site-cms/tsconfig/library.json",
+  "include": ["src/**/*.ts", "vitest.config.ts"]
+}

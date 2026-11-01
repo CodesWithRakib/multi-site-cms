@@ -1,0 +1,30 @@
+name: multi-site-cms
+
+services:
+  postgres:
+    image: postgres:18.6-alpine
+    restart: unless-stopped
+    shm_size: 128mb
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-multi_site_cms}
+      POSTGRES_USER: ${POSTGRES_USER:-multi_site_cms}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-multi_site_cms_dev}
+      POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256
+    ports:
+      - '${POSTGRES_PORT:-5432}:5432'
+    volumes:
+      # PostgreSQL 18 changed PGDATA to /var/lib/postgresql/18/docker and the
+      # image volume to /var/lib/postgresql. Do not use the pre-18 data path.
+      - postgres_data:/var/lib/postgresql
+      - ./init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+    stop_grace_period: 30s
+
+volumes:
+  postgres_data:
+    name: multi-site-cms-postgres-data

@@ -1,0 +1,21 @@
+{
+  "name": "@multi-site-cms/types",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Framework-agnostic API and platform contract types.",
+  "type": "module",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@multi-site-cms/eslint-config": "workspace:*",
+    "@multi-site-cms/tsconfig": "workspace:*"
+  }
+}

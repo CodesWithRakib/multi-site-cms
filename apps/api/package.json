@@ -1,0 +1,49 @@
+{
+  "name": "@multi-site-cms/api",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Centralized NestJS API for the multi-site publishing platform.",
+  "type": "commonjs",
+  "main": "dist/main.js",
+  "scripts": {
+    "dev": "nest start --watch",
+    "build": "nest build",
+    "start": "node dist/main.js",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand",
+    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
+    "test:cov": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage",
+    "db:migration:run": "typeorm -d dist/database/data-source.js migration:run",
+    "db:migration:revert": "typeorm -d dist/database/data-source.js migration:revert",
+    "db:migration:show": "typeorm -d dist/database/data-source.js migration:show"
+  },
+  "dependencies": {
+    "@multi-site-cms/types": "workspace:*",
+    "@nestjs/common": "12.3.2",
+    "@nestjs/core": "12.3.2",
+    "@nestjs/platform-express": "12.3.2",
+    "@nestjs/throttler": "6.7.1",
+    "class-transformer": "0.5.1",
+    "class-validator": "0.15.1",
+    "helmet": "8.3.0",
+    "pg": "8.23.1",
+    "reflect-metadata": "0.2.2",
+    "rxjs": "7.8.2",
+    "typeorm": "1.1.2",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@jest/globals": "30.5.2",
+    "@multi-site-cms/eslint-config": "workspace:*",
+    "@multi-site-cms/tsconfig": "workspace:*",
+    "@nestjs/cli": "12.0.11",
+    "@nestjs/testing": "12.3.2",
+    "@types/express": "5.0.6",
+    "@types/node": "24.19.2",
+    "@types/supertest": "7.2.1",
+    "jest": "30.5.2",
+    "supertest": "7.3.1",
+    "ts-jest": "29.4.15"
+  }
+}

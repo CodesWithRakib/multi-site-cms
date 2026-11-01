@@ -1,0 +1,13 @@
+packages:
+  - 'apps/*'
+  - 'apps/sites/*'
+  - 'packages/*'
+
+# pnpm 12 blocks dependency lifecycle scripts by default. These are the only
+# packages in the graph with build steps; the allowlist is intentionally small.
+allowBuilds:
+  '@parcel/watcher': true
+  '@tailwindcss/oxide': true
+  esbuild: true
+  sharp: true
+  unrs-resolver: true
