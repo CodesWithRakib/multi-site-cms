@@ -29,10 +29,10 @@ export function MediaCard({ asset, isSelected, onSelect, onDelete }: MediaCardPr
   return (
     <div
       onClick={() => onSelect && onSelect(asset)}
-      className={`group relative flex flex-col rounded-xl overflow-hidden border transition-all cursor-pointer ${
+      className={`group relative flex flex-col rounded-2xl overflow-hidden border transition-all cursor-pointer ${
         isSelected
-          ? 'border-blue-600 ring-2 ring-blue-600/30 bg-blue-50/20'
-          : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-md'
+          ? 'border-emerald-500 ring-2 ring-emerald-500/30 bg-emerald-50/20 dark:bg-emerald-950/20 shadow-sm'
+          : 'border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900/90 hover:border-emerald-500/50 dark:hover:border-emerald-500/40 hover:shadow-lg hover:-translate-y-0.5'
       }`}
     >
       {/* Thumbnail */}

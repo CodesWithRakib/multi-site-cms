@@ -85,6 +85,13 @@ export class LocalStorageProvider implements StorageProvider {
   }
 
   getUrl(key: string): string {
+    if (key.startsWith('http://') || key.startsWith('https://')) {
+      return key;
+    }
+    if (key.startsWith('multi-site-cms/')) {
+      const cloudName = process.env.CLOUDINARY_CLOUD_NAME || 'cdikzkfd';
+      return `https://res.cloudinary.com/${cloudName}/image/upload/${key}`;
+    }
     const sanitizedKey = encodeURIComponent(key).replace(/%2F/g, '/');
     return `${this.baseUrl}/media/assets/${sanitizedKey}`;
   }

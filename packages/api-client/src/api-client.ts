@@ -61,6 +61,15 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
+function getCsrfTokenFromCookie(): string | undefined {
+  if (typeof document === 'undefined' || typeof document.cookie !== 'string') {
+    return undefined;
+  }
+  const match = document.cookie.match(/(?:^|;\s*)(?:cms_csrf|multi_site_cms_csrf)=([^;]+)/);
+  const token = match?.[1];
+  return token ? decodeURIComponent(token) : undefined;
+}
+
 function readApiError(payload: unknown, response: Response): ParsedApiError | undefined {
   if (!isRecord(payload) || !isRecord(payload.error)) {
     return undefined;
@@ -181,6 +190,21 @@ export function createApiClient(options: ApiClientOptions): ApiClient {
         ...options.defaultHeaders,
         ...requestOptions.headers,
       };
+
+      const method = (requestOptions.method ?? 'GET').toUpperCase();
+      const isMutatingMethod = method !== 'GET' && method !== 'HEAD' && method !== 'OPTIONS';
+
+      if (isMutatingMethod) {
+        const hasCsrf = Object.keys(headers).some(
+          (headerName) => headerName.toLowerCase() === 'x-csrf-token',
+        );
+        if (!hasCsrf) {
+          const csrfToken = getCsrfTokenFromCookie();
+          if (csrfToken) {
+            headers['x-csrf-token'] = csrfToken;
+          }
+        }
+      }
 
       const isFormData = typeof FormData !== 'undefined' && requestOptions.body instanceof FormData;
 

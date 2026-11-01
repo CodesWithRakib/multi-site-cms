@@ -61,6 +61,11 @@ const envSchema = z.object({
    * surface area.
    */
   DOCS_ENABLED: z.enum(['true', 'false']).default('false'),
+  STORAGE_PROVIDER: z.enum(['local', 'cloudinary']).default('local'),
+  CLOUDINARY_URL: z.string().optional(),
+  CLOUDINARY_CLOUD_NAME: z.string().optional(),
+  CLOUDINARY_API_KEY: z.string().optional(),
+  CLOUDINARY_API_SECRET: z.string().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;

@@ -82,6 +82,8 @@ export class MediaController {
     res.setHeader('Content-Length', byteSize);
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+    res.setHeader('Access-Control-Allow-Origin', '*');
 
     const isInline = mimeType.startsWith('image/') || mimeType === 'application/pdf';
     const disposition = isInline ? 'inline' : 'attachment';

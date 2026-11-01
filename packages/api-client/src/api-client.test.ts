@@ -86,4 +86,33 @@ describe('createApiClient', () => {
   it('validates the base URL at construction time', () => {
     expect(() => createApiClient({ baseUrl: 'not-a-url' })).toThrow(/absolute HTTP\(S\) URL/i);
   });
+
+  it('automatically attaches x-csrf-token from document.cookie on mutating requests', async () => {
+    const fetchMock = vi.fn<typeof fetch>().mockResolvedValue(
+      jsonResponse({ data: { success: true } }),
+    );
+    const client = createApiClient({
+      baseUrl: 'https://api.example.com/api/v1',
+      fetch: fetchMock,
+    });
+
+    // Mock document.cookie
+    const originalDocument = globalThis.document;
+    try {
+      (globalThis as unknown as { document: { cookie: string } }).document = {
+        cookie: 'cms_csrf=mock-csrf-token-12345; other_cookie=xyz',
+      };
+
+      await client.request('/posts/1', {
+        method: 'DELETE',
+      });
+
+      const [, init] = fetchMock.mock.calls[0] ?? [];
+      expect(init?.headers).toMatchObject({
+        'x-csrf-token': 'mock-csrf-token-12345',
+      });
+    } finally {
+      (globalThis as unknown as { document?: unknown }).document = originalDocument;
+    }
+  });
 });

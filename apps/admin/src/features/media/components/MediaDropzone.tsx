@@ -107,12 +107,12 @@ export function MediaDropzone({ siteId, onUploaded }: MediaDropzoneProps) {
         onDragOver={handleDrag}
         onDrop={handleDrop}
         onClick={() => fileInputRef.current?.click()}
-        className={`flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-2xl cursor-pointer transition-colors ${
+        className={`flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-2xl cursor-pointer transition-all ${
           isDragOver
-            ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-950/20'
+            ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/20 shadow-inner ring-4 ring-emerald-500/10'
             : selectedFile
               ? 'border-emerald-400 bg-emerald-50/20 dark:bg-emerald-950/10'
-              : 'border-slate-300 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-600 bg-slate-50/50 dark:bg-slate-900/50'
+              : 'border-slate-300 dark:border-slate-700 hover:border-emerald-400 dark:hover:border-emerald-500 bg-slate-50/50 dark:bg-slate-900/50'
         }`}
       >
         <input
@@ -125,7 +125,7 @@ export function MediaDropzone({ siteId, onUploaded }: MediaDropzoneProps) {
 
         {selectedFile ? (
           <div className="flex flex-col items-center gap-2 text-center">
-            <CheckCircle2 className="w-10 h-10 text-emerald-500" />
+            <CheckCircle2 className="w-10 h-10 text-emerald-500 animate-bounce" />
             <p className="font-semibold text-slate-800 dark:text-slate-200">{selectedFile.name}</p>
             <p className="text-xs text-slate-500 dark:text-slate-400">
               {(selectedFile.size / 1024).toFixed(1)} KB — Click or drop another file to replace
@@ -133,7 +133,7 @@ export function MediaDropzone({ siteId, onUploaded }: MediaDropzoneProps) {
           </div>
         ) : (
           <div className="flex flex-col items-center gap-2 text-center">
-            <UploadCloud className="w-10 h-10 text-slate-400 group-hover:text-blue-500" />
+            <UploadCloud className="w-10 h-10 text-slate-400 group-hover:text-emerald-500 transition-colors" />
             <p className="font-semibold text-slate-700 dark:text-slate-300">
               Click to select or drag and drop media here
             </p>
@@ -145,14 +145,14 @@ export function MediaDropzone({ siteId, onUploaded }: MediaDropzoneProps) {
       </div>
 
       {errorMsg && (
-        <div className="flex items-center gap-2 p-3 text-sm rounded-lg bg-red-50 text-red-700 border border-red-200 dark:bg-red-950/30 dark:border-red-800 dark:text-red-300">
+        <div className="flex items-center gap-2 p-3 text-sm rounded-xl bg-red-50 text-red-700 border border-red-200 dark:bg-red-950/30 dark:border-red-800 dark:text-red-300">
           <AlertCircle className="w-4 h-4 shrink-0" />
           <span>{errorMsg}</span>
         </div>
       )}
 
       {successMsg && (
-        <div className="flex items-center gap-2 p-3 text-sm rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/30 dark:border-emerald-800 dark:text-emerald-300">
+        <div className="flex items-center gap-2 p-3 text-sm rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/30 dark:border-emerald-800 dark:text-emerald-300">
           <CheckCircle2 className="w-4 h-4 shrink-0" />
           <span>{successMsg}</span>
         </div>
@@ -169,7 +169,7 @@ export function MediaDropzone({ siteId, onUploaded }: MediaDropzoneProps) {
               value={altText}
               onChange={(e) => setAltText(e.target.value)}
               placeholder="Descriptive image summary"
-              className="w-full px-3 py-2 border rounded-lg border-slate-300 dark:border-slate-700 dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-xs"
+              className="w-full px-3 py-2 border rounded-xl border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-hidden"
             />
           </div>
           <div>
@@ -181,7 +181,7 @@ export function MediaDropzone({ siteId, onUploaded }: MediaDropzoneProps) {
               value={caption}
               onChange={(e) => setCaption(e.target.value)}
               placeholder="Photo credit or caption"
-              className="w-full px-3 py-2 border rounded-lg border-slate-300 dark:border-slate-700 dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-xs"
+              className="w-full px-3 py-2 border rounded-xl border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-hidden"
             />
           </div>
         </div>
@@ -191,7 +191,7 @@ export function MediaDropzone({ siteId, onUploaded }: MediaDropzoneProps) {
         <button
           type="submit"
           disabled={!selectedFile || isLoading}
-          className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm shadow-xs"
+          className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#00e599] to-[#05f292] text-[#072423] font-bold rounded-xl hover:brightness-105 disabled:opacity-50 disabled:cursor-not-allowed transition-all text-xs shadow-md shadow-emerald-500/20 cursor-pointer"
         >
           {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
           <span>{isLoading ? 'Uploading...' : 'Upload Media Asset'}</span>

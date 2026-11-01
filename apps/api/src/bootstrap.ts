@@ -32,7 +32,7 @@ export function configureApp(app: NestExpressApplication): NestExpressApplicatio
   app.use(requestIdMiddleware);
   app.use(localeMiddleware);
   app.use(cookieParser());
-  app.use(helmet());
+  app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 
   // Explicit body limits. Without them the framework default is inherited silently.
   app.useBodyParser('json', { limit: env.BODY_LIMIT });
