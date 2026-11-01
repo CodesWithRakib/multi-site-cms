@@ -6,6 +6,7 @@ export interface ApiClientOptions {
   baseUrl: string;
   timeoutMs?: number;
   defaultHeaders?: Readonly<Record<string, string>>;
+  credentials?: RequestCredentials;
   /**
    * Injection point for tests and non-standard runtimes. Defaults to the global
    * fetch implementation.
@@ -19,6 +20,7 @@ export interface ApiRequestOptions {
   body?: unknown;
   query?: Readonly<Record<string, QueryValue>>;
   signal?: AbortSignal;
+  credentials?: RequestCredentials;
 }
 
 export interface ApiClient {
@@ -180,19 +182,29 @@ export function createApiClient(options: ApiClientOptions): ApiClient {
         ...requestOptions.headers,
       };
 
+      const isFormData = typeof FormData !== 'undefined' && requestOptions.body instanceof FormData;
+
       const hasContentType = Object.keys(headers).some(
         (headerName) => headerName.toLowerCase() === 'content-type',
       );
 
-      if (requestOptions.body !== undefined && !hasContentType) {
+      if (requestOptions.body !== undefined && !hasContentType && !isFormData) {
         headers['Content-Type'] = 'application/json';
       }
+
+      const requestCredentials = requestOptions.credentials ?? options.credentials;
 
       try {
         const response = await fetchImpl(url, {
           method: requestOptions.method ?? 'GET',
           headers,
-          body: requestOptions.body === undefined ? undefined : JSON.stringify(requestOptions.body),
+          body:
+            requestOptions.body === undefined
+              ? undefined
+              : isFormData
+                ? (requestOptions.body as FormData)
+                : JSON.stringify(requestOptions.body),
+          credentials: requestCredentials,
           signal: controller.signal,
           cache: 'no-store',
         });

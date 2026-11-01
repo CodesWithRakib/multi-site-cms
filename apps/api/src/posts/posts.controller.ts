@@ -1,3 +1,4 @@
+import type { Response } from 'express';
 import {
   Body,
   Controller,
@@ -11,6 +12,7 @@ import {
   Patch,
   Post,
   Query,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -18,11 +20,14 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import type {
   PaginatedResult,
   PostItem,
+  PostPreviewData,
   PostPublicationItem,
   PostRevisionItem,
+  PreviewTokenResponse,
 } from '@multi-site-cms/types';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { RequirePermissions } from '../auth/decorators/permissions.decorator';
+import { Public } from '../auth/decorators/public.decorator';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { PermissionsGuard } from '../auth/guards/permissions.guard';
 import type { EffectiveAuthContext } from '../auth/services/authorization.service';
@@ -164,5 +169,33 @@ export class PostsController {
     @Body() dto: CreatePublicationDto,
   ): Promise<PostPublicationItem> {
     return this.publicationsService.createPublication(actor, postId, dto);
+  }
+
+  // --- PREVIEW SYSTEM ---
+
+  @Post(':postId/preview-token')
+  @RequirePermissions('post:read')
+  @ApiOperation({ summary: 'Generate short-lived signed preview token for post draft' })
+  @ApiResponse({ status: 201, description: 'Preview token generated' })
+  async generatePreviewToken(
+    @CurrentUser() actor: EffectiveAuthContext,
+    @Param('postId', new ParseUUIDPipe({ version: '4' })) postId: string,
+    @Query('siteId') siteId?: string,
+  ): Promise<PreviewTokenResponse> {
+    return this.postsService.generatePreviewToken(actor, postId, siteId);
+  }
+
+  @Get(':postId/preview')
+  @Public()
+  @ApiOperation({ summary: 'Render authenticated post draft preview with simulated site context' })
+  @ApiResponse({ status: 200, description: 'Post preview content' })
+  async getPostPreview(
+    @Param('postId', new ParseUUIDPipe({ version: '4' })) postId: string,
+    @Query('token') token: string,
+    @Query('siteId') siteId: string | undefined,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<PostPreviewData> {
+    res.setHeader('X-Robots-Tag', 'noindex, nofollow');
+    return this.postsService.getPostPreview(postId, token, siteId);
   }
 }

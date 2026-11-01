@@ -320,7 +320,50 @@ export interface MediaAssetItem {
   altText: string | null;
   caption: string | null;
   status: MediaStatus;
+  url?: string;
   deletedAt: string | null;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface MediaUploadResponse {
+  media: MediaAssetItem;
+  url: string;
+}
+
+export interface PreviewTokenResponse {
+  token: string;
+  expiresAt: string;
+  previewUrl: string;
+}
+
+export interface PostPreviewData {
+  post: PostItem;
+  revision: PostRevisionItem;
+  publication: PostPublicationItem | null;
+  site: {
+    id: string;
+    key: string;
+    name: string;
+    primaryDomain: string | null;
+  } | null;
+}
+
+export interface DestinationInfoBlockAttributes {
+  destination: string;
+  country: string;
+  region?: string;
+  bestSeason?: string;
+  elevation?: string;
+  highlights?: string[];
+}
+
+export interface EventTimelineBlockAttributes {
+  time: string;
+  title: string;
+  description?: string;
+  status: 'scheduled' | 'live' | 'completed' | 'delayed' | 'cancelled';
+  windSpeed?: string;
+  weatherCondition?: string;
+  alertLevel?: 'normal' | 'advisory' | 'warning';
 }

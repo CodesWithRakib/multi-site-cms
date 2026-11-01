@@ -78,6 +78,11 @@ export const en = {
   'media.notFound': 'Media asset not found.',
   'media.invalidMimeType': 'Unsupported media MIME type.',
   'media.cannotDeleteInUse': 'Media is in use by publications and cannot be deleted.',
+  'media.fileRequired': 'A file is required for upload.',
+  'media.fileTooLarge': 'The uploaded file exceeds the maximum allowed size.',
+  'media.invalidFileSignature': 'The uploaded file signature does not match its declared type.',
+  'post.previewTokenExpired': 'The preview token has expired.',
+  'post.previewTokenInvalid': 'Invalid or tampered preview token.',
 
   'validation.failed': 'The request contains invalid fields.',
   'validation.unexpectedField': 'This field is not allowed.',
@@ -165,6 +170,11 @@ export const bn: Record<MessageKey, string> = {
   'media.notFound': 'মিডিয়া ফাইলটি পাওয়া যায়নি।',
   'media.invalidMimeType': 'অসমর্থিত মিডিয়া ফাইল টাইপ।',
   'media.cannotDeleteInUse': 'মিডিয়াটি প্রকাশনায় ব্যবহৃত হচ্ছে, তাই মুছে ফেলা যাবে না।',
+  'media.fileRequired': 'আপলোড করার জন্য একটি ফাইল নির্বাচন করা আবশ্যক।',
+  'media.fileTooLarge': 'আপলোডকৃত ফাইলটি অনুমোদিত সর্বোচ্চ আকারের চেয়ে বড়।',
+  'media.invalidFileSignature': 'আপলোডকৃত ফাইলটির অভ্যন্তরীণ কাঠামো এর টাইপের সাথে মিলছে না।',
+  'post.previewTokenExpired': 'প্রিভিউ টোকেনের মেয়াদ শেষ হয়ে গেছে।',
+  'post.previewTokenInvalid': 'অবৈধ বা বিকৃত প্রিভিউ টোকেন।',
 
   'validation.failed': 'অনুরোধে অবৈধ ফিল্ড রয়েছে।',
   'validation.unexpectedField': 'এই ফিল্ডটি অনুমোদিত নয়।',

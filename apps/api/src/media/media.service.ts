@@ -2,7 +2,7 @@ import crypto from 'node:crypto';
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { type DataSource, type Repository } from 'typeorm';
 
-import type { MediaAssetItem, PaginatedResult } from '@multi-site-cms/types';
+import type { MediaAssetItem, MediaUploadResponse, PaginatedResult } from '@multi-site-cms/types';
 import type { EffectiveAuthContext } from '../auth/services/authorization.service';
 import { AuditService } from '../common/audit/audit.service';
 import { ApiException } from '../common/exceptions/api.exception';
@@ -11,7 +11,13 @@ import { getInitializedRepository } from '../database/ensure-connected';
 import { MediaAsset } from '../database/entities/media-asset.entity';
 import { PostPublicationMedia } from '../database/entities/post-publication-media.entity';
 import { PostPublication } from '../database/entities/post-publication.entity';
-import { CreateMediaDto, ListMediaQueryDto, UpdateMediaDto } from './dto';
+import { CreateMediaDto, ListMediaQueryDto, UpdateMediaDto, UploadMediaDto } from './dto';
+import {
+  STORAGE_PROVIDER,
+  type StorageProvider,
+  type UploadedFilePayload,
+} from './storage/storage-provider.interface';
+import { validateAndInspectFile } from './utils/file-validator';
 
 const ALLOWED_MIME_TYPES = new Set([
   'image/jpeg',
@@ -31,6 +37,7 @@ const ALLOWED_MIME_TYPES = new Set([
 export class MediaService {
   constructor(
     @Inject(DATA_SOURCE) private readonly dataSource: DataSource,
+    @Inject(STORAGE_PROVIDER) private readonly storageProvider: StorageProvider,
     private readonly auditService: AuditService,
   ) {}
 
@@ -260,6 +267,126 @@ export class MediaService {
     });
   }
 
+  async uploadMedia(
+    actor: EffectiveAuthContext,
+    file: UploadedFilePayload,
+    dto: UploadMediaDto,
+  ): Promise<MediaUploadResponse> {
+    if (!file || !file.buffer) {
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'VALIDATION_ERROR', 'media.fileRequired');
+    }
+
+    this.checkSiteAccess(actor, dto.siteId);
+
+    const isVideoOrAudio = file.mimetype.startsWith('video/') || file.mimetype.startsWith('audio/');
+    const maxSizeBytes = isVideoOrAudio ? 50 * 1024 * 1024 : 15 * 1024 * 1024;
+
+    if (file.size > maxSizeBytes) {
+      throw new ApiException(
+        HttpStatus.PAYLOAD_TOO_LARGE,
+        'PAYLOAD_TOO_LARGE',
+        'media.fileTooLarge',
+      );
+    }
+
+    const inspection = validateAndInspectFile(file.buffer, file.mimetype);
+    if (!inspection.isValid || !inspection.detectedMimeType) {
+      throw new ApiException(
+        HttpStatus.BAD_REQUEST,
+        'VALIDATION_ERROR',
+        'media.invalidFileSignature',
+      );
+    }
+
+    const finalBuffer = inspection.sanitizedBuffer ?? file.buffer;
+    const finalMime = inspection.detectedMimeType;
+
+    const extMatch = (file.originalname || '').match(/\.([a-zA-Z0-9]+)$/);
+    let ext = extMatch && extMatch[1] ? extMatch[1].toLowerCase() : '';
+    if (!ext) {
+      if (finalMime === 'image/jpeg') ext = 'jpg';
+      else if (finalMime === 'image/png') ext = 'png';
+      else if (finalMime === 'image/webp') ext = 'webp';
+      else if (finalMime === 'image/gif') ext = 'gif';
+      else if (finalMime === 'image/svg+xml') ext = 'svg';
+      else if (finalMime === 'application/pdf') ext = 'pdf';
+      else if (finalMime === 'video/mp4') ext = 'mp4';
+      else ext = 'bin';
+    }
+
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const storageKey = `${dto.siteId ?? 'platform'}/${year}/${month}/${crypto.randomUUID()}.${ext}`;
+
+    const uploadResult = await this.storageProvider.upload(storageKey, finalBuffer, finalMime);
+
+    const mediaRepo = await this.getMediaRepo();
+    const asset = mediaRepo.create({
+      siteId: dto.siteId || null,
+      uploadedBy: actor.user.id,
+      storageProvider: this.storageProvider.name,
+      storageKey: uploadResult.key,
+      originalFilename: file.originalname || null,
+      mimeType: finalMime,
+      byteSize: String(uploadResult.byteSize),
+      checksum: uploadResult.checksum,
+      width: inspection.width ?? null,
+      height: inspection.height ?? null,
+      altText: dto.altText?.trim() || null,
+      caption: dto.caption?.trim() || null,
+      status: 'active',
+      deletedAt: null,
+    });
+
+    const saved = await mediaRepo.save(asset);
+
+    await this.auditService.record({
+      actorId: actor.user.id,
+      actorType: 'user',
+      siteId: saved.siteId ?? null,
+      action: 'media.upload',
+      entityType: 'media_asset',
+      entityId: saved.id,
+      metadata: {
+        originalFilename: saved.originalFilename,
+        mimeType: saved.mimeType,
+        byteSize: saved.byteSize,
+        storageKey: saved.storageKey,
+      },
+    });
+
+    const item = this.mapToItem(saved);
+    return {
+      media: item,
+      url: this.storageProvider.getUrl(saved.storageKey),
+    };
+  }
+
+  async getMediaStream(storageKey: string): Promise<{
+    stream: NodeJS.ReadableStream;
+    mimeType: string;
+    byteSize: string;
+    filename: string | null;
+  }> {
+    const mediaRepo = await this.getMediaRepo();
+    const asset = await mediaRepo.findOne({
+      where: { storageKey },
+    });
+
+    if (!asset || asset.deletedAt) {
+      throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'media.notFound');
+    }
+
+    const stream = await this.storageProvider.getStream(storageKey);
+    return {
+      stream,
+      mimeType: asset.mimeType,
+      byteSize: asset.byteSize,
+      filename: asset.originalFilename,
+    };
+  }
+
   private mapToItem(asset: MediaAsset): MediaAssetItem {
     return {
       id: asset.id,
@@ -276,6 +403,7 @@ export class MediaService {
       altText: asset.altText,
       caption: asset.caption,
       status: asset.status,
+      url: this.storageProvider.getUrl(asset.storageKey),
       deletedAt: asset.deletedAt ? asset.deletedAt.toISOString() : null,
       createdAt: asset.createdAt.toISOString(),
       updatedAt: asset.updatedAt.toISOString(),

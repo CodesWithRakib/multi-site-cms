@@ -1,3 +1,4 @@
+import type { Request, Response } from 'express';
 import {
   Body,
   Controller,
@@ -10,24 +11,45 @@ import {
   Patch,
   Post,
   Query,
+  Req,
+  Res,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiConsumes, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import type { MediaAssetItem, PaginatedResult } from '@multi-site-cms/types';
+import type { MediaAssetItem, MediaUploadResponse, PaginatedResult } from '@multi-site-cms/types';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { RequirePermissions } from '../auth/decorators/permissions.decorator';
+import { Public } from '../auth/decorators/public.decorator';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { PermissionsGuard } from '../auth/guards/permissions.guard';
 import type { EffectiveAuthContext } from '../auth/services/authorization.service';
-import { CreateMediaDto, ListMediaQueryDto, UpdateMediaDto } from './dto';
+import { CreateMediaDto, ListMediaQueryDto, UpdateMediaDto, UploadMediaDto } from './dto';
 import { MediaService } from './media.service';
+import type { UploadedFilePayload } from './storage/storage-provider.interface';
 
 @ApiTags('Media')
 @Controller('media')
 @UseGuards(AuthGuard, PermissionsGuard)
 export class MediaController {
   constructor(private readonly mediaService: MediaService) {}
+
+  @Post('upload')
+  @RequirePermissions('media:upload')
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({ summary: 'Upload a binary media asset file' })
+  @ApiResponse({ status: 201, description: 'Media file uploaded and asset created' })
+  async uploadMedia(
+    @CurrentUser() actor: EffectiveAuthContext,
+    @UploadedFile() file: UploadedFilePayload,
+    @Body() dto: UploadMediaDto,
+  ): Promise<MediaUploadResponse> {
+    return this.mediaService.uploadMedia(actor, file, dto);
+  }
 
   @Post()
   @RequirePermissions('media:upload')
@@ -38,6 +60,41 @@ export class MediaController {
     @Body() dto: CreateMediaDto,
   ): Promise<MediaAssetItem> {
     return this.mediaService.createMedia(actor, dto);
+  }
+
+  @Get('assets/*')
+  @Public()
+  @ApiOperation({ summary: 'Stream or serve media asset binary content' })
+  async getAsset(
+    @Param() params: Record<string, string>,
+    @Req() req: Request,
+    @Res() res: Response,
+  ): Promise<void> {
+    const urlPath = req.originalUrl || req.url;
+    const match = urlPath.match(/\/media\/assets\/(.+?)(\?|$)/);
+    const rawPath =
+      match && match[1] ? match[1] : (req.params as Record<string, string>)[0] || params['0'] || '';
+    const storageKey = decodeURIComponent(rawPath);
+    const { stream, mimeType, byteSize, filename } =
+      await this.mediaService.getMediaStream(storageKey);
+
+    res.setHeader('Content-Type', mimeType);
+    res.setHeader('Content-Length', byteSize);
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+
+    const isInline = mimeType.startsWith('image/') || mimeType === 'application/pdf';
+    const disposition = isInline ? 'inline' : 'attachment';
+    if (filename) {
+      res.setHeader(
+        'Content-Disposition',
+        `${disposition}; filename="${encodeURIComponent(filename)}"`,
+      );
+    } else {
+      res.setHeader('Content-Disposition', disposition);
+    }
+
+    stream.pipe(res);
   }
 
   @Get()

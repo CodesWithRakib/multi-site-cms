@@ -82,6 +82,17 @@ describing future behavior is labelled with its phase.
 - [Media Metadata Foundation](content/media-metadata.md) — Abstract storage keys, MIME allowlists, and deletion protection.
 - [Content Authorization & Isolation](content/content-authorization.md) — Multi-tenant boundaries, RBAC permissions, and opaque 404 denials.
 
+## Rich Text Editor & Media Upload System
+
+- [Editor Architecture](editor/editor-architecture.md) — Headless Tiptap integration, React 19 RSC/Client split, and local state isolation.
+- [Custom Extensions](editor/editor-extensions.md) — Destination cards, event timelines, callouts, and AST schemas.
+- [Content-Type Configurations](editor/content-type-configurations.md) — Presets for Travel Blog, Air Sports, and Articles.
+- [Media Upload Pipeline](media/upload-architecture.md) — Multipart upload, magic byte sniffing, SVG sanitization, and size limits.
+- [Storage Provider](media/storage-provider.md) — LocalStorageProvider, path traversal protection, and asset streaming route.
+- [Autosave & Draft Recovery](editor/autosave-and-recovery.md) — Debounced saving, sessionStorage snapshots, and OCC conflict handling.
+- [Authenticated Preview System](editor/preview-system.md) — Ephemeral HMAC-SHA256 tokens, crawler suppression, and layout simulation.
+- [Editorial Security](editor/security.md) — File validation, XSS prevention, tenant isolation, and preview controls.
+
 ## Security
 
 - [Authentication and authorization](security/authentication.md)

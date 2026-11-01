@@ -33,6 +33,10 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# Uploads
+uploads/
+**/uploads/
+
 # Editors and OS
 .idea/
 .vscode/

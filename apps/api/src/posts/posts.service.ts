@@ -1,7 +1,14 @@
+import crypto from 'node:crypto';
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { type DataSource, type Repository } from 'typeorm';
 
-import type { PaginatedResult, PostItem, PostRevisionItem } from '@multi-site-cms/types';
+import type {
+  PaginatedResult,
+  PostItem,
+  PostPreviewData,
+  PostRevisionItem,
+  PreviewTokenResponse,
+} from '@multi-site-cms/types';
 import type { EffectiveAuthContext } from '../auth/services/authorization.service';
 import { AuditService } from '../common/audit/audit.service';
 import { ApiException } from '../common/exceptions/api.exception';
@@ -12,6 +19,7 @@ import { PostPublicationTag } from '../database/entities/post-publication-tag.en
 import { PostPublication } from '../database/entities/post-publication.entity';
 import { PostRevision } from '../database/entities/post-revision.entity';
 import { Post } from '../database/entities/post.entity';
+import { Site } from '../database/entities/site.entity';
 import { CreatePostDto, ListPostsQueryDto, RestoreRevisionDto, UpdatePostDto } from './dto';
 import { validateStructuredBody } from './utils/body-validator';
 
@@ -647,6 +655,202 @@ export class PostsService {
       changeSummary: rev.changeSummary,
       createdBy: rev.createdBy,
       createdAt: rev.createdAt.toISOString(),
+    };
+  }
+
+  private getPreviewSecret(): string {
+    return process.env.SESSION_SECRET || 'preview-secret-key-multi-site-cms-development-2026';
+  }
+
+  async generatePreviewToken(
+    actor: EffectiveAuthContext,
+    postId: string,
+    siteId?: string,
+  ): Promise<PreviewTokenResponse> {
+    if (siteId && !actor.isSuperAdmin && !actor.authorizedSiteIds.includes(siteId)) {
+      throw new ApiException(HttpStatus.FORBIDDEN, 'FORBIDDEN', 'http.forbidden');
+    }
+
+    const postRepo = await this.getPostRepo();
+    const post = await postRepo.findOne({ where: { id: postId } });
+    if (!post || post.deletedAt) {
+      throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'post.notFound');
+    }
+
+    const ttlMs = 15 * 60 * 1000; // 15 minutes
+    const expiresAt = new Date(Date.now() + ttlMs);
+    const exp = Math.floor(expiresAt.getTime() / 1000);
+    const payload = `${postId}:${siteId || 'none'}:${actor.user.id}:${exp}`;
+    const signature = crypto
+      .createHmac('sha256', this.getPreviewSecret())
+      .update(payload)
+      .digest('hex');
+
+    const token = Buffer.from(`${payload}:${signature}`).toString('base64url');
+    const apiBase = (process.env.API_BASE_URL || 'http://localhost:4000/api/v1').replace(
+      /\/+$/,
+      '',
+    );
+    const previewUrl = `${apiBase}/posts/${postId}/preview?token=${token}${siteId ? `&siteId=${siteId}` : ''}`;
+
+    return {
+      token,
+      expiresAt: expiresAt.toISOString(),
+      previewUrl,
+    };
+  }
+
+  async getPostPreview(postId: string, token: string, siteId?: string): Promise<PostPreviewData> {
+    let decoded: string;
+    try {
+      decoded = Buffer.from(token, 'base64url').toString('utf-8');
+    } catch {
+      throw new ApiException(
+        HttpStatus.UNAUTHORIZED,
+        'UNAUTHENTICATED',
+        'post.previewTokenInvalid',
+      );
+    }
+
+    const parts = decoded.split(':');
+    if (parts.length !== 5) {
+      throw new ApiException(
+        HttpStatus.UNAUTHORIZED,
+        'UNAUTHENTICATED',
+        'post.previewTokenInvalid',
+      );
+    }
+
+    const [tokenPostId, tokenSiteId, tokenUserId, tokenExpStr, tokenSig] = parts;
+    if (!tokenPostId || !tokenSiteId || !tokenUserId || !tokenExpStr || !tokenSig) {
+      throw new ApiException(
+        HttpStatus.UNAUTHORIZED,
+        'UNAUTHENTICATED',
+        'post.previewTokenInvalid',
+      );
+    }
+
+    const exp = parseInt(tokenExpStr, 10);
+    if (!Number.isFinite(exp) || Math.floor(Date.now() / 1000) > exp) {
+      throw new ApiException(
+        HttpStatus.UNAUTHORIZED,
+        'UNAUTHENTICATED',
+        'post.previewTokenExpired',
+      );
+    }
+
+    if (tokenPostId !== postId) {
+      throw new ApiException(
+        HttpStatus.UNAUTHORIZED,
+        'UNAUTHENTICATED',
+        'post.previewTokenInvalid',
+      );
+    }
+
+    const payload = `${tokenPostId}:${tokenSiteId}:${tokenUserId}:${tokenExpStr}`;
+    const expectedSig = crypto
+      .createHmac('sha256', this.getPreviewSecret())
+      .update(payload)
+      .digest('hex');
+
+    if (tokenSig !== expectedSig) {
+      throw new ApiException(
+        HttpStatus.UNAUTHORIZED,
+        'UNAUTHENTICATED',
+        'post.previewTokenInvalid',
+      );
+    }
+
+    const postRepo = await this.getPostRepo();
+    const revisionRepo = await this.getRevisionRepo();
+    const publicationRepo = await this.getPublicationRepo();
+    const siteRepo = await getInitializedRepository(this.dataSource, Site);
+
+    const post = await postRepo.findOne({
+      where: { id: postId },
+    });
+
+    if (!post || post.deletedAt) {
+      throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'post.notFound');
+    }
+
+    const revision = await revisionRepo.findOne({
+      where: { postId },
+      order: { revisionNumber: 'DESC' },
+    });
+
+    if (!revision) {
+      throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'revision.notFound');
+    }
+
+    const targetSiteId = siteId || (tokenSiteId !== 'none' ? tokenSiteId : undefined);
+    let publication: PostPublication | null = null;
+    let site: Site | null = null;
+
+    if (targetSiteId) {
+      publication = await publicationRepo.findOne({
+        where: { postId, siteId: targetSiteId },
+      });
+      site = await siteRepo.findOne({
+        where: { id: targetSiteId },
+        relations: { domains: true },
+      });
+    }
+
+    const primaryDomain =
+      site?.domains?.find((d) => d.isPrimary && d.status === 'active')?.hostname ?? null;
+
+    return {
+      post: {
+        id: post.id,
+        authorId: post.authorId,
+        type: post.type,
+        status: post.status,
+        sourceLocale: post.sourceLocale,
+        deletedAt: null,
+        createdAt: post.createdAt.toISOString(),
+        updatedAt: post.updatedAt.toISOString(),
+        currentRevisionNumber: revision.revisionNumber,
+      },
+      revision: {
+        id: revision.id,
+        postId: revision.postId,
+        revisionNumber: revision.revisionNumber,
+        title: revision.title,
+        excerpt: revision.excerpt,
+        body: revision.body,
+        changeSummary: revision.changeSummary,
+        createdBy: revision.createdBy,
+        createdAt: revision.createdAt.toISOString(),
+      },
+      publication: publication
+        ? {
+            id: publication.id,
+            siteId: publication.siteId,
+            postId: publication.postId,
+            revisionId: publication.revisionId,
+            slug: publication.slug,
+            status: publication.status,
+            scheduledFor: publication.scheduledFor ? publication.scheduledFor.toISOString() : null,
+            publishedAt: publication.publishedAt ? publication.publishedAt.toISOString() : null,
+            seoTitle: publication.seoTitle,
+            seoDescription: publication.seoDescription,
+            canonicalUrl: publication.canonicalUrl,
+            featuredImageId: publication.featuredImageId,
+            templateKey: publication.templateKey,
+            eventId: publication.eventId,
+            createdAt: publication.createdAt.toISOString(),
+            updatedAt: publication.updatedAt.toISOString(),
+          }
+        : null,
+      site: site
+        ? {
+            id: site.id,
+            key: site.key,
+            name: site.name,
+            primaryDomain,
+          }
+        : null,
     };
   }
 }

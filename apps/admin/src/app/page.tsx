@@ -64,6 +64,48 @@ export default function AdminHomePage() {
           </div>
         </header>
 
+        <section aria-labelledby="editorial-heading" className="mt-10">
+          <div className="flex flex-wrap items-center justify-between gap-4 p-6 rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-900 dark:to-slate-800 border border-blue-200/80 dark:border-slate-700 shadow-xs">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-blue-600 text-white">
+                  Phase 07
+                </span>
+                <h2
+                  id="editorial-heading"
+                  className="text-xl font-bold text-slate-900 dark:text-slate-100"
+                >
+                  Rich Text Editor & Media Upload System
+                </h2>
+              </div>
+              <p className="text-xs text-slate-600 dark:text-slate-400 max-w-xl">
+                Tiptap rich text editing experience, custom destination & event timeline blocks,
+                drag-and-drop media upload, autosave, and authenticated preview system.
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-2.5">
+              <a
+                href="/posts"
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl shadow-xs transition-colors"
+              >
+                Manage Posts
+              </a>
+              <a
+                href="/posts/new"
+                className="px-4 py-2 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-slate-600 text-xs font-semibold rounded-xl shadow-xs transition-colors"
+              >
+                + New Post
+              </a>
+              <a
+                href="/media"
+                className="px-4 py-2 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-slate-600 text-xs font-semibold rounded-xl shadow-xs transition-colors"
+              >
+                Media Library
+              </a>
+            </div>
+          </div>
+        </section>
+
         <section aria-labelledby="status-heading" className="mt-10">
           <h2 id="status-heading" className="sr-only">
             Platform status
