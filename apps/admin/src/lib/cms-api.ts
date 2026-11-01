@@ -718,7 +718,21 @@ export const cmsApi = platformApi.injectEndpoints({
     // ==========================================
     listCategories: build.query<CategoryItem[], string>({
       query: (siteId) => ({ path: `/sites/${siteId}/categories` }),
-      transformResponse: (response: ApiSuccess<unknown>) => response.data as CategoryItem[],
+      transformResponse: (response: ApiSuccess<unknown>) => {
+        const payload = response.data;
+        if (Array.isArray(payload)) {
+          return payload as CategoryItem[];
+        }
+        if (
+          payload &&
+          typeof payload === 'object' &&
+          'items' in payload &&
+          Array.isArray((payload as { items: unknown }).items)
+        ) {
+          return (payload as { items: CategoryItem[] }).items;
+        }
+        return [] as CategoryItem[];
+      },
       providesTags: (_res, _err, siteId) => [
         { type: 'Taxonomy' as const, id: `CATEGORIES_${siteId}` },
       ],
@@ -763,7 +777,21 @@ export const cmsApi = platformApi.injectEndpoints({
 
     listTags: build.query<TagItem[], string>({
       query: (siteId) => ({ path: `/sites/${siteId}/tags` }),
-      transformResponse: (response: ApiSuccess<unknown>) => response.data as TagItem[],
+      transformResponse: (response: ApiSuccess<unknown>) => {
+        const payload = response.data;
+        if (Array.isArray(payload)) {
+          return payload as TagItem[];
+        }
+        if (
+          payload &&
+          typeof payload === 'object' &&
+          'items' in payload &&
+          Array.isArray((payload as { items: unknown }).items)
+        ) {
+          return (payload as { items: TagItem[] }).items;
+        }
+        return [] as TagItem[];
+      },
       providesTags: (_res, _err, siteId) => [{ type: 'Taxonomy' as const, id: `TAGS_${siteId}` }],
     }),
 

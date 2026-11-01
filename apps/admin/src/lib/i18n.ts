@@ -288,6 +288,14 @@ export const translations = {
       description: 'Description',
       parentCategory: 'Parent Category (Optional)',
       displayOrder: 'Display Order',
+      editCategory: 'Edit Category',
+      editTag: 'Edit Tag',
+      searchPlaceholder: 'Search categories and tags by name or slug...',
+      noCategoriesFound: 'No categories found for this website.',
+      noTagsFound: 'No tags found for this website.',
+      hierarchyDepth: 'Hierarchy Depth',
+      activeScope: 'Active Website Scope',
+      subcategories: 'Subcategories',
     },
 
     // Auth
@@ -590,6 +598,14 @@ export const translations = {
       description: 'বিবরণ',
       parentCategory: 'মূল বিভাগ (ঐচ্ছিক)',
       displayOrder: 'প্রদর্শনের ক্রম',
+      editCategory: 'বিভাগ সম্পাদনা করুন',
+      editTag: 'ট্যাগ সম্পাদনা করুন',
+      searchPlaceholder: 'নাম বা স্লাগ দিয়ে বিভাগ ও ট্যাগ অনুসন্ধান করুন...',
+      noCategoriesFound: 'এই ওয়েবসাইটের জন্য কোনো বিভাগ পাওয়া যায়নি।',
+      noTagsFound: 'এই ওয়েবসাইটের জন্য কোনো ট্যাগ পাওয়া যায়নি।',
+      hierarchyDepth: 'ক্রমবিন্যাস স্তর',
+      activeScope: 'সক্রিয় ওয়েবসাইটের পরিসর',
+      subcategories: 'উপবিভাগসমূহ',
     },
 
     // Auth
