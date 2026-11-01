@@ -48,6 +48,12 @@ export class SiteDomain {
   @Column({ name: 'verified_at', type: 'timestamptz', nullable: true })
   verifiedAt!: Date | null;
 
+  @Column({ name: 'verification_token', type: 'text', nullable: true })
+  verificationToken!: string | null;
+
+  @Column({ name: 'verification_token_expires_at', type: 'timestamptz', nullable: true })
+  verificationTokenExpiresAt!: Date | null;
+
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt!: Date;
 

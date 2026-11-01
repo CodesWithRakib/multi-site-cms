@@ -65,6 +65,13 @@ describing future behavior is labelled with its phase.
 - [Backend security](backend/security.md) — implemented controls and the Phase 04 boundary.
 - [Backend development](backend/development.md) — commands and the endpoint checklist.
 
+## Multi-Site Core
+
+- [Site Management & Lifecycle](multisite/site-management.md) — Tenant registry, lifecycle states, and soft-deletion/archiving policy.
+- [Domain Management & Resolution](multisite/domain-resolution.md) — Domain registry, normalization, primary domain transaction, and DNS verification challenge.
+- [Site Configuration & Public Discovery](multisite/site-configuration.md) — Branding, acyclic navigation trees, SEO defaults, locales, and public ETag caching.
+- [Multi-Site Authorization Matrix](multisite/site-authorization-matrix.md) — Super Admin vs Site Admin permissions, 404 IDOR protection, and audit logs.
+
 ## Security
 
 - [Authentication and authorization](security/authentication.md)

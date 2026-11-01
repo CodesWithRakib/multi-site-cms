@@ -25,7 +25,7 @@ import { User } from './user.entity';
  */
 @Entity({ name: 'sites' })
 @Check('CHK_sites_key_format', '"key"::text ~ \'^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$\'')
-@Check('CHK_sites_status', "\"status\" IN ('active', 'paused', 'archived')")
+@Check('CHK_sites_status', "\"status\" IN ('active', 'paused', 'archived', 'suspended')")
 @Check('CHK_sites_settings_object', 'jsonb_typeof("settings") = \'object\'')
 @Check('CHK_sites_locale_format', '"default_locale" ~ \'^[a-zA-Z]{2,8}(-[a-zA-Z0-9]{2,8})*$\'')
 @Index('IDX_sites_status', ['status'])

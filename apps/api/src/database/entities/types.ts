@@ -14,7 +14,7 @@ export type UserStatus = (typeof USER_STATUSES)[number];
 export const ROLE_SCOPES = ['platform', 'site'] as const;
 export type RoleScope = (typeof ROLE_SCOPES)[number];
 
-export const SITE_STATUSES = ['active', 'paused', 'archived'] as const;
+export const SITE_STATUSES = ['active', 'paused', 'archived', 'suspended'] as const;
 export type SiteStatus = (typeof SITE_STATUSES)[number];
 
 export const DOMAIN_STATUSES = ['active', 'disabled'] as const;

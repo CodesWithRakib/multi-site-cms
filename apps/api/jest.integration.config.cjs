@@ -9,6 +9,9 @@ module.exports = {
   roots: ['<rootDir>/test/database'],
   testRegex: '.*\\.integration-spec\\.ts$',
   moduleFileExtensions: ['ts', 'js', 'json'],
+  moduleNameMapper: {
+    '^(\\.{1,2}/.*)\\.js$': '$1',
+  },
   setupFiles: ['<rootDir>/test/setup-env.ts'],
   transform: {
     '^.+\\.ts$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.json' }],

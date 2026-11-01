@@ -2,6 +2,7 @@ import { AuthenticationAndSessions1793491203000 } from './1793491203000-Authenti
 import { ContentMediaAndAudit1793491202000 } from './1793491202000-ContentMediaAndAudit';
 import { EnableDatabaseExtensions1793491200000 } from './1793491200000-EnableDatabaseExtensions';
 import { IdentityAndSiteRegistry1793491201000 } from './1793491201000-IdentityAndSiteRegistry';
+import { SiteDomainsVerificationAndLifecycle1793491204000 } from './1793491204000-SiteDomainsVerificationAndLifecycle';
 
 /**
  * Ordered migration registry.
@@ -14,4 +15,5 @@ export const MIGRATIONS = [
   IdentityAndSiteRegistry1793491201000,
   ContentMediaAndAudit1793491202000,
   AuthenticationAndSessions1793491203000,
+  SiteDomainsVerificationAndLifecycle1793491204000,
 ] as const;

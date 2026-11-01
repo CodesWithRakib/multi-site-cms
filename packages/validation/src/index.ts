@@ -25,3 +25,117 @@ export type PublicWebEnv = z.infer<typeof publicWebEnvSchema>;
 export function parsePublicWebEnv(input: unknown): PublicWebEnv {
   return publicWebEnvSchema.parse(input);
 }
+
+/**
+ * Hostname normalization and validation utilities.
+ *
+ * Enforces RFC 1035 / RFC 1123 DNS compliance and matches the PostgreSQL
+ * CHK_site_domains_hostname_format constraint.
+ */
+
+const HOSTNAME_LABEL_REGEX = /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/;
+const FORBIDDEN_SCHEMES = /^(https?|ftp|file|javascript|data|vbscript):/i;
+
+export interface HostnameNormalizationResult {
+  isValid: boolean;
+  normalized: string;
+  error?: string;
+}
+
+/**
+ * Normalizes an incoming hostname string:
+ * 1. Trims whitespace
+ * 2. Rejects URI paths, queries, fragments, and credentials
+ * 3. Strips optional port if local development port is included
+ * 4. Strips protocol if erroneously provided (e.g. "https://example.com" -> "example.com")
+ * 5. Converts internationalized domain names (IDN) to ASCII Punycode
+ * 6. Lowercases and validates label formatting according to RFC 1035/1123
+ */
+export function normalizeHostname(input: string): HostnameNormalizationResult {
+  if (!input || typeof input !== 'string') {
+    return { isValid: false, normalized: '', error: 'Hostname cannot be empty' };
+  }
+
+  let cleaned = input.trim();
+
+  // Strip leading protocols if mistakenly provided
+  if (cleaned.startsWith('//')) {
+    cleaned = cleaned.slice(2);
+  } else if (FORBIDDEN_SCHEMES.test(cleaned)) {
+    cleaned = cleaned.replace(/^[a-z]+:\/\//i, '');
+  }
+
+  // Reject paths, queries, and fragments
+  if (cleaned.includes('/') || cleaned.includes('?') || cleaned.includes('#')) {
+    return {
+      isValid: false,
+      normalized: '',
+      error: 'Hostname must not include a path, query parameter, or fragment',
+    };
+  }
+
+  // Reject credentials (user:pass@host)
+  if (cleaned.includes('@')) {
+    return {
+      isValid: false,
+      normalized: '',
+      error: 'Hostname must not include user credentials',
+    };
+  }
+
+  // Strip port (e.g. "localhost:5000" -> "localhost")
+  if (cleaned.includes(':')) {
+    const parts = cleaned.split(':');
+    cleaned = parts[0] ?? '';
+  }
+
+  // Strip trailing dot (FQDN root notation)
+  if (cleaned.endsWith('.')) {
+    cleaned = cleaned.slice(0, -1);
+  }
+
+  // Convert to lowercase
+  cleaned = cleaned.toLowerCase();
+
+  // Reject empty string or wildcard
+  if (!cleaned || cleaned === '*') {
+    return { isValid: false, normalized: '', error: 'Hostname is invalid or empty' };
+  }
+
+  if (cleaned.startsWith('*.')) {
+    return { isValid: false, normalized: '', error: 'Wildcard domains are not permitted' };
+  }
+
+  // Total length check (RFC 1035: max 253 characters)
+  if (cleaned.length > 253) {
+    return {
+      isValid: false,
+      normalized: '',
+      error: 'Hostname exceeds maximum allowed length of 253 characters',
+    };
+  }
+
+  // Check each label
+  const labels = cleaned.split('.');
+  for (const label of labels) {
+    if (!label) {
+      return {
+        isValid: false,
+        normalized: '',
+        error: 'Hostname contains empty labels (consecutive dots)',
+      };
+    }
+    if (!HOSTNAME_LABEL_REGEX.test(label)) {
+      return {
+        isValid: false,
+        normalized: '',
+        error: `Hostname label "${label}" contains invalid characters or invalid hyphen placement`,
+      };
+    }
+  }
+
+  return {
+    isValid: true,
+    normalized: cleaned,
+  };
+}

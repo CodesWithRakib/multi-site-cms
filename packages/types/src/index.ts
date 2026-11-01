@@ -122,3 +122,101 @@ export interface PaginatedResult<T> {
   limit: number;
   totalPages: number;
 }
+
+export type SiteStatus = 'active' | 'paused' | 'archived' | 'suspended';
+export type DomainStatus = 'active' | 'disabled';
+export type NavigationVisibility = 'public' | 'authenticated' | 'hidden';
+export type RobotsPolicy = 'all' | 'noindex' | 'nofollow' | 'none';
+export type ThemePreference = 'light' | 'dark' | 'system';
+
+export interface SiteBranding {
+  displayName?: string;
+  description?: string;
+  logoMediaId?: string | null;
+  faviconMediaId?: string | null;
+  primaryColor: string;
+  secondaryColor?: string;
+  accentColor?: string;
+  themePreference: ThemePreference;
+}
+
+export interface SiteSeo {
+  titleTemplate?: string;
+  defaultDescription?: string;
+  socialImageMediaId?: string | null;
+  canonicalHost?: string;
+  robotsPolicy: RobotsPolicy;
+  sitemapEnabled: boolean;
+}
+
+export interface SiteNavigationItem {
+  id: string;
+  label: string;
+  url: string;
+  visibility: NavigationVisibility;
+  order: number;
+  parentId: string | null;
+  localeLabels?: Record<string, string>;
+}
+
+export interface SiteLocales {
+  defaultLocale: string;
+  supportedLocales: string[];
+  fallbackLocale: string;
+}
+
+export interface SiteSettings {
+  branding?: Partial<SiteBranding>;
+  seo?: Partial<SiteSeo>;
+  navigation?: SiteNavigationItem[];
+  locales?: Partial<SiteLocales>;
+  features?: Record<string, boolean>;
+  [key: string]: unknown;
+}
+
+export interface SiteDomainItem {
+  id: string;
+  siteId: string;
+  hostname: string;
+  status: DomainStatus;
+  isPrimary: boolean;
+  verifiedAt: string | null;
+  verificationToken?: string | null;
+  verificationTokenExpiresAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SiteItem {
+  id: string;
+  key: string;
+  name: string;
+  defaultLocale: string;
+  timezone: string;
+  status: SiteStatus;
+  settings: SiteSettings;
+  domains: SiteDomainItem[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PublicNavigationItem {
+  id: string;
+  label: string;
+  url: string;
+  order: number;
+  parentId: string | null;
+  children?: PublicNavigationItem[];
+}
+
+export interface PublicSiteConfig {
+  key: string;
+  name: string;
+  defaultLocale: string;
+  supportedLocales: string[];
+  timezone: string;
+  primaryDomain: string | null;
+  branding: SiteBranding;
+  navigation: PublicNavigationItem[];
+  seo: SiteSeo;
+}

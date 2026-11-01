@@ -42,6 +42,21 @@ export const en = {
   'role.notFound': 'Role not found.',
   'role.assignmentNotFound': 'Role assignment not found.',
 
+  'sites.notFound': 'Site not found.',
+  'sites.keyConflict': 'A site with this key already exists.',
+  'sites.cannotDeleteActive': 'Active sites cannot be deleted. Archive the site first.',
+  'sites.cannotDeleteWithContent': 'Sites with existing content cannot be deleted.',
+  'domains.notFound': 'Domain not found.',
+  'domains.conflict': 'This domain is already registered to a site.',
+  'domains.invalidHostname': 'Invalid domain hostname.',
+  'domains.verificationFailed': 'Domain verification failed.',
+  'domains.alreadyVerified': 'Domain is already verified.',
+  'domains.cannotRemovePrimary':
+    'Cannot remove the primary domain. Set another domain as primary first.',
+  'settings.invalidColor': 'Invalid color format. Hex color code expected.',
+  'settings.invalidUrl': 'Invalid navigation URL.',
+  'settings.cycleDetected': 'Navigation item cannot have itself or its descendants as parent.',
+
   'validation.failed': 'The request contains invalid fields.',
   'validation.unexpectedField': 'This field is not allowed.',
   'validation.isDefined': 'This field is required.',
@@ -91,6 +106,22 @@ export const bn: Record<MessageKey, string> = {
   'user.emailConflict': 'এই ইমেইল ঠিকানার একজন ব্যবহারকারী ইতিমধ্যে বিদ্যমান।',
   'role.notFound': 'রোল পাওয়া যায়নি।',
   'role.assignmentNotFound': 'রোল অ্যাসাইনমেন্ট পাওয়া যায়নি।',
+
+  'sites.notFound': 'সাইটটি পাওয়া যায়নি।',
+  'sites.keyConflict': 'এই কি (key) দিয়ে একটি সাইট ইতিমধ্যে বিদ্যমান।',
+  'sites.cannotDeleteActive': 'সক্রিয় সাইট মুছে ফেলা যাবে না। প্রথমে সাইটটি আর্কাইভ করুন।',
+  'sites.cannotDeleteWithContent': 'কন্টেন্ট বিদ্যমান থাকা সাইট মুছে ফেলা যাবে না।',
+  'domains.notFound': 'ডোমেন পাওয়া যায়নি।',
+  'domains.conflict': 'এই ডোমেনটি ইতিমধ্যে একটি সাইটে নিবন্ধিত।',
+  'domains.invalidHostname': 'অবৈধ ডোমেন হোস্টনেম।',
+  'domains.verificationFailed': 'ডোমেন যাচাইকরণ ব্যর্থ হয়েছে।',
+  'domains.alreadyVerified': 'ডোমেনটি ইতিমধ্যে যাচাইকৃত।',
+  'domains.cannotRemovePrimary':
+    'প্রাইমারি ডোমেন মুছে ফেলা যাবে না। প্রথমে অন্য একটি ডোমেনকে প্রাইমারি হিসেবে নির্ধারণ করুন।',
+  'settings.invalidColor': 'অবৈধ রঙের ফরম্যাট। হেক্স কালার কোড প্রত্যাশিত।',
+  'settings.invalidUrl': 'অবৈধ নেভিগেশন URL।',
+  'settings.cycleDetected':
+    'নেভিগেশন আইটেম নিজের বা অধীনস্থ আইটেমকে প্যারেন্ট হিসেবে রাখতে পারে না।',
 
   'validation.failed': 'অনুরোধে অবৈধ ফিল্ড রয়েছে।',
   'validation.unexpectedField': 'এই ফিল্ডটি অনুমোদিত নয়।',
