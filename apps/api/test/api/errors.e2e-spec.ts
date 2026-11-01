@@ -7,6 +7,7 @@ import { afterAll, beforeAll, describe, expect, it } from '@jest/globals';
 import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 import request from 'supertest';
 
+import { Public } from '../../src/auth/decorators/public.decorator';
 import { AppModule } from '../../src/app.module';
 import { configureApp } from '../../src/bootstrap';
 
@@ -25,6 +26,7 @@ class ProbeDto {
   name!: string;
 }
 
+@Public()
 @Controller('probe')
 class ProbeController {
   @Post()

@@ -69,3 +69,56 @@ export interface ReadinessResponse {
     database: ReadinessCheck;
   };
 }
+
+export type UserStatus = 'active' | 'invited' | 'suspended' | 'disabled';
+export type RoleScope = 'platform' | 'site';
+
+export interface UserRoleSummary {
+  assignmentId: string;
+  roleId: string;
+  roleKey: string;
+  roleName: string;
+  scopeType: RoleScope;
+  siteId: string | null;
+}
+
+export interface AuthUser {
+  id: string;
+  email: string;
+  displayName: string;
+  status: UserStatus;
+  roles: UserRoleSummary[];
+  permissions: string[];
+  authorizedSiteIds: string[];
+  isSuperAdmin: boolean;
+}
+
+export interface LoginResponse {
+  user: AuthUser;
+  expiresAt: string;
+}
+
+export interface CsrfResponse {
+  csrfToken: string;
+}
+
+export interface UserItem {
+  id: string;
+  email: string;
+  displayName: string;
+  status: UserStatus;
+  lastLoginAt: string | null;
+  failedLoginCount: number;
+  lockedUntil: string | null;
+  createdAt: string;
+  updatedAt: string;
+  roles: UserRoleSummary[];
+}
+
+export interface PaginatedResult<T> {
+  items: T[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}

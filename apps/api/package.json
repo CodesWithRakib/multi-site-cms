@@ -19,7 +19,8 @@
     "db:migration:revert": "typeorm -d dist/database/data-source.js migration:revert",
     "db:migration:show": "typeorm -d dist/database/data-source.js migration:show",
     "db:migration:generate": "typeorm -d dist/database/data-source.js migration:generate --pretty",
-    "db:seed:dev": "node dist/database/seeds/development.seed.js"
+    "db:seed:dev": "node dist/database/seeds/development.seed.js",
+    "bootstrap:super-admin": "node dist/database/cli/bootstrap-super-admin.js"
   },
   "dependencies": {
     "@multi-site-cms/types": "workspace:*",
@@ -28,8 +29,10 @@
     "@nestjs/platform-express": "12.3.2",
     "@nestjs/swagger": "12.0.5",
     "@nestjs/throttler": "6.7.1",
+    "@node-rs/argon2": "^2.2.2",
     "class-transformer": "0.5.1",
     "class-validator": "0.15.1",
+    "cookie-parser": "^1.4.7",
     "helmet": "8.3.0",
     "pg": "8.23.1",
     "reflect-metadata": "0.2.2",
@@ -44,6 +47,7 @@
     "@multi-site-cms/tsconfig": "workspace:*",
     "@nestjs/cli": "12.0.11",
     "@nestjs/testing": "12.3.2",
+    "@types/cookie-parser": "^1.4.10",
     "@types/express": "5.0.6",
     "@types/node": "24.19.2",
     "@types/supertest": "7.2.1",

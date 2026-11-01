@@ -10,4 +10,5 @@ module.exports = {
   },
   collectCoverageFrom: ['src/**/*.ts', '!src/main.ts', '!src/database/**'],
   clearMocks: true,
+  testTimeout: 30_000,
 };

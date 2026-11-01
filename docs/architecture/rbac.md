@@ -1,6 +1,6 @@
 # Authorization model: Super Admin, Admin, and future roles
 
-Status: **design for Phase 02**. Phase 01 has no users, sessions, or guards.
+Status: **Implemented in Phase 04** (Authentication, RBAC & Site Authorization).
 
 ## Roles versus permissions
 

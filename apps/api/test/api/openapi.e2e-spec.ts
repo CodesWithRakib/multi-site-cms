@@ -42,7 +42,20 @@ describe('OpenAPI document', () => {
 
     // Nest applies the global prefix to document paths, so they include `/api/v1`
     // exactly once.
-    expect(paths).toEqual([`/${env.API_PREFIX}/health`, `/${env.API_PREFIX}/health/ready`]);
+    expect(paths).toEqual([
+      `/${env.API_PREFIX}/auth/csrf`,
+      `/${env.API_PREFIX}/auth/login`,
+      `/${env.API_PREFIX}/auth/logout`,
+      `/${env.API_PREFIX}/auth/me`,
+      `/${env.API_PREFIX}/health`,
+      `/${env.API_PREFIX}/health/ready`,
+      `/${env.API_PREFIX}/sites/{siteId}`,
+      `/${env.API_PREFIX}/sites/{siteId}/settings`,
+      `/${env.API_PREFIX}/users`,
+      `/${env.API_PREFIX}/users/{id}`,
+      `/${env.API_PREFIX}/users/{id}/roles`,
+      `/${env.API_PREFIX}/users/{id}/roles/{assignmentId}`,
+    ]);
     expect(paths.some((path) => path.includes('identity'))).toBe(false);
     expect(paths.some((path) => path.includes('post'))).toBe(false);
   });

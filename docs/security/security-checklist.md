@@ -32,15 +32,15 @@ described as implemented when it is not.
 
 ## Authentication and authorization
 
-| Control                             | Status | Where                           |
-| ----------------------------------- | ------ | ------------------------------- |
-| Server-side session authentication  | ⏳ 02  | Not implemented                 |
-| Role and permission enforcement     | ⏳ 02  | [RBAC](../architecture/rbac.md) |
-| Site-scoped object authorization    | ⏳ 02  | Guard + scoped query            |
-| CSRF defense (origin + token)       | ⏳ 02  | Before cookie-auth mutations    |
-| Login throttling and lockout        | ⏳ 02  | Login module                    |
-| Last-Super-Admin protection         | ⏳ 02  | Role service                    |
-| Audit events for privileged actions | ⏳ 02  | Audit module                    |
+| Control                             | Status | Where                                |
+| ----------------------------------- | ------ | ------------------------------------ |
+| Server-side session authentication  | ✅ 04  | `SessionService`, `sessions` table   |
+| Role and permission enforcement     | ✅ 04  | `PermissionsGuard`, RBAC entities    |
+| Site-scoped object authorization    | ✅ 04  | `SiteAccessGuard`, 404 IDOR denial   |
+| CSRF defense (origin + token)       | ✅ 04  | `CsrfGuard`, Double Submit Cookie    |
+| Login throttling and lockout        | ✅ 04  | `AuthService`, 15-min `locked_until` |
+| Last-Super-Admin protection         | ✅ 04  | `UsersService`                       |
+| Audit events for privileged actions | ✅ 04  | `AuditService`, `audit_events` table |
 
 ## Secrets and configuration
 

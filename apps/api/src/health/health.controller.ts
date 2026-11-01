@@ -7,11 +7,13 @@ import {
 } from '@nestjs/swagger';
 import type { HealthResponse, ReadinessResponse } from '@multi-site-cms/types';
 
+import { Public } from '../auth/decorators/public.decorator';
 import { ApiErrorResponseDto } from '../common/http/openapi-error.dto';
 import { ApiException } from '../common/exceptions/api.exception';
 import { DatabaseHealthService } from '../database/database-health.service';
 import { HealthEnvelopeDto, ReadinessEnvelopeDto } from './health.dto';
 
+@Public()
 @Controller('health')
 @ApiTags('operations')
 export class HealthController {

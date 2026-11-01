@@ -5,6 +5,7 @@ export default [
   {
     files: ['**/*.ts'],
     rules: {
+      '@typescript-eslint/consistent-type-imports': 'off',
       'no-restricted-imports': [
         'error',
         {

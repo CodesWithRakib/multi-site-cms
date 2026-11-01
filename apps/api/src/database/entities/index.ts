@@ -11,6 +11,7 @@ import { PostPublicationTag } from './post-publication-tag.entity';
 import { PostRevision } from './post-revision.entity';
 import { Role } from './role.entity';
 import { RolePermission } from './role-permission.entity';
+import { Session } from './session.entity';
 import { Site } from './site.entity';
 import { SiteDomain } from './site-domain.entity';
 import { Tag } from './tag.entity';
@@ -26,6 +27,7 @@ import { UserRoleAssignment } from './user-role-assignment.entity';
 export const ENTITIES = [
   // Identity and authorization
   User,
+  Session,
   Role,
   Permission,
   RolePermission,
@@ -63,6 +65,7 @@ export {
   PostRevision,
   Role,
   RolePermission,
+  Session,
   Site,
   SiteDomain,
   Tag,

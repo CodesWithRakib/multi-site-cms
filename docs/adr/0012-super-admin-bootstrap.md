@@ -1,6 +1,6 @@
 # ADR-0012: Controlled Super Admin bootstrap
 
-- Status: Proposed (implemented in the authentication phase)
+- Status: Accepted
 - Date: 2026-11-01
 - Owners: security + platform engineering
 

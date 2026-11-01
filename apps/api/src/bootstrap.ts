@@ -1,5 +1,6 @@
 import { ValidationPipe } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
+import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 
 import { validationExceptionFactory } from './common/http/validation.exception';
@@ -30,6 +31,7 @@ export function configureApp(app: NestExpressApplication): NestExpressApplicatio
 
   app.use(requestIdMiddleware);
   app.use(localeMiddleware);
+  app.use(cookieParser());
   app.use(helmet());
 
   // Explicit body limits. Without them the framework default is inherited silently.
@@ -41,7 +43,15 @@ export function configureApp(app: NestExpressApplication): NestExpressApplicatio
     origin: env.CORS_ORIGINS,
     credentials: true,
     methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Accept', 'Accept-Language', 'Authorization', 'Content-Type', 'X-Request-Id'],
+    allowedHeaders: [
+      'Accept',
+      'Accept-Language',
+      'Authorization',
+      'Content-Type',
+      'X-Request-Id',
+      'X-CSRF-Token',
+      'X-XSRF-Token',
+    ],
     exposedHeaders: ['X-Request-Id'],
     maxAge: 600,
   });

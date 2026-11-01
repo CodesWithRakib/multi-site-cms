@@ -146,7 +146,7 @@ describe('migration chain', () => {
       `SELECT "name" FROM "typeorm_migrations" ORDER BY "id"`,
     );
 
-    expect(applied).toHaveLength(3);
+    expect(applied).toHaveLength(4);
   });
 
   it('creates every expected table', async () => {
@@ -164,6 +164,7 @@ describe('migration chain', () => {
       'posts',
       'role_permissions',
       'roles',
+      'sessions',
       'site_domains',
       'sites',
       'tags',
@@ -855,8 +856,81 @@ describe('index plan', () => {
       'UQ_site_domains_primary_per_site',
       'IDX_audit_events_site_created',
       'IDX_events_site_start',
+      'UQ_sessions_token_hash',
+      'IDX_sessions_user_active',
+      'IDX_sessions_expires_at',
+      'IDX_users_locked_until',
     ]) {
       expect(names.has(expected)).toBe(true);
     }
+  });
+});
+
+describe('sessions and account lockout', () => {
+  it('enforces token hash uniqueness and validity', async () => {
+    const userId = await insertUser('session-owner@example.test');
+
+    await dataSource.query(
+      `INSERT INTO "sessions" ("user_id", "token_hash", "expires_at")
+       VALUES ($1, 'hash-token-1', now() + interval '7 days')`,
+      [userId],
+    );
+
+    // Duplicate token_hash must fail
+    await expect(
+      dataSource.query(
+        `INSERT INTO "sessions" ("user_id", "token_hash", "expires_at")
+         VALUES ($1, 'hash-token-1', now() + interval '7 days')`,
+        [userId],
+      ),
+    ).rejects.toThrow(/UQ_sessions_token_hash/);
+
+    // Blank token_hash must fail
+    await expect(
+      dataSource.query(
+        `INSERT INTO "sessions" ("user_id", "token_hash", "expires_at")
+         VALUES ($1, '   ', now() + interval '7 days')`,
+        [userId],
+      ),
+    ).rejects.toThrow(/CHK_sessions_token_hash_not_blank/);
+  });
+
+  it('cascades session deletion when user is deleted', async () => {
+    const userId = await insertUser('cascaded-session@example.test');
+
+    await dataSource.query(
+      `INSERT INTO "sessions" ("user_id", "token_hash", "expires_at")
+       VALUES ($1, 'cascade-token-1', now() + interval '7 days')`,
+      [userId],
+    );
+
+    const beforeRows: unknown[] = await dataSource.query(
+      `SELECT "id" FROM "sessions" WHERE "user_id" = $1`,
+      [userId],
+    );
+    expect(beforeRows).toHaveLength(1);
+
+    await dataSource.query(`DELETE FROM "users" WHERE "id" = $1`, [userId]);
+
+    const afterRows: unknown[] = await dataSource.query(
+      `SELECT "id" FROM "sessions" WHERE "user_id" = $1`,
+      [userId],
+    );
+    expect(afterRows).toHaveLength(0);
+  });
+
+  it('supports locked_until on users', async () => {
+    const userId = await insertUser('locked-user@example.test');
+
+    await dataSource.query(
+      `UPDATE "users" SET "locked_until" = now() + interval '15 minutes' WHERE "id" = $1`,
+      [userId],
+    );
+
+    const rows: unknown[] = await dataSource.query(
+      `SELECT "locked_until" FROM "users" WHERE "id" = $1`,
+      [userId],
+    );
+    expect((rows[0] as { locked_until: Date }).locked_until).toBeDefined();
   });
 });

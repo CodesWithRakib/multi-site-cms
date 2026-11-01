@@ -17,14 +17,14 @@ describe('database integration wiring', () => {
     expect(dataSource.options.synchronize).toBe(false);
     expect(dataSource.options.migrationsRun).toBe(false);
     expect(dataSource.options.migrations).toHaveLength(MIGRATIONS.length);
-    expect(MIGRATIONS).toHaveLength(3);
+    expect(MIGRATIONS).toHaveLength(4);
   });
 
   it('registers every domain entity', () => {
     const dataSource = new DataSource(buildDataSourceOptions(testDatabaseUrl()));
 
-    expect(ENTITIES).toHaveLength(18);
-    expect(dataSource.options.entities).toHaveLength(18);
+    expect(ENTITIES).toHaveLength(19);
+    expect(dataSource.options.entities).toHaveLength(19);
 
     // Every entity is registered exactly once; a duplicate would silently merge
     // metadata and hide a second definition of the same table.
@@ -38,14 +38,14 @@ describe('database integration wiring', () => {
     await dataSource.initialize();
 
     try {
-      expect(dataSource.entityMetadatas).toHaveLength(18);
+      expect(dataSource.entityMetadatas).toHaveLength(19);
 
       const rows: unknown[] = await dataSource.query(
         `SELECT "table_name" FROM "information_schema"."tables"
-         WHERE "table_schema" = 'public' AND "table_name" IN ('users', 'post_publications', 'audit_events')`,
+         WHERE "table_schema" = 'public' AND "table_name" IN ('users', 'sessions', 'post_publications', 'audit_events')`,
       );
 
-      expect(rows).toHaveLength(3);
+      expect(rows).toHaveLength(4);
     } finally {
       await dataSource.destroy();
     }

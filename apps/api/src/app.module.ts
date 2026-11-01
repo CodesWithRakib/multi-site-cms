@@ -2,11 +2,18 @@ import { Module } from '@nestjs/common';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
+import { AuthModule } from './auth/auth.module';
+import { AuthGuard } from './auth/guards/auth.guard';
+import { CsrfGuard } from './auth/guards/csrf.guard';
+import { PermissionsGuard } from './auth/guards/permissions.guard';
+import { AuditModule } from './common/audit/audit.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { RequestLoggingInterceptor } from './common/interceptors/request-logging.interceptor';
 import { ResponseEnvelopeInterceptor } from './common/interceptors/response-envelope.interceptor';
 import { DatabaseModule } from './database/database.module';
 import { HealthModule } from './health/health.module';
+import { SitesModule } from './sites/sites.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -18,6 +25,10 @@ import { HealthModule } from './health/health.module';
       },
     ]),
     DatabaseModule,
+    AuditModule,
+    AuthModule,
+    UsersModule,
+    SitesModule,
     HealthModule,
   ],
   providers: [
@@ -36,6 +47,18 @@ import { HealthModule } from './health/health.module';
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: CsrfGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: PermissionsGuard,
     },
   ],
 })
