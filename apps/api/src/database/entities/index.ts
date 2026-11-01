@@ -2,6 +2,7 @@ import { AuditEvent } from './audit-event.entity';
 import { Category } from './category.entity';
 import { Event } from './event.entity';
 import { MediaAsset } from './media-asset.entity';
+import { OutboxEvent } from './outbox-event.entity';
 import { Permission } from './permission.entity';
 import { Post } from './post.entity';
 import { PostPublication } from './post-publication.entity';
@@ -47,8 +48,9 @@ export const ENTITIES = [
   // Media
   MediaAsset,
   PostPublicationMedia,
-  // Audit
+  // Audit and Outbox
   AuditEvent,
+  OutboxEvent,
 ] as const;
 
 export {
@@ -56,6 +58,7 @@ export {
   Category,
   Event,
   MediaAsset,
+  OutboxEvent,
   Permission,
   Post,
   PostPublication,

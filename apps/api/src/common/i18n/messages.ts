@@ -83,6 +83,16 @@ export const en = {
   'media.invalidFileSignature': 'The uploaded file signature does not match its declared type.',
   'post.previewTokenExpired': 'The preview token has expired.',
   'post.previewTokenInvalid': 'Invalid or tampered preview token.',
+  'publication.invalidTransition': 'Invalid publication state transition.',
+  'publication.scheduledTimeInPast': 'Scheduled publication time must be in the future.',
+  'publication.scheduledTimeInvalid': 'Invalid scheduled timestamp format.',
+  'publication.contentNotEligible':
+    'The source post or revision is incomplete and cannot be published.',
+  'publication.siteInactive': 'Cannot publish content to an inactive site.',
+  'publication.cannotCancelNonScheduled': 'Only scheduled publications can be cancelled.',
+  'publication.cannotRescheduleNonScheduled': 'Only scheduled publications can be rescheduled.',
+  'publication.cannotUnpublishNonPublished': 'Only published content can be unpublished.',
+  'publication.cannotRestoreNonArchived': 'Only archived publications can be restored.',
 
   'validation.failed': 'The request contains invalid fields.',
   'validation.unexpectedField': 'This field is not allowed.',
@@ -175,6 +185,16 @@ export const bn: Record<MessageKey, string> = {
   'media.invalidFileSignature': 'আপলোডকৃত ফাইলটির অভ্যন্তরীণ কাঠামো এর টাইপের সাথে মিলছে না।',
   'post.previewTokenExpired': 'প্রিভিউ টোকেনের মেয়াদ শেষ হয়ে গেছে।',
   'post.previewTokenInvalid': 'অবৈধ বা বিকৃত প্রিভিউ টোকেন।',
+  'publication.invalidTransition': 'প্রকাশনার অবস্থার এই পরিবর্তনটি অনুমোদিত নয়।',
+  'publication.scheduledTimeInPast': 'নির্ধারিত সময় ভবিষ্যতের হতে হবে।',
+  'publication.scheduledTimeInvalid': 'নির্ধারিত সময়ের ফরম্যাটটি সঠিক নয়।',
+  'publication.contentNotEligible': 'মূল পোস্ট বা সংস্করণটি অসম্পূর্ণ এবং প্রকাশযোগ্য নয়।',
+  'publication.siteInactive': 'নিষ্ক্রিয় সাইটে কোনো বিষয়বস্তু প্রকাশ করা যাবে না।',
+  'publication.cannotCancelNonScheduled': 'শুধুমাত্র নির্ধারিত সময়সূচীর প্রকাশনাই বাতিল করা যায়।',
+  'publication.cannotRescheduleNonScheduled':
+    'শুধুমাত্র নির্ধারিত সময়সূচীর প্রকাশনাই পুনর্নির্ধারণ করা যায়।',
+  'publication.cannotUnpublishNonPublished': 'শুধুমাত্র প্রকাশিত বিষয়বস্তুই অপ্রকাশিত করা যায়।',
+  'publication.cannotRestoreNonArchived': 'শুধুমাত্র আর্কাইভ করা প্রকাশনাই পুনরুদ্ধার করা যায়।',
 
   'validation.failed': 'অনুরোধে অবৈধ ফিল্ড রয়েছে।',
   'validation.unexpectedField': 'এই ফিল্ডটি অনুমোদিত নয়।',

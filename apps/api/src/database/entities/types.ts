@@ -36,8 +36,23 @@ export const POST_STATUSES = ['draft', 'in_review', 'approved', 'archived'] as c
 export type PostStatus = (typeof POST_STATUSES)[number];
 
 /** Per-site publication state. Distinct from `POST_STATUSES` on purpose. */
-export const PUBLICATION_STATUSES = ['draft', 'scheduled', 'published', 'archived'] as const;
+export const PUBLICATION_STATUSES = [
+  'draft',
+  'in_review',
+  'scheduled',
+  'published',
+  'archived',
+] as const;
 export type PublicationStatus = (typeof PUBLICATION_STATUSES)[number];
+
+export const OUTBOX_STATUSES = [
+  'pending',
+  'processing',
+  'completed',
+  'failed',
+  'dead_letter',
+] as const;
+export type OutboxStatus = (typeof OUTBOX_STATUSES)[number];
 
 export const MEDIA_STATUSES = ['active', 'archived'] as const;
 export type MediaStatus = (typeof MEDIA_STATUSES)[number];

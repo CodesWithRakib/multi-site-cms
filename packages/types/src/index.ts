@@ -231,7 +231,7 @@ export type PostType =
   | 'event_update';
 
 export type PostStatus = 'draft' | 'in_review' | 'approved' | 'archived';
-export type PublicationStatus = 'draft' | 'scheduled' | 'published' | 'archived';
+export type PublicationStatus = 'draft' | 'in_review' | 'scheduled' | 'published' | 'archived';
 export type MediaStatus = 'active' | 'archived';
 export type MediaUsageRole = 'featured' | 'gallery' | 'inline' | 'attachment';
 
@@ -366,4 +366,38 @@ export interface EventTimelineBlockAttributes {
   windSpeed?: string;
   weatherCondition?: string;
   alertLevel?: 'normal' | 'advisory' | 'warning';
+}
+
+export interface PublishingHealthStats {
+  scheduledPublicationsPending: number;
+  oldestPendingScheduledFor: string | null;
+  outboxBacklogPending: number;
+  outboxDeadLetterCount: number;
+  isScheduledWorkerActive: boolean;
+  isOutboxDispatcherActive: boolean;
+}
+
+export interface RealtimeBroadcastEvent {
+  id: string;
+  type: string;
+  siteKey: string;
+  publicationId: string;
+  postId: string;
+  slug: string;
+  title: string;
+  publishedAt: string;
+  alertLevel?: string;
+  windConditions?: string;
+  weather?: string;
+  timestamp: number;
+}
+
+export interface SchedulePublicationRequest {
+  scheduledFor: string;
+  reason?: string;
+}
+
+export interface ReschedulePublicationRequest {
+  scheduledFor: string;
+  reason?: string;
 }

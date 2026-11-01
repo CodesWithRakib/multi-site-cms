@@ -93,6 +93,16 @@ describing future behavior is labelled with its phase.
 - [Authenticated Preview System](editor/preview-system.md) — Ephemeral HMAC-SHA256 tokens, crawler suppression, and layout simulation.
 - [Editorial Security](editor/security.md) — File validation, XSS prevention, tenant isolation, and preview controls.
 
+## Publishing Engine & Scheduling
+
+- [Publishing Lifecycle & State Machine](publishing/publishing-lifecycle.md) — 5-state lifecycle, transition matrix, capability permissions, and audit logs.
+- [Scheduled Publishing Semantics](publishing/scheduled-publishing.md) — Canonical UTC normalization, future validation, rescheduling, and cancellation.
+- [Background Jobs & Polling Infrastructure](publishing/background-jobs.md) — Concurrency workers via PostgreSQL `FOR UPDATE SKIP LOCKED`.
+- [Transactional Outbox Pattern](publishing/outbox-and-events.md) — Dual-write elimination, `outbox_events` schema, exponential backoff, and dead-letter queue.
+- [Next.js Cache Invalidation](publishing/cache-invalidation.md) — Path derivation, on-demand ISR revalidation, and webhook secrets.
+- [Real-Time Updates (SSE)](publishing/realtime-updates.md) — Server-Sent Events, site channel isolation, draft suppression, and client reconnection.
+- [Operations & Disaster Recovery](publishing/operations-and-recovery.md) — Health statistics, downtime recovery, and dead-letter replay procedures.
+
 ## Security
 
 - [Authentication and authorization](security/authentication.md)

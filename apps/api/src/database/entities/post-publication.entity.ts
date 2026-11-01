@@ -37,7 +37,7 @@ import type { PublicationStatus } from './types';
 @Entity({ name: 'post_publications' })
 @Check(
   'CHK_post_publications_status',
-  "\"status\" IN ('draft', 'scheduled', 'published', 'archived')",
+  "\"status\" IN ('draft', 'in_review', 'scheduled', 'published', 'archived')",
 )
 @Check('CHK_post_publications_slug_format', '"slug"::text ~ \'^[a-z0-9]+(?:-[a-z0-9]+)*$\'')
 @Check('CHK_post_publications_slug_length', 'char_length("slug"::text) BETWEEN 1 AND 96')

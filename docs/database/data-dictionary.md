@@ -170,21 +170,21 @@ projection when it is implemented, not `ILIKE` over JSONB.
 
 The tenant-visible unit. Site-owned.
 
-| Column              | Type        | Null | Notes                                            |
-| ------------------- | ----------- | ---- | ------------------------------------------------ |
-| `site_id`           | uuid        | no   | → `sites` RESTRICT                               |
-| `post_id`           | uuid        | no   | → `posts` RESTRICT                               |
-| `revision_id`       | uuid        | no   | Composite `(post_id, revision_id)` → revisions   |
-| `event_id`          | uuid        | yes  | Composite `(event_id, site_id)` → events         |
-| `slug`              | citext      | no   | Unique per site, `^[a-z0-9]+(-[a-z0-9]+)*$`      |
-| `status`            | text        | no   | `draft`/`scheduled`/`published`/`archived`       |
-| `scheduled_for`     | timestamptz | yes  | Required when `status = 'scheduled'`             |
-| `published_at`      | timestamptz | yes  | Required when `status = 'published'`             |
-| `seo_title`         | text        | yes  | `<= 200` characters                              |
-| `seo_description`   | text        | yes  | `<= 320` characters                              |
-| `canonical_url`     | text        | yes  | Absolute `http(s)://`                            |
-| `featured_image_id` | uuid        | yes  | Composite `(featured_image_id, site_id)` → media |
-| `template_key`      | text        | yes  | Allowlisted key, `^[a-z][a-z0-9-]{0,63}$`        |
+| Column              | Type        | Null | Notes                                                  |
+| ------------------- | ----------- | ---- | ------------------------------------------------------ |
+| `site_id`           | uuid        | no   | → `sites` RESTRICT                                     |
+| `post_id`           | uuid        | no   | → `posts` RESTRICT                                     |
+| `revision_id`       | uuid        | no   | Composite `(post_id, revision_id)` → revisions         |
+| `event_id`          | uuid        | yes  | Composite `(event_id, site_id)` → events               |
+| `slug`              | citext      | no   | Unique per site, `^[a-z0-9]+(-[a-z0-9]+)*$`            |
+| `status`            | text        | no   | `draft`/`in_review`/`scheduled`/`published`/`archived` |
+| `scheduled_for`     | timestamptz | yes  | Required when `status = 'scheduled'`                   |
+| `published_at`      | timestamptz | yes  | Required when `status = 'published'`                   |
+| `seo_title`         | text        | yes  | `<= 200` characters                                    |
+| `seo_description`   | text        | yes  | `<= 320` characters                                    |
+| `canonical_url`     | text        | yes  | Absolute `http(s)://`                                  |
+| `featured_image_id` | uuid        | yes  | Composite `(featured_image_id, site_id)` → media       |
+| `template_key`      | text        | yes  | Allowlisted key, `^[a-z][a-z0-9-]{0,63}$`              |
 
 Unique `(site_id, post_id)`, `(site_id, slug)`, `(id, site_id)`. Indexes:
 `(site_id, status, published_at)`, partial `(scheduled_for) WHERE status =
@@ -256,3 +256,26 @@ be a user. Indexes: `(site_id, created_at)`, `(actor_id, created_at)`,
 Append-only is enforced by privileges, not constraints: the application role gets
 `INSERT` and `SELECT` only. See
 [multi-site isolation](multi-site-data-isolation.md#audit-tampering).
+
+## outbox_events
+
+Transactional outbox table for reliable external event dispatch, Next.js cache revalidation, and SSE streams.
+
+| Column           | Type        | Null | Notes                                                      |
+| ---------------- | ----------- | ---- | ---------------------------------------------------------- |
+| `id`             | uuid        | no   | Primary Key (`gen_random_uuid()`)                          |
+| `event_type`     | varchar     | no   | e.g. `publication.published`, `airsports.update.published` |
+| `event_version`  | integer     | no   | Default 1                                                  |
+| `site_id`        | uuid        | yes  | → `sites` SET NULL                                         |
+| `publication_id` | uuid        | yes  | → `post_publications` SET NULL                             |
+| `post_id`        | uuid        | yes  | → `posts` SET NULL                                         |
+| `payload`        | jsonb       | no   | Structured event payload                                   |
+| `status`         | varchar     | no   | `pending`/`processing`/`completed`/`failed`/`dead_letter`  |
+| `retry_count`    | integer     | no   | Default 0                                                  |
+| `max_retries`    | integer     | no   | Default 5                                                  |
+| `next_retry_at`  | timestamptz | no   | Scheduled timestamp for polling worker                     |
+| `last_error`     | text        | yes  | Stack trace or message from last failed dispatch attempt   |
+| `processed_at`   | timestamptz | yes  | Recorded when `status = 'completed'`                       |
+| `created_at`     | timestamptz | no   | Creation timestamp                                         |
+
+Indexes: partial `IDX_outbox_events_due` on `(status, next_retry_at) WHERE status IN ('pending', 'processing')`, `IDX_outbox_events_site` on `site_id`, `IDX_outbox_events_pub` on `publication_id`.
