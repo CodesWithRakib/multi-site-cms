@@ -96,19 +96,24 @@ database access pattern, or a competing UI system to finish a feature faster.
 
 ## Skills index
 
-| Skill                     | Load it when you touch                                   |
-| ------------------------- | -------------------------------------------------------- |
-| `architecture-governance` | Boundaries, packages, ADRs, cross-cutting design         |
-| `clean-code`              | Any source change; naming, structure, errors             |
-| `database-engineering`    | Entities, migrations, constraints, indexes, transactions |
-| `api-engineering`         | Controllers, DTOs, guards, envelopes, versioning         |
-| `frontend-engineering`    | Pages, layouts, Server/Client components, accessibility  |
-| `state-management`        | Redux, RTK Query, forms, editor state                    |
-| `security-engineering`    | Auth, RBAC, validation, headers, secrets, audit          |
-| `testing-quality`         | Test design, coverage, fixtures, E2E                     |
-| `performance-engineering` | Queries, bundles, caching, rendering, Core Web Vitals    |
-| `documentation`           | Docs, ADRs, README, runbooks, diagrams                   |
-| `deployment-engineering`  | Environments, CI, hosting, database operations           |
+| Skill                        | Load it when you touch                                   |
+| ---------------------------- | -------------------------------------------------------- |
+| `architecture-governance`    | Boundaries, packages, ADRs, cross-cutting design         |
+| `clean-code`                 | Any source change; naming, structure, errors             |
+| `database-engineering`       | Entities, migrations, constraints, indexes, transactions |
+| `api-engineering`            | Controllers, DTOs, guards, envelopes, versioning         |
+| `frontend-engineering`       | Pages, layouts, Server/Client components, accessibility  |
+| `state-management`           | Redux, RTK Query, forms, editor state                    |
+| `security-engineering`       | Auth, RBAC, validation, headers, secrets, audit          |
+| `testing-quality`            | Test design, coverage, fixtures, E2E                     |
+| `performance-engineering`    | Queries, bundles, caching, rendering, Core Web Vitals    |
+| `documentation`              | Docs, ADRs, README, runbooks, diagrams                   |
+| `deployment-engineering`     | Environments, CI, hosting, database operations           |
+| `ui-ux-design-standards`     | Design tokens, spacing, typography hierarchy, states     |
+| `shadcn-component-standards` | `@multi-site-cms/ui` primitives, Radix, cva variants     |
+| `accessibility-wcag`         | WCAG 2.2 AA, semantic landmarks, keyboard, focus trap    |
+| `visual-qa-testing`          | Multi-viewport (1440, 768, 375), dual-theme visual QA    |
+| `refactoring-standards`      | Safe route-by-route refactoring, 150-250 lines max/file  |
 
 Each skill follows the same shape: purpose, when to use it, mandatory rules,
 workflow, anti-patterns, review checklist, project references.

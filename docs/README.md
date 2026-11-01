@@ -146,6 +146,18 @@ describing future behavior is labelled with its phase.
 - [Release and Rollback](production/release-and-rollback.md) — Zero-downtime release workflow and rollback decision criteria.
 - [Known Limitations](production/known-limitations.md) — Technical debt, free-tier limits, and prioritized follow-up backlog.
 
+## Admin Refactoring & Design System (Phase 13+)
+
+- [Refactoring Audit](refactoring/admin-refactoring-audit.md) — Comprehensive technical audit of all 15 admin routes and code smells.
+- [Route Inventory](refactoring/admin-route-inventory.md) — Complete matrix of admin routes, roles, guards, and states.
+- [Design System & Tokens](refactoring/design-system.md) — OKLCH semantic tokens, typography, elevation, and layout grid.
+- [Component Guidelines](refactoring/component-guidelines.md) — 5-tier architecture, 150–250 line file target, and decomposition plans.
+- [Frontend Architecture](refactoring/frontend-architecture.md) — App Router boundaries, RTK Query caching, and form validation standards.
+- [Backend Architecture](refactoring/backend-architecture.md) — Modular monolith, DTO validation, and multi-tenant isolation.
+- [Skills Inventory](refactoring/skills-inventory.md) — Available skills, tools, and developer guidelines.
+- [Seed Data Strategy](refactoring/seed-data-strategy.md) — Deterministic, realistic seed data and multi-role user fixtures.
+- [Visual QA Protocol](refactoring/visual-qa.md) — Multi-viewport testing matrix (1440, 768, 375) and zero-tolerance gates.
+
 ## Security
 
 - [Authentication and authorization](security/authentication.md)

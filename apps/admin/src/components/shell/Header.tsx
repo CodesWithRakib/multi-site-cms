@@ -5,6 +5,7 @@ import { Menu, Languages } from 'lucide-react';
 import { useAdmin } from '@/lib/admin-context';
 import { SiteSwitcher } from './SiteSwitcher';
 import { UserMenu } from './UserMenu';
+import { ThemeToggle } from '../theme-toggle';
 
 interface HeaderProps {
   onMenuToggle: () => void;
@@ -36,6 +37,9 @@ export function Header({ onMenuToggle }: HeaderProps) {
 
       {/* Right side: Language Toggle, Health Status Pill, User Menu */}
       <div className="flex items-center gap-2.5 sm:gap-3">
+        {/* Theme Toggle */}
+        <ThemeToggle />
+
         {/* Language switcher button */}
         <button
           type="button"
