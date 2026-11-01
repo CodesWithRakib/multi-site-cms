@@ -10,6 +10,10 @@ export class AssignRoleDto {
   roleKey!: string;
 
   @IsOptional()
+  @IsString()
+  scopeType?: string;
+
+  @IsOptional()
   @IsUUID('4')
   siteId?: string;
 }

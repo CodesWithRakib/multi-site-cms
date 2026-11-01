@@ -16,10 +16,10 @@ import type { Request } from 'express';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { RequirePermissions } from '../auth/decorators/permissions.decorator';
 import type { EffectiveAuthContext } from '../auth/services/authorization.service';
-import { type AssignRoleDto } from './dto/assign-role.dto';
-import { type CreateUserDto } from './dto/create-user.dto';
-import { type ListUsersQueryDto } from './dto/list-users-query.dto';
-import { type UpdateUserDto } from './dto/update-user.dto';
+import { AssignRoleDto } from './dto/assign-role.dto';
+import { CreateUserDto } from './dto/create-user.dto';
+import { ListUsersQueryDto } from './dto/list-users-query.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
 
 @Controller('users')

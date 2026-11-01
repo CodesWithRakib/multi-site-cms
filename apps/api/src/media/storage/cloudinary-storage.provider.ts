@@ -1,4 +1,6 @@
 import crypto from 'node:crypto';
+import fs from 'node:fs';
+import path from 'node:path';
 import { Readable } from 'node:stream';
 import { Injectable, Logger } from '@nestjs/common';
 import { v2 as cloudinary, type UploadApiResponse } from 'cloudinary';
@@ -30,16 +32,18 @@ export class CloudinaryStorageProvider implements StorageProvider {
     this.logger.log(`CloudinaryStorageProvider initialized for cloud: ${cloudName}`);
   }
 
-  async upload(key: string, buffer: Buffer, _mimeType: string): Promise<StorageUploadResult> {
-    // Format public_id without file extension
+  async upload(key: string, buffer: Buffer, mimeType: string): Promise<StorageUploadResult> {
     const cleanKey = key.replace(/\.[^/.]+$/, '').replace(/^[\\/]+/, '');
     const publicId = cleanKey.startsWith('multi-site-cms/') ? cleanKey : `multi-site-cms/${cleanKey}`;
+    const isVideo = mimeType.startsWith('video/') || mimeType.startsWith('audio/');
+    const isImage = mimeType.startsWith('image/') && mimeType !== 'image/svg+xml';
+    const resourceType = isVideo ? 'video' : isImage ? 'image' : 'auto';
 
     return new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
         {
           public_id: publicId,
-          resource_type: 'auto',
+          resource_type: resourceType,
           overwrite: true,
         },
         (error, result?: UploadApiResponse) => {
@@ -52,7 +56,7 @@ export class CloudinaryStorageProvider implements StorageProvider {
             result.etag || crypto.createHash('sha256').update(buffer).digest('hex');
 
           resolve({
-            key: result.public_id,
+            key: result.secure_url || result.public_id,
             byteSize: result.bytes,
             checksum,
           });
@@ -66,13 +70,25 @@ export class CloudinaryStorageProvider implements StorageProvider {
     });
   }
 
+  private extractPublicId(key: string): string {
+    if (key.startsWith('http://') || key.startsWith('https://')) {
+      const parts = key.split('/upload/');
+      if (parts[1]) {
+        const afterUpload = parts[1].replace(/^v\d+\//, '');
+        return afterUpload.replace(/\.[^/.]+$/, '');
+      }
+    }
+    return key.replace(/\.[^/.]+$/, '');
+  }
+
   async delete(key: string): Promise<void> {
     try {
-      const res = await cloudinary.uploader.destroy(key, { resource_type: 'image' });
+      const publicId = this.extractPublicId(key);
+      const res = await cloudinary.uploader.destroy(publicId, { resource_type: 'image' });
       if (res.result === 'not found') {
-        const rawRes = await cloudinary.uploader.destroy(key, { resource_type: 'raw' });
+        const rawRes = await cloudinary.uploader.destroy(publicId, { resource_type: 'raw' });
         if (rawRes.result === 'not found') {
-          await cloudinary.uploader.destroy(key, { resource_type: 'video' });
+          await cloudinary.uploader.destroy(publicId, { resource_type: 'video' });
         }
       }
     } catch (error) {
@@ -81,22 +97,36 @@ export class CloudinaryStorageProvider implements StorageProvider {
   }
 
   async getStream(key: string): Promise<Readable> {
-    const url = this.getUrl(key);
-    const response = await fetch(url);
-    if (!response.ok || !response.body) {
-      throw new Error(`Failed to fetch media stream from Cloudinary: ${url} (status: ${response.status})`);
+    if (key.startsWith('multi-site-cms/') || key.startsWith('http://') || key.startsWith('https://')) {
+      const url = this.getUrl(key);
+      const response = await fetch(url);
+      if (!response.ok || !response.body) {
+        throw new Error(`Failed to fetch media stream from Cloudinary: ${url} (status: ${response.status})`);
+      }
+
+      return Readable.fromWeb(response.body as unknown as import('node:stream/web').ReadableStream);
     }
 
-    return Readable.fromWeb(response.body as unknown as import('node:stream/web').ReadableStream);
+    // Local file fallback
+    const resolvedPath = path.resolve(process.cwd(), 'uploads', key);
+    if (!fs.existsSync(resolvedPath)) {
+      throw new Error(`Local media file not found: ${resolvedPath}`);
+    }
+    return fs.createReadStream(resolvedPath);
   }
 
   async exists(key: string): Promise<boolean> {
-    try {
-      await cloudinary.api.resource(key);
-      return true;
-    } catch {
-      return false;
+    if (key.startsWith('multi-site-cms/') || key.startsWith('http://') || key.startsWith('https://')) {
+      const publicId = this.extractPublicId(key);
+      try {
+        await cloudinary.api.resource(publicId);
+        return true;
+      } catch {
+        return false;
+      }
     }
+    const resolvedPath = path.resolve(process.cwd(), 'uploads', key);
+    return fs.existsSync(resolvedPath);
   }
 
   getUrl(key: string): string {
@@ -104,11 +134,9 @@ export class CloudinaryStorageProvider implements StorageProvider {
       return key;
     }
 
-    // If it's a Cloudinary public ID
     if (key.startsWith('multi-site-cms/')) {
       return cloudinary.url(key, {
         secure: true,
-        resource_type: 'auto',
       });
     }
 

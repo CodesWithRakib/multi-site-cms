@@ -183,7 +183,7 @@ export default function UserDetailPage() {
     return (
       <ShellLayout requiredPermission="user:read">
         <div className="flex flex-col items-center justify-center py-20 text-slate-400 gap-3">
-          <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
+          <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
           <span className="text-xs">Loading user details...</span>
         </div>
       </ShellLayout>
@@ -288,13 +288,13 @@ export default function UserDetailPage() {
           <div className="md:col-span-1 flex flex-col gap-5 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
               <h2 className="font-bold text-sm text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                <User className="w-4 h-4 text-indigo-500" />
+                <User className="w-4 h-4 text-emerald-500" />
                 <span>Account Profile</span>
               </h2>
               {isSuperAdmin && !isEditingProfile && (
                 <button
                   onClick={startEditing}
-                  className="text-xs text-indigo-600 dark:text-indigo-400 font-semibold hover:underline"
+                  className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold hover:underline"
                 >
                   Edit
                 </button>
@@ -340,7 +340,7 @@ export default function UserDetailPage() {
                   <button
                     type="submit"
                     disabled={isUpdating}
-                    className="px-3 py-1.5 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-700"
+                    className="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold rounded-lg"
                   >
                     {isUpdating ? 'Saving...' : 'Save'}
                   </button>
@@ -422,7 +422,7 @@ export default function UserDetailPage() {
               {isSuperAdmin && (
                 <button
                   onClick={() => setIsRoleModalOpen(true)}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 rounded-xl text-xs font-semibold transition-colors"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 rounded-xl text-xs font-semibold transition-colors"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>{t('actions.assignRole')}</span>
@@ -560,7 +560,7 @@ export default function UserDetailPage() {
                   <button
                     type="submit"
                     disabled={isAssigning}
-                    className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-xs font-semibold rounded-xl shadow-xs"
+                    className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-white text-xs font-bold rounded-xl shadow-md shadow-emerald-500/20"
                   >
                     {isAssigning ? 'Assigning...' : 'Confirm Assignment'}
                   </button>
