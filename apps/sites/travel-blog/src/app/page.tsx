@@ -1,133 +1,212 @@
-import {
-  Badge,
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  Container,
-} from '@multi-site-cms/ui';
-
+import Link from 'next/link';
+import { ArrowRight, Compass, Sparkles } from 'lucide-react';
+import { ArticleCard } from '@/components/cards/ArticleCard';
 import { siteConfig } from '@/config/site';
+import { fetchArticles, fetchCategories } from '@/lib/api';
 
-const editorialPillars = [
-  {
-    number: '01',
-    title: 'Destination guides',
-    description:
-      'Practical, deeply researched guides designed to be useful long after the first visit.',
-  },
-  {
-    number: '02',
-    title: 'Reported stories',
-    description:
-      'Human-scale travel writing with room for nuance, context and a strong point of view.',
-  },
-  {
-    number: '03',
-    title: 'Visual journeys',
-    description:
-      'Image-led features and galleries that give a place texture before the first paragraph.',
-  },
-] as const;
+export const revalidate = 60; // Revalidate every 60 seconds (ISR)
 
-export default function TravelHomePage() {
-  const year = new Date().getFullYear();
+export default async function TravelHomePage() {
+  const [articlesData, guidesData, categories] = await Promise.all([
+    fetchArticles({ limit: 7 }),
+    fetchArticles({ type: 'travel_guide', limit: 3 }),
+    fetchCategories(),
+  ]);
+
+  const articles = articlesData.items;
+  const heroArticle = articles[0] ?? null;
+  const recentArticles = articles.slice(1);
+  const destinationGuides = guidesData.items;
+
+  // Schema.org Structured Data
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebSite',
+        '@id': `${siteConfig.url}/#website`,
+        url: siteConfig.url,
+        name: siteConfig.name,
+        description: siteConfig.description,
+        publisher: {
+          '@id': `${siteConfig.url}/#organization`,
+        },
+      },
+      {
+        '@type': 'Organization',
+        '@id': `${siteConfig.url}/#organization`,
+        name: siteConfig.name,
+        url: siteConfig.url,
+        logo: `${siteConfig.url}/logo.png`,
+      },
+    ],
+  };
 
   return (
-    <div className="min-h-dvh">
-      <header className="border-b border-border/80 bg-background/90">
-        <Container className="flex items-center justify-between gap-6 py-5">
-          <div className="flex items-center gap-3">
-            <span className="grid size-9 place-items-center rounded-full bg-primary text-xs font-semibold tracking-[0.12em] text-primary-foreground">
-              TB
-            </span>
-            <div>
-              <p className="text-sm font-semibold tracking-tight">{siteConfig.name}</p>
-              <p className="text-xs text-muted-foreground">Independent travel journal</p>
-            </div>
-          </div>
-          <Badge variant="outline">Working title</Badge>
-        </Container>
-      </header>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
 
-      <main>
-        <section className="relative overflow-hidden border-b border-border/70">
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute -right-24 top-8 size-80 rounded-full bg-primary/10 blur-3xl"
-          />
-          <Container className="relative grid gap-10 py-20 lg:grid-cols-[minmax(0,1.25fr)_minmax(16rem,0.75fr)] lg:items-end lg:py-28">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">
-                Stories for the road ahead
-              </p>
-              <h1 className="mt-5 max-w-3xl text-balance font-serif text-5xl leading-[1.08] tracking-tight sm:text-6xl lg:text-7xl">
-                Travel slowly.
-                <br />
-                Look closely.
-              </h1>
-              <p className="mt-6 max-w-2xl text-pretty text-lg leading-8 text-muted-foreground">
-                {siteConfig.description}
-              </p>
-            </div>
-            <aside className="border-l border-border pl-6">
-              <p className="text-sm font-medium text-foreground">Phase 01 foundation</p>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                The publication shell, typography and visual language are in place. Editorial
-                content begins once the shared content platform is implemented.
-              </p>
-            </aside>
-          </Container>
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-16 sm:space-y-24">
+        {/* Editorial Masthead / Intro Banner */}
+        <section className="border-b border-border/60 pb-8 text-center sm:text-left flex flex-col sm:flex-row sm:items-end justify-between gap-6">
+          <div className="space-y-2 max-w-2xl">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
+              <Compass className="h-3.5 w-3.5" /> Field Journal & Guides
+            </span>
+            <h1 className="font-serif text-3xl sm:text-5xl font-extrabold tracking-tight text-foreground leading-[1.15]">
+              {siteConfig.tagline}
+            </h1>
+            <p className="font-serif text-base sm:text-lg text-muted-foreground leading-relaxed">
+              {siteConfig.description}
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center sm:justify-end gap-2 text-xs">
+            {categories.slice(0, 5).map((cat) => (
+              <Link
+                key={cat.id}
+                href={`/categories/${cat.slug}`}
+                className="rounded-full border border-border bg-card px-3 py-1.5 font-medium text-foreground/80 hover:bg-muted hover:text-foreground transition-colors"
+              >
+                {cat.name} ({cat.postCount})
+              </Link>
+            ))}
+          </div>
         </section>
 
-        <section aria-labelledby="pillars-heading" className="py-16 sm:py-20">
-          <Container>
-            <div className="flex flex-wrap items-end justify-between gap-4">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
-                  Editorial direction
-                </p>
+        {/* Hero Featured Story */}
+        {heroArticle ? (
+          <section aria-labelledby="featured-story-heading">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-primary" />
                 <h2
-                  id="pillars-heading"
-                  className="mt-3 font-serif text-3xl tracking-tight sm:text-4xl"
+                  id="featured-story-heading"
+                  className="text-xs font-bold uppercase tracking-wider text-muted-foreground"
                 >
-                  Three ways into a place.
+                  Lead Story
                 </h2>
               </div>
-              <p className="max-w-md text-sm leading-6 text-muted-foreground">
-                The shared CMS will power all three formats without forcing every story into the
-                same template.
-              </p>
+            </div>
+            <ArticleCard article={heroArticle} variant="hero" priority />
+          </section>
+        ) : (
+          <section className="rounded-3xl border border-dashed border-border p-12 text-center space-y-3">
+            <Compass className="h-10 w-10 text-muted-foreground mx-auto" />
+            <h3 className="font-serif text-xl font-bold text-foreground">
+              Awaiting First Dispatch
+            </h3>
+            <p className="text-sm text-muted-foreground max-w-md mx-auto">
+              Published articles from the CMS will appear here dynamically. Create and publish your
+              first article from the Admin Dashboard.
+            </p>
+          </section>
+        )}
+
+        {/* Destination Guides Showcase */}
+        {destinationGuides.length > 0 && (
+          <section aria-labelledby="destination-guides-heading" className="space-y-6">
+            <div className="flex items-end justify-between border-b border-border/60 pb-4">
+              <div>
+                <span className="text-xs font-bold uppercase tracking-wider text-primary">
+                  Curated Travel
+                </span>
+                <h2
+                  id="destination-guides-heading"
+                  className="font-serif text-2xl sm:text-3xl font-bold text-foreground"
+                >
+                  Destination Guides
+                </h2>
+              </div>
+              <Link
+                href="/destinations"
+                className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline group"
+              >
+                View all guides{' '}
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </Link>
             </div>
 
-            <div className="mt-10 grid gap-4 md:grid-cols-3">
-              {editorialPillars.map((pillar) => (
-                <Card key={pillar.number} className="border-border/80 bg-card/70">
-                  <CardHeader>
-                    <p className="font-mono text-xs text-primary">{pillar.number}</p>
-                    <CardTitle className="font-serif text-2xl font-normal">
-                      {pillar.title}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <CardDescription>{pillar.description}</CardDescription>
-                  </CardContent>
-                </Card>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+              {destinationGuides.map((guide) => (
+                <ArticleCard key={guide.id} article={guide} variant="standard" />
               ))}
             </div>
-          </Container>
-        </section>
-      </main>
+          </section>
+        )}
 
-      <footer className="border-t border-border">
-        <Container className="flex flex-col gap-2 py-8 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-          <p>
-            © {year} {siteConfig.name}. Foundation preview.
-          </p>
-          <p>One platform. Independent publications.</p>
-        </Container>
-      </footer>
-    </div>
+        {/* Recent Dispatches */}
+        {recentArticles.length > 0 && (
+          <section aria-labelledby="recent-stories-heading" className="space-y-6">
+            <div className="flex items-end justify-between border-b border-border/60 pb-4">
+              <div>
+                <span className="text-xs font-bold uppercase tracking-wider text-primary">
+                  Dispatches
+                </span>
+                <h2
+                  id="recent-stories-heading"
+                  className="font-serif text-2xl sm:text-3xl font-bold text-foreground"
+                >
+                  Latest Stories & Field Notes
+                </h2>
+              </div>
+              <Link
+                href="/search"
+                className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline group"
+              >
+                Browse archive{' '}
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+              {recentArticles.map((article) => (
+                <ArticleCard key={article.id} article={article} variant="standard" />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Editorial Pillars Section */}
+        <section className="rounded-3xl bg-muted/40 border border-border p-8 sm:p-12">
+          <div className="max-w-xl space-y-2 mb-10">
+            <span className="text-xs font-semibold uppercase tracking-wider text-primary">
+              Our Principles
+            </span>
+            <h2 className="font-serif text-2xl sm:text-3xl font-bold text-foreground">
+              Considered, independent travel reporting.
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="space-y-2">
+              <span className="font-mono text-xs font-bold text-primary">01 / RESEARCH</span>
+              <h3 className="font-serif text-lg font-bold text-foreground">Depth over clicks</h3>
+              <p className="font-serif text-sm text-muted-foreground leading-relaxed">
+                Practical, deeply researched routes designed to be useful years after publication.
+              </p>
+            </div>
+            <div className="space-y-2">
+              <span className="font-mono text-xs font-bold text-primary">02 / LOCAL CONTEXT</span>
+              <h3 className="font-serif text-lg font-bold text-foreground">Respect and nuance</h3>
+              <p className="font-serif text-sm text-muted-foreground leading-relaxed">
+                Human-scale travel writing grounded in local communities, history, and environmental
+                realities.
+              </p>
+            </div>
+            <div className="space-y-2">
+              <span className="font-mono text-xs font-bold text-primary">03 / VISUALS</span>
+              <h3 className="font-serif text-lg font-bold text-foreground">Authentic imagery</h3>
+              <p className="font-serif text-sm text-muted-foreground leading-relaxed">
+                Photographic journeys that convey tactile atmosphere without digital distortion.
+              </p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </>
   );
 }

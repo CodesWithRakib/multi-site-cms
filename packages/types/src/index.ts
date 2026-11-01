@@ -476,3 +476,90 @@ export interface CreateTagPayload {
   slug: string;
   description?: string | null;
 }
+
+// ==========================================
+// Phase 10: Public Content Discovery Types
+// ==========================================
+
+export interface PublicArticleImage {
+  id: string;
+  url: string;
+  altText: string | null;
+  caption: string | null;
+  width: number | null;
+  height: number | null;
+}
+
+export interface PublicTaxonomyRef {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+export interface PublicArticleAuthor {
+  id: string;
+  displayName: string;
+}
+
+export interface PublicArticleSummary {
+  id: string;
+  publicationId: string;
+  postId: string;
+  slug: string;
+  title: string;
+  excerpt: string | null;
+  type: PostType;
+  sourceLocale: string;
+  publishedAt: string;
+  updatedAt: string;
+  readingTimeMinutes: number;
+  featuredImage: PublicArticleImage | null;
+  categories: PublicTaxonomyRef[];
+  tags: PublicTaxonomyRef[];
+  author: PublicArticleAuthor | null;
+}
+
+export interface PublicArticleDetail extends PublicArticleSummary {
+  body: Record<string, unknown>; // Tiptap JSON document AST
+  seoTitle: string | null;
+  seoDescription: string | null;
+  canonicalUrl: string | null;
+  relatedArticles: PublicArticleSummary[];
+  adjacentArticles: {
+    prev: { slug: string; title: string } | null;
+    next: { slug: string; title: string } | null;
+  };
+}
+
+export interface PublicCategoryItem {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  parentId: string | null;
+  postCount: number;
+}
+
+export interface PublicTagItem {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  postCount: number;
+}
+
+export interface PublicSitemapItem {
+  slug: string;
+  updatedAt: string;
+  publishedAt: string;
+}
+
+export interface ListPublicPostsQuery {
+  page?: number;
+  limit?: number;
+  type?: string;
+  categorySlug?: string;
+  tagSlug?: string;
+  search?: string;
+  featured?: boolean;
+}

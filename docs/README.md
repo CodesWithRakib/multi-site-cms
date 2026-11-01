@@ -114,6 +114,15 @@ describing future behavior is labelled with its phase.
 - [Internationalization](admin/internationalization.md) — Bilingual dictionary (English & Bangla), dual-access syntax, and timezone-aware formatting.
 - [Testing & Quality Verification](admin/testing.md) — Multi-tier test pyramid, Vitest unit suites, backend integration, and Next.js static builds.
 
+## Travel Blog Public Website
+
+- [Travel Blog Architecture](sites/travel-blog/architecture.md) — Next.js 16 App Router, RSC boundaries, and backend public content integration.
+- [Public Routing & Data Fetching](sites/travel-blog/routes.md) — Route table, ISR caching, error handling, and build-time resilience.
+- [Content Rendering & AST Transformation](sites/travel-blog/content-rendering.md) — Safe ProseMirror AST walking, XSS prevention, and destination guide blocks.
+- [SEO & Structured Data](sites/travel-blog/seo.md) — Dynamic metadata, Schema.org JSON-LD (BlogPosting, BreadcrumbList), and crawler suppression.
+- [Performance & Core Web Vitals](sites/travel-blog/performance.md) — Zero-JS body hydration, Next.js Image optimization, and multi-tier HTTP caching.
+- [URL Architecture & Migration](sites/travel-blog/url-migration.md) — Slug immutability, canonical links, and 301 permanent redirect handling.
+
 ## Security
 
 - [Authentication and authorization](security/authentication.md)

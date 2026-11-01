@@ -1,0 +1,498 @@
+import type { NestExpressApplication } from '@nestjs/platform-express';
+import { Test } from '@nestjs/testing';
+import type {
+  ApiSuccess,
+  PublicArticleDetail,
+  PublicArticleSummary,
+  PublicCategoryItem,
+  PublicSitemapItem,
+  PublicTagItem,
+} from '@multi-site-cms/types';
+import { afterAll, beforeAll, describe, expect, it } from '@jest/globals';
+import request from 'supertest';
+import type { DataSource } from 'typeorm';
+
+import { AppModule } from '../../src/app.module';
+import { AuthorizationService } from '../../src/auth/services/authorization.service';
+import { PasswordService } from '../../src/auth/services/password.service';
+import { configureApp } from '../../src/bootstrap';
+import { Category } from '../../src/database/entities/category.entity';
+import { PostPublicationCategory } from '../../src/database/entities/post-publication-category.entity';
+import { PostPublicationTag } from '../../src/database/entities/post-publication-tag.entity';
+import { PostPublication } from '../../src/database/entities/post-publication.entity';
+import { PostRevision } from '../../src/database/entities/post-revision.entity';
+import { Post } from '../../src/database/entities/post.entity';
+import { Role } from '../../src/database/entities/role.entity';
+import { Site } from '../../src/database/entities/site.entity';
+import { Tag } from '../../src/database/entities/tag.entity';
+import { UserRoleAssignment } from '../../src/database/entities/user-role-assignment.entity';
+import { User } from '../../src/database/entities/user.entity';
+import { PostsService } from '../../src/posts/posts.service';
+import { createTestDataSource, resetTestSchema } from '../database/test-database';
+
+describe('Public Content Discovery API (/api/v1/public/sites/:siteKey/*)', () => {
+  let app: NestExpressApplication;
+  let dataSource: DataSource;
+  let passwordService: PasswordService;
+  let postsService: PostsService;
+
+  let siteTravelId: string;
+  let siteAirSportsId: string;
+  let authorUserId: string;
+
+  let _publishedPost1Id: string;
+  let _publishedPost2Id: string;
+  let draftPostId: string;
+  let _airSportsPostId: string;
+
+  let categoryAdventureId: string;
+  let categoryCultureId: string;
+  let tagEuropeId: string;
+
+  let previewToken: string;
+
+  beforeAll(async () => {
+    dataSource = await createTestDataSource();
+    await resetTestSchema(dataSource);
+    passwordService = new PasswordService();
+
+    // 1. Seed Roles and Super Admin User
+    const roleRepo = dataSource.getRepository(Role);
+    const superAdminRole = await roleRepo.save({
+      key: 'super_admin',
+      name: 'Super Admin',
+      scopeType: 'platform',
+    });
+
+    const userRepo = dataSource.getRepository(User);
+    const authorUser = await userRepo.save({
+      email: 'travel-editor@platform.local',
+      displayName: 'Elena Rostova',
+      passwordHash: await passwordService.hash('EditorPassword123!'),
+      status: 'active',
+    });
+    authorUserId = authorUser.id;
+
+    const uraRepo = dataSource.getRepository(UserRoleAssignment);
+    await uraRepo.save({
+      userId: authorUser.id,
+      roleId: superAdminRole.id,
+      scopeType: 'platform',
+      siteId: null,
+    });
+
+    // 2. Seed Sites
+    const siteRepo = dataSource.getRepository(Site);
+    const travelSite = await siteRepo.save({
+      key: 'travel-blog',
+      name: 'Wanderlust Chronicles',
+      defaultLocale: 'en',
+      timezone: 'UTC',
+      status: 'active',
+      settings: {},
+    });
+    siteTravelId = travelSite.id;
+
+    const airSportsSite = await siteRepo.save({
+      key: 'air-sports',
+      name: 'SkyPulse Live Updates',
+      defaultLocale: 'en',
+      timezone: 'UTC',
+      status: 'active',
+      settings: {},
+    });
+    siteAirSportsId = airSportsSite.id;
+
+    // 3. Seed Taxonomies
+    const catRepo = dataSource.getRepository(Category);
+    const catAdventure = await catRepo.save({
+      siteId: siteTravelId,
+      name: 'Adventure Escapes',
+      slug: 'adventure-escapes',
+      description: 'Mountain treks and wilderness routes',
+    });
+    categoryAdventureId = catAdventure.id;
+
+    const catCulture = await catRepo.save({
+      siteId: siteTravelId,
+      name: 'Cultural Heritage',
+      slug: 'cultural-heritage',
+      description: 'Ancient monuments and local living arts',
+    });
+    categoryCultureId = catCulture.id;
+
+    const tagRepo = dataSource.getRepository(Tag);
+    const tagEurope = await tagRepo.save({
+      siteId: siteTravelId,
+      name: 'Europe',
+      slug: 'europe',
+      description: 'European destinations',
+    });
+    tagEuropeId = tagEurope.id;
+
+    // 4. Seed Posts, Revisions, and Publications
+    const postRepo = dataSource.getRepository(Post);
+    const revRepo = dataSource.getRepository(PostRevision);
+    const pubRepo = dataSource.getRepository(PostPublication);
+    const ppcRepo = dataSource.getRepository(PostPublicationCategory);
+    const pptRepo = dataSource.getRepository(PostPublicationTag);
+
+    // Published Article 1 (Travel Blog)
+    const post1 = await postRepo.save({
+      authorId: authorUserId,
+      type: 'article',
+      status: 'approved',
+      sourceLocale: 'en',
+    });
+    _publishedPost1Id = post1.id;
+
+    const rev1 = await revRepo.save({
+      postId: post1.id,
+      revisionNumber: 1,
+      title: 'Hidden Fjords of Norway: A Winter Odyssey',
+      excerpt: 'Sailing through majestic icy fjords under Arctic northern lights.',
+      body: {
+        type: 'doc',
+        content: [
+          {
+            type: 'paragraph',
+            content: [
+              { type: 'text', text: 'Norway in winter offers unearthly crystalline beauty.' },
+            ],
+          },
+        ],
+      },
+      createdBy: authorUserId,
+    });
+
+    const pub1 = await pubRepo.save({
+      siteId: siteTravelId,
+      postId: post1.id,
+      revisionId: rev1.id,
+      slug: 'hidden-fjords-norway',
+      status: 'published',
+      publishedAt: new Date(Date.now() - 3600 * 1000 * 24), // 1 day ago
+      seoTitle: 'Hidden Fjords of Norway Travel Guide',
+      seoDescription: 'Comprehensive guide to exploring Arctic Norway in winter.',
+    });
+
+    await ppcRepo.save({
+      publicationId: pub1.id,
+      categoryId: categoryAdventureId,
+      siteId: siteTravelId,
+    });
+
+    await pptRepo.save({
+      publicationId: pub1.id,
+      tagId: tagEuropeId,
+      siteId: siteTravelId,
+    });
+
+    // Published Travel Guide 2 (Travel Blog)
+    const post2 = await postRepo.save({
+      authorId: authorUserId,
+      type: 'travel_guide',
+      status: 'approved',
+      sourceLocale: 'en',
+    });
+    _publishedPost2Id = post2.id;
+
+    const rev2 = await revRepo.save({
+      postId: post2.id,
+      revisionNumber: 1,
+      title: 'Kyoto Ancient Temples Walking Guide',
+      excerpt: 'Explore historic Zen shrines and bamboo pathways of Arashiyama.',
+      body: {
+        type: 'doc',
+        content: [
+          {
+            type: 'paragraph',
+            content: [
+              { type: 'text', text: 'Kyoto retains centuries of contemplative Japanese serenity.' },
+            ],
+          },
+        ],
+      },
+      createdBy: authorUserId,
+    });
+
+    const pub2 = await pubRepo.save({
+      siteId: siteTravelId,
+      postId: post2.id,
+      revisionId: rev2.id,
+      slug: 'kyoto-temples-guide',
+      status: 'published',
+      publishedAt: new Date(), // Just now
+      seoTitle: 'Kyoto Temples Guide 2026',
+      seoDescription: 'Step by step route to Kyoto UNESCO temples.',
+    });
+
+    await ppcRepo.save({
+      publicationId: pub2.id,
+      categoryId: categoryCultureId,
+      siteId: siteTravelId,
+    });
+
+    // Draft Post (Travel Blog - should NEVER be exposed publicly)
+    const postDraft = await postRepo.save({
+      authorId: authorUserId,
+      type: 'article',
+      status: 'draft',
+      sourceLocale: 'en',
+    });
+    draftPostId = postDraft.id;
+
+    const revDraft = await revRepo.save({
+      postId: postDraft.id,
+      revisionNumber: 1,
+      title: 'Secret Draft: Unannounced Expedition',
+      excerpt: 'Top secret article still in draft mode.',
+      body: {
+        type: 'doc',
+        content: [
+          {
+            type: 'paragraph',
+            content: [{ type: 'text', text: 'Classified notes for editorial eyes only.' }],
+          },
+        ],
+      },
+      createdBy: authorUserId,
+    });
+
+    await pubRepo.save({
+      siteId: siteTravelId,
+      postId: postDraft.id,
+      revisionId: revDraft.id,
+      slug: 'secret-draft-expedition',
+      status: 'draft',
+      publishedAt: null,
+    });
+
+    // Air Sports Published Post (Different site - must never leak into travel-blog)
+    const postAir = await postRepo.save({
+      authorId: authorUserId,
+      type: 'live_update',
+      status: 'approved',
+      sourceLocale: 'en',
+    });
+    _airSportsPostId = postAir.id;
+
+    const revAir = await revRepo.save({
+      postId: postAir.id,
+      revisionNumber: 1,
+      title: 'Red Bull Air Race Round 3 Live Timing',
+      excerpt: 'High speed aerobatic action from Abu Dhabi.',
+      body: {
+        type: 'doc',
+        content: [
+          {
+            type: 'paragraph',
+            content: [{ type: 'text', text: 'Fastest lap time clocked in qualifying.' }],
+          },
+        ],
+      },
+      createdBy: authorUserId,
+    });
+
+    await pubRepo.save({
+      siteId: siteAirSportsId,
+      postId: postAir.id,
+      revisionId: revAir.id,
+      slug: 'red-bull-air-race-round-3',
+      status: 'published',
+      publishedAt: new Date(),
+    });
+
+    // Initialize Nest Application
+    const moduleRef = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile();
+
+    app = moduleRef.createNestApplication<NestExpressApplication>();
+    configureApp(app);
+    await app.init();
+
+    postsService = app.get(PostsService);
+    const authService = app.get(AuthorizationService);
+    const actor = await authService.resolveUserAccess(authorUser);
+
+    // Generate preview token for draft post
+    const previewRes = await postsService.generatePreviewToken(actor, draftPostId, siteTravelId);
+    previewToken = previewRes.token;
+  });
+
+  afterAll(async () => {
+    if (app) {
+      await app.close();
+    }
+    if (dataSource && dataSource.isInitialized) {
+      await dataSource.destroy();
+    }
+  });
+
+  describe('GET /api/v1/public/sites/:siteKey/posts', () => {
+    it('returns published articles for travel-blog with ETag and Cache-Control', async () => {
+      const res = await request(app.getHttpServer())
+        .get('/api/v1/public/sites/travel-blog/posts')
+        .expect(200);
+
+      expect(res.headers['cache-control']).toBeDefined();
+      expect(res.headers['etag']).toBeDefined();
+
+      const body = res.body as ApiSuccess<PublicArticleSummary[]>;
+      expect(body.data).toHaveLength(2);
+      expect(body.data.some((a) => a.slug === 'hidden-fjords-norway')).toBe(true);
+      expect(body.data.some((a) => a.slug === 'kyoto-temples-guide')).toBe(true);
+
+      // Ensures draft and air-sports posts are excluded
+      expect(body.data.some((a) => a.slug === 'secret-draft-expedition')).toBe(false);
+      expect(body.data.some((a) => a.slug === 'red-bull-air-race-round-3')).toBe(false);
+
+      // ETag 304 Not Modified
+      const etag = (res.headers['etag'] as string) || '';
+      await request(app.getHttpServer())
+        .get('/api/v1/public/sites/travel-blog/posts')
+        .set('If-None-Match', etag)
+        .expect(304);
+    });
+
+    it('filters articles by type=travel_guide', async () => {
+      const res = await request(app.getHttpServer())
+        .get('/api/v1/public/sites/travel-blog/posts?type=travel_guide')
+        .expect(200);
+
+      const body = res.body as ApiSuccess<PublicArticleSummary[]>;
+      expect(body.data).toHaveLength(1);
+      expect(body.data[0]?.slug).toBe('kyoto-temples-guide');
+    });
+
+    it('filters articles by categorySlug=adventure-escapes', async () => {
+      const res = await request(app.getHttpServer())
+        .get('/api/v1/public/sites/travel-blog/posts?categorySlug=adventure-escapes')
+        .expect(200);
+
+      const body = res.body as ApiSuccess<PublicArticleSummary[]>;
+      expect(body.data).toHaveLength(1);
+      expect(body.data[0]?.slug).toBe('hidden-fjords-norway');
+      expect(body.data[0]?.categories.some((c) => c.slug === 'adventure-escapes')).toBe(true);
+    });
+
+    it('filters articles by tagSlug=europe', async () => {
+      const res = await request(app.getHttpServer())
+        .get('/api/v1/public/sites/travel-blog/posts?tagSlug=europe')
+        .expect(200);
+
+      const body = res.body as ApiSuccess<PublicArticleSummary[]>;
+      expect(body.data).toHaveLength(1);
+      expect(body.data[0]?.slug).toBe('hidden-fjords-norway');
+    });
+
+    it('searches articles by title keyword', async () => {
+      const res = await request(app.getHttpServer())
+        .get('/api/v1/public/sites/travel-blog/posts?search=Fjords')
+        .expect(200);
+
+      const body = res.body as ApiSuccess<PublicArticleSummary[]>;
+      expect(body.data).toHaveLength(1);
+      expect(body.data[0]?.slug).toBe('hidden-fjords-norway');
+    });
+
+    it('returns 404 for non-existent site', async () => {
+      await request(app.getHttpServer())
+        .get('/api/v1/public/sites/non-existent-site/posts')
+        .expect(404);
+    });
+  });
+
+  describe('GET /api/v1/public/sites/:siteKey/posts/:slug', () => {
+    it('returns article detail with rich body, author, taxonomies, and adjacent articles', async () => {
+      const res = await request(app.getHttpServer())
+        .get('/api/v1/public/sites/travel-blog/posts/hidden-fjords-norway')
+        .expect(200);
+
+      const body = res.body as ApiSuccess<PublicArticleDetail>;
+      expect(body.data.slug).toBe('hidden-fjords-norway');
+      expect(body.data.title).toBe('Hidden Fjords of Norway: A Winter Odyssey');
+      expect(body.data.author?.displayName).toBe('Elena Rostova');
+      expect(body.data.body).toBeDefined();
+      expect(body.data.body.type).toBe('doc');
+      expect(body.data.categories.some((c) => c.slug === 'adventure-escapes')).toBe(true);
+      expect(body.data.tags.some((t) => t.slug === 'europe')).toBe(true);
+      expect(body.data.readingTimeMinutes).toBeGreaterThanOrEqual(1);
+      expect(body.data.seoTitle).toBe('Hidden Fjords of Norway Travel Guide');
+    });
+
+    it('returns opaque 404 for unpublished draft post slug', async () => {
+      await request(app.getHttpServer())
+        .get('/api/v1/public/sites/travel-blog/posts/secret-draft-expedition')
+        .expect(404);
+    });
+
+    it('returns opaque 404 for slug belonging to another site', async () => {
+      await request(app.getHttpServer())
+        .get('/api/v1/public/sites/travel-blog/posts/red-bull-air-race-round-3')
+        .expect(404);
+    });
+  });
+
+  describe('GET /api/v1/public/sites/:siteKey/categories and /tags', () => {
+    it('returns public categories with published post counts', async () => {
+      const res = await request(app.getHttpServer())
+        .get('/api/v1/public/sites/travel-blog/categories')
+        .expect(200);
+
+      const body = res.body as ApiSuccess<PublicCategoryItem[]>;
+      expect(body.data.length).toBeGreaterThanOrEqual(2);
+      const adv = body.data.find((c) => c.slug === 'adventure-escapes');
+      expect(adv).toBeDefined();
+      expect(adv?.postCount).toBe(1);
+    });
+
+    it('returns public tags with published post counts', async () => {
+      const res = await request(app.getHttpServer())
+        .get('/api/v1/public/sites/travel-blog/tags')
+        .expect(200);
+
+      const body = res.body as ApiSuccess<PublicTagItem[]>;
+      expect(body.data.length).toBeGreaterThanOrEqual(1);
+      const europe = body.data.find((t) => t.slug === 'europe');
+      expect(europe).toBeDefined();
+      expect(europe?.postCount).toBe(1);
+    });
+  });
+
+  describe('GET /api/v1/public/sites/:siteKey/sitemap', () => {
+    it('returns published slugs and timestamps for XML sitemap generation', async () => {
+      const res = await request(app.getHttpServer())
+        .get('/api/v1/public/sites/travel-blog/sitemap')
+        .expect(200);
+
+      const body = res.body as ApiSuccess<PublicSitemapItem[]>;
+      expect(body.data).toHaveLength(2);
+      expect(body.data.some((s) => s.slug === 'hidden-fjords-norway')).toBe(true);
+      expect(body.data.some((s) => s.slug === 'kyoto-temples-guide')).toBe(true);
+      expect(body.data.some((s) => s.slug === 'secret-draft-expedition')).toBe(false);
+    });
+  });
+
+  describe('GET /api/v1/public/sites/:siteKey/preview/:postId', () => {
+    it('allows viewing draft post with valid signed HMAC token and sends noindex headers', async () => {
+      const res = await request(app.getHttpServer())
+        .get(`/api/v1/public/sites/travel-blog/preview/${draftPostId}?token=${previewToken}`)
+        .expect(200);
+
+      expect(res.headers['x-robots-tag']).toBe('noindex, nofollow');
+      expect(res.headers['cache-control']).toContain('no-store');
+
+      const body = res.body as ApiSuccess<PublicArticleDetail>;
+      expect(body.data.title).toBe('Secret Draft: Unannounced Expedition');
+      expect(body.data.body.type).toBe('doc');
+    });
+
+    it('rejects tampered or forged preview token with 401', async () => {
+      await request(app.getHttpServer())
+        .get(`/api/v1/public/sites/travel-blog/preview/${draftPostId}?token=invalid-token`)
+        .expect(401);
+    });
+  });
+});

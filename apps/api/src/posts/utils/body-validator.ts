@@ -124,3 +124,40 @@ export function validateStructuredBody(body: unknown, depth = 0): BodyValidation
 
   return { isValid: true };
 }
+
+/**
+ * Recursively extracts plain text from a structured Tiptap / ProseMirror JSON document AST.
+ */
+export function extractTextFromDoc(node: unknown): string {
+  if (!node || typeof node !== 'object') {
+    return '';
+  }
+
+  const record = node as Record<string, unknown>;
+  let text = '';
+
+  if (typeof record.text === 'string') {
+    text += record.text + ' ';
+  }
+
+  if (Array.isArray(record.content)) {
+    for (const child of record.content) {
+      text += extractTextFromDoc(child) + ' ';
+    }
+  }
+
+  return text.trim();
+}
+
+/**
+ * Calculates estimated reading time in whole minutes based on word count.
+ * Average reading speed: 200 words per minute. Minimum returned is 1 minute.
+ */
+export function calculateReadingTimeMinutes(textOrWords: string | number): number {
+  const wordCount =
+    typeof textOrWords === 'number'
+      ? textOrWords
+      : textOrWords.trim().split(/\s+/).filter(Boolean).length;
+
+  return Math.max(1, Math.ceil(wordCount / 200));
+}
