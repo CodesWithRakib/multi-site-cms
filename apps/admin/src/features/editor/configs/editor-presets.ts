@@ -34,6 +34,8 @@ export function getEditorExtensions(options: EditorPresetOptions = {}): Extensio
         color: '#3b82f6',
         width: 2,
       },
+      link: false,
+      underline: false,
     }),
     Underline,
     TextAlign.configure({

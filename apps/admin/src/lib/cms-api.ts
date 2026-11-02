@@ -51,6 +51,7 @@ export interface CreatePostPayload {
   title: string;
   excerpt?: string;
   body: Record<string, unknown>;
+  publications?: CreatePublicationPayload[];
 }
 
 export interface UpdatePostPayload {
@@ -70,6 +71,7 @@ export interface CreatePublicationPayload {
   seoDescription?: string;
   canonicalUrl?: string;
   featuredImageId?: string;
+  scheduledFor?: string;
   categoryIds?: string[];
   tagIds?: string[];
 }
