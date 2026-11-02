@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ChevronRight, Tag as TagIcon } from 'lucide-react';
 import { ArticleCard } from '@/components/cards/ArticleCard';
+import { NewsletterBanner } from '@/components/home/NewsletterBanner';
 import { siteConfig } from '@/config/site';
 import { fetchArticles, fetchTags } from '@/lib/api';
 
@@ -25,17 +26,12 @@ export async function generateMetadata({ params }: TagPageProps): Promise<Metada
   }
 
   return {
-    title: `#${tag.name} Articles`,
+    title: `#${tag.name} Articles — Travel Blog`,
     description:
       tag.description ||
       `Browse travel stories and articles tagged with #${tag.name} on ${siteConfig.name}.`,
     alternates: {
       canonical: `/tags/${tag.slug}`,
-    },
-    openGraph: {
-      title: `#${tag.name} | ${siteConfig.name}`,
-      description: tag.description || `Browse articles tagged with #${tag.name}.`,
-      url: `/tags/${tag.slug}`,
     },
   };
 }
@@ -56,16 +52,16 @@ export default async function TagDetailPage({ params }: TagPageProps) {
   const articles = articlesData.items;
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-10">
+    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 sm:py-14 space-y-10">
       <nav
         aria-label="Breadcrumb"
         className="flex items-center gap-1.5 text-xs text-muted-foreground"
       >
-        <Link href="/" className="hover:text-primary transition-colors">
+        <Link href="/" className="hover:text-emerald-600 transition-colors">
           Home
         </Link>
         <ChevronRight className="h-3 w-3" />
-        <Link href="/tags" className="hover:text-primary transition-colors">
+        <Link href="/tags" className="hover:text-emerald-600 transition-colors">
           Tags
         </Link>
         <ChevronRight className="h-3 w-3" />
@@ -73,14 +69,14 @@ export default async function TagDetailPage({ params }: TagPageProps) {
       </nav>
 
       <header className="border-b border-border/60 pb-8 space-y-3">
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary uppercase tracking-wider">
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3.5 py-1 text-xs font-bold text-emerald-700 dark:text-emerald-300">
           <TagIcon className="h-3.5 w-3.5" /> Tag Archive
         </span>
         <h1 className="font-serif text-3xl sm:text-5xl font-extrabold tracking-tight text-foreground">
           #{tag.name}
         </h1>
         {tag.description && (
-          <p className="font-serif text-base sm:text-lg text-muted-foreground max-w-2xl leading-relaxed">
+          <p className="text-base sm:text-lg text-muted-foreground max-w-2xl leading-relaxed">
             {tag.description}
           </p>
         )}
@@ -99,14 +95,14 @@ export default async function TagDetailPage({ params }: TagPageProps) {
         </div>
       ) : (
         <div className="rounded-3xl border border-dashed border-border p-16 text-center space-y-2">
-          <h2 className="font-serif text-xl font-bold text-foreground">
-            No Articles Tagged with #{tag.name} Yet
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Articles tagged with this term will appear here.
-          </p>
+          <h2 className="font-serif text-xl font-bold text-foreground">No Articles Tagged #{tag.name}</h2>
+          <p className="text-sm text-muted-foreground">Check back soon for new dispatches.</p>
         </div>
       )}
+
+      <div className="pt-8">
+        <NewsletterBanner />
+      </div>
     </div>
   );
 }
