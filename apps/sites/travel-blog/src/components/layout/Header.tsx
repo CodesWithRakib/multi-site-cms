@@ -12,10 +12,6 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [destDropdownOpen, setDestDropdownOpen] = useState(false);
 
-  // When visiting the Explorer / Reader Portal at /articles, render the dedicated portal layout
-  if (pathname === '/articles') {
-    return null;
-  }
 
   const isHome = pathname === '/';
 

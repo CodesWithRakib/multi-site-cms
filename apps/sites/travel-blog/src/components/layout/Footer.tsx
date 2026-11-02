@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import type { FC, SVGProps } from 'react';
 import { TravelLogo } from '@/components/ui/TravelLogo';
 import { FooterNewsletterForm } from './FooterNewsletterForm';
@@ -64,12 +63,8 @@ const SOCIAL_LINKS = [
 ];
 
 export function Footer() {
-  const pathname = usePathname();
   const currentYear = new Date().getFullYear();
 
-  if (pathname === '/articles') {
-    return null;
-  }
 
   return (
     <footer className="relative mt-24 overflow-hidden bg-[#061B1B] text-emerald-100/80">

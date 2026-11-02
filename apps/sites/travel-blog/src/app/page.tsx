@@ -49,21 +49,23 @@ export default async function TravelHomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <div className="relative space-y-16 pb-12 sm:space-y-24">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-16 sm:pb-24">
         {/* Editorial Hero */}
         <TravelHero />
 
         {/* Floating Destination Search Filter */}
-        <DestinationSearchBar categories={categories} />
+        <div className="mb-16 sm:mb-24">
+          <DestinationSearchBar categories={categories} />
+        </div>
 
-        {/* Popular Destinations Showcase */}
-        <PopularDestinations />
+        <div className="space-y-16 sm:space-y-24">
+          {/* Popular Destinations Showcase */}
+          <PopularDestinations />
 
-        {/* Dynamic Travel Guides Grid from Live Backend */}
-        <TravelGuidesSection articles={articles} />
+          {/* Dynamic Travel Guides Grid from Live Backend */}
+          <TravelGuidesSection articles={articles} />
 
-        {/* Illustrated Mint Newsletter Banner */}
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          {/* Illustrated Mint Newsletter Banner */}
           <NewsletterBanner />
         </div>
       </div>

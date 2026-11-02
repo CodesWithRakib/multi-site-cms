@@ -9,7 +9,7 @@ export function TravelHero() {
   const [videoModalOpen, setVideoModalOpen] = useState(false);
 
   return (
-    <section className="relative overflow-hidden pt-4 pb-12 sm:pt-8 sm:pb-16">
+    <section className="relative overflow-hidden pt-4 pb-6 sm:pt-6 sm:pb-10">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
         {/* Left Content Column */}
         <div className="lg:col-span-7 space-y-6 sm:space-y-8 z-10 text-center lg:text-left">
