@@ -477,6 +477,12 @@ export interface CreateTagPayload {
   description?: string | null;
 }
 
+export interface UpdateTagPayload {
+  name?: string;
+  slug?: string;
+  description?: string | null;
+}
+
 // ==========================================
 // Phase 10: Public Content Discovery Types
 // ==========================================

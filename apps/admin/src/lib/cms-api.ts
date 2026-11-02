@@ -39,6 +39,7 @@ import type {
   UpdateCategoryPayload,
   UpdatePlatformSettingsPayload,
   UpdateSitePayload,
+  UpdateTagPayload,
   UpdateUserPayload,
   UserItem,
   VerificationChallenge,
@@ -903,6 +904,18 @@ export const cmsApi = platformApi.injectEndpoints({
       ],
     }),
 
+    updateTag: build.mutation<TagItem, { siteId: string; tagId: string; data: UpdateTagPayload }>({
+      query: ({ siteId, tagId, data }) => ({
+        path: `/sites/${siteId}/tags/${tagId}`,
+        method: 'PATCH',
+        body: data,
+      }),
+      transformResponse: (response: ApiSuccess<unknown>) => response.data as TagItem,
+      invalidatesTags: (_res, _err, { siteId }) => [
+        { type: 'Taxonomy' as const, id: `TAGS_${siteId}` },
+      ],
+    }),
+
     deleteTag: build.mutation<void, { siteId: string; tagId: string }>({
       query: ({ siteId, tagId }) => ({
         path: `/sites/${siteId}/tags/${tagId}`,
@@ -1003,5 +1016,6 @@ export const {
   useDeleteCategoryMutation,
   useListTagsQuery,
   useCreateTagMutation,
+  useUpdateTagMutation,
   useDeleteTagMutation,
 } = cmsApi;
