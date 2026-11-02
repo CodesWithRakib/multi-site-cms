@@ -747,3 +747,59 @@ export interface RecordPageViewPayload {
   durationSeconds?: number;
 }
 
+/**
+ * Audit Log Types
+ */
+export type AuditActorType = 'user' | 'system' | 'bootstrap';
+
+export interface AuditLogItem {
+  id: string;
+  actorId: string | null;
+  actorType: AuditActorType;
+  actorName: string | null;
+  actorEmail: string | null;
+  siteId: string | null;
+  siteName: string | null;
+  siteKey: string | null;
+  action: string;
+  entityType: string;
+  entityId: string | null;
+  requestId: string | null;
+  ipAddress: string | null;
+  metadata: Record<string, unknown>;
+  createdAt: string;
+}
+
+export interface AuditLogSummary {
+  totalEvents: number;
+  securityAuthEvents: number;
+  contentEvents: number;
+  systemRoleEvents: number;
+  uniqueActorsCount: number;
+  activeSitesCount: number;
+}
+
+export type AuditLogCategory = 'all' | 'auth' | 'content' | 'user' | 'system' | 'media';
+
+export interface AuditLogQueryParams {
+  siteId?: string;
+  action?: string;
+  category?: AuditLogCategory;
+  entityType?: string;
+  actorId?: string;
+  search?: string;
+  startDate?: string;
+  endDate?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface PaginatedAuditLogs {
+  items: AuditLogItem[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+

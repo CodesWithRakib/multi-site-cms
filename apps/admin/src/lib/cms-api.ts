@@ -6,6 +6,8 @@ import type {
   AnalyticsRealtimeData,
   ApiSuccess,
   AssignRolePayload,
+  AuditLogQueryParams,
+  AuditLogSummary,
   AuthUser,
   CategoryItem,
   CreateCategoryPayload,
@@ -18,6 +20,7 @@ import type {
   LoginResponse,
   MediaAssetItem,
   MediaUploadResponse,
+  PaginatedAuditLogs,
   PaginatedResult,
   PostItem,
   PostPreviewData,
@@ -403,6 +406,28 @@ export const cmsApi = platformApi.injectEndpoints({
       }),
       transformResponse: (response: ApiSuccess<{ success: boolean; id: string }>) => response.data,
     }),
+
+    // ==========================================
+    // Audit Logs
+    // ==========================================
+    listAuditLogs: build.query<PaginatedAuditLogs, AuditLogQueryParams | void>({
+      query: (params) => ({
+        path: '/audit-logs',
+        query: params as Record<string, string | number | boolean | null | undefined> | undefined,
+      }),
+      transformResponse: (response: ApiSuccess<unknown>) => response.data as PaginatedAuditLogs,
+      providesTags: ['Site', 'User'],
+    }),
+
+    getAuditSummary: build.query<AuditLogSummary, { siteId?: string } | void>({
+      query: (params) => ({
+        path: '/audit-logs/summary',
+        query: params as Record<string, string | number | boolean | null | undefined> | undefined,
+      }),
+      transformResponse: (response: ApiSuccess<unknown>) => response.data as AuditLogSummary,
+      providesTags: ['Site', 'User'],
+    }),
+
 
     // ==========================================
     // Posts & Revisions
@@ -887,6 +912,11 @@ export const {
   useGetAnalyticsOverviewQuery,
   useGetAnalyticsRealtimeQuery,
   useRecordPageViewMutation,
+
+  // Audit Logs
+  useListAuditLogsQuery,
+  useGetAuditSummaryQuery,
+
 
   // Posts
   useListPostsQuery,

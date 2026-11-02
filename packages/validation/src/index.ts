@@ -162,3 +162,22 @@ export const recordPageViewSchema = z.object({
 
 export type RecordPageViewInput = z.infer<typeof recordPageViewSchema>;
 
+/**
+ * Audit Log validation schemas
+ */
+export const auditLogQuerySchema = z.object({
+  siteId: z.string().uuid().optional(),
+  action: z.string().max(128).optional(),
+  category: z.enum(['all', 'auth', 'content', 'user', 'system', 'media']).optional(),
+  entityType: z.string().max(64).optional(),
+  actorId: z.string().uuid().optional(),
+  search: z.string().max(256).optional(),
+  startDate: z.string().optional(),
+  endDate: z.string().optional(),
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(100).default(20),
+});
+
+export type AuditLogQueryInput = z.infer<typeof auditLogQuerySchema>;
+
+

@@ -14,7 +14,7 @@ import {
   Users,
   BarChart2,
   Settings,
-  Info,
+  ShieldCheck,
   Crown,
   ArrowRight,
   ChevronDown,
@@ -85,10 +85,10 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       active: false,
     },
     {
-      href: '#logs',
+      href: '/audit-logs',
       label: t('nav.activityLogs'),
-      icon: Info,
-      active: false,
+      icon: ShieldCheck,
+      active: pathname.startsWith('/audit-logs'),
     },
   ];
 
