@@ -79,7 +79,7 @@ export async function fetchArticles(
 }
 
 /**
- * Fetch single published article or live update by slug.
+ * Fetch single article detail by slug.
  */
 export async function fetchArticleBySlug(slug: string): Promise<PublicArticleDetail | null> {
   try {
@@ -87,14 +87,12 @@ export async function fetchArticleBySlug(slug: string): Promise<PublicArticleDet
     const res = await fetch(url, {
       next: {
         revalidate: 30,
-        tags: ['air-sports-content', `air-sports-post-${slug}`],
+        tags: ['air-sports-content', `post-${slug}`],
       },
       headers: { Accept: 'application/json' },
     });
 
-    if (!res.ok) {
-      return null;
-    }
+    if (!res.ok) return null;
 
     const json = (await res.json()) as { data: PublicArticleDetail };
     return json.data || null;
@@ -105,15 +103,15 @@ export async function fetchArticleBySlug(slug: string): Promise<PublicArticleDet
 }
 
 /**
- * Fetch active air sports events with update counts.
+ * Fetch scheduled and active events.
  */
 export async function fetchEvents(): Promise<PublicEventSummary[]> {
   try {
     const url = buildUrl('/events');
     const res = await fetch(url, {
       next: {
-        revalidate: 60,
-        tags: ['air-sports-content', 'air-sports-events'],
+        revalidate: 30,
+        tags: ['air-sports-events'],
       },
       headers: { Accept: 'application/json' },
     });
@@ -129,15 +127,15 @@ export async function fetchEvents(): Promise<PublicEventSummary[]> {
 }
 
 /**
- * Fetch event details with its timeline of published updates by slug.
+ * Fetch single event detail with live updates.
  */
 export async function fetchEventBySlug(slug: string): Promise<PublicEventDetail | null> {
   try {
     const url = buildUrl(`/events/${encodeURIComponent(slug)}`);
     const res = await fetch(url, {
       next: {
-        revalidate: 30,
-        tags: ['air-sports-content', `air-sports-event-${slug}`],
+        revalidate: 15,
+        tags: ['air-sports-events', `event-${slug}`],
       },
       headers: { Accept: 'application/json' },
     });
@@ -153,15 +151,15 @@ export async function fetchEventBySlug(slug: string): Promise<PublicEventDetail 
 }
 
 /**
- * Fetch active categories for Air Sports.
+ * Fetch list of air sports categories / disciplines.
  */
 export async function fetchCategories(): Promise<PublicCategoryItem[]> {
   try {
     const url = buildUrl('/categories');
     const res = await fetch(url, {
       next: {
-        revalidate: 300,
-        tags: ['air-sports-content', 'air-sports-categories'],
+        revalidate: 60,
+        tags: ['air-sports-categories'],
       },
       headers: { Accept: 'application/json' },
     });
@@ -177,15 +175,15 @@ export async function fetchCategories(): Promise<PublicCategoryItem[]> {
 }
 
 /**
- * Fetch active tags for Air Sports.
+ * Fetch public tags.
  */
 export async function fetchTags(): Promise<PublicTagItem[]> {
   try {
     const url = buildUrl('/tags');
     const res = await fetch(url, {
       next: {
-        revalidate: 300,
-        tags: ['air-sports-content', 'air-sports-tags'],
+        revalidate: 60,
+        tags: ['air-sports-tags'],
       },
       headers: { Accept: 'application/json' },
     });
@@ -245,5 +243,41 @@ export async function fetchDraftPreview(
   } catch (error) {
     console.warn(`[Air Sports API] Failed to fetch preview for ${postId}:`, error);
     return null;
+  }
+}
+
+/**
+ * Submit email to air sports newsletter subscription.
+ */
+export async function subscribeNewsletter(
+  email: string,
+): Promise<{ success: boolean; message: string }> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/public/sites/${SITE_KEY}/newsletter`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+
+    if (!res.ok) {
+      const err = (await res.json().catch(() => null)) as {
+        error?: { message?: string };
+      } | null;
+      return {
+        success: false,
+        message: err?.error?.message || 'Failed to subscribe. Please try again.',
+      };
+    }
+
+    const payload = (await res.json()) as { data?: { message?: string } };
+    return {
+      success: true,
+      message: payload.data?.message || 'Thank you for subscribing to Air Sports newsletter!',
+    };
+  } catch {
+    return {
+      success: false,
+      message: 'Network error. Please try again later.',
+    };
   }
 }

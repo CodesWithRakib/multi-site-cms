@@ -1,49 +1,78 @@
 @import 'tailwindcss';
 @import '@multi-site-cms/ui/styles.css';
 
+@custom-variant dark (&:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *));
+
 @source '../../../../../packages/ui/src';
 
 :root {
-  --background: oklch(0.985 0.004 240);
-  --foreground: oklch(0.17 0.02 245);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.17 0.02 245);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.17 0.02 245);
-  --primary: oklch(0.5 0.18 38);
-  --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.95 0.015 240);
-  --secondary-foreground: oklch(0.28 0.04 245);
-  --muted: oklch(0.96 0.008 240);
-  --muted-foreground: oklch(0.48 0.02 245);
-  --accent: oklch(0.94 0.02 220);
-  --accent-foreground: oklch(0.27 0.04 245);
+  --background: oklch(0.985 0.005 220);
+  --foreground: oklch(0.18 0.03 230);
+  --card: #ffffff;
+  --card-foreground: oklch(0.18 0.03 230);
+  --popover: #ffffff;
+  --popover-foreground: oklch(0.18 0.03 230);
+
+  /* Sky Azure Primary */
+  --primary: oklch(0.60 0.18 230);
+  --primary-foreground: #ffffff;
+  --primary-hover: oklch(0.52 0.19 230);
+
+  /* Vibrant Teal / Mint Accent */
+  --mint: oklch(0.62 0.17 175);
+  --mint-foreground: #ffffff;
+
+  /* Deep Mountain Spruce / Navy */
+  --spruce: oklch(0.20 0.04 220);
+  --spruce-foreground: #ffffff;
+
+  /* Warm Amber Rating */
+  --amber: oklch(0.75 0.16 75);
+
+  --secondary: oklch(0.95 0.02 220);
+  --secondary-foreground: oklch(0.22 0.05 230);
+  --muted: oklch(0.96 0.008 220);
+  --muted-foreground: oklch(0.48 0.025 230);
+  --accent: oklch(0.94 0.03 175);
+  --accent-foreground: oklch(0.22 0.06 175);
   --destructive: oklch(0.55 0.2 25);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.9 0.01 240);
-  --input: oklch(0.9 0.01 240);
-  --ring: oklch(0.58 0.16 38);
+  --destructive-foreground: #ffffff;
+  --border: oklch(0.91 0.01 220);
+  --input: oklch(0.91 0.01 220);
+  --ring: oklch(0.60 0.18 230);
 }
 
 .dark,
 [data-theme='dark'] {
-  --background: oklch(0.12 0.015 240);
-  --foreground: oklch(0.98 0.005 240);
-  --card: oklch(0.16 0.02 240);
-  --card-foreground: oklch(0.98 0.005 240);
-  --popover: oklch(0.16 0.02 240);
-  --popover-foreground: oklch(0.98 0.005 240);
-  --primary: oklch(0.68 0.2 38);
-  --primary-foreground: oklch(0.12 0.02 240);
-  --secondary: oklch(0.22 0.02 240);
-  --secondary-foreground: oklch(0.95 0.01 240);
-  --muted: oklch(0.2 0.015 240);
-  --muted-foreground: oklch(0.7 0.02 240);
-  --accent: oklch(0.24 0.03 220);
-  --accent-foreground: oklch(0.98 0.005 240);
+  --background: oklch(0.13 0.02 225);
+  --foreground: oklch(0.96 0.01 220);
+  --card: oklch(0.17 0.025 225);
+  --card-foreground: oklch(0.96 0.01 220);
+  --popover: oklch(0.17 0.025 225);
+  --popover-foreground: oklch(0.96 0.01 220);
+
+  --primary: oklch(0.68 0.18 230);
+  --primary-foreground: oklch(0.12 0.02 225);
+
+  --mint: oklch(0.70 0.17 175);
+  --mint-foreground: #ffffff;
+
+  --spruce: oklch(0.16 0.03 225);
+  --spruce-foreground: #ffffff;
+
+  --secondary: oklch(0.22 0.025 225);
+  --secondary-foreground: oklch(0.96 0.01 220);
+  --muted: oklch(0.20 0.02 225);
+  --muted-foreground: oklch(0.68 0.02 220);
+  --accent: oklch(0.22 0.03 175);
+  --accent-foreground: oklch(0.96 0.01 175);
   --destructive: oklch(0.48 0.18 25);
-  --destructive-foreground: oklch(0.98 0 0);
-  --border: oklch(0.24 0.02 240);
-  --input: oklch(0.24 0.02 240);
-  --ring: oklch(0.68 0.2 38);
+  --destructive-foreground: #ffffff;
+  --border: oklch(0.25 0.02 225);
+  --input: oklch(0.25 0.02 225);
+  --ring: oklch(0.68 0.18 230);
+}
+
+.font-handwriting {
+  font-family: var(--font-handwriting), 'Caveat', cursive;
 }

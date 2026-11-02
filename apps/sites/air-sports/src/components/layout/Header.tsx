@@ -2,121 +2,159 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Menu, Radio, Search, X, Zap } from 'lucide-react';
-import { siteConfig } from '@/config/site';
+import { usePathname } from 'next/navigation';
+import { ChevronDown, Menu, Search, Send, X } from 'lucide-react';
+import { AirSportsLogo } from '@/components/ui/AirSportsLogo';
+import { PillButton } from '@/components/ui/PillButton';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
+
+const NAV_ITEMS = [
+  { label: 'Home', href: '/' },
+  { label: 'Disciplines', href: '/categories', hasDropdown: true },
+  { label: 'Events & Races', href: '/events' },
+  { label: 'Field Notes', href: '/tags' },
+];
+
+const DISCIPLINES = [
+  { name: 'Paragliding', href: '/categories/paragliding' },
+  { name: 'Skydiving', href: '/categories/skydiving' },
+  { name: 'Hot Air Balloon', href: '/categories/hot-air-balloon' },
+  { name: 'Wingsuit Flying', href: '/categories/wingsuit-flying' },
+  { name: 'Ultralight Flight', href: '/categories/ultralight-flight' },
+];
 
 export function Header() {
+  const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [disciplinesOpen, setDisciplinesOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        {/* Brand Logo with Live Radar Pulse */}
-        <Link href="/" className="flex items-center gap-3 group focus:outline-hidden">
-          <div className="flex size-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-xs group-hover:scale-105 transition-transform">
-            <Radio className="size-5" />
-          </div>
-          <div>
-            <span className="text-base font-black uppercase tracking-tight text-foreground flex items-center gap-1.5">
-              {siteConfig.name}
-              <span className="relative flex size-2">
-                <span className="absolute inline-flex size-full animate-ping rounded-full bg-rose-500 opacity-75" />
-                <span className="relative inline-flex size-2 rounded-full bg-rose-500" />
-              </span>
-            </span>
-            <span className="block text-[10px] font-mono uppercase tracking-widest text-muted-foreground -mt-0.5">
-              Live Aviation Desk
-            </span>
-          </div>
-        </Link>
+    <header className="sticky top-0 z-40 w-full border-b border-border/80 bg-background/85 backdrop-blur-md transition-colors">
+      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        {/* Brand Logo */}
+        <AirSportsLogo />
 
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-7 text-xs font-mono font-bold uppercase tracking-wider text-foreground/80">
-          <Link href="/" className="hover:text-primary transition-colors">
-            Radar Feed
-          </Link>
-          <Link href="/events" className="hover:text-primary transition-colors">
-            Events Hub
-          </Link>
-          <Link href="/categories" className="hover:text-primary transition-colors">
-            Disciplines
-          </Link>
-          <Link href="/tags" className="hover:text-primary transition-colors">
-            Tags
-          </Link>
+        {/* Centered Pill Navigation */}
+        <nav
+          aria-label="Air Sports Navigation"
+          className="hidden md:flex items-center gap-1.5 rounded-full border border-border/70 bg-card/60 px-3 py-1.5 text-sm font-semibold shadow-2xs backdrop-blur-xs"
+        >
+          {NAV_ITEMS.map((item) => {
+            const isActive = pathname === item.href;
+
+            if (item.hasDropdown) {
+              return (
+                <div
+                  key={item.label}
+                  className="relative"
+                  onMouseEnter={() => setDisciplinesOpen(true)}
+                  onMouseLeave={() => setDisciplinesOpen(false)}
+                >
+                  <Link
+                    href={item.href}
+                    className={`inline-flex items-center gap-1 rounded-full px-3.5 py-1.5 transition-all ${
+                      pathname.startsWith('/categories')
+                        ? 'bg-sky-600 text-white shadow-2xs'
+                        : 'text-foreground/80 hover:text-sky-600 dark:hover:text-sky-400'
+                    }`}
+                  >
+                    <span>{item.label}</span>
+                    <ChevronDown className="h-3.5 w-3.5 opacity-70" />
+                  </Link>
+
+                  {disciplinesOpen && (
+                    <div className="absolute left-0 top-full pt-2 z-50 min-w-[200px]">
+                      <div className="rounded-2xl border border-border bg-card p-2 shadow-xl backdrop-blur-md">
+                        {DISCIPLINES.map((d) => (
+                          <Link
+                            key={d.name}
+                            href={d.href}
+                            className="block rounded-xl px-3 py-2 text-xs font-semibold text-foreground/80 transition hover:bg-sky-500/10 hover:text-sky-600 dark:hover:text-sky-400"
+                          >
+                            {d.name}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            }
+
+            return (
+              <Link
+                key={item.label}
+                href={item.href}
+                className={`rounded-full px-4 py-1.5 transition-all ${
+                  isActive
+                    ? 'bg-sky-600 text-white shadow-2xs'
+                    : 'text-foreground/80 hover:text-sky-600 dark:hover:text-sky-400'
+                }`}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
         </nav>
 
         {/* Right Action Controls */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <Link
             href="/search"
-            aria-label="Search dispatches"
-            className="flex size-9 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground hover:border-foreground/30 hover:text-foreground transition-colors shadow-xs"
+            aria-label="Search air sports dispatches"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card text-foreground/80 transition hover:border-sky-500/50 hover:bg-muted"
           >
-            <Search className="size-4" />
+            <Search className="h-4 w-4" />
           </Link>
 
-          <Link
-            href="/#live-feed"
-            className="hidden sm:inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 font-mono text-xs font-bold uppercase tracking-wider text-primary-foreground hover:bg-primary/90 transition-colors shadow-xs"
-          >
-            <Zap className="size-3.5" />
-            Live Timeline
-          </Link>
+          <ThemeToggle />
 
-          {/* Mobile Menu Button */}
+          <PillButton
+            href="#newsletter"
+            size="sm"
+            icon={<Send className="h-3.5 w-3.5" />}
+            iconPosition="right"
+            className="hidden sm:inline-flex bg-emerald-600 hover:bg-emerald-500 text-white"
+          >
+            Subscribe
+          </PillButton>
+
+          {/* Mobile Menu Toggle */}
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="flex size-9 items-center justify-center rounded-lg border border-border bg-card text-foreground md:hidden"
-            aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+            aria-label="Toggle navigation menu"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card md:hidden text-foreground"
           >
-            {mobileMenuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
+            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
       </div>
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="border-b border-border bg-card px-4 pt-3 pb-6 md:hidden animate-in slide-in-from-top-2 duration-200">
-          <nav className="flex flex-col space-y-3 font-mono text-xs font-bold uppercase tracking-wider">
-            <Link
-              href="/"
-              onClick={() => setMobileMenuOpen(false)}
-              className="px-2 py-1.5 hover:text-primary transition-colors"
+        <div className="border-b border-border bg-card p-4 md:hidden space-y-3">
+          <div className="space-y-1">
+            {NAV_ITEMS.map((item) => (
+              <Link
+                key={item.label}
+                href={item.href}
+                onClick={() => setMobileMenuOpen(false)}
+                className="block rounded-xl px-4 py-2.5 text-sm font-semibold text-foreground hover:bg-muted"
+              >
+                {item.label}
+              </Link>
+            ))}
+          </div>
+          <div className="pt-2 border-t border-border">
+            <PillButton
+              href="#newsletter"
+              size="sm"
+              className="w-full justify-center bg-emerald-600 text-white"
             >
-              Radar Feed
-            </Link>
-            <Link
-              href="/events"
-              onClick={() => setMobileMenuOpen(false)}
-              className="px-2 py-1.5 hover:text-primary transition-colors"
-            >
-              Events Hub
-            </Link>
-            <Link
-              href="/categories"
-              onClick={() => setMobileMenuOpen(false)}
-              className="px-2 py-1.5 hover:text-primary transition-colors"
-            >
-              Disciplines & Categories
-            </Link>
-            <Link
-              href="/tags"
-              onClick={() => setMobileMenuOpen(false)}
-              className="px-2 py-1.5 hover:text-primary transition-colors"
-            >
-              Tags
-            </Link>
-            <Link
-              href="/search"
-              onClick={() => setMobileMenuOpen(false)}
-              className="px-2 py-1.5 hover:text-primary transition-colors flex items-center gap-2"
-            >
-              <Search className="size-3.5" />
-              Search Dispatches
-            </Link>
-          </nav>
+              Subscribe ✈
+            </PillButton>
+          </div>
         </div>
       )}
     </header>

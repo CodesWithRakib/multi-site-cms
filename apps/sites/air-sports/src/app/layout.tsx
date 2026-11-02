@@ -1,9 +1,10 @@
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
-import { JetBrains_Mono, Plus_Jakarta_Sans } from 'next/font/google';
+import { Caveat, JetBrains_Mono, Plus_Jakarta_Sans } from 'next/font/google';
 
-import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import { Header } from '@/components/layout/Header';
+import { ThemeProvider } from '@/components/ui/ThemeProvider';
 import { siteConfig } from '@/config/site';
 
 import './globals.css';
@@ -15,7 +16,14 @@ const sansFont = Plus_Jakarta_Sans({
   weight: ['400', '500', '600', '700', '800'],
 });
 
-const jetbrainsMono = JetBrains_Mono({
+const handwritingFont = Caveat({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-handwriting',
+  weight: ['500', '600', '700'],
+});
+
+const monoFont = JetBrains_Mono({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-mono',
@@ -38,35 +46,25 @@ export const metadata: Metadata = {
     siteName: siteConfig.name,
     title: `${siteConfig.name} — ${siteConfig.tagline}`,
     description: siteConfig.description,
-    locale: 'en_US',
-    images: [
-      {
-        url: '/images/air-sports-og.jpg',
-        width: 1200,
-        height: 630,
-        alt: siteConfig.name,
-      },
-    ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: `${siteConfig.name} — ${siteConfig.tagline}`,
-    description: siteConfig.description,
   },
 };
 
 export const viewport: Viewport = {
-  colorScheme: 'light',
-  themeColor: siteConfig.themeColor,
+  colorScheme: 'light dark',
+  themeColor: '#0284c7',
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={`${sansFont.variable} ${jetbrainsMono.variable}`}>
-      <body className="min-h-dvh bg-background text-foreground font-sans antialiased flex flex-col selection:bg-primary/20 selection:text-primary">
-        <Header />
-        <main className="flex-1">{children}</main>
-        <Footer />
+    <html lang="en" suppressHydrationWarning>
+      <body
+        className={`${sansFont.variable} ${handwritingFont.variable} ${monoFont.variable} min-h-dvh flex flex-col bg-background font-sans antialiased text-foreground`}
+      >
+        <ThemeProvider>
+          <Header />
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </ThemeProvider>
       </body>
     </html>
   );
