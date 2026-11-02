@@ -1,4 +1,5 @@
 import { AuditEvent } from './audit-event.entity';
+import { AnalyticsPageView } from './analytics-page-view.entity';
 import { Category } from './category.entity';
 import { Event } from './event.entity';
 import { MediaAsset } from './media-asset.entity';
@@ -51,9 +52,12 @@ export const ENTITIES = [
   // Audit and Outbox
   AuditEvent,
   OutboxEvent,
+  // Analytics
+  AnalyticsPageView,
 ] as const;
 
 export {
+  AnalyticsPageView,
   AuditEvent,
   Category,
   Event,

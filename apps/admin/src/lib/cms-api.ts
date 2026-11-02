@@ -1,6 +1,9 @@
 'use client';
 
 import type {
+  AnalyticsOverviewData,
+  AnalyticsQueryParams,
+  AnalyticsRealtimeData,
   ApiSuccess,
   AssignRolePayload,
   AuthUser,
@@ -21,6 +24,7 @@ import type {
   PostPublicationItem,
   PreviewTokenResponse,
   PublishingHealthStats,
+  RecordPageViewPayload,
   ReschedulePublicationRequest,
   SchedulePublicationRequest,
   SiteDomainItem,
@@ -369,6 +373,35 @@ export const cmsApi = platformApi.injectEndpoints({
       }),
       transformResponse: (response: ApiSuccess<unknown>) => response.data as DashboardOverviewData,
       providesTags: ['Post', 'Publication', 'Site'],
+    }),
+
+    // ==========================================
+    // Analytics (Full Multi-Site Analytics System)
+    // ==========================================
+    getAnalyticsOverview: build.query<AnalyticsOverviewData, AnalyticsQueryParams | void>({
+      query: (params) => ({
+        path: '/analytics/overview',
+        query: params as Record<string, string | number | boolean | null | undefined> | undefined,
+      }),
+      transformResponse: (response: ApiSuccess<unknown>) => response.data as AnalyticsOverviewData,
+      providesTags: ['Post', 'Publication', 'Site'],
+    }),
+
+    getAnalyticsRealtime: build.query<AnalyticsRealtimeData, { siteId?: string } | void>({
+      query: (params) => ({
+        path: '/analytics/realtime',
+        query: params as Record<string, string | number | boolean | null | undefined> | undefined,
+      }),
+      transformResponse: (response: ApiSuccess<unknown>) => response.data as AnalyticsRealtimeData,
+    }),
+
+    recordPageView: build.mutation<{ success: boolean; id: string }, RecordPageViewPayload>({
+      query: (body) => ({
+        path: '/public/analytics/collect',
+        method: 'POST',
+        body,
+      }),
+      transformResponse: (response: ApiSuccess<{ success: boolean; id: string }>) => response.data,
     }),
 
     // ==========================================
@@ -849,6 +882,11 @@ export const {
 
   // Dashboard (Phase 14)
   useGetDashboardOverviewQuery,
+
+  // Analytics
+  useGetAnalyticsOverviewQuery,
+  useGetAnalyticsRealtimeQuery,
+  useRecordPageViewMutation,
 
   // Posts
   useListPostsQuery,

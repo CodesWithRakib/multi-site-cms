@@ -644,3 +644,106 @@ export interface DashboardOverviewData {
   recentContent: DashboardRecentContentItem[];
   recentActivity: DashboardRecentActivityItem[];
 }
+
+// ==========================================
+// Analytics Domain Contracts
+// ==========================================
+
+export type AnalyticsTimeframe = '7d' | '14d' | '30d' | '90d' | '1y';
+
+export interface AnalyticsSummary {
+  totalPageViews: number;
+  pageViewsGrowth: number;
+  uniqueVisitors: number;
+  visitorsGrowth: number;
+  avgDurationSeconds: number;
+  durationGrowth: number;
+  bounceRate: number;
+  bounceRateGrowth: number;
+}
+
+export interface AnalyticsTimeseriesPoint {
+  date: string;
+  pageViews: number;
+  uniqueVisitors: number;
+  avgDurationSeconds: number;
+}
+
+export interface AnalyticsTopPage {
+  postId?: string | null;
+  slug: string;
+  title: string;
+  siteId: string;
+  siteName: string;
+  pageViews: number;
+  uniqueVisitors: number;
+  avgDurationSeconds: number;
+  bounceRate: number;
+}
+
+export interface AnalyticsBreakdownItem {
+  label: string;
+  key: string;
+  count: number;
+  percentage: number;
+}
+
+export interface AnalyticsCountryItem {
+  countryCode: string;
+  countryName: string;
+  count: number;
+  percentage: number;
+}
+
+export interface AnalyticsSitePerformance {
+  siteId: string;
+  siteName: string;
+  siteKey: string;
+  pageViews: number;
+  uniqueVisitors: number;
+  percentage: number;
+}
+
+export interface AnalyticsRealtimeEvent {
+  id: string;
+  siteName: string;
+  path: string;
+  title?: string;
+  countryName: string;
+  deviceType: string;
+  timestamp: string;
+}
+
+export interface AnalyticsRealtimeData {
+  activeVisitors30m: number;
+  pageViewsLastHour: number;
+  recentViewsPerMinute: Array<{ minute: string; views: number }>;
+  recentEvents: AnalyticsRealtimeEvent[];
+}
+
+export interface AnalyticsOverviewData {
+  summary: AnalyticsSummary;
+  timeseries: AnalyticsTimeseriesPoint[];
+  topPages: AnalyticsTopPage[];
+  deviceBreakdown: AnalyticsBreakdownItem[];
+  trafficSources: AnalyticsBreakdownItem[];
+  countryBreakdown: AnalyticsCountryItem[];
+  browserBreakdown: AnalyticsBreakdownItem[];
+  sitePerformance: AnalyticsSitePerformance[];
+}
+
+export interface AnalyticsQueryParams {
+  siteId?: string;
+  days?: number;
+  timeframe?: AnalyticsTimeframe;
+}
+
+export interface RecordPageViewPayload {
+  siteId: string;
+  postId?: string;
+  path: string;
+  referrer?: string;
+  visitorId?: string;
+  durationSeconds?: number;
+}
+

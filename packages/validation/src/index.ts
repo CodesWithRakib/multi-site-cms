@@ -139,3 +139,26 @@ export function normalizeHostname(input: string): HostnameNormalizationResult {
     normalized: cleaned,
   };
 }
+
+/**
+ * Analytics validation schemas
+ */
+export const analyticsQuerySchema = z.object({
+  siteId: z.string().uuid().optional(),
+  days: z.coerce.number().int().min(1).max(365).optional().default(30),
+  timeframe: z.enum(['7d', '14d', '30d', '90d', '1y']).optional(),
+});
+
+export type AnalyticsQueryInput = z.infer<typeof analyticsQuerySchema>;
+
+export const recordPageViewSchema = z.object({
+  siteId: z.string().uuid(),
+  postId: z.string().uuid().optional(),
+  path: z.string().min(1).max(1024),
+  referrer: z.string().max(2048).optional(),
+  visitorId: z.string().max(128).optional(),
+  durationSeconds: z.number().int().min(0).max(86400).optional(),
+});
+
+export type RecordPageViewInput = z.infer<typeof recordPageViewSchema>;
+

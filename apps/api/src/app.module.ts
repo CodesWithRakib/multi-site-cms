@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { AuthGuard } from './auth/guards/auth.guard';
 import { CsrfGuard } from './auth/guards/csrf.guard';
 import { PermissionsGuard } from './auth/guards/permissions.guard';
+import { AnalyticsModule } from './analytics/analytics.module';
 import { AuditModule } from './common/audit/audit.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { RequestLoggingInterceptor } from './common/interceptors/request-logging.interceptor';
@@ -40,6 +41,7 @@ import { UsersModule } from './users/users.module';
     PublishingModule,
     HealthModule,
     DashboardModule,
+    AnalyticsModule,
   ],
   providers: [
     {

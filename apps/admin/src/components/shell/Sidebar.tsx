@@ -73,10 +73,10 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       active: pathname.startsWith('/users'),
     },
     {
-      href: '#analytics',
+      href: '/analytics',
       label: t('nav.analytics'),
       icon: BarChart2,
-      active: false,
+      active: pathname.startsWith('/analytics'),
     },
     {
       href: '#settings',

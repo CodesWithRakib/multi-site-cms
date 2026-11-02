@@ -5,6 +5,7 @@ import { EnableDatabaseExtensions1793491200000 } from './1793491200000-EnableDat
 import { IdentityAndSiteRegistry1793491201000 } from './1793491201000-IdentityAndSiteRegistry';
 import { PublishingLifecycleAndOutbox1793491206000 } from './1793491206000-PublishingLifecycleAndOutbox';
 import { SiteDomainsVerificationAndLifecycle1793491204000 } from './1793491204000-SiteDomainsVerificationAndLifecycle';
+import { AnalyticsAndTrafficEvents1793491207000 } from './1793491207000-AnalyticsAndTrafficEvents';
 
 /**
  * Ordered migration registry.
@@ -20,4 +21,5 @@ export const MIGRATIONS = [
   SiteDomainsVerificationAndLifecycle1793491204000,
   ContentEnhancementsAndTaxonomyHierarchy1793491205000,
   PublishingLifecycleAndOutbox1793491206000,
+  AnalyticsAndTrafficEvents1793491207000,
 ] as const;
