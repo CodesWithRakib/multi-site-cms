@@ -196,3 +196,51 @@ export async function fetchSiteConfig(): Promise<PublicSiteConfig | null> {
     tags: ['travel-blog-config'],
   });
 }
+
+/**
+ * Submit email to public site newsletter subscription.
+ */
+export async function subscribeNewsletter(
+  email: string,
+): Promise<{ success: boolean; message: string }> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/public/sites/${SITE_KEY}/newsletter`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+
+    if (!res.ok) {
+      const err = (await res.json().catch(() => null)) as {
+        error?: { message?: string };
+      } | null;
+      return {
+        success: false,
+        message: err?.error?.message || 'Failed to subscribe. Please try again.',
+      };
+    }
+
+    const payload = (await res.json()) as { data?: { message?: string } };
+    return {
+      success: true,
+      message: payload.data?.message || 'Thank you for subscribing to our travel newsletter!',
+    };
+  } catch {
+    return {
+      success: false,
+      message: 'Network error. Please try again later.',
+    };
+  }
+}
+
+export type {
+  PublicArticleDetail,
+  PublicArticleSummary,
+  PublicCategoryItem,
+  PublicSiteConfig,
+  PublicTagItem,
+} from '@multi-site-cms/types';
+
+export type PublicArticle = PublicArticleSummary;
+export type PublicCategory = PublicCategoryItem;
+

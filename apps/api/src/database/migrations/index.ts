@@ -7,6 +7,7 @@ import { PublishingLifecycleAndOutbox1793491206000 } from './1793491206000-Publi
 import { SiteDomainsVerificationAndLifecycle1793491204000 } from './1793491204000-SiteDomainsVerificationAndLifecycle';
 import { AnalyticsAndTrafficEvents1793491207000 } from './1793491207000-AnalyticsAndTrafficEvents';
 import { PlatformSettingsRegistry1793491208000 } from './1793491208000-PlatformSettingsRegistry';
+import { NewsletterSubscribers1793491209000 } from './1793491209000-NewsletterSubscribers';
 
 /**
  * Ordered migration registry.
@@ -24,5 +25,6 @@ export const MIGRATIONS = [
   PublishingLifecycleAndOutbox1793491206000,
   AnalyticsAndTrafficEvents1793491207000,
   PlatformSettingsRegistry1793491208000,
+  NewsletterSubscribers1793491209000,
 ] as const;
 

@@ -1,11 +1,12 @@
 import { createHash, randomUUID } from 'node:crypto';
 import type { Request, Response } from 'express';
-import { Controller, Get, HttpStatus, Param, ParseUUIDPipe, Query, Req, Res } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Param, ParseUUIDPipe, Post, Query, Req, Res } from '@nestjs/common';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { Public } from '../auth/decorators/public.decorator';
 import type { RequestContext } from '../common/http/request-context';
 import { ListPublicPostsQueryDto } from './dto/list-public-posts-query.dto';
+import { SubscribeNewsletterDto } from './dto/subscribe-newsletter.dto';
 import { PublicContentService } from './public-content.service';
 
 @ApiTags('Public Content')
@@ -243,6 +244,30 @@ export class PublicContentController {
 
     res.status(HttpStatus.OK).json({
       data: article,
+      meta: {
+        requestId,
+        timestamp: new Date().toISOString(),
+      },
+    });
+  }
+
+  @Post('newsletter')
+  @ApiOperation({ summary: 'Subscribe email to public site newsletter' })
+  @ApiResponse({ status: 200, description: 'Subscribed successfully' })
+  async subscribeNewsletter(
+    @Param('siteKey') siteKey: string,
+    @Body() dto: SubscribeNewsletterDto,
+    @Req() req: Request,
+    @Res() res: Response,
+  ): Promise<void> {
+    const requestId = (req as RequestContext).requestId ?? randomUUID();
+    const result = await this.publicContentService.subscribeNewsletter(siteKey, dto, {
+      requestId,
+      ipAddress: req.ip || null,
+    });
+
+    res.status(HttpStatus.OK).json({
+      data: result,
       meta: {
         requestId,
         timestamp: new Date().toISOString(),

@@ -1,9 +1,10 @@
 import type { Metadata, Viewport } from 'next';
-import { JetBrains_Mono, Playfair_Display, Plus_Jakarta_Sans } from 'next/font/google';
+import { Caveat, JetBrains_Mono, Playfair_Display, Plus_Jakarta_Sans } from 'next/font/google';
 import type { ReactNode } from 'react';
 
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
+import { ThemeProvider } from '@/components/ui/ThemeProvider';
 import { siteConfig } from '@/config/site';
 
 import './globals.css';
@@ -20,6 +21,13 @@ const serifFont = Playfair_Display({
   display: 'swap',
   variable: '--font-serif',
   weight: ['400', '500', '600', '700', '800', '900'],
+});
+
+const handwritingFont = Caveat({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-handwriting',
+  weight: ['500', '600', '700'],
 });
 
 const monoFont = JetBrains_Mono({
@@ -49,19 +57,21 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  colorScheme: 'light',
+  colorScheme: 'light dark',
   themeColor: siteConfig.themeColor,
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
-        className={`${sansFont.variable} ${serifFont.variable} ${monoFont.variable} min-h-dvh flex flex-col bg-background font-sans antialiased text-foreground`}
+        className={`${sansFont.variable} ${serifFont.variable} ${handwritingFont.variable} ${monoFont.variable} min-h-dvh flex flex-col bg-background font-sans antialiased text-foreground`}
       >
-        <Header />
-        <main className="flex-1">{children}</main>
-        <Footer />
+        <ThemeProvider>
+          <Header />
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </ThemeProvider>
       </body>
     </html>
   );

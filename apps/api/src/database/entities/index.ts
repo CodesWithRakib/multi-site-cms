@@ -1,6 +1,7 @@
 import { AuditEvent } from './audit-event.entity';
 import { AnalyticsPageView } from './analytics-page-view.entity';
 import { PlatformSettingsEntity } from './platform-settings.entity';
+import { NewsletterSubscriber } from './newsletter-subscriber.entity';
 import { Category } from './category.entity';
 import { Event } from './event.entity';
 import { MediaAsset } from './media-asset.entity';
@@ -38,6 +39,7 @@ export const ENTITIES = [
   // Site registry and site-owned configuration
   Site,
   SiteDomain,
+  NewsletterSubscriber,
   Category,
   Tag,
   Event,
@@ -65,6 +67,7 @@ export {
   Category,
   Event,
   MediaAsset,
+  NewsletterSubscriber,
   OutboxEvent,
   Permission,
   PlatformSettingsEntity,

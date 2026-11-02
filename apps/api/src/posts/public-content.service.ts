@@ -18,6 +18,7 @@ import { DATA_SOURCE } from '../database/database.tokens';
 import { Category } from '../database/entities/category.entity';
 import { Event } from '../database/entities/event.entity';
 import { MediaAsset } from '../database/entities/media-asset.entity';
+import { NewsletterSubscriber } from '../database/entities/newsletter-subscriber.entity';
 import { PostPublicationCategory } from '../database/entities/post-publication-category.entity';
 import { PostPublicationTag } from '../database/entities/post-publication-tag.entity';
 import { PostPublication } from '../database/entities/post-publication.entity';
@@ -27,7 +28,9 @@ import { Site } from '../database/entities/site.entity';
 import { Tag } from '../database/entities/tag.entity';
 import { User } from '../database/entities/user.entity';
 import { getInitializedRepository } from '../database/ensure-connected';
+import { AuditService } from '../common/audit/audit.service';
 import type { ListPublicPostsQueryDto } from './dto/list-public-posts-query.dto';
+import type { SubscribeNewsletterDto } from './dto/subscribe-newsletter.dto';
 import { PostsService } from './posts.service';
 import { calculateReadingTimeMinutes, extractTextFromDoc } from './utils/body-validator';
 
@@ -39,11 +42,15 @@ export class PublicContentService {
     @Inject(DATA_SOURCE) private readonly dataSource: DataSource,
     @Inject(forwardRef(() => PostsService))
     private readonly postsService: PostsService,
+    private readonly auditService: AuditService,
   ) {
     this.baseUrl = (process.env.API_BASE_URL || 'http://localhost:4000/api/v1').replace(/\/+$/, '');
   }
 
   private resolveMediaUrl(storageKey: string): string {
+    if (storageKey.startsWith('http://') || storageKey.startsWith('https://')) {
+      return storageKey;
+    }
     const sanitizedKey = encodeURIComponent(storageKey).replace(/%2F/g, '/');
     return `${this.baseUrl}/media/assets/${sanitizedKey}`;
   }
@@ -865,6 +872,59 @@ export class PublicContentService {
       description: event.description,
       updateCount: updates.length,
       updates,
+    };
+  }
+
+  /**
+   * Subscribes an email to a public site newsletter with audit logging.
+   */
+  async subscribeNewsletter(
+    siteKey: string,
+    dto: SubscribeNewsletterDto,
+    requestInfo?: { ipAddress?: string | null; requestId?: string | null },
+  ): Promise<{ subscribed: boolean; message: string }> {
+    const site = await this.resolveSite(siteKey);
+    const subscriberRepo = await getInitializedRepository(this.dataSource, NewsletterSubscriber);
+
+    let subscriber = await subscriberRepo.findOne({
+      where: { siteId: site.id, email: dto.email },
+    });
+
+    if (subscriber) {
+      if (subscriber.status !== 'subscribed') {
+        subscriber.status = 'subscribed';
+        subscriber.updatedAt = new Date();
+        await subscriberRepo.save(subscriber);
+      }
+    } else {
+      subscriber = subscriberRepo.create({
+        siteId: site.id,
+        email: dto.email,
+        status: 'subscribed',
+        metadata: {
+          source: 'public_web',
+        },
+      });
+      await subscriberRepo.save(subscriber);
+    }
+
+    await this.auditService.record({
+      actorType: 'system',
+      siteId: site.id,
+      action: 'newsletter.subscribed',
+      entityType: 'newsletter_subscriber',
+      entityId: subscriber.id,
+      requestId: requestInfo?.requestId ?? null,
+      ipAddress: requestInfo?.ipAddress ?? null,
+      metadata: {
+        email: dto.email,
+        siteKey,
+      },
+    });
+
+    return {
+      subscribed: true,
+      message: 'Thank you for subscribing to our travel newsletter!',
     };
   }
 }
