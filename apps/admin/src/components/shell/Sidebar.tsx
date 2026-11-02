@@ -18,6 +18,7 @@ import {
   Crown,
   ArrowRight,
   ChevronDown,
+  Calendar,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -41,6 +42,12 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       label: t('nav.posts'),
       icon: FileText,
       active: pathname.startsWith('/posts'),
+    },
+    {
+      href: '/calendar',
+      label: t('nav.calendar'),
+      icon: Calendar,
+      active: pathname.startsWith('/calendar'),
     },
     {
       href: '/sites',
