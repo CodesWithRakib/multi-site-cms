@@ -6,6 +6,7 @@ import { IdentityAndSiteRegistry1793491201000 } from './1793491201000-IdentityAn
 import { PublishingLifecycleAndOutbox1793491206000 } from './1793491206000-PublishingLifecycleAndOutbox';
 import { SiteDomainsVerificationAndLifecycle1793491204000 } from './1793491204000-SiteDomainsVerificationAndLifecycle';
 import { AnalyticsAndTrafficEvents1793491207000 } from './1793491207000-AnalyticsAndTrafficEvents';
+import { PlatformSettingsRegistry1793491208000 } from './1793491208000-PlatformSettingsRegistry';
 
 /**
  * Ordered migration registry.
@@ -22,4 +23,6 @@ export const MIGRATIONS = [
   ContentEnhancementsAndTaxonomyHierarchy1793491205000,
   PublishingLifecycleAndOutbox1793491206000,
   AnalyticsAndTrafficEvents1793491207000,
+  PlatformSettingsRegistry1793491208000,
 ] as const;
+

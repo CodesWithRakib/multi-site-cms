@@ -180,4 +180,57 @@ export const auditLogQuerySchema = z.object({
 
 export type AuditLogQueryInput = z.infer<typeof auditLogQuerySchema>;
 
+/**
+ * Platform Settings validation schemas
+ */
+export const platformGeneralSettingsSchema = z.object({
+  platformName: z.string().min(1).max(128).optional(),
+  tagline: z.string().max(256).optional(),
+  contactEmail: z.string().email().max(256).optional(),
+  defaultLocale: z.string().regex(/^[a-z]{2}(-[A-Z]{2})?$/).optional(),
+  defaultTimezone: z.string().max(64).optional(),
+});
+
+export const platformSecuritySettingsSchema = z.object({
+  sessionTtlHours: z.number().int().min(1).max(720).optional(),
+  maxLoginAttempts: z.number().int().min(1).max(20).optional(),
+  lockoutDurationMinutes: z.number().int().min(1).max(1440).optional(),
+  passwordMinLength: z.number().int().min(8).max(64).optional(),
+  requireStrongPasswords: z.boolean().optional(),
+  enforceMfaForSuperAdmin: z.boolean().optional(),
+  allowPublicRegistration: z.boolean().optional(),
+});
+
+export const platformMediaSettingsSchema = z.object({
+  storageProvider: z.enum(['cloudinary', 'local', 's3']).optional(),
+  maxUploadSizeBytes: z.number().int().min(1024 * 1024).max(100 * 1024 * 1024).optional(),
+  allowedMimeTypes: z.array(z.string().max(128)).optional(),
+  autoWebpConversion: z.boolean().optional(),
+});
+
+export const platformPublishingSettingsSchema = z.object({
+  defaultPostStatus: z.enum(['draft', 'in_review']).optional(),
+  autoSaveIntervalSeconds: z.number().int().min(5).max(300).optional(),
+  maxRevisionHistory: z.number().int().min(1).max(100).optional(),
+  previewTokenTtlMinutes: z.number().int().min(5).max(1440).optional(),
+});
+
+export const platformMaintenanceSettingsSchema = z.object({
+  maintenanceMode: z.boolean().optional(),
+  maintenanceNoticeEn: z.string().max(512).optional(),
+  maintenanceNoticeBn: z.string().max(512).optional(),
+  auditRetentionDays: z.number().int().min(7).max(3650).optional(),
+});
+
+export const updatePlatformSettingsSchema = z.object({
+  general: platformGeneralSettingsSchema.optional(),
+  security: platformSecuritySettingsSchema.optional(),
+  media: platformMediaSettingsSchema.optional(),
+  publishing: platformPublishingSettingsSchema.optional(),
+  maintenance: platformMaintenanceSettingsSchema.optional(),
+});
+
+export type UpdatePlatformSettingsInput = z.infer<typeof updatePlatformSettingsSchema>;
+
+
 

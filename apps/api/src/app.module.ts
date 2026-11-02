@@ -18,6 +18,7 @@ import { MediaModule } from './media/media.module';
 import { PostsModule } from './posts/posts.module';
 import { PublishingModule } from './publishing/publishing.module';
 import { SitesModule } from './sites/sites.module';
+import { SettingsModule } from './settings/settings.module';
 import { TaxonomyModule } from './taxonomy/taxonomy.module';
 import { UsersModule } from './users/users.module';
 
@@ -42,6 +43,7 @@ import { UsersModule } from './users/users.module';
     HealthModule,
     DashboardModule,
     AnalyticsModule,
+    SettingsModule,
   ],
   providers: [
     {

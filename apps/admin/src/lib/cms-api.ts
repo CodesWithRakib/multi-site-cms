@@ -22,6 +22,9 @@ import type {
   MediaUploadResponse,
   PaginatedAuditLogs,
   PaginatedResult,
+  PlatformSettings,
+  PlatformSystemDiagnostics,
+  PublicPlatformSettings,
   PostItem,
   PostPreviewData,
   PostPublicationItem,
@@ -34,6 +37,7 @@ import type {
   SiteItem,
   TagItem,
   UpdateCategoryPayload,
+  UpdatePlatformSettingsPayload,
   UpdateSitePayload,
   UpdateUserPayload,
   UserItem,
@@ -427,6 +431,38 @@ export const cmsApi = platformApi.injectEndpoints({
       transformResponse: (response: ApiSuccess<unknown>) => response.data as AuditLogSummary,
       providesTags: ['Site', 'User'],
     }),
+
+    // ==========================================
+    // Platform Settings
+    // ==========================================
+    getPlatformSettings: build.query<PlatformSettings, void>({
+      query: () => ({ path: '/settings/platform' }),
+      transformResponse: (response: ApiSuccess<unknown>) => response.data as PlatformSettings,
+      providesTags: ['Site', 'User'],
+    }),
+
+    updatePlatformSettings: build.mutation<PlatformSettings, UpdatePlatformSettingsPayload>({
+      query: (body) => ({
+        path: '/settings/platform',
+        method: 'PATCH',
+        body,
+      }),
+      transformResponse: (response: ApiSuccess<unknown>) => response.data as PlatformSettings,
+      invalidatesTags: ['Site', 'User'],
+    }),
+
+    getPlatformDiagnostics: build.query<PlatformSystemDiagnostics, void>({
+      query: () => ({ path: '/settings/diagnostics' }),
+      transformResponse: (response: ApiSuccess<unknown>) =>
+        response.data as PlatformSystemDiagnostics,
+      providesTags: ['Health'],
+    }),
+
+    getPublicPlatformSettings: build.query<PublicPlatformSettings, void>({
+      query: () => ({ path: '/settings/public' }),
+      transformResponse: (response: ApiSuccess<unknown>) => response.data as PublicPlatformSettings,
+    }),
+
 
 
     // ==========================================
@@ -916,6 +952,13 @@ export const {
   // Audit Logs
   useListAuditLogsQuery,
   useGetAuditSummaryQuery,
+
+  // Platform Settings
+  useGetPlatformSettingsQuery,
+  useUpdatePlatformSettingsMutation,
+  useGetPlatformDiagnosticsQuery,
+  useGetPublicPlatformSettingsQuery,
+
 
 
   // Posts

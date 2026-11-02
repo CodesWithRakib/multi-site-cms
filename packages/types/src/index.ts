@@ -802,4 +802,93 @@ export interface PaginatedAuditLogs {
   totalPages: number;
 }
 
+/**
+ * Platform Settings Types
+ */
+export interface PlatformGeneralSettings {
+  platformName: string;
+  tagline: string;
+  contactEmail: string;
+  defaultLocale: string;
+  defaultTimezone: string;
+}
+
+export interface PlatformSecuritySettings {
+  sessionTtlHours: number;
+  maxLoginAttempts: number;
+  lockoutDurationMinutes: number;
+  passwordMinLength: number;
+  requireStrongPasswords: boolean;
+  enforceMfaForSuperAdmin: boolean;
+  allowPublicRegistration: boolean;
+}
+
+export interface PlatformMediaSettings {
+  storageProvider: 'cloudinary' | 'local' | 's3';
+  maxUploadSizeBytes: number;
+  allowedMimeTypes: string[];
+  autoWebpConversion: boolean;
+}
+
+export interface PlatformPublishingSettings {
+  defaultPostStatus: 'draft' | 'in_review';
+  autoSaveIntervalSeconds: number;
+  maxRevisionHistory: number;
+  previewTokenTtlMinutes: number;
+}
+
+export interface PlatformMaintenanceSettings {
+  maintenanceMode: boolean;
+  maintenanceNoticeEn: string;
+  maintenanceNoticeBn: string;
+  auditRetentionDays: number;
+}
+
+export interface PlatformSettings {
+  id: string;
+  general: PlatformGeneralSettings;
+  security: PlatformSecuritySettings;
+  media: PlatformMediaSettings;
+  publishing: PlatformPublishingSettings;
+  maintenance: PlatformMaintenanceSettings;
+  updatedAt: string;
+  updatedBy: string | null;
+}
+
+export interface UpdatePlatformSettingsPayload {
+  general?: Partial<PlatformGeneralSettings>;
+  security?: Partial<PlatformSecuritySettings>;
+  media?: Partial<PlatformMediaSettings>;
+  publishing?: Partial<PlatformPublishingSettings>;
+  maintenance?: Partial<PlatformMaintenanceSettings>;
+}
+
+export interface PublicPlatformSettings {
+  platformName: string;
+  tagline: string;
+  maintenanceMode: boolean;
+  maintenanceNoticeEn: string;
+  maintenanceNoticeBn: string;
+  allowPublicRegistration: boolean;
+  defaultLocale: string;
+  defaultTimezone: string;
+}
+
+export interface PlatformSystemDiagnostics {
+  service: string;
+  nodeVersion: string;
+  platform: string;
+  environment: string;
+  uptimeSeconds: number;
+  databaseStatus: 'up' | 'down';
+  databaseLatencyMs: number;
+  totalSites: number;
+  totalUsers: number;
+  totalPosts: number;
+  totalMediaAssets: number;
+  storageProvider: string;
+  memoryUsageMb: number;
+}
+
+
 
