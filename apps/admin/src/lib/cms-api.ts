@@ -1,6 +1,8 @@
 'use client';
 
 import type {
+  AdminCommentItem,
+  AdminCommentsListResult,
   AnalyticsOverviewData,
   AnalyticsQueryParams,
   AnalyticsRealtimeData,
@@ -10,6 +12,7 @@ import type {
   AuditLogSummary,
   AuthUser,
   CategoryItem,
+  CommentStatus,
   CreateCategoryPayload,
   CreateDomainPayload,
   CreateSitePayload,
@@ -17,6 +20,7 @@ import type {
   CreateUserPayload,
   CsrfResponse,
   DashboardOverviewData,
+  ListAdminCommentsQuery,
   LoginResponse,
   MediaAssetItem,
   MediaUploadResponse,
@@ -925,6 +929,65 @@ export const cmsApi = platformApi.injectEndpoints({
         { type: 'Taxonomy' as const, id: `TAGS_${siteId}` },
       ],
     }),
+
+    // ==========================================
+    // Comments Moderation
+    // ==========================================
+    listComments: build.query<AdminCommentsListResult, ListAdminCommentsQuery | void>({
+      query: (params) => {
+        const query: Record<string, string | number> = {};
+        if (params?.siteId) query.siteId = params.siteId;
+        if (params?.status && params.status !== 'all') query.status = params.status;
+        if (params?.search) query.search = params.search;
+        if (params?.publicationId) query.publicationId = params.publicationId;
+        if (params?.page) query.page = params.page;
+        if (params?.limit) query.limit = params.limit;
+
+        return {
+          path: '/comments',
+          query,
+        };
+      },
+      transformResponse: (response: ApiSuccess<unknown>) =>
+        response.data as AdminCommentsListResult,
+      providesTags: ['Comment'],
+    }),
+
+    updateCommentStatus: build.mutation<
+      AdminCommentItem,
+      { id: string; status: CommentStatus }
+    >({
+      query: ({ id, status }) => ({
+        path: `/comments/${id}/status`,
+        method: 'PATCH',
+        body: { status },
+      }),
+      transformResponse: (response: ApiSuccess<unknown>) =>
+        response.data as AdminCommentItem,
+      invalidatesTags: ['Comment'],
+    }),
+
+    batchUpdateComments: build.mutation<
+      { updatedCount: number },
+      { ids: string[]; status: CommentStatus }
+    >({
+      query: (body) => ({
+        path: '/comments/batch',
+        method: 'POST',
+        body,
+      }),
+      transformResponse: (response: ApiSuccess<unknown>) =>
+        response.data as { updatedCount: number },
+      invalidatesTags: ['Comment'],
+    }),
+
+    deleteComment: build.mutation<void, string>({
+      query: (id) => ({
+        path: `/comments/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Comment'],
+    }),
   }),
 });
 
@@ -1018,4 +1081,10 @@ export const {
   useCreateTagMutation,
   useUpdateTagMutation,
   useDeleteTagMutation,
+
+  // Comments Moderation
+  useListCommentsQuery,
+  useUpdateCommentStatusMutation,
+  useBatchUpdateCommentsMutation,
+  useDeleteCommentMutation,
 } = cmsApi;

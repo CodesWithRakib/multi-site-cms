@@ -926,6 +926,62 @@ export interface PublicCommentsResult {
   averageRating: number | null;
 }
 
+export interface AdminCommentItem {
+  id: string;
+  siteId: string;
+  siteName: string;
+  siteKey: string;
+  publicationId: string;
+  publicationSlug: string;
+  publicationTitle: string;
+  authorName: string;
+  authorEmail: string;
+  content: string;
+  rating: number | null;
+  status: CommentStatus;
+  parentId: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AdminCommentsCounts {
+  all: number;
+  pending: number;
+  approved: number;
+  rejected: number;
+  spam: number;
+}
+
+export interface AdminCommentsListResult {
+  items: AdminCommentItem[];
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+  counts: AdminCommentsCounts;
+}
+
+export interface ListAdminCommentsQuery {
+  siteId?: string;
+  status?: string;
+  search?: string;
+  publicationId?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface UpdateCommentStatusPayload {
+  status: CommentStatus;
+}
+
+export interface BatchUpdateCommentsPayload {
+  ids: string[];
+  status: CommentStatus;
+}
+
+
 
 
 

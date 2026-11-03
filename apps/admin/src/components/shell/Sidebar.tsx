@@ -19,7 +19,9 @@ import {
   ArrowRight,
   ChevronDown,
   Calendar,
+  MessageSquare,
 } from 'lucide-react';
+import { useListCommentsQuery } from '@/lib/cms-api';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -29,6 +31,8 @@ interface SidebarProps {
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
   const { t } = useAdmin();
+  const { data: commentsData } = useListCommentsQuery({ limit: 1 });
+  const pendingCommentsCount = commentsData?.counts.pending ?? 0;
 
   const navItems = [
     {
@@ -42,6 +46,13 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       label: t('nav.posts'),
       icon: FileText,
       active: pathname.startsWith('/posts'),
+    },
+    {
+      href: '/comments',
+      label: 'Comments',
+      icon: MessageSquare,
+      active: pathname.startsWith('/comments'),
+      badge: pendingCommentsCount > 0 ? pendingCommentsCount : undefined,
     },
     {
       href: '/calendar',
@@ -164,7 +175,12 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                     item.active ? 'text-[#072624]' : 'text-slate-300/80 group-hover:text-white'
                   }`}
                 />
-                <span>{item.label}</span>
+                <span className="flex-1">{item.label}</span>
+                {typeof item.badge === 'number' && (
+                  <span className="inline-flex items-center justify-center rounded-full bg-amber-400 px-1.5 py-0.5 text-[10px] font-bold text-slate-900 shadow-2xs">
+                    {item.badge}
+                  </span>
+                )}
               </Link>
             );
           })}
