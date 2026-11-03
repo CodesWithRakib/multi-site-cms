@@ -18,6 +18,7 @@ import {
   MediaListView,
   MediaDropzone,
   MediaDetailModal,
+  MediaBatchActionBar,
   formatBytes,
   type MediaViewMode,
   type MediaTab,
@@ -34,9 +35,11 @@ export default function MediaPage() {
   const [viewMode, setViewMode] = useState<MediaViewMode>('grid');
   const [activeTab, setActiveTab] = useState<MediaTab>('browse');
 
-  // Asset detail modal
+  // Asset detail modal & batch selection
   const [selectedAsset, setSelectedAsset] = useState<MediaAssetItem | null>(null);
+  const [selectedBatchIds, setSelectedBatchIds] = useState<Set<string>>(new Set());
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isBatchDeleting, setIsBatchDeleting] = useState(false);
 
   // Queries and mutations
   const {
@@ -96,33 +99,69 @@ export default function MediaPage() {
     }
   };
 
-  // Delete media asset
+  // Delete single media asset
   const handleDelete = async (id: string) => {
     if (confirm(t.media.deleteConfirm || 'Are you sure you want to delete this media asset?')) {
       try {
         await deleteMedia(id).unwrap();
-        if (selectedAsset?.id === id) {
-          setSelectedAsset(null);
-        }
+        if (selectedAsset?.id === id) setSelectedAsset(null);
+        setSelectedBatchIds((prev) => {
+          const next = new Set(prev);
+          next.delete(id);
+          return next;
+        });
         refetch();
       } catch (err: unknown) {
         const errorObj = err as { data?: { error?: { message?: string } }; message?: string };
         alert(
-          'Failed to delete asset: ' +
+          'Failed to delete: ' +
             (errorObj?.data?.error?.message || errorObj?.message || 'Media is currently in use.'),
         );
       }
     }
   };
 
-  const handleCopyUrl = (url: string) => {
-    navigator.clipboard.writeText(url);
+  // Batch selection handlers
+  const handleToggleBatchSelect = (id: string, selected: boolean) => {
+    setSelectedBatchIds((prev) => {
+      const next = new Set(prev);
+      if (selected) next.add(id);
+      else next.delete(id);
+      return next;
+    });
   };
+
+  const handleSelectAllOnPage = (selected: boolean) => {
+    setSelectedBatchIds((prev) => {
+      const next = new Set(prev);
+      items.forEach((item) => (selected ? next.add(item.id) : next.delete(item.id)));
+      return next;
+    });
+  };
+
+  const handleBatchDelete = async () => {
+    if (selectedBatchIds.size === 0) return;
+    const count = selectedBatchIds.size;
+    if (!confirm(`Are you sure you want to delete ${count} selected media assets?`)) return;
+
+    setIsBatchDeleting(true);
+    try {
+      await Promise.all(Array.from(selectedBatchIds).map((id) => deleteMedia(id).unwrap()));
+      setSelectedBatchIds(new Set());
+      refetch();
+    } catch {
+      alert('Some items could not be deleted as they may be in use.');
+      refetch();
+    } finally {
+      setIsBatchDeleting(false);
+    }
+  };
+
+  const allSelectedOnPage = items.length > 0 && items.every((i) => selectedBatchIds.has(i.id));
 
   return (
     <ShellLayout>
-      <div className="w-full space-y-6 pb-16">
-        {/* 1. Header Row */}
+      <div className="w-full space-y-6 pb-20">
         <MediaHeader
           title={t.media.title}
           subtitle={t.media.subtitle}
@@ -138,10 +177,8 @@ export default function MediaPage() {
           uploadLabel={t.media.uploadTitle}
         />
 
-        {/* 2. Top Metric Cards */}
         <MediaMetricsCards stats={stats} />
 
-        {/* 3. Controls & Filter Bar */}
         <MediaFilterBar
           activeSiteId={activeSiteId}
           availableSites={availableSites}
@@ -161,7 +198,6 @@ export default function MediaPage() {
           }}
         />
 
-        {/* 4. Main Body: Upload Tab vs Browse Tab */}
         {activeTab === 'upload' ? (
           <div className="w-full max-w-3xl mx-auto py-6 bg-white dark:bg-slate-900/90 p-6 sm:p-8 rounded-3xl border border-slate-200/80 dark:border-slate-800/80 shadow-lg">
             <MediaDropzone
@@ -190,7 +226,9 @@ export default function MediaPage() {
                         key={asset.id}
                         asset={asset}
                         isSelected={selectedAsset?.id === asset.id}
+                        isBatchSelected={selectedBatchIds.has(asset.id)}
                         onSelect={setSelectedAsset}
+                        onToggleBatchSelect={handleToggleBatchSelect}
                         onDelete={handleDelete}
                       />
                     ))}
@@ -198,13 +236,15 @@ export default function MediaPage() {
                 ) : (
                   <MediaListView
                     items={items}
+                    selectedBatchIds={selectedBatchIds}
+                    onToggleBatchSelect={handleToggleBatchSelect}
+                    onSelectAll={handleSelectAllOnPage}
                     onSelect={setSelectedAsset}
-                    onCopyUrl={handleCopyUrl}
+                    onCopyUrl={(url) => navigator.clipboard.writeText(url)}
                     onDelete={handleDelete}
                   />
                 )}
 
-                {/* Pagination */}
                 {mediaData && mediaData.totalPages > 1 && (
                   <div className="flex items-center justify-between border-t border-slate-200 dark:border-slate-800 pt-4 text-xs text-slate-500 dark:text-slate-400">
                     <span>
@@ -255,13 +295,22 @@ export default function MediaPage() {
         )}
       </div>
 
-      {/* Asset Detail Modal */}
       <MediaDetailModal
         asset={selectedAsset}
         onClose={() => setSelectedAsset(null)}
         onSaveMetadata={handleSaveMetadata}
         onDelete={handleDelete}
         isUpdating={isUpdating}
+      />
+
+      <MediaBatchActionBar
+        selectedCount={selectedBatchIds.size}
+        totalOnPage={items.length}
+        allSelectedOnPage={allSelectedOnPage}
+        onSelectAllOnPage={handleSelectAllOnPage}
+        onClearSelection={() => setSelectedBatchIds(new Set())}
+        onDeleteSelected={handleBatchDelete}
+        isDeleting={isBatchDeleting}
       />
     </ShellLayout>
   );

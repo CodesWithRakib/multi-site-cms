@@ -11,11 +11,12 @@ import {
   Video,
   FileText,
   Image as ImageIcon,
+  Code,
 } from 'lucide-react';
 import type { MediaAssetItem } from '@multi-site-cms/types';
 import { formatBytes } from '../utils/formatBytes';
 
-interface MediaDetailModalProps {
+export interface MediaDetailModalProps {
   asset: MediaAssetItem | null;
   onClose: () => void;
   onSaveMetadata: (payload: { altText: string; caption: string }) => Promise<void>;
@@ -33,7 +34,7 @@ export function MediaDetailModal({
   if (!asset) return null;
 
   return (
-    <MediaDetailModalContent
+    <MediaDetailModalView
       key={asset.id}
       asset={asset}
       onClose={onClose}
@@ -44,24 +45,22 @@ export function MediaDetailModal({
   );
 }
 
-interface ContentProps {
-  asset: MediaAssetItem;
-  onClose: () => void;
-  onSaveMetadata: (payload: { altText: string; caption: string }) => Promise<void>;
-  onDelete: (id: string) => void;
-  isUpdating: boolean;
-}
-
-function MediaDetailModalContent({
+function MediaDetailModalView({
   asset,
   onClose,
   onSaveMetadata,
   onDelete,
   isUpdating,
-}: ContentProps) {
+}: {
+  asset: MediaAssetItem;
+  onClose: () => void;
+  onSaveMetadata: (payload: { altText: string; caption: string }) => Promise<void>;
+  onDelete: (id: string) => void;
+  isUpdating: boolean;
+}) {
   const [altText, setAltText] = useState(asset.altText || '');
   const [caption, setCaption] = useState(asset.caption || '');
-  const [copiedUrl, setCopiedUrl] = useState(false);
+  const [copiedKind, setCopiedKind] = useState<'url' | 'md' | 'html' | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
 
   const assetUrl = asset.url || `/api/v1/media/assets/${asset.storageKey}`;
@@ -69,10 +68,10 @@ function MediaDetailModalContent({
   const isVideo = asset.mimeType.startsWith('video/');
   const isPdf = asset.mimeType === 'application/pdf';
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(assetUrl);
-    setCopiedUrl(true);
-    setTimeout(() => setCopiedUrl(false), 2000);
+  const copyToClipboard = (text: string, kind: 'url' | 'md' | 'html') => {
+    navigator.clipboard.writeText(text);
+    setCopiedKind(kind);
+    setTimeout(() => setCopiedKind(null), 2000);
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -107,7 +106,7 @@ function MediaDetailModalContent({
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           >
             <X className="size-4" />
           </button>
@@ -115,16 +114,11 @@ function MediaDetailModalContent({
 
         {/* Content Body: Left Preview, Right Metadata */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
-          {/* Left: Preview Container */}
           <div className="flex flex-col gap-3">
             <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center justify-center">
               {isImage ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={assetUrl}
-                  alt={asset.altText || 'Media preview'}
-                  className="size-full object-contain"
-                />
+                <img src={assetUrl} alt={asset.altText || 'Media preview'} className="size-full object-contain" />
               ) : isVideo ? (
                 <Video className="size-16 text-slate-400" />
               ) : isPdf ? (
@@ -134,28 +128,51 @@ function MediaDetailModalContent({
               )}
             </div>
 
-            {/* Quick URL Copy Bar */}
-            <div className="flex items-center gap-2 p-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 text-xs">
-              <span className="font-mono text-[11px] text-slate-500 truncate flex-1 pl-1">
-                {assetUrl}
+            {/* Quick Embed Snippets */}
+            <div className="flex flex-col gap-2 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 text-xs">
+              <span className="font-semibold text-slate-600 dark:text-slate-400 text-[11px] flex items-center gap-1">
+                <Code className="size-3" />
+                <span>Quick Copy Embed Snippets:</span>
               </span>
-              <button
-                type="button"
-                onClick={handleCopy}
-                className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 font-semibold text-slate-700 dark:text-slate-200 hover:text-emerald-500 transition-colors shrink-0 cursor-pointer"
-              >
-                {copiedUrl ? <Check className="size-3 text-emerald-500" /> : <Copy className="size-3" />}
-                <span>{copiedUrl ? 'Copied' : 'Copy'}</span>
-              </button>
-              <a
-                href={assetUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-                title="Open asset in new tab"
-              >
-                <ExternalLink className="size-3.5" />
-              </a>
+
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <button
+                  type="button"
+                  onClick={() => copyToClipboard(assetUrl, 'url')}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 font-semibold text-slate-700 dark:text-slate-200 hover:text-emerald-500 transition-colors cursor-pointer"
+                >
+                  {copiedKind === 'url' ? <Check className="size-3 text-emerald-500" /> : <Copy className="size-3" />}
+                  <span>{copiedKind === 'url' ? 'URL Copied!' : 'Copy URL'}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => copyToClipboard(`![${altText || asset.originalFilename || 'image'}](${assetUrl})`, 'md')}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 font-semibold text-slate-700 dark:text-slate-200 hover:text-emerald-500 transition-colors cursor-pointer"
+                >
+                  {copiedKind === 'md' ? <Check className="size-3 text-emerald-500" /> : <Copy className="size-3" />}
+                  <span>{copiedKind === 'md' ? 'Markdown Copied!' : 'Copy Markdown'}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => copyToClipboard(`<img src="${assetUrl}" alt="${altText.replace(/"/g, '&quot;')}" />`, 'html')}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 font-semibold text-slate-700 dark:text-slate-200 hover:text-emerald-500 transition-colors cursor-pointer"
+                >
+                  {copiedKind === 'html' ? <Check className="size-3 text-emerald-500" /> : <Copy className="size-3" />}
+                  <span>{copiedKind === 'html' ? 'HTML Copied!' : 'Copy HTML'}</span>
+                </button>
+
+                <a
+                  href={assetUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="p-1 rounded-md text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 ml-auto"
+                  title="Open original asset in new tab"
+                >
+                  <ExternalLink className="size-4" />
+                </a>
+              </div>
             </div>
           </div>
 
@@ -168,14 +185,13 @@ function MediaDetailModalContent({
                 </div>
               )}
 
-              {/* Technical specs */}
+              {/* Specs */}
               <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/40 p-3 rounded-xl border border-slate-100 dark:border-slate-800">
                 <div>Dimensions: <span className="font-mono font-bold text-slate-700 dark:text-slate-200">{asset.width && asset.height ? `${asset.width} × ${asset.height}` : '—'}</span></div>
                 <div>Size: <span className="font-mono font-bold text-slate-700 dark:text-slate-200">{formatBytes(asset.byteSize)}</span></div>
                 <div className="col-span-2 truncate">Storage Key: <span className="font-mono font-bold text-slate-700 dark:text-slate-200">{asset.storageKey}</span></div>
               </div>
 
-              {/* Alt Text Input */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                   Alt Text (Accessibility & SEO)
@@ -189,7 +205,6 @@ function MediaDetailModalContent({
                 />
               </div>
 
-              {/* Caption Input */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                   Caption
@@ -198,20 +213,17 @@ function MediaDetailModalContent({
                   rows={2}
                   value={caption}
                   onChange={(e) => setCaption(e.target.value)}
-                  placeholder="Optional visual caption..."
+                  placeholder="Optional visual caption or photo credits..."
                   className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-emerald-500 font-medium resize-none"
                 />
               </div>
             </div>
 
-            {/* Modal Actions */}
             <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800">
               <button
                 type="button"
                 onClick={() => {
-                  if (confirm('Are you sure you want to delete this media asset?')) {
-                    onDelete(asset.id);
-                  }
+                  if (confirm('Are you sure you want to delete this media asset?')) onDelete(asset.id);
                 }}
                 className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
               >
@@ -234,4 +246,3 @@ function MediaDetailModalContent({
     </div>
   );
 }
-

@@ -5,19 +5,43 @@ import { Video, FileText, Image as ImageIcon, Copy, Trash2 } from 'lucide-react'
 import type { MediaAssetItem } from '@multi-site-cms/types';
 import { formatBytes } from '../utils/formatBytes';
 
-interface MediaListViewProps {
+export interface MediaListViewProps {
   items: MediaAssetItem[];
+  selectedBatchIds?: Set<string>;
+  onToggleBatchSelect?: (id: string, selected: boolean) => void;
+  onSelectAll?: (selected: boolean) => void;
   onSelect: (asset: MediaAssetItem) => void;
   onCopyUrl: (url: string) => void;
   onDelete: (id: string) => void;
 }
 
-export function MediaListView({ items, onSelect, onCopyUrl, onDelete }: MediaListViewProps) {
+export function MediaListView({
+  items,
+  selectedBatchIds,
+  onToggleBatchSelect,
+  onSelectAll,
+  onSelect,
+  onCopyUrl,
+  onDelete,
+}: MediaListViewProps) {
+  const isAllSelected = items.length > 0 && items.every((i) => selectedBatchIds?.has(i.id));
+
   return (
     <div className="overflow-hidden rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-2xs">
       <table className="w-full text-left border-collapse text-xs">
         <thead>
           <tr className="border-b border-slate-200 dark:border-slate-800 text-[11px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50/70 dark:bg-slate-950/50">
+            {onToggleBatchSelect && (
+              <th className="py-3 pl-4 pr-1 w-10">
+                <input
+                  type="checkbox"
+                  checked={isAllSelected}
+                  onChange={(e) => onSelectAll?.(e.target.checked)}
+                  className="size-4 rounded border-slate-300 dark:border-slate-700 text-emerald-500 focus:ring-emerald-500 cursor-pointer"
+                  title="Select all on this page"
+                />
+              </th>
+            )}
             <th className="py-3 px-4">Preview</th>
             <th className="py-3 px-4">File Name & Alt</th>
             <th className="py-3 px-4">MIME Type</th>
@@ -33,13 +57,29 @@ export function MediaListView({ items, onSelect, onCopyUrl, onDelete }: MediaLis
             const isImage = asset.mimeType.startsWith('image/');
             const isVideo = asset.mimeType.startsWith('video/');
             const isPdf = asset.mimeType === 'application/pdf';
+            const isSelected = selectedBatchIds?.has(asset.id) || false;
 
             return (
               <tr
                 key={asset.id}
                 onClick={() => onSelect(asset)}
-                className="group hover:bg-slate-50/80 dark:hover:bg-slate-800/40 cursor-pointer transition-colors"
+                className={`group cursor-pointer transition-colors ${
+                  isSelected
+                    ? 'bg-emerald-50/60 dark:bg-emerald-950/30'
+                    : 'hover:bg-slate-50/80 dark:hover:bg-slate-800/40'
+                }`}
               >
+                {onToggleBatchSelect && (
+                  <td className="py-2.5 pl-4 pr-1" onClick={(e) => e.stopPropagation()}>
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={(e) => onToggleBatchSelect(asset.id, e.target.checked)}
+                      className="size-4 rounded border-slate-300 dark:border-slate-700 text-emerald-500 focus:ring-emerald-500 cursor-pointer"
+                    />
+                  </td>
+                )}
+
                 <td className="py-2.5 px-4">
                   <div className="size-11 rounded-xl bg-slate-100 dark:bg-slate-800 overflow-hidden flex items-center justify-center shrink-0 border border-slate-200/60 dark:border-slate-700/60">
                     {isImage ? (
@@ -120,4 +160,3 @@ export function MediaListView({ items, onSelect, onCopyUrl, onDelete }: MediaLis
     </div>
   );
 }
-

@@ -1,16 +1,26 @@
 'use client';
 
-import { FileText, Image as ImageIcon, Trash2, Video } from 'lucide-react';
+import React from 'react';
+import { FileText, Image as ImageIcon, Trash2, Video, Check } from 'lucide-react';
 import type { MediaAssetItem } from '@multi-site-cms/types';
 
 export interface MediaCardProps {
   asset: MediaAssetItem;
   isSelected?: boolean;
+  isBatchSelected?: boolean;
   onSelect?: (asset: MediaAssetItem) => void;
+  onToggleBatchSelect?: (assetId: string, selected: boolean) => void;
   onDelete?: (assetId: string) => void;
 }
 
-export function MediaCard({ asset, isSelected, onSelect, onDelete }: MediaCardProps) {
+export function MediaCard({
+  asset,
+  isSelected,
+  isBatchSelected,
+  onSelect,
+  onToggleBatchSelect,
+  onDelete,
+}: MediaCardProps) {
   const isImage = asset.mimeType.startsWith('image/');
   const isVideo = asset.mimeType.startsWith('video/');
   const isPdf = asset.mimeType === 'application/pdf';
@@ -30,11 +40,32 @@ export function MediaCard({ asset, isSelected, onSelect, onDelete }: MediaCardPr
     <div
       onClick={() => onSelect && onSelect(asset)}
       className={`group relative flex flex-col rounded-2xl overflow-hidden border transition-all cursor-pointer ${
-        isSelected
-          ? 'border-emerald-500 ring-2 ring-emerald-500/30 bg-emerald-50/20 dark:bg-emerald-950/20 shadow-sm'
-          : 'border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900/90 hover:border-emerald-500/50 dark:hover:border-emerald-500/40 hover:shadow-lg hover:-translate-y-0.5'
+        isBatchSelected
+          ? 'border-emerald-500 ring-2 ring-emerald-500/40 bg-emerald-50/20 dark:bg-emerald-950/20 shadow-md'
+          : isSelected
+            ? 'border-emerald-500 ring-2 ring-emerald-500/30 bg-emerald-50/10 dark:bg-emerald-950/10 shadow-sm'
+            : 'border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900/90 hover:border-emerald-500/50 dark:hover:border-emerald-500/40 hover:shadow-lg hover:-translate-y-0.5'
       }`}
     >
+      {/* Batch Select Checkbox */}
+      {onToggleBatchSelect && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleBatchSelect(asset.id, !isBatchSelected);
+          }}
+          className={`absolute top-2 left-2 z-10 size-5 rounded-md border flex items-center justify-center transition-all ${
+            isBatchSelected
+              ? 'bg-emerald-500 border-emerald-500 text-white shadow-xs'
+              : 'border-white/80 bg-black/40 hover:bg-black/60 text-white opacity-0 group-hover:opacity-100 backdrop-blur-xs'
+          }`}
+          title="Select asset"
+        >
+          {isBatchSelected && <Check className="size-3.5 stroke-[3]" />}
+        </button>
+      )}
+
       {/* Thumbnail */}
       <div className="relative aspect-video w-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center overflow-hidden">
         {isImage ? (

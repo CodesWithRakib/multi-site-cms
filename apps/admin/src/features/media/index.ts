@@ -8,3 +8,4 @@ export * from './components/MediaHeader';
 export * from './components/MediaFilterBar';
 export * from './components/MediaListView';
 export * from './components/MediaDetailModal';
+export * from './components/MediaBatchActionBar';
