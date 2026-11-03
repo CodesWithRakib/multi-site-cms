@@ -8,6 +8,7 @@ import { SiteDomainsVerificationAndLifecycle1793491204000 } from './179349120400
 import { AnalyticsAndTrafficEvents1793491207000 } from './1793491207000-AnalyticsAndTrafficEvents';
 import { PlatformSettingsRegistry1793491208000 } from './1793491208000-PlatformSettingsRegistry';
 import { NewsletterSubscribers1793491209000 } from './1793491209000-NewsletterSubscribers';
+import { PostComments1793491210000 } from './1793491210000-PostComments';
 
 /**
  * Ordered migration registry.
@@ -26,5 +27,6 @@ export const MIGRATIONS = [
   AnalyticsAndTrafficEvents1793491207000,
   PlatformSettingsRegistry1793491208000,
   NewsletterSubscribers1793491209000,
+  PostComments1793491210000,
 ] as const;
 

@@ -44,7 +44,14 @@ export function ArticleCard({ article, variant = 'standard', priority = false }:
               <CategoryBadge label={categoryLabel} slug={category?.slug} />
             </div>
             <div className="absolute right-4 top-4 z-10">
-              <BookmarkButton articleId={article.id} articleTitle={article.title} />
+              <BookmarkButton
+                articleId={article.id}
+                articleSlug={article.slug}
+                articleTitle={article.title}
+                featuredImageUrl={article.featuredImage?.url}
+                categoryName={categoryLabel}
+                readingTimeMinutes={article.readingTimeMinutes}
+              />
             </div>
           </div>
 
@@ -153,7 +160,14 @@ export function ArticleCard({ article, variant = 'standard', priority = false }:
             <CategoryBadge label={categoryLabel} slug={category?.slug} />
           </div>
           <div className="absolute right-3 top-3 z-10">
-            <BookmarkButton articleId={article.id} articleTitle={article.title} />
+            <BookmarkButton
+              articleId={article.id}
+              articleSlug={article.slug}
+              articleTitle={article.title}
+              featuredImageUrl={article.featuredImage?.url}
+              categoryName={categoryLabel}
+              readingTimeMinutes={article.readingTimeMinutes}
+            />
           </div>
         </div>
 

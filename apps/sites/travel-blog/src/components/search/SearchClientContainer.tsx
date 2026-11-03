@@ -278,7 +278,11 @@ export function SearchClientContainer({
                         <div className="absolute right-3 top-3 z-10">
                           <BookmarkButton
                             articleId={article.id}
+                            articleSlug={article.slug}
                             articleTitle={article.title}
+                            featuredImageUrl={article.featuredImage?.url}
+                            categoryName={primaryCat?.name}
+                            readingTimeMinutes={article.readingTimeMinutes}
                           />
                         </div>
                       </div>

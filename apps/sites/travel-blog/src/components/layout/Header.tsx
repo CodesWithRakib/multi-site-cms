@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { ChevronDown, Menu, Search, Send, X } from 'lucide-react';
 
 import { PillButton, ThemeToggle, TravelLogo } from '@/components/ui';
+import { BookmarkNavTrigger } from './BookmarkNavTrigger';
 
 export function Header() {
   const pathname = usePathname();
@@ -130,6 +131,9 @@ export function Header() {
           >
             <Search className="h-4 w-4" />
           </Link>
+
+          {/* Saved Articles Bookmark Trigger */}
+          <BookmarkNavTrigger />
 
           {/* Theme Toggle Button */}
           <ThemeToggle size="md" />

@@ -4,9 +4,11 @@ import { ArticleAuthorCard } from '@/components/article/ArticleAuthorCard';
 import { ArticleDetailHeader } from '@/components/article/ArticleDetailHeader';
 import { ArticleHeroImage } from '@/components/article/ArticleHeroImage';
 import { ArticleNavigationAndRelated } from '@/components/article/ArticleNavigationAndRelated';
+import { ArticleCommentsSection } from '@/components/article/comments/ArticleCommentsSection';
 import { DocRenderer } from '@/components/content/DocRenderer';
 import { siteConfig } from '@/config/site';
 import { fetchArticleBySlug } from '@/lib/api';
+import { fetchArticleComments } from '@/lib/comments';
 
 export const revalidate = 60; // ISR cache revalidation every 60s
 
@@ -67,7 +69,10 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
 
 export default async function ArticleDetailPage({ params }: ArticlePageProps) {
   const { slug } = await params;
-  const article = await fetchArticleBySlug(slug);
+  const [article, initialComments] = await Promise.all([
+    fetchArticleBySlug(slug),
+    fetchArticleComments(slug),
+  ]);
 
   if (!article) {
     notFound();
@@ -123,6 +128,9 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
 
         {/* Author Bio Box */}
         <ArticleAuthorCard author={article.author} />
+
+        {/* Reader Comments & Interactive Reviews Section */}
+        <ArticleCommentsSection slug={article.slug} initialData={initialComments} />
 
         {/* Tags, Adjacent Stories, Related Dispatches & Newsletter */}
         <ArticleNavigationAndRelated

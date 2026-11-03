@@ -2,6 +2,7 @@ import { AuditEvent } from './audit-event.entity';
 import { AnalyticsPageView } from './analytics-page-view.entity';
 import { PlatformSettingsEntity } from './platform-settings.entity';
 import { NewsletterSubscriber } from './newsletter-subscriber.entity';
+import { PostComment } from './post-comment.entity';
 import { Category } from './category.entity';
 import { Event } from './event.entity';
 import { MediaAsset } from './media-asset.entity';
@@ -49,6 +50,7 @@ export const ENTITIES = [
   PostPublication,
   PostPublicationCategory,
   PostPublicationTag,
+  PostComment,
   // Media
   MediaAsset,
   PostPublicationMedia,
@@ -72,6 +74,7 @@ export {
   Permission,
   PlatformSettingsEntity,
   Post,
+  PostComment,
   PostPublication,
   PostPublicationCategory,
   PostPublicationMedia,

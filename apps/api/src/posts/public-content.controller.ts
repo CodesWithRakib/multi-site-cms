@@ -7,13 +7,18 @@ import { Public } from '../auth/decorators/public.decorator';
 import type { RequestContext } from '../common/http/request-context';
 import { ListPublicPostsQueryDto } from './dto/list-public-posts-query.dto';
 import { SubscribeNewsletterDto } from './dto/subscribe-newsletter.dto';
+import { CreatePublicCommentDto } from './dto/create-public-comment.dto';
 import { PublicContentService } from './public-content.service';
+import { PublicCommentsService } from './public-comments.service';
 
 @ApiTags('Public Content')
 @Controller('public/sites/:siteKey')
 @Public()
 export class PublicContentController {
-  constructor(private readonly publicContentService: PublicContentService) {}
+  constructor(
+    private readonly publicContentService: PublicContentService,
+    private readonly publicCommentsService: PublicCommentsService,
+  ) {}
 
   private sendWithEtag(
     req: Request,
@@ -268,6 +273,57 @@ export class PublicContentController {
 
     res.status(HttpStatus.OK).json({
       data: result,
+      meta: {
+        requestId,
+        timestamp: new Date().toISOString(),
+      },
+    });
+  }
+
+  @Get('posts/:slug/comments')
+  @ApiOperation({ summary: 'List approved comments and ratings for an article' })
+  @ApiResponse({ status: 200, description: 'Comments list with total and average rating' })
+  async listComments(
+    @Param('siteKey') siteKey: string,
+    @Param('slug') slug: string,
+    @Req() req: Request,
+    @Res() res: Response,
+  ): Promise<void> {
+    const result = await this.publicCommentsService.listComments(siteKey, slug);
+
+    this.sendWithEtag(
+      req,
+      res,
+      result,
+      (requestId) => ({
+        data: result,
+        meta: {
+          requestId,
+          timestamp: new Date().toISOString(),
+        },
+      }),
+      'public, max-age=15, stale-while-revalidate=60',
+    );
+  }
+
+  @Post('posts/:slug/comments')
+  @ApiOperation({ summary: 'Submit a new reader comment with optional rating' })
+  @ApiResponse({ status: 201, description: 'Comment submitted successfully' })
+  async createComment(
+    @Param('siteKey') siteKey: string,
+    @Param('slug') slug: string,
+    @Body() dto: CreatePublicCommentDto,
+    @Req() req: Request,
+    @Res() res: Response,
+  ): Promise<void> {
+    const requestId = (req as RequestContext).requestId ?? randomUUID();
+    const comment = await this.publicCommentsService.createComment(siteKey, slug, dto, {
+      requestId,
+      ipAddress: req.ip || null,
+    });
+
+    res.status(HttpStatus.CREATED).json({
+      data: comment,
       meta: {
         requestId,
         timestamp: new Date().toISOString(),

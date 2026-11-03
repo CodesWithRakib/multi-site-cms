@@ -107,7 +107,14 @@ export function ArticleDetailHeader({
             {article.readingTimeMinutes} min read
           </span>
           <div className="flex items-center gap-2 pl-2 border-l border-border/80">
-            <BookmarkButton articleId={article.id} articleTitle={article.title} />
+            <BookmarkButton
+              articleId={article.id}
+              articleSlug={article.slug}
+              articleTitle={article.title}
+              featuredImageUrl={article.featuredImage?.url}
+              categoryName={article.categories[0]?.name}
+              readingTimeMinutes={article.readingTimeMinutes}
+            />
             <ShareButtons title={article.title} url={articleUrl} />
           </div>
         </div>

@@ -5,6 +5,7 @@ import { AuditModule } from '../common/audit/audit.module';
 import { DatabaseModule } from '../database/database.module';
 import { PostsController } from './posts.controller';
 import { PostsService } from './posts.service';
+import { PublicCommentsService } from './public-comments.service';
 import { PublicContentController } from './public-content.controller';
 import { PublicContentService } from './public-content.service';
 import { PublicationsController } from './publications.controller';
@@ -13,7 +14,7 @@ import { PublicationsService } from './publications.service';
 @Module({
   imports: [DatabaseModule, AuthModule, AuditModule],
   controllers: [PostsController, PublicationsController, PublicContentController],
-  providers: [PostsService, PublicationsService, PublicContentService],
-  exports: [PostsService, PublicationsService, PublicContentService],
+  providers: [PostsService, PublicationsService, PublicContentService, PublicCommentsService],
+  exports: [PostsService, PublicationsService, PublicContentService, PublicCommentsService],
 })
 export class PostsModule {}

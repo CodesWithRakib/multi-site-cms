@@ -899,5 +899,33 @@ export interface PlatformSystemDiagnostics {
   memoryUsageMb: number;
 }
 
+export type CommentStatus = 'approved' | 'pending' | 'rejected' | 'spam';
+
+export interface PublicCommentItem {
+  id: string;
+  authorName: string;
+  content: string;
+  rating: number | null;
+  createdAt: string;
+  parentId: string | null;
+  replies?: PublicCommentItem[];
+}
+
+export interface CreatePublicCommentPayload {
+  authorName: string;
+  authorEmail: string;
+  content: string;
+  rating?: number | null;
+  parentId?: string | null;
+  website_url?: string;
+}
+
+export interface PublicCommentsResult {
+  items: PublicCommentItem[];
+  total: number;
+  averageRating: number | null;
+}
+
+
 
 

@@ -1,70 +1,68 @@
 'use client';
 
-import React, { useSyncExternalStore } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Bookmark } from 'lucide-react';
+import {
+  isArticleSaved,
+  removeArticle,
+  saveArticle,
+} from '@/lib/bookmarks';
 
-interface BookmarkButtonProps {
+export interface BookmarkButtonProps {
   articleId: string;
+  articleSlug?: string;
   articleTitle?: string;
+  featuredImageUrl?: string | null;
+  categoryName?: string | null;
+  readingTimeMinutes?: number;
   className?: string;
   size?: 'sm' | 'md';
 }
 
-const STORAGE_KEY = 'travel_blog_saved_articles';
-
-function subscribe(callback: () => void) {
-  window.addEventListener('storage', callback);
-  window.addEventListener('travel_blog_bookmark_change', callback);
-  return () => {
-    window.removeEventListener('storage', callback);
-    window.removeEventListener('travel_blog_bookmark_change', callback);
-  };
-}
-
-function getSnapshot(): string {
-  try {
-    return localStorage.getItem(STORAGE_KEY) || '[]';
-  } catch {
-    return '[]';
-  }
-}
-
-function getServerSnapshot(): string {
-  return '[]';
-}
-
 export function BookmarkButton({
   articleId,
+  articleSlug,
   articleTitle,
+  featuredImageUrl,
+  categoryName,
+  readingTimeMinutes,
   className = '',
   size = 'md',
 }: BookmarkButtonProps) {
-  const savedJson = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const [isSaved, setIsSaved] = useState(false);
 
-  let isSaved = false;
-  try {
-    const savedIds = JSON.parse(savedJson) as string[];
-    isSaved = savedIds.includes(articleId);
-  } catch {
-    isSaved = false;
-  }
+  useEffect(() => {
+    const checkSaved = () => {
+      setIsSaved(
+        isArticleSaved(articleId) ||
+          (Boolean(articleSlug) && isArticleSaved(articleSlug ?? '')),
+      );
+    };
+
+    checkSaved();
+    window.addEventListener('storage', checkSaved);
+    window.addEventListener('travel_blog_bookmark_change', checkSaved);
+    return () => {
+      window.removeEventListener('storage', checkSaved);
+      window.removeEventListener('travel_blog_bookmark_change', checkSaved);
+    };
+  }, [articleId, articleSlug]);
 
   const toggleBookmark = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      const savedIds = stored ? (JSON.parse(stored) as string[]) : [];
-
-      const updatedIds = savedIds.includes(articleId)
-        ? savedIds.filter((id) => id !== articleId)
-        : [...savedIds, articleId];
-
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedIds));
-      window.dispatchEvent(new Event('travel_blog_bookmark_change'));
-    } catch {
-      // Ignore quota errors
+    if (isSaved) {
+      removeArticle(articleId);
+    } else {
+      saveArticle({
+        id: articleId,
+        slug: articleSlug || articleId,
+        title: articleTitle || 'Travel Dispatch',
+        featuredImageUrl: featuredImageUrl ?? null,
+        categoryName: categoryName ?? null,
+        readingTimeMinutes,
+      });
     }
   };
 
