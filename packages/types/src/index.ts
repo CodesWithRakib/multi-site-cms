@@ -583,6 +583,8 @@ export interface PublicSitemapItem {
   publishedAt: string;
 }
 
+export type PublicPostSort = 'newest' | 'oldest' | 'popular' | 'title_asc';
+
 export interface ListPublicPostsQuery {
   page?: number;
   limit?: number;
@@ -593,6 +595,7 @@ export interface ListPublicPostsQuery {
   tagSlug?: string;
   search?: string;
   featured?: boolean;
+  sort?: PublicPostSort;
 }
 
 // ==========================================

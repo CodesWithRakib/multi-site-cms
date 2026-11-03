@@ -77,6 +77,7 @@ export async function fetchArticles(
   if (query.tagSlug) searchParams.set('tagSlug', query.tagSlug);
   if (query.search) searchParams.set('search', query.search);
   if (query.featured) searchParams.set('featured', 'true');
+  if (query.sort) searchParams.set('sort', query.sort);
 
   const queryString = searchParams.toString();
   const endpoint = `/public/sites/${SITE_KEY}/posts${queryString ? `?${queryString}` : ''}`;

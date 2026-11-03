@@ -41,6 +41,15 @@ export class ListPublicPostsQueryDto {
   @IsBoolean()
   featured?: boolean;
 
+  @ApiPropertyOptional({
+    description: 'Sorting criteria',
+    enum: ['newest', 'oldest', 'popular', 'title_asc'],
+    default: 'newest',
+  })
+  @IsOptional()
+  @IsIn(['newest', 'oldest', 'popular', 'title_asc'])
+  sort?: 'newest' | 'oldest' | 'popular' | 'title_asc';
+
   @ApiPropertyOptional({ description: 'Page number', default: 1 })
   @IsOptional()
   @Transform(({ value }) => Number.parseInt(value, 10))

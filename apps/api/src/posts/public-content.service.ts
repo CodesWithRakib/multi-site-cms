@@ -133,8 +133,18 @@ export class PublicContentService {
     }
 
     if (query.search && query.search.trim().length > 0) {
-      const term = `%${query.search.trim()}%`;
-      qb.andWhere('(rev.title ILIKE :term OR rev.excerpt ILIKE :term)', { term });
+      const terms = query.search.trim().split(/\s+/).filter(Boolean);
+      if (terms.length === 1) {
+        const term = `%${terms[0]}%`;
+        qb.andWhere('(rev.title ILIKE :term OR rev.excerpt ILIKE :term)', { term });
+      } else {
+        terms.forEach((termStr, index) => {
+          const paramName = `term_${index}`;
+          qb.andWhere(`(rev.title ILIKE :${paramName} OR rev.excerpt ILIKE :${paramName})`, {
+            [paramName]: `%${termStr}%`,
+          });
+        });
+      }
     }
 
     if (query.categorySlug && query.categorySlug.trim().length > 0) {
@@ -157,7 +167,24 @@ export class PublicContentService {
       });
     }
 
-    qb.orderBy('pub.published_at', 'DESC').skip(skip).take(limit);
+    // Dynamic sorting
+    switch (query.sort) {
+      case 'oldest':
+        qb.orderBy('pub.published_at', 'ASC');
+        break;
+      case 'popular':
+        qb.orderBy('pub.featured_image_id', 'DESC').addOrderBy('pub.published_at', 'DESC');
+        break;
+      case 'title_asc':
+        qb.addSelect('rev.title').orderBy('rev.title', 'ASC');
+        break;
+      case 'newest':
+      default:
+        qb.orderBy('pub.published_at', 'DESC');
+        break;
+    }
+
+    qb.skip(skip).take(limit);
 
     const [publications, total] = await qb.getManyAndCount();
 
