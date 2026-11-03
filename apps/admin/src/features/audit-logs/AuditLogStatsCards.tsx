@@ -2,19 +2,36 @@
 
 import React from 'react';
 import { ShieldCheck, ShieldAlert, FileEdit, Users2 } from 'lucide-react';
-import type { AuditLogSummary } from '@multi-site-cms/types';
+import type { AuditLogCategory, AuditLogSummary } from '@multi-site-cms/types';
 import { useAdmin } from '@/lib/admin-context';
 
 interface AuditLogStatsCardsProps {
   summary?: AuditLogSummary;
   isLoading: boolean;
+  activeCategory?: AuditLogCategory;
+  onSelectCategory?: (category: AuditLogCategory) => void;
 }
 
-export function AuditLogStatsCards({ summary, isLoading }: AuditLogStatsCardsProps) {
+export function AuditLogStatsCards({
+  summary,
+  isLoading,
+  activeCategory = 'all',
+  onSelectCategory,
+}: AuditLogStatsCardsProps) {
   const { t } = useAdmin();
 
-  const cards = [
+  const cards: Array<{
+    category: AuditLogCategory;
+    title: string;
+    value: number;
+    icon: typeof ShieldCheck;
+    color: string;
+    bgColor: string;
+    borderColor: string;
+    badge: string;
+  }> = [
     {
+      category: 'all',
       title: t('auditLogs.totalEvents'),
       value: summary?.totalEvents ?? 0,
       icon: ShieldCheck,
@@ -24,6 +41,7 @@ export function AuditLogStatsCards({ summary, isLoading }: AuditLogStatsCardsPro
       badge: `${summary?.uniqueActorsCount ?? 0} ${t('auditLogs.uniqueActors')}`,
     },
     {
+      category: 'auth',
       title: t('auditLogs.authEvents'),
       value: summary?.securityAuthEvents ?? 0,
       icon: ShieldAlert,
@@ -33,6 +51,7 @@ export function AuditLogStatsCards({ summary, isLoading }: AuditLogStatsCardsPro
       badge: 'Auth & MFA',
     },
     {
+      category: 'content',
       title: t('auditLogs.contentEvents'),
       value: summary?.contentEvents ?? 0,
       icon: FileEdit,
@@ -42,6 +61,7 @@ export function AuditLogStatsCards({ summary, isLoading }: AuditLogStatsCardsPro
       badge: 'Posts & Media',
     },
     {
+      category: 'system',
       title: t('auditLogs.systemEventsCount'),
       value: summary?.systemRoleEvents ?? 0,
       icon: Users2,
@@ -56,12 +76,20 @@ export function AuditLogStatsCards({ summary, isLoading }: AuditLogStatsCardsPro
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
       {cards.map((card) => {
         const IconComponent = card.icon;
+        const isSelected = activeCategory === card.category;
+
         return (
-          <div
-            key={card.title}
-            className="flex flex-col justify-between p-4.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-xs transition-all hover:border-emerald-500/30"
+          <button
+            type="button"
+            key={card.category}
+            onClick={() => onSelectCategory?.(card.category)}
+            className={`flex flex-col justify-between p-4.5 rounded-xl border text-left bg-white dark:bg-neutral-900 shadow-xs transition-all cursor-pointer ${
+              isSelected
+                ? 'ring-2 ring-emerald-500 border-emerald-500/40 bg-emerald-50/20 dark:bg-emerald-950/20'
+                : 'border-neutral-200 dark:border-neutral-800 hover:border-emerald-500/40 hover:shadow-sm'
+            }`}
           >
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between w-full">
               <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400">
                 {card.title}
               </span>
@@ -70,7 +98,7 @@ export function AuditLogStatsCards({ summary, isLoading }: AuditLogStatsCardsPro
               </div>
             </div>
 
-            <div className="mt-3 flex items-baseline justify-between">
+            <div className="mt-3 flex items-baseline justify-between w-full">
               {isLoading ? (
                 <div className="h-8 w-20 bg-neutral-200 dark:bg-neutral-800 animate-pulse rounded-md" />
               ) : (
@@ -83,10 +111,9 @@ export function AuditLogStatsCards({ summary, isLoading }: AuditLogStatsCardsPro
                 {card.badge}
               </span>
             </div>
-          </div>
+          </button>
         );
       })}
     </div>
   );
 }
-

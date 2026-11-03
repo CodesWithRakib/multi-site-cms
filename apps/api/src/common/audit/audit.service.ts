@@ -129,14 +129,16 @@ export class AuditService {
         conditions.push(`ae.action LIKE 'auth.%'`);
       } else if (query.category === 'content') {
         conditions.push(
-          `(ae.action LIKE 'post.%' OR ae.action LIKE 'publication.%' OR ae.action LIKE 'taxonomy.%')`,
+          `(ae.action LIKE 'post.%' OR ae.action LIKE 'publication.%' OR ae.action LIKE 'taxonomy.%' OR ae.action LIKE 'comment.%')`,
         );
       } else if (query.category === 'media') {
         conditions.push(`ae.action LIKE 'media.%'`);
       } else if (query.category === 'user') {
         conditions.push(`(ae.action LIKE 'user.%' OR ae.action LIKE 'role.%')`);
       } else if (query.category === 'system') {
-        conditions.push(`(ae.actor_type IN ('system', 'bootstrap') OR ae.action LIKE 'site.%')`);
+        conditions.push(
+          `(ae.actor_type IN ('system', 'bootstrap') OR ae.action LIKE 'site.%' OR ae.action LIKE 'platform.%' OR ae.action LIKE 'newsletter.%')`,
+        );
       }
     }
 
@@ -155,8 +157,10 @@ export class AuditService {
       params.push(query.startDate);
     }
     if (query.endDate) {
+      const endVal =
+        query.endDate.length === 10 ? `${query.endDate}T23:59:59.999Z` : query.endDate;
       conditions.push(`ae.created_at <= $${pIdx++}`);
-      params.push(query.endDate);
+      params.push(endVal);
     }
 
     if (query.search && query.search.trim()) {
@@ -289,8 +293,8 @@ export class AuditService {
       SELECT 
         COUNT(*)::int AS "totalEvents",
         COUNT(CASE WHEN ae.action LIKE 'auth.%' THEN 1 END)::int AS "securityAuthEvents",
-        COUNT(CASE WHEN ae.action LIKE 'post.%' OR ae.action LIKE 'publication.%' OR ae.action LIKE 'media.%' OR ae.action LIKE 'taxonomy.%' THEN 1 END)::int AS "contentEvents",
-        COUNT(CASE WHEN ae.action LIKE 'role.%' OR ae.action LIKE 'user.%' OR ae.action LIKE 'site.%' OR ae.actor_type IN ('system', 'bootstrap') THEN 1 END)::int AS "systemRoleEvents",
+        COUNT(CASE WHEN ae.action LIKE 'post.%' OR ae.action LIKE 'publication.%' OR ae.action LIKE 'media.%' OR ae.action LIKE 'taxonomy.%' OR ae.action LIKE 'comment.%' THEN 1 END)::int AS "contentEvents",
+        COUNT(CASE WHEN ae.action LIKE 'role.%' OR ae.action LIKE 'user.%' OR ae.action LIKE 'site.%' OR ae.action LIKE 'platform.%' OR ae.action LIKE 'newsletter.%' OR ae.actor_type IN ('system', 'bootstrap') THEN 1 END)::int AS "systemRoleEvents",
         COUNT(DISTINCT ae.actor_id)::int AS "uniqueActorsCount",
         COUNT(DISTINCT ae.site_id)::int AS "activeSitesCount"
       FROM audit_events ae

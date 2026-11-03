@@ -14,8 +14,30 @@ import {
   AuditLogStatsCards,
   AuditLogFilterBar,
   AuditLogTable,
+  AuditLogTimeline,
   AuditLogDetailModal,
 } from '@/features/audit-logs';
+
+function computeStartDate(preset: string): string | undefined {
+  if (preset === 'today') {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return d.toISOString();
+  }
+  if (preset === '7d') {
+    const d = new Date();
+    d.setDate(d.getDate() - 7);
+    d.setHours(0, 0, 0, 0);
+    return d.toISOString();
+  }
+  if (preset === '30d') {
+    const d = new Date();
+    d.setDate(d.getDate() - 30);
+    d.setHours(0, 0, 0, 0);
+    return d.toISOString();
+  }
+  return undefined;
+}
 
 export default function AuditLogsPage() {
   const { t, activeSiteId } = useAdmin();
@@ -27,32 +49,50 @@ export default function AuditLogsPage() {
   const [selectedSiteId, setSelectedSiteId] = useState<string | undefined>(
     activeSiteId || undefined,
   );
+  const [selectedEntityType, setSelectedEntityType] = useState<string | undefined>(undefined);
+  const [selectedDatePreset, setSelectedDatePreset] = useState<string>('all');
+  const [viewMode, setViewMode] = useState<'table' | 'timeline'>('table');
+  const [isLiveStream, setIsLiveStream] = useState<boolean>(false);
   const [selectedLog, setSelectedLog] = useState<AuditLogItem | null>(null);
 
   // Queries
   const { data: sitesData } = useListSitesQuery();
   const sites = sitesData || [];
 
+  const startDate = computeStartDate(selectedDatePreset);
+
   const {
     data: logsData,
     isLoading: isLogsLoading,
     isFetching: isLogsFetching,
     refetch: refetchLogs,
-  } = useListAuditLogsQuery({
-    page,
-    limit: 15,
-    search: searchTerm.trim() || undefined,
-    category: selectedCategory !== 'all' ? selectedCategory : undefined,
-    siteId: selectedSiteId || undefined,
-  });
+  } = useListAuditLogsQuery(
+    {
+      page,
+      limit: 15,
+      search: searchTerm.trim() || undefined,
+      category: selectedCategory !== 'all' ? selectedCategory : undefined,
+      siteId: selectedSiteId || undefined,
+      entityType: selectedEntityType || undefined,
+      startDate,
+    },
+    {
+      pollingInterval: isLiveStream ? 15000 : 0,
+    },
+  );
 
   const {
     data: summaryData,
     isLoading: isSummaryLoading,
     refetch: refetchSummary,
-  } = useGetAuditSummaryQuery({
-    siteId: selectedSiteId || undefined,
-  });
+  } = useGetAuditSummaryQuery(
+    {
+      siteId: selectedSiteId || undefined,
+    },
+    {
+      pollingInterval: isLiveStream ? 15000 : 0,
+    },
+  );
 
   const handleRefresh = async () => {
     await Promise.all([refetchLogs(), refetchSummary()]);
@@ -70,6 +110,16 @@ export default function AuditLogsPage() {
 
   const handleSiteChange = (siteId?: string) => {
     setSelectedSiteId(siteId);
+    setPage(1);
+  };
+
+  const handleEntityTypeChange = (entityType?: string) => {
+    setSelectedEntityType(entityType);
+    setPage(1);
+  };
+
+  const handleDatePresetChange = (preset: string) => {
+    setSelectedDatePreset(preset);
     setPage(1);
   };
 
@@ -138,7 +188,12 @@ export default function AuditLogsPage() {
         </div>
 
         {/* KPI Metric Cards */}
-        <AuditLogStatsCards summary={summaryData} isLoading={isSummaryLoading} />
+        <AuditLogStatsCards
+          summary={summaryData}
+          isLoading={isSummaryLoading}
+          activeCategory={selectedCategory}
+          onSelectCategory={handleCategoryChange}
+        />
 
         {/* Filter and Search Bar */}
         <AuditLogFilterBar
@@ -148,6 +203,14 @@ export default function AuditLogsPage() {
           onCategoryChange={handleCategoryChange}
           selectedSiteId={selectedSiteId}
           onSiteChange={handleSiteChange}
+          selectedEntityType={selectedEntityType}
+          onEntityTypeChange={handleEntityTypeChange}
+          selectedDatePreset={selectedDatePreset}
+          onDatePresetChange={handleDatePresetChange}
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+          isLiveStream={isLiveStream}
+          onToggleLiveStream={() => setIsLiveStream((prev) => !prev)}
           sites={sites}
           onRefresh={handleRefresh}
           onExportCsv={handleExportCsv}
@@ -155,17 +218,30 @@ export default function AuditLogsPage() {
           isRefreshing={isLogsFetching}
         />
 
-        {/* Audit Log Data Table */}
-        <AuditLogTable
-          logs={logsData?.items ?? []}
-          total={logsData?.total ?? 0}
-          page={logsData?.page ?? page}
-          limit={logsData?.limit ?? 15}
-          totalPages={logsData?.totalPages ?? 1}
-          onPageChange={setPage}
-          onSelectLog={setSelectedLog}
-          isLoading={isLogsLoading}
-        />
+        {/* Audit Log Data View: Table vs Timeline */}
+        {viewMode === 'table' ? (
+          <AuditLogTable
+            logs={logsData?.items ?? []}
+            total={logsData?.total ?? 0}
+            page={logsData?.page ?? page}
+            limit={logsData?.limit ?? 15}
+            totalPages={logsData?.totalPages ?? 1}
+            onPageChange={setPage}
+            onSelectLog={setSelectedLog}
+            isLoading={isLogsLoading}
+          />
+        ) : (
+          <AuditLogTimeline
+            logs={logsData?.items ?? []}
+            total={logsData?.total ?? 0}
+            page={logsData?.page ?? page}
+            limit={logsData?.limit ?? 15}
+            totalPages={logsData?.totalPages ?? 1}
+            onPageChange={setPage}
+            onSelectLog={setSelectedLog}
+            isLoading={isLogsLoading}
+          />
+        )}
 
         {/* Detail Inspection Modal */}
         <AuditLogDetailModal log={selectedLog} onClose={() => setSelectedLog(null)} />

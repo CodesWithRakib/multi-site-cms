@@ -1,13 +1,24 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, Copy, Check, Shield, Globe, Terminal, User } from 'lucide-react';
+import Link from 'next/link';
+import { X, Copy, Check, Shield, Globe, Terminal, User, ArrowUpRight } from 'lucide-react';
 import type { AuditLogItem } from '@multi-site-cms/types';
 import { useAdmin } from '@/lib/admin-context';
 
 interface AuditLogDetailModalProps {
   log: AuditLogItem | null;
   onClose: () => void;
+}
+
+function getResourceRoute(entityType: string): string | null {
+  const norm = entityType.toLowerCase();
+  if (norm.includes('comment')) return '/comments';
+  if (norm.includes('post') || norm.includes('publication')) return '/posts';
+  if (norm.includes('media')) return '/media';
+  if (norm.includes('user') || norm.includes('role')) return '/users';
+  if (norm.includes('site')) return '/sites';
+  return null;
 }
 
 export function AuditLogDetailModal({ log, onClose }: AuditLogDetailModalProps) {
@@ -23,14 +34,20 @@ export function AuditLogDetailModal({ log, onClose }: AuditLogDetailModalProps) 
   };
 
   const getActionTheme = (action: string) => {
-    if (action.startsWith('auth.')) return 'bg-amber-500/10 text-amber-500 border-amber-500/20';
+    if (action.includes('delete') || action.includes('failed'))
+      return 'bg-rose-500/10 text-rose-500 border-rose-500/20';
+    if (action.startsWith('auth.') || action.startsWith('role.'))
+      return 'bg-amber-500/10 text-amber-500 border-amber-500/20';
+    if (action.includes('status') || action.includes('schedule'))
+      return 'bg-indigo-500/10 text-indigo-500 border-indigo-500/20';
+    if (action.startsWith('media.')) return 'bg-cyan-500/10 text-cyan-500 border-cyan-500/20';
     if (action.startsWith('post.') || action.startsWith('publication.'))
       return 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20';
-    if (action.startsWith('media.')) return 'bg-cyan-500/10 text-cyan-500 border-cyan-500/20';
-    if (action.startsWith('user.') || action.startsWith('role.'))
-      return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
     return 'bg-purple-500/10 text-purple-500 border-purple-500/20';
   };
+
+  const resourceLink = getResourceRoute(log.entityType);
+  const metadataEntries = Object.entries(log.metadata || {});
 
   return (
     <div
@@ -52,7 +69,7 @@ export function AuditLogDetailModal({ log, onClose }: AuditLogDetailModalProps) 
             >
               {log.action}
             </span>
-            <span className="text-xs text-neutral-400">ID: #{log.id}</span>
+            <span className="text-xs text-neutral-400 font-mono">ID: #{log.id}</span>
           </div>
 
           <button
@@ -88,9 +105,21 @@ export function AuditLogDetailModal({ log, onClose }: AuditLogDetailModalProps) 
                 <Shield className="w-3.5 h-3.5" />
                 {t('auditLogs.entity')}
               </span>
-              <p className="font-medium text-neutral-900 dark:text-neutral-100 capitalize">
-                {log.entityType}
-              </p>
+              <div className="flex items-center gap-2">
+                <p className="font-medium text-neutral-900 dark:text-neutral-100 capitalize">
+                  {log.entityType}
+                </p>
+                {resourceLink && (
+                  <Link
+                    href={resourceLink}
+                    onClick={onClose}
+                    className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 hover:underline"
+                  >
+                    <span>View Section</span>
+                    <ArrowUpRight className="w-3 h-3" />
+                  </Link>
+                )}
+              </div>
               {log.entityId && (
                 <p className="text-xs font-mono text-neutral-500 dark:text-neutral-400 truncate">
                   {log.entityId}
@@ -126,6 +155,30 @@ export function AuditLogDetailModal({ log, onClose }: AuditLogDetailModalProps) 
             </div>
           </div>
 
+          {/* Structured metadata overview */}
+          {metadataEntries.length > 0 && (
+            <div className="space-y-2">
+              <span className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                Key Parameters
+              </span>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {metadataEntries.map(([key, val]) => (
+                  <div
+                    key={key}
+                    className="p-2.5 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-neutral-50/60 dark:bg-neutral-800/40 text-xs"
+                  >
+                    <span className="block text-[11px] font-medium text-neutral-400 truncate">
+                      {key}
+                    </span>
+                    <span className="font-mono font-semibold text-neutral-800 dark:text-neutral-200 truncate block">
+                      {typeof val === 'object' ? JSON.stringify(val) : String(val)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* JSON Metadata Payload */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
@@ -142,7 +195,7 @@ export function AuditLogDetailModal({ log, onClose }: AuditLogDetailModalProps) 
               </button>
             </div>
 
-            <pre className="p-4 rounded-xl bg-neutral-950 text-emerald-400 font-mono text-xs overflow-x-auto max-h-64 border border-neutral-800">
+            <pre className="p-4 rounded-xl bg-neutral-950 text-emerald-400 font-mono text-xs overflow-x-auto max-h-56 border border-neutral-800">
               {JSON.stringify(log.metadata, null, 2)}
             </pre>
           </div>
@@ -165,4 +218,3 @@ export function AuditLogDetailModal({ log, onClose }: AuditLogDetailModalProps) 
     </div>
   );
 }
-

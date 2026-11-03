@@ -29,14 +29,16 @@ export function AuditLogTable({
   const { t } = useAdmin();
 
   const getActionBadgeClass = (action: string) => {
-    if (action.startsWith('auth.'))
+    if (action.includes('delete') || action.includes('failed'))
+      return 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20';
+    if (action.startsWith('auth.') || action.startsWith('role.'))
       return 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20';
-    if (action.startsWith('post.') || action.startsWith('publication.'))
-      return 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20';
+    if (action.includes('status') || action.includes('schedule'))
+      return 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20';
     if (action.startsWith('media.'))
       return 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/20';
-    if (action.startsWith('user.') || action.startsWith('role.'))
-      return 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20';
+    if (action.startsWith('post.') || action.startsWith('publication.'))
+      return 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20';
     return 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20';
   };
 
@@ -137,13 +139,15 @@ export function AuditLogTable({
                   </td>
 
                   {/* Timestamp */}
-                  <td className="py-3 px-4 text-xs text-neutral-500 whitespace-nowrap">
-                    {new Date(log.createdAt).toLocaleString(undefined, {
-                      month: 'short',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
+                  <td className="py-3 px-4 text-xs whitespace-nowrap">
+                    <span className="text-neutral-700 dark:text-neutral-300 font-medium">
+                      {new Date(log.createdAt).toLocaleString(undefined, {
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </span>
                   </td>
 
                   {/* View Button */}
