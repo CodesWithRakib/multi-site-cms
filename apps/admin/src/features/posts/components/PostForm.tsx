@@ -1,24 +1,21 @@
 'use client';
 
 import React, { useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import type { Editor } from '@tiptap/react';
 import type { MediaAssetItem, PostItem, PostPublicationItem } from '@multi-site-cms/types';
 import { RichTextEditor } from '@/features/editor';
 import { MediaLibraryModal } from '@/features/media';
-import {
-  useCreatePostMutation,
-  useCreatePublicationMutation,
-  useListSitesQuery,
-  useUpdatePostMutation,
-} from '@/lib/cms-api';
+import { useListSitesQuery, useUpdatePostMutation } from '@/lib/cms-api';
 import { useAutosave } from '../hooks/useAutosave';
 import { useDraftRecovery } from '../hooks/useDraftRecovery';
+import { usePostSubmit } from '../hooks/usePostSubmit';
 import { PostBasicFields } from './PostBasicFields';
 import { PostFeaturedImagePicker } from './PostFeaturedImagePicker';
 import { PostFormHeader } from './PostFormHeader';
 import { PostPreviewModal } from './PostPreviewModal';
-import { PostSitePublicationCard, type SitePubConfig } from './PostSitePublicationCard';
+import { PostPublicationsSection } from './PostPublicationsSection';
+import { PostDraftRecoveryBanner } from './PostDraftRecoveryBanner';
+import type { SitePubConfig } from './PostSitePublicationCard';
 import { PublishingModal, type PublishingActionType } from './PublishingModal';
 
 export interface PostFormProps {
@@ -27,13 +24,12 @@ export interface PostFormProps {
 }
 
 export function PostForm({ initialPost, isCreateMode = false }: PostFormProps) {
-  const router = useRouter();
-
   // Basic post fields
   const [title, setTitle] = useState(initialPost?.currentRevision?.title || '');
   const [excerpt, setExcerpt] = useState(initialPost?.currentRevision?.excerpt || '');
   const [type, setType] = useState<string>(initialPost?.type || 'article');
   const [sourceLocale, setSourceLocale] = useState(initialPost?.sourceLocale || 'en');
+  const [isLocalDirty, setIsLocalDirty] = useState(false);
 
   // Rich text body
   const [bodyJson, setBodyJson] = useState<Record<string, unknown>>(
@@ -41,10 +37,8 @@ export function PostForm({ initialPost, isCreateMode = false }: PostFormProps) {
   );
   const [bodyHtml, setBodyHtml] = useState<string>('');
 
-  // Featured Image
+  // Featured Image & Publications
   const [featuredImage, setFeaturedImage] = useState<MediaAssetItem | null>(null);
-
-  // Publications state: map of siteId -> SitePubConfig
   const [siteConfigs, setSiteConfigs] = useState<Record<string, SitePubConfig>>({});
 
   // Modals & targets
@@ -58,15 +52,11 @@ export function PostForm({ initialPost, isCreateMode = false }: PostFormProps) {
 
   const editorRef = useRef<Editor | null>(null);
 
-  // API mutations & queries
-  const [createPost, { isLoading: isCreating }] = useCreatePostMutation();
   const [updatePost] = useUpdatePostMutation();
-  const [createPublication] = useCreatePublicationMutation();
   const { data: sitesData = [] } = useListSitesQuery();
-
   const currentRevisionNumber = initialPost?.currentRevisionNumber || 1;
 
-  // Autosave handler for edit mode
+  // Autosave handler for existing posts
   const handleAutosave = async (formData: {
     title: string;
     excerpt: string;
@@ -100,16 +90,45 @@ export function PostForm({ initialPost, isCreateMode = false }: PostFormProps) {
     enabled: !isCreateMode,
   });
 
-  // Draft recovery from sessionStorage
-  const { clearDraft } = useDraftRecovery(
+  // Draft recovery from sessionStorage (active in both create & edit modes)
+  const { recoverableDraft, hasRecoverableDraft, clearDraft } = useDraftRecovery(
     initialPost?.id || 'new_post',
     { title, excerpt, type, bodyJson },
-    autosaveStatus !== 'saved',
+    isLocalDirty || autosaveStatus !== 'saved',
   );
+
+  const handleRestoreDraft = () => {
+    if (!recoverableDraft) return;
+    setTitle(recoverableDraft.data.title || '');
+    setExcerpt(recoverableDraft.data.excerpt || '');
+    setType(recoverableDraft.data.type || 'article');
+    setBodyJson(recoverableDraft.data.bodyJson);
+    if (editorRef.current && recoverableDraft.data.bodyJson) {
+      editorRef.current.commands.setContent(recoverableDraft.data.bodyJson);
+    }
+    clearDraft();
+  };
+
+  // Submit hook
+  const { handleFormSubmit, isSubmitting } = usePostSubmit({
+    isCreateMode,
+    initialPost,
+    title,
+    excerpt,
+    type,
+    sourceLocale,
+    bodyJson,
+    featuredImage,
+    siteConfigs,
+    sitesData,
+    clearDraft,
+    triggerManualSave,
+  });
 
   const handleEditorChange = (json: Record<string, unknown>, html: string) => {
     setBodyJson(json);
     setBodyHtml(html);
+    setIsLocalDirty(true);
     markDirty();
   };
 
@@ -126,90 +145,8 @@ export function PostForm({ initialPost, isCreateMode = false }: PostFormProps) {
       editorRef.current
         .chain()
         .focus()
-        .setImage({ src: url, alt: asset.altText || '' })
+        .setImage({ src: url, alt: asset.altText || asset.originalFilename || '' })
         .run();
-    }
-  };
-
-  const handleFormSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!title.trim()) {
-      alert('Post title is required.');
-      return;
-    }
-
-    if (isCreateMode) {
-      try {
-        const publicationsPayload = [];
-        for (const site of sitesData) {
-          const defaultSlug = (title || 'post-slug')
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/^-|-$/g, '');
-          const existingPub = initialPost?.publications?.find((p) => p.siteId === site.id);
-          const config = siteConfigs[site.id] || {
-            enabled: Boolean(existingPub),
-            slug: existingPub?.slug || defaultSlug,
-            status: 'draft' as const,
-            categoryIds: [],
-            seoTitle: existingPub?.seoTitle || '',
-            seoDescription: existingPub?.seoDescription || '',
-          };
-
-          if (config.enabled) {
-            publicationsPayload.push({
-              siteId: site.id,
-              slug: config.slug,
-              status: config.status,
-              scheduledFor: config.scheduledFor,
-              categoryIds: config.categoryIds.length > 0 ? config.categoryIds : undefined,
-              seoTitle: config.seoTitle || undefined,
-              seoDescription: config.seoDescription || undefined,
-              featuredImageId: featuredImage?.id,
-            });
-          }
-        }
-
-        const created = await createPost({
-          title: title.trim(),
-          excerpt: excerpt.trim() || undefined,
-          type,
-          sourceLocale,
-          body: bodyJson,
-          publications: publicationsPayload.length > 0 ? publicationsPayload : undefined,
-        }).unwrap();
-
-        clearDraft();
-        router.push(`/posts/${created.id}/edit`);
-      } catch (err: unknown) {
-        alert('Failed to create post: ' + ((err as Error).message || 'Server error'));
-      }
-    } else {
-      await triggerManualSave();
-
-      // For existing post, update publication targets if toggled on
-      for (const site of sitesData) {
-        const config = siteConfigs[site.id];
-        const existingPub = initialPost?.publications?.find((p) => p.siteId === site.id);
-        if (config?.enabled && !existingPub && initialPost?.id) {
-          try {
-            await createPublication({
-              postId: initialPost.id,
-              data: {
-                siteId: site.id,
-                slug: config.slug,
-                status: config.status,
-                categoryIds: config.categoryIds.length > 0 ? config.categoryIds : undefined,
-                seoTitle: config.seoTitle || undefined,
-                seoDescription: config.seoDescription || undefined,
-                featuredImageId: featuredImage?.id,
-              },
-            }).unwrap();
-          } catch {
-            // Publication might already exist or conflict
-          }
-        }
-      }
     }
   };
 
@@ -220,47 +157,37 @@ export function PostForm({ initialPost, isCreateMode = false }: PostFormProps) {
         currentRevisionNumber={currentRevisionNumber}
         lastSavedAt={lastSavedAt}
         autosaveStatus={autosaveStatus}
-        isSubmitting={isCreating}
+        isSubmitting={isSubmitting}
         onOpenPreview={() => setIsPreviewOpen(true)}
         hasInitialPost={Boolean(initialPost?.id)}
+        onSaveShortcut={() => void triggerManualSave()}
       />
+
+      {hasRecoverableDraft && recoverableDraft && (
+        <PostDraftRecoveryBanner
+          savedAt={recoverableDraft.savedAt}
+          onRestore={handleRestoreDraft}
+          onDismiss={clearDraft}
+        />
+      )}
 
       <PostBasicFields
         title={title}
-        onTitleChange={(val) => {
-          setTitle(val);
-          markDirty();
-        }}
+        onTitleChange={(val) => { setTitle(val); setIsLocalDirty(true); markDirty(); }}
         excerpt={excerpt}
-        onExcerptChange={(val) => {
-          setExcerpt(val);
-          markDirty();
-        }}
+        onExcerptChange={(val) => { setExcerpt(val); setIsLocalDirty(true); markDirty(); }}
         type={type}
-        onTypeChange={(val) => {
-          setType(val);
-          markDirty();
-        }}
+        onTypeChange={(val) => { setType(val); setIsLocalDirty(true); markDirty(); }}
         sourceLocale={sourceLocale}
-        onLocaleChange={(val) => {
-          setSourceLocale(val);
-          markDirty();
-        }}
+        onLocaleChange={(val) => { setSourceLocale(val); setIsLocalDirty(true); markDirty(); }}
       />
 
       <PostFeaturedImagePicker
         featuredImage={featuredImage}
-        onSelectClick={() => {
-          setMediaTarget('featured');
-          setIsMediaLibraryOpen(true);
-        }}
-        onRemove={() => {
-          setFeaturedImage(null);
-          markDirty();
-        }}
+        onSelectClick={() => { setMediaTarget('featured'); setIsMediaLibraryOpen(true); }}
+        onRemove={() => { setFeaturedImage(null); markDirty(); }}
       />
 
-      {/* Tiptap Rich Text Editor */}
       <div className="flex flex-col gap-2">
         <label className="text-xs font-bold uppercase tracking-wider text-slate-500 px-1">
           Editorial Content Body
@@ -268,7 +195,7 @@ export function PostForm({ initialPost, isCreateMode = false }: PostFormProps) {
         <RichTextEditor
           initialContent={bodyJson}
           contentType={type}
-          placeholder="Compose rich article content. Use '/' for blocks, lists, destination guides, or timeline events..."
+          placeholder="Compose rich article content. Use toolbar for headings, lists, tables, images, destination guides, or timeline events..."
           onChange={handleEditorChange}
           onOpenMediaLibrary={() => {
             setMediaTarget('editor');
@@ -278,52 +205,17 @@ export function PostForm({ initialPost, isCreateMode = false }: PostFormProps) {
         />
       </div>
 
-      {/* Multi-Site Publications Section */}
-      <div className="flex flex-col gap-4 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-xs">
-        <div>
-          <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 font-sans">
-            Site Publications
-          </h3>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Publish this canonical post across independent websites with site-specific slugs,
-            categories, and SEO configuration.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {sitesData.map((site) => {
-            const defaultSlug = (title || 'post-slug')
-              .toLowerCase()
-              .replace(/[^a-z0-9]+/g, '-')
-              .replace(/^-|-$/g, '');
-            const existingPub = initialPost?.publications?.find((p) => p.siteId === site.id);
-            const currentConfig = siteConfigs[site.id] || {
-              enabled: Boolean(existingPub),
-              slug: existingPub?.slug || defaultSlug,
-              status: existingPub?.status || 'draft',
-              categoryIds: [],
-              seoTitle: existingPub?.seoTitle || '',
-              seoDescription: existingPub?.seoDescription || '',
-            };
-
-            return (
-              <PostSitePublicationCard
-                key={site.id}
-                site={site}
-                config={currentConfig}
-                existingPub={existingPub}
-                onChange={(updated) => {
-                  setSiteConfigs((prev) => ({ ...prev, [site.id]: updated }));
-                  markDirty();
-                }}
-                onOpenPublishModal={(pub, action) =>
-                  setPublishingTarget({ publication: pub, action })
-                }
-              />
-            );
-          })}
-        </div>
-      </div>
+      <PostPublicationsSection
+        sites={sitesData}
+        title={title}
+        siteConfigs={siteConfigs}
+        existingPublications={initialPost?.publications}
+        onConfigChange={(sId, updated) => {
+          setSiteConfigs((prev) => ({ ...prev, [sId]: updated }));
+          markDirty();
+        }}
+        onOpenPublishModal={(pub, action) => setPublishingTarget({ publication: pub, action })}
+      />
 
       <MediaLibraryModal
         isOpen={isMediaLibraryOpen}

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 
-export type AutosaveStatus = 'saved' | 'saving' | 'failed' | 'offline';
+export type AutosaveStatus = 'saved' | 'unsaved' | 'saving' | 'failed' | 'offline';
 
 export interface UseAutosaveOptions<T> {
   data: T;
@@ -32,7 +32,7 @@ export function useAutosave<T>({
   // Online / Offline tracking
   useEffect(() => {
     const handleOnline = () => {
-      if (status === 'offline') setStatus(isDirty ? 'failed' : 'saved');
+      if (status === 'offline') setStatus(isDirty ? 'unsaved' : 'saved');
     };
     const handleOffline = () => {
       setStatus('offline');
@@ -87,7 +87,7 @@ export function useAutosave<T>({
   const markDirty = useCallback(() => {
     if (!enabled) return;
     setIsDirty(true);
-    setStatus('failed'); // Pending save
+    setStatus('unsaved');
 
     if (timerRef.current) {
       clearTimeout(timerRef.current);
@@ -97,6 +97,23 @@ export function useAutosave<T>({
       void executeSave(dataRef.current);
     }, debounceMs);
   }, [debounceMs, enabled, executeSave]);
+
+  // Global Ctrl+S / Cmd+S shortcut to save immediately
+  useEffect(() => {
+    if (!enabled) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        void triggerManualSave();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [enabled, triggerManualSave]);
 
   // Cleanup on unmount
   useEffect(() => {

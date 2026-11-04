@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { ArrowLeft, Check, Eye, Loader2, Save, WifiOff, AlertTriangle } from 'lucide-react';
 import type { AutosaveStatus } from '../hooks/useAutosave';
 
-interface PostFormHeaderProps {
+export interface PostFormHeaderProps {
   isCreateMode: boolean;
   currentRevisionNumber: number;
   lastSavedAt: Date | null;
@@ -13,6 +13,7 @@ interface PostFormHeaderProps {
   isSubmitting: boolean;
   onOpenPreview: () => void;
   hasInitialPost: boolean;
+  onSaveShortcut?: () => void;
 }
 
 export function PostFormHeader({
@@ -23,6 +24,7 @@ export function PostFormHeader({
   isSubmitting,
   onOpenPreview,
   hasInitialPost,
+  onSaveShortcut,
 }: PostFormHeaderProps) {
   return (
     <div className="sticky top-0 z-30 flex flex-wrap items-center justify-between gap-4 p-4 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-2xl border border-slate-100 dark:border-slate-800 shadow-xs">
@@ -40,7 +42,7 @@ export function PostFormHeader({
           </h1>
           <p className="text-xs text-slate-500">
             {isCreateMode
-              ? 'Draft will be auto-saved once created'
+              ? 'Draft will be auto-saved and backed up locally'
               : `Revision #${currentRevisionNumber} • Last saved: ${
                   lastSavedAt ? lastSavedAt.toLocaleTimeString() : 'Up to date'
                 }`}
@@ -56,6 +58,12 @@ export function PostFormHeader({
               <>
                 <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-500" />
                 <span className="text-slate-600 dark:text-slate-400">Saving...</span>
+              </>
+            )}
+            {autosaveStatus === 'unsaved' && (
+              <>
+                <div className="size-2 rounded-full bg-amber-500 animate-pulse" />
+                <span className="text-amber-600 dark:text-amber-400 font-medium">Unsaved</span>
               </>
             )}
             {autosaveStatus === 'saved' && (
@@ -93,7 +101,8 @@ export function PostFormHeader({
         <button
           type="submit"
           disabled={isSubmitting}
-          className="flex items-center gap-2 px-5 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 rounded-xl shadow-xs transition-colors cursor-pointer"
+          onClick={onSaveShortcut}
+          className="flex items-center gap-2 px-5 py-2 text-xs font-bold text-[#072423] bg-gradient-to-r from-[#00e599] to-[#05f292] hover:brightness-105 active:scale-95 disabled:opacity-50 rounded-xl shadow-xs transition-all cursor-pointer"
         >
           {isSubmitting ? (
             <>
