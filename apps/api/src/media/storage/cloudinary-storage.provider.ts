@@ -4,7 +4,7 @@ import path from 'node:path';
 import { Readable } from 'node:stream';
 import { Injectable, Logger } from '@nestjs/common';
 import { v2 as cloudinary, type UploadApiResponse } from 'cloudinary';
-import { env } from '../../config/env';
+import { env, resolveCloudinaryCredentials } from '../../config/env';
 import type { StorageProvider, StorageUploadResult } from './storage-provider.interface';
 
 @Injectable()
@@ -16,25 +16,29 @@ export class CloudinaryStorageProvider implements StorageProvider {
   constructor() {
     this.baseUrl = (process.env.API_BASE_URL || 'http://localhost:4000/api/v1').replace(/\/+$/, '');
 
-    // Configure Cloudinary with environment variables
-    const cloudName = env.CLOUDINARY_CLOUD_NAME || process.env.CLOUDINARY_CLOUD_NAME || 'cdikzkfd';
-    const apiKey = env.CLOUDINARY_API_KEY || process.env.CLOUDINARY_API_KEY || '956222911712727';
-    const apiSecret =
-      env.CLOUDINARY_API_SECRET || process.env.CLOUDINARY_API_SECRET || 'B_zamtWcgoVw-CYtm17ssQZH1tw';
+    // The module instantiates this provider even when local storage is selected,
+    // so missing credentials leave it unconfigured instead of failing boot.
+    // `parseEnv` already rejects STORAGE_PROVIDER=cloudinary without credentials.
+    const credentials = resolveCloudinaryCredentials(env);
+    if (!credentials) {
+      return;
+    }
 
     cloudinary.config({
-      cloud_name: cloudName,
-      api_key: apiKey,
-      api_secret: apiSecret,
+      cloud_name: credentials.cloudName,
+      api_key: credentials.apiKey,
+      api_secret: credentials.apiSecret,
       secure: true,
     });
 
-    this.logger.log(`CloudinaryStorageProvider initialized for cloud: ${cloudName}`);
+    this.logger.log(`CloudinaryStorageProvider initialized for cloud: ${credentials.cloudName}`);
   }
 
   async upload(key: string, buffer: Buffer, mimeType: string): Promise<StorageUploadResult> {
     const cleanKey = key.replace(/\.[^/.]+$/, '').replace(/^[\\/]+/, '');
-    const publicId = cleanKey.startsWith('multi-site-cms/') ? cleanKey : `multi-site-cms/${cleanKey}`;
+    const publicId = cleanKey.startsWith('multi-site-cms/')
+      ? cleanKey
+      : `multi-site-cms/${cleanKey}`;
     const isVideo = mimeType.startsWith('video/') || mimeType.startsWith('audio/');
     const isImage = mimeType.startsWith('image/') && mimeType !== 'image/svg+xml';
     const resourceType = isVideo ? 'video' : isImage ? 'image' : 'auto';
@@ -52,8 +56,7 @@ export class CloudinaryStorageProvider implements StorageProvider {
             return reject(error || new Error('Cloudinary upload returned empty response'));
           }
 
-          const checksum =
-            result.etag || crypto.createHash('sha256').update(buffer).digest('hex');
+          const checksum = result.etag || crypto.createHash('sha256').update(buffer).digest('hex');
 
           resolve({
             key: result.secure_url || result.public_id,
@@ -97,11 +100,17 @@ export class CloudinaryStorageProvider implements StorageProvider {
   }
 
   async getStream(key: string): Promise<Readable> {
-    if (key.startsWith('multi-site-cms/') || key.startsWith('http://') || key.startsWith('https://')) {
+    if (
+      key.startsWith('multi-site-cms/') ||
+      key.startsWith('http://') ||
+      key.startsWith('https://')
+    ) {
       const url = this.getUrl(key);
       const response = await fetch(url);
       if (!response.ok || !response.body) {
-        throw new Error(`Failed to fetch media stream from Cloudinary: ${url} (status: ${response.status})`);
+        throw new Error(
+          `Failed to fetch media stream from Cloudinary: ${url} (status: ${response.status})`,
+        );
       }
 
       return Readable.fromWeb(response.body as unknown as import('node:stream/web').ReadableStream);
@@ -116,7 +125,11 @@ export class CloudinaryStorageProvider implements StorageProvider {
   }
 
   async exists(key: string): Promise<boolean> {
-    if (key.startsWith('multi-site-cms/') || key.startsWith('http://') || key.startsWith('https://')) {
+    if (
+      key.startsWith('multi-site-cms/') ||
+      key.startsWith('http://') ||
+      key.startsWith('https://')
+    ) {
       const publicId = this.extractPublicId(key);
       try {
         await cloudinary.api.resource(publicId);

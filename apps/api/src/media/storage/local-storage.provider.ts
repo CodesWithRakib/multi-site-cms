@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { Readable } from 'node:stream';
 import { Injectable, Logger } from '@nestjs/common';
+import { env, resolveCloudinaryCredentials } from '../../config/env';
 import type { StorageProvider, StorageUploadResult } from './storage-provider.interface';
 
 @Injectable()
@@ -88,8 +89,10 @@ export class LocalStorageProvider implements StorageProvider {
     if (key.startsWith('http://') || key.startsWith('https://')) {
       return key;
     }
-    if (key.startsWith('multi-site-cms/')) {
-      const cloudName = process.env.CLOUDINARY_CLOUD_NAME || 'cdikzkfd';
+    // Assets uploaded while Cloudinary was the active provider keep resolving
+    // to Cloudinary, as long as the account is still configured.
+    const cloudName = resolveCloudinaryCredentials(env)?.cloudName;
+    if (key.startsWith('multi-site-cms/') && cloudName) {
       return `https://res.cloudinary.com/${cloudName}/image/upload/${key}`;
     }
     const sanitizedKey = encodeURIComponent(key).replace(/%2F/g, '/');

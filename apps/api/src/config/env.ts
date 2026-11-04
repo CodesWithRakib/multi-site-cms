@@ -14,6 +14,14 @@ const httpUrl = z
     'URL must use the http or https protocol.',
   );
 
+/** An empty value (e.g. `KEY=` copied from `.env.example`) counts as unset. */
+function optionalSecret(minLength: number, name: string) {
+  return z.preprocess(
+    (value) => (typeof value === 'string' && value.trim() === '' ? undefined : value),
+    z.string().min(minLength, `${name} must be at least ${minLength} characters.`).optional(),
+  );
+}
+
 const LOCAL_HOSTNAMES = new Set(['localhost', '127.0.0.1', '0.0.0.0', '[::1]']);
 
 const envSchema = z.object({
@@ -66,6 +74,17 @@ const envSchema = z.object({
   CLOUDINARY_CLOUD_NAME: z.string().optional(),
   CLOUDINARY_API_KEY: z.string().optional(),
   CLOUDINARY_API_SECRET: z.string().optional(),
+  /**
+   * HMAC key for draft preview tokens. Required in production. Outside
+   * production a random per-process key is generated when it is absent, so a
+   * token can never be forged from a value committed to the repository.
+   */
+  PREVIEW_TOKEN_SECRET: optionalSecret(32, 'PREVIEW_TOKEN_SECRET'),
+  /**
+   * Shared secret sent to the public sites' `POST /api/revalidate` webhook in
+   * the `x-revalidate-secret` header. When absent, revalidation is skipped.
+   */
+  REVALIDATE_SECRET: optionalSecret(16, 'REVALIDATE_SECRET'),
 });
 
 export type Env = z.infer<typeof envSchema>;
@@ -78,6 +97,50 @@ function formatIssues(error: z.ZodError): string {
   return error.issues
     .map((issue) => `${issue.path.join('.') || 'environment'}: ${issue.message}`)
     .join('\n');
+}
+
+export interface CloudinaryCredentials {
+  readonly cloudName: string;
+  readonly apiKey: string;
+  readonly apiSecret: string;
+}
+
+/**
+ * Resolves Cloudinary credentials from the explicit trio, falling back to
+ * `CLOUDINARY_URL` (`cloudinary://<api_key>:<api_secret>@<cloud_name>`).
+ * Returns null when they are incomplete; there are no built-in defaults.
+ */
+export function resolveCloudinaryCredentials(
+  config: Pick<
+    Env,
+    'CLOUDINARY_URL' | 'CLOUDINARY_CLOUD_NAME' | 'CLOUDINARY_API_KEY' | 'CLOUDINARY_API_SECRET'
+  >,
+): CloudinaryCredentials | null {
+  if (config.CLOUDINARY_CLOUD_NAME && config.CLOUDINARY_API_KEY && config.CLOUDINARY_API_SECRET) {
+    return {
+      cloudName: config.CLOUDINARY_CLOUD_NAME,
+      apiKey: config.CLOUDINARY_API_KEY,
+      apiSecret: config.CLOUDINARY_API_SECRET,
+    };
+  }
+
+  if (!config.CLOUDINARY_URL) {
+    return null;
+  }
+
+  try {
+    const url = new URL(config.CLOUDINARY_URL);
+    if (url.protocol !== 'cloudinary:' || !url.username || !url.password || !url.hostname) {
+      return null;
+    }
+    return {
+      cloudName: url.hostname,
+      apiKey: decodeURIComponent(url.username),
+      apiSecret: decodeURIComponent(url.password),
+    };
+  } catch {
+    return null;
+  }
 }
 
 function isLocalhost(origin: string): boolean {
@@ -104,10 +167,16 @@ export function parseEnv(input: NodeJS.ProcessEnv): ApiConfig {
 
   const config = parsed.data;
 
+  if (config.STORAGE_PROVIDER === 'cloudinary' && !resolveCloudinaryCredentials(config)) {
+    throw new Error(
+      'Invalid API environment configuration:\nSTORAGE_PROVIDER=cloudinary requires CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET, or a valid CLOUDINARY_URL.',
+    );
+  }
+
   // Production must not silently inherit development defaults. `envSchema` applies
   // them, so the raw input is what proves intent.
   if (config.NODE_ENV === 'production') {
-    const missing = (['DATABASE_URL', 'CORS_ORIGINS'] as const).filter(
+    const missing = (['DATABASE_URL', 'CORS_ORIGINS', 'PREVIEW_TOKEN_SECRET'] as const).filter(
       (key) => !input[key] || input[key]?.trim() === '',
     );
 

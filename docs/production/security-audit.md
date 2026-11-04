@@ -1,5 +1,11 @@
 # Production Security Audit & Threat Assessment Report
 
+> **Superseded (2026-11-04).** The 2026-11-04 audit in
+> [docs/audit/](../audit/PRODUCTION_READINESS.md) found critical issues this report
+> did not cover, including committed credentials and a forgeable preview key.
+> Use [docs/audit/PRODUCTION_READINESS.md](../audit/PRODUCTION_READINESS.md) and
+> [docs/audit/SECURITY_AUDIT.md](../audit/SECURITY_AUDIT.md). This file is kept for history.
+
 **Classification**: Confidential Engineering Security Audit  
 **Scope**: `apps/api`, `apps/admin`, `apps/sites/travel-blog`, `apps/sites/air-sports`, shared packages  
 **Methodology**: Threat modeling, source code static analysis, dynamic API testing, dependency audit

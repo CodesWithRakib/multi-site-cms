@@ -21,9 +21,9 @@ export class CsrfGuard implements CanActivate {
       return true;
     }
 
-    // 2. Login endpoint establishes the session and is exempt from prior CSRF token
-    const url = request.originalUrl ?? request.url ?? '';
-    if (url.includes('/auth/login')) {
+    // 2. Login endpoint establishes the session and is exempt from prior CSRF token.
+    // Match the exact path; the query string must never be able to opt a request out.
+    if (this.isLoginPath(request.originalUrl ?? request.url ?? '')) {
       return true;
     }
 
@@ -64,6 +64,12 @@ export class CsrfGuard implements CanActivate {
     }
 
     return true;
+  }
+
+  private isLoginPath(url: string): boolean {
+    const queryStart = url.search(/[?#]/);
+    const path = (queryStart === -1 ? url : url.slice(0, queryStart)).replace(/\/+$/, '');
+    return path === `/${env.API_PREFIX}/auth/login`;
   }
 
   private extractOriginFromReferer(referer?: string): string | null {

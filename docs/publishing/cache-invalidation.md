@@ -36,30 +36,43 @@ for (const tagSlug of tagSlugs) {
 
 ## Secure Revalidation Protocol
 
-The CMS communicates with the target site's on-demand revalidation route (e.g., `POST /api/revalidate`) using shared secret authentication:
+Every public site exposes `POST /api/revalidate`. The contract lives in code in
+[`packages/config/src/revalidation.ts`](../../packages/config/src/revalidation.ts)
+and is shared by both site route handlers.
 
-1. **Webhook Request Headers**:
+1. **Request**
 
    ```http
    POST /api/revalidate HTTP/1.1
-   Host: travelblog.internal
    Content-Type: application/json
-   x-revalidation-secret: <REVALIDATION_SECRET>
+   x-revalidate-secret: <REVALIDATE_SECRET>
+
+   { "paths": ["/", "/articles/exploring-swiss-alps"], "tags": ["site:travel-blog"] }
    ```
 
-2. **Webhook Request Payload**:
+   Both arrays are optional. Paths must start with a single `/` and contain no
+   whitespace, `?`, `#` or `\`; at most 50 items in total. Anything else is `400`.
 
-   ```json
-   {
-     "paths": ["/", "/exploring-swiss-alps", "/categories/alps", "/tags/hiking"],
-     "slug": "exploring-swiss-alps",
-     "timestamp": "2026-11-01T12:00:00.000Z"
-   }
-   ```
+2. **Authentication** — `REVALIDATE_SECRET` must be set to the same value on the
+   API and on each site. Comparison is constant-time. The handler fails closed:
+   - secret not configured on the site → `503`
+   - header missing or wrong → `401`
 
-3. **Frontend Validation**:
-   The Next.js route handler verifies `request.headers.get('x-revalidation-secret') === process.env.REVALIDATION_SECRET`. Unauthenticated or forged revalidation requests receive an immediate `401 Unauthorized`.
-   Upon verification, Next.js executes `revalidatePath(path)` for each derived route.
+   `GET` and query-string secrets are not accepted, so the secret never appears
+   in access logs.
+
+3. **Effect** — each site always purges its own site-level fetch tags
+   (`travel-blog-content`; `air-sports-content`, `-events`, `-categories`,
+   `-tags`), then every tag and path in the payload, then `/`.
+
+### Known gap: the API does not yet call the webhook
+
+`OutboxDispatcherWorker` calls `CacheInvalidationService.revalidatePaths(siteKey, paths)`
+without a site base URL, so no request is sent and the result is reported as
+`skipped: true`. Published changes therefore appear after the time-based ISR
+window (`revalidate = 60` on the site pages), not immediately. Wiring a per-site
+base URL is tracked in [`docs/roadmap/MASTER_IMPLEMENTATION_PLAN.md`](../roadmap/MASTER_IMPLEMENTATION_PLAN.md)
+(Phase 2).
 
 ---
 

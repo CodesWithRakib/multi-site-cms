@@ -313,8 +313,9 @@ describe('Authenticated Post Draft Preview System', () => {
     });
 
     it('rejects an expired preview token with 401 Unauthorized', async () => {
-      const secret =
-        process.env.SESSION_SECRET || 'preview-secret-key-multi-site-cms-development-2026';
+      // Signed with the real key (set in test/setup-env.ts), so only expiry can fail it.
+      const secret = process.env.PREVIEW_TOKEN_SECRET ?? '';
+      expect(secret).not.toBe('');
       const expiredTimestamp = Math.floor(Date.now() / 1000) - 300; // 5 minutes in past
       const payload = `${testPostId}:${siteTravelId}:actor-1:${expiredTimestamp}`;
       const sig = crypto.createHmac('sha256', secret).update(payload).digest('hex');
@@ -327,6 +328,41 @@ describe('Authenticated Post Draft Preview System', () => {
       expect(res.status).toBe(401);
       const err = res.body as ApiErrorResponse;
       expect(err.error.code).toBe('UNAUTHENTICATED');
+    });
+
+    it('rejects a token forged with the former hardcoded fallback key (regression: SEC-1)', async () => {
+      const exp = Math.floor(Date.now() / 1000) + 300;
+      const payload = `${testPostId}:${siteTravelId}:actor-1:${exp}`;
+      const sig = crypto
+        .createHmac('sha256', 'preview-secret-key-multi-site-cms-development-2026')
+        .update(payload)
+        .digest('hex');
+      const forgedToken = Buffer.from(`${payload}:${sig}`).toString('base64url');
+
+      const res = await request(app.getHttpServer()).get(
+        `/api/v1/posts/${testPostId}/preview?siteId=${siteTravelId}&token=${forgedToken}`,
+      );
+
+      expect(res.status).toBe(401);
+    });
+
+    it('rejects a valid token replayed against a different site (regression: SEC-3)', async () => {
+      const res = await request(app.getHttpServer()).get(
+        `/api/v1/posts/${testPostId}/preview?siteId=${siteAirSportsId}&token=${validToken}`,
+      );
+
+      expect(res.status).toBe(401);
+      const err = res.body as ApiErrorResponse;
+      expect(err.error.code).toBe('UNAUTHENTICATED');
+    });
+
+    it('denies minting a site-less token for a post on a site the caller cannot access (regression: SEC-2)', async () => {
+      const res = await request(app.getHttpServer())
+        .post(`/api/v1/posts/${testPostId}/preview-token`)
+        .set('Cookie', airSportsAdminCookie)
+        .set('x-csrf-token', airSportsAdminCsrf);
+
+      expect(res.status).toBe(404);
     });
 
     it('enforces tenant isolation: Air Sports admin cannot request preview token for Travel Blog', async () => {

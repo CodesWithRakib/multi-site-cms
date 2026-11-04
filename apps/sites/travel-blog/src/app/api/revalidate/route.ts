@@ -1,53 +1,49 @@
 import { revalidatePath, revalidateTag } from 'next/cache';
 import { type NextRequest, NextResponse } from 'next/server';
 
+import {
+  parseRevalidationPayload,
+  REVALIDATE_SECRET_HEADER,
+  verifyRevalidationSecret,
+} from '@multi-site-cms/config/revalidation';
+
+/** Site-wide tag attached to every content fetch in `src/lib/api.ts`. */
+const SITE_CONTENT_TAG = 'travel-blog-content';
+
+/**
+ * On-demand ISR webhook. Contract: `POST`, header `x-revalidate-secret`, JSON
+ * body `{ paths?: string[], tags?: string[] }`. See docs/publishing/cache-invalidation.md.
+ */
 export async function POST(request: NextRequest) {
-  return handleRevalidation(request);
-}
-
-export async function GET(request: NextRequest) {
-  return handleRevalidation(request);
-}
-
-async function handleRevalidation(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const secret = searchParams.get('secret') || request.headers.get('x-revalidate-secret');
-
-  const expectedSecret =
-    process.env.REVALIDATE_SECRET ||
-    process.env.SESSION_SECRET ||
-    'revalidate-secret-key-multi-site-cms-2026';
-
-  if (!secret || secret !== expectedSecret) {
-    return NextResponse.json({ error: 'Invalid or missing revalidation secret' }, { status: 401 });
+  const auth = verifyRevalidationSecret(
+    request.headers.get(REVALIDATE_SECRET_HEADER),
+    process.env.REVALIDATE_SECRET,
+  );
+  if (auth === 'unconfigured') {
+    return NextResponse.json({ error: 'Revalidation is not configured' }, { status: 503 });
+  }
+  if (auth === 'invalid') {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const slug = searchParams.get('slug');
-  const path = searchParams.get('path');
-  const tag = searchParams.get('tag');
+  const payload = parseRevalidationPayload(await request.json().catch(() => null));
+  if (!payload) {
+    return NextResponse.json({ error: 'Invalid revalidation payload' }, { status: 400 });
+  }
 
-  // Revalidate tags if specified, or global travel-blog-content tag by default
-  if (tag) {
+  revalidateTag(SITE_CONTENT_TAG, 'default');
+  for (const tag of payload.tags) {
     revalidateTag(tag, 'default');
-  } else {
-    revalidateTag('travel-blog-content', 'default');
   }
-
-  // Revalidate specific path or article slug
-  if (slug) {
-    revalidatePath(`/articles/${slug}`);
-  }
-  if (path) {
+  for (const path of payload.paths) {
     revalidatePath(path);
   }
-
-  // Always refresh front page
   revalidatePath('/');
 
   return NextResponse.json({
     revalidated: true,
-    slug: slug || null,
-    path: path || null,
+    paths: payload.paths,
+    tags: payload.tags,
     timestamp: new Date().toISOString(),
   });
 }

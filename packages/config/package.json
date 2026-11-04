@@ -9,6 +9,10 @@
       "types": "./src/index.ts",
       "default": "./src/index.ts"
     },
+    "./revalidation": {
+      "types": "./src/revalidation.ts",
+      "default": "./src/revalidation.ts"
+    },
     "./security-headers": {
       "types": "./security-headers.d.mts",
       "default": "./security-headers.mjs"

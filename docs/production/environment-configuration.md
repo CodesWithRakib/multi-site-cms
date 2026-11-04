@@ -17,18 +17,21 @@ This document serves as the canonical reference for all environment variables ac
 
 Validated by [`parseEnv()`](file:///C:/Sofof_tech_2026/multi-site-cms/apps/api/src/config/env.ts).
 
-| Variable       | Type                  | Default (Local Dev)                                                                       | Production Requirement       | Description                                                                                                         |
-| :------------- | :-------------------- | :---------------------------------------------------------------------------------------- | :--------------------------- | :------------------------------------------------------------------------------------------------------------------ |
-| `NODE_ENV`     | Enum                  | `development`                                                                             | Mandatory (`production`)     | Node execution environment (`development`, `test`, `production`).                                                   |
-| `HOST`         | String                | `0.0.0.0`                                                                                 | Optional (`0.0.0.0`)         | Network interface to bind HTTP listener to.                                                                         |
-| `PORT`         | Integer               | `4000`                                                                                    | Optional (`4000`)            | Network port to listen on.                                                                                          |
-| `API_PREFIX`   | String                | `api/v1`                                                                                  | Optional (`api/v1`)          | Global route prefix without leading slash.                                                                          |
-| `DATABASE_URL` | PostgreSQL URL        | `postgresql://multi_site_cms:multi_site_cms_dev@localhost:5432/multi_site_cms`            | **MANDATORY**                | Full PostgreSQL connection string with credentials. In production, localhosts are prohibited.                       |
-| `CORS_ORIGINS` | Comma-delimited URLs  | `http://localhost:3000,http://localhost:3001,http://localhost:3002,http://localhost:5000` | **MANDATORY**                | Whitelisted web origins permitted to make credentialed browser calls. Localhost origins are rejected in production. |
-| `TRUST_PROXY`  | Integer (0–10)        | `0`                                                                                       | Mandatory behind proxy (`1`) | Number of trusted upstream reverse proxies for Express IP and header resolution.                                    |
-| `LOG_LEVEL`    | Enum                  | `info`                                                                                    | Optional (`info`)            | Logging verbosity (`debug`, `info`, `warn`, `error`, `silent`).                                                     |
-| `BODY_LIMIT`   | String                | `1mb`                                                                                     | Optional (`1mb`)             | Maximum request body limit for JSON and urlencoded parsers (e.g. `1mb`, `512kb`).                                   |
-| `DOCS_ENABLED` | Enum (`true`/`false`) | `false`                                                                                   | Optional (`false`)           | Explicitly enable OpenAPI Swagger documentation UI in production environments.                                      |
+| Variable               | Type                        | Default (Local Dev)                                                                       | Production Requirement       | Description                                                                                                                                                          |
+| :--------------------- | :-------------------------- | :---------------------------------------------------------------------------------------- | :--------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `NODE_ENV`             | Enum                        | `development`                                                                             | Mandatory (`production`)     | Node execution environment (`development`, `test`, `production`).                                                                                                    |
+| `HOST`                 | String                      | `0.0.0.0`                                                                                 | Optional (`0.0.0.0`)         | Network interface to bind HTTP listener to.                                                                                                                          |
+| `PORT`                 | Integer                     | `4000`                                                                                    | Optional (`4000`)            | Network port to listen on.                                                                                                                                           |
+| `API_PREFIX`           | String                      | `api/v1`                                                                                  | Optional (`api/v1`)          | Global route prefix without leading slash.                                                                                                                           |
+| `DATABASE_URL`         | PostgreSQL URL              | `postgresql://multi_site_cms:multi_site_cms_dev@localhost:5432/multi_site_cms`            | **MANDATORY**                | Full PostgreSQL connection string with credentials. In production, localhosts are prohibited.                                                                        |
+| `CORS_ORIGINS`         | Comma-delimited URLs        | `http://localhost:3000,http://localhost:3001,http://localhost:3002,http://localhost:5000` | **MANDATORY**                | Whitelisted web origins permitted to make credentialed browser calls. Localhost origins are rejected in production.                                                  |
+| `TRUST_PROXY`          | Integer (0–10)              | `0`                                                                                       | Mandatory behind proxy (`1`) | Number of trusted upstream reverse proxies for Express IP and header resolution.                                                                                     |
+| `LOG_LEVEL`            | Enum                        | `info`                                                                                    | Optional (`info`)            | Logging verbosity (`debug`, `info`, `warn`, `error`, `silent`).                                                                                                      |
+| `BODY_LIMIT`           | String                      | `1mb`                                                                                     | Optional (`1mb`)             | Maximum request body limit for JSON and urlencoded parsers (e.g. `1mb`, `512kb`).                                                                                    |
+| `DOCS_ENABLED`         | Enum (`true`/`false`)       | `false`                                                                                   | Optional (`false`)           | Explicitly enable OpenAPI Swagger documentation UI in production environments.                                                                                       |
+| `STORAGE_PROVIDER`     | Enum (`local`/`cloudinary`) | `local`                                                                                   | Optional                     | `cloudinary` requires `CLOUDINARY_CLOUD_NAME` + `CLOUDINARY_API_KEY` + `CLOUDINARY_API_SECRET`, or `CLOUDINARY_URL`. No built-in credentials; boot fails if missing. |
+| `PREVIEW_TOKEN_SECRET` | String (≥32 chars)          | random per process                                                                        | **MANDATORY**                | HMAC key for draft preview tokens. Production boot fails without it.                                                                                                 |
+| `REVALIDATE_SECRET`    | String (≥16 chars)          | None                                                                                      | Recommended                  | Sent as `x-revalidate-secret` to each site's `POST /api/revalidate`. Must equal the sites' value.                                                                    |
 
 ---
 
@@ -43,19 +46,19 @@ Validated by [`parseEnv()`](file:///C:/Sofof_tech_2026/multi-site-cms/apps/api/s
 
 ### Travel Blog (`apps/sites/travel-blog`)
 
-| Variable              | Type   | Default (Local Dev)            | Description                                                                            |
-| :-------------------- | :----- | :----------------------------- | :------------------------------------------------------------------------------------- |
-| `NEXT_PUBLIC_API_URL` | URL    | `http://localhost:4000/api/v1` | Public REST API base URL.                                                              |
-| `NEXT_PUBLIC_APP_URL` | URL    | `http://localhost:3001`        | Public URL for OpenGraph tags, canonical links, and sitemaps.                          |
-| `REVALIDATE_SECRET`   | String | None                           | Shared bearer secret for on-demand ISR revalidation webhooks (`POST /api/revalidate`). |
+| Variable              | Type   | Default (Local Dev)            | Description                                                                                                                               |
+| :-------------------- | :----- | :----------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_API_URL` | URL    | `http://localhost:4000/api/v1` | Public REST API base URL.                                                                                                                 |
+| `NEXT_PUBLIC_APP_URL` | URL    | `http://localhost:3001`        | Public URL for OpenGraph tags, canonical links, and sitemaps.                                                                             |
+| `REVALIDATE_SECRET`   | String | None                           | Must equal the API value. Checked against the `x-revalidate-secret` header on `POST /api/revalidate`; when unset the webhook returns 503. |
 
 ### Air Sports Website (`apps/sites/air-sports`)
 
-| Variable              | Type   | Default (Local Dev)            | Description                                                   |
-| :-------------------- | :----- | :----------------------------- | :------------------------------------------------------------ |
-| `NEXT_PUBLIC_API_URL` | URL    | `http://localhost:4000/api/v1` | Public REST API base URL for content fetching.                |
-| `NEXT_PUBLIC_APP_URL` | URL    | `http://localhost:3002`        | Public URL for OpenGraph tags and canonical sitemaps.         |
-| `REVALIDATE_SECRET`   | String | None                           | Shared bearer secret for on-demand ISR revalidation webhooks. |
+| Variable              | Type   | Default (Local Dev)            | Description                                           |
+| :-------------------- | :----- | :----------------------------- | :---------------------------------------------------- |
+| `NEXT_PUBLIC_API_URL` | URL    | `http://localhost:4000/api/v1` | Public REST API base URL for content fetching.        |
+| `NEXT_PUBLIC_APP_URL` | URL    | `http://localhost:3002`        | Public URL for OpenGraph tags and canonical sitemaps. |
+| `REVALIDATE_SECRET`   | String | None                           | Must equal the API value; see the Travel Blog row.    |
 
 ---
 

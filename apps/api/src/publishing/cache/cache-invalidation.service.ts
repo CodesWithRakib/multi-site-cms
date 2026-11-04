@@ -1,4 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
+
+import { env } from '../../config/env';
 import type {
   PublicationPublishedPayload,
   PublicationUnpublishedPayload,
@@ -9,6 +11,8 @@ export interface InvalidationResult {
   siteKey: string;
   paths: string[];
   revalidatedAt: string;
+  /** True when no request was sent (no site URL or no shared secret). */
+  skipped?: boolean;
   error?: string;
 }
 
@@ -63,31 +67,37 @@ export class CacheInvalidationService {
     siteBaseUrl?: string,
     secret?: string,
   ): Promise<InvalidationResult> {
-    const revalidationSecret =
-      secret || process.env.REVALIDATION_SECRET || 'dev_revalidation_secret';
+    const revalidationSecret = secret ?? env.REVALIDATE_SECRET;
     const targetUrl = siteBaseUrl ? `${siteBaseUrl.replace(/\/$/, '')}/api/revalidate` : null;
 
-    this.logger.log(
-      `Triggering on-demand cache revalidation for site [${siteKey}] on paths: ${paths.join(', ')}`,
-    );
-
-    if (!targetUrl) {
-      // In local development or testing environments where sites are not running on separate ports,
-      // simulate successful path invalidation without network timeouts.
+    if (!targetUrl || !revalidationSecret) {
+      // Not a failure: without a site URL or shared secret there is nothing to
+      // call, and retrying would only fill the dead-letter queue. Sites fall
+      // back to time-based ISR. Reported as `skipped` so it is never mistaken
+      // for a real revalidation.
+      this.logger.debug(
+        `Skipping on-demand revalidation for site [${siteKey}]: ${targetUrl ? 'REVALIDATE_SECRET not set' : 'no site URL'}`,
+      );
       return {
         success: true,
+        skipped: true,
         siteKey,
         paths,
         revalidatedAt: new Date().toISOString(),
       };
     }
 
+    this.logger.log(
+      `Triggering on-demand cache revalidation for site [${siteKey}] on paths: ${paths.join(', ')}`,
+    );
+
     try {
       const response = await fetch(targetUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-revalidation-token': revalidationSecret,
+          // Header name is the contract in @multi-site-cms/config/revalidation.
+          'x-revalidate-secret': revalidationSecret,
         },
         body: JSON.stringify({ paths, tags: [`site:${siteKey}`] }),
         signal: AbortSignal.timeout(5000), // 5s timeout

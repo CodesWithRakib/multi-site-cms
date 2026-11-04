@@ -1,7 +1,19 @@
 import { createHash, randomUUID } from 'node:crypto';
 import type { Request, Response } from 'express';
-import { Body, Controller, Get, HttpStatus, Param, ParseUUIDPipe, Post, Query, Req, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpStatus,
+  Param,
+  ParseUUIDPipe,
+  Post,
+  Query,
+  Req,
+  Res,
+} from '@nestjs/common';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 
 import { Public } from '../auth/decorators/public.decorator';
 import type { RequestContext } from '../common/http/request-context';
@@ -257,6 +269,7 @@ export class PublicContentController {
   }
 
   @Post('newsletter')
+  @Throttle({ default: { limit: 5, ttl: 60_000 } })
   @ApiOperation({ summary: 'Subscribe email to public site newsletter' })
   @ApiResponse({ status: 200, description: 'Subscribed successfully' })
   async subscribeNewsletter(
@@ -307,6 +320,8 @@ export class PublicContentController {
   }
 
   @Post('posts/:slug/comments')
+  // No per-IP throttle here: the travel-blog proxies this call from its server,
+  // so every reader shares one IP. See docs/audit/SECURITY_AUDIT.md (SEC-6).
   @ApiOperation({ summary: 'Submit a new reader comment with optional rating' })
   @ApiResponse({ status: 201, description: 'Comment submitted successfully' })
   async createComment(

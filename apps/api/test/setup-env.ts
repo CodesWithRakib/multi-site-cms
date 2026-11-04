@@ -12,3 +12,13 @@ process.env.DATABASE_URL =
 
 process.env.TRUST_PROXY = '1';
 process.env.LOG_LEVEL = 'silent';
+process.env.PREVIEW_TOKEN_SECRET = 'test-preview-token-secret-0123456789abcdef';
+
+// Tests must never reach a real storage account. `config/env.ts` loads `.env`,
+// but `process.loadEnvFile` does not override variables that are already set,
+// so pinning them here keeps a developer's Cloudinary credentials out of tests.
+process.env.STORAGE_PROVIDER = 'local';
+process.env.CLOUDINARY_URL = '';
+process.env.CLOUDINARY_CLOUD_NAME = '';
+process.env.CLOUDINARY_API_KEY = '';
+process.env.CLOUDINARY_API_SECRET = '';

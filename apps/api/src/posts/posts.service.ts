@@ -12,6 +12,7 @@ import type {
 import type { EffectiveAuthContext } from '../auth/services/authorization.service';
 import { AuditService } from '../common/audit/audit.service';
 import { ApiException } from '../common/exceptions/api.exception';
+import { env } from '../config/env';
 import { DATA_SOURCE } from '../database/database.tokens';
 import { getInitializedRepository } from '../database/ensure-connected';
 import { PostPublicationCategory } from '../database/entities/post-publication-category.entity';
@@ -22,6 +23,19 @@ import { Post } from '../database/entities/post.entity';
 import { Site } from '../database/entities/site.entity';
 import { CreatePostDto, ListPostsQueryDto, RestoreRevisionDto, UpdatePostDto } from './dto';
 import { validateStructuredBody } from './utils/body-validator';
+
+/**
+ * Production requires PREVIEW_TOKEN_SECRET (enforced by `parseEnv`). Elsewhere a
+ * random per-process key keeps tokens unforgeable; they simply stop validating
+ * after a restart, which is acceptable for 15-minute development previews.
+ */
+const PREVIEW_TOKEN_SECRET = env.PREVIEW_TOKEN_SECRET ?? crypto.randomBytes(32).toString('hex');
+
+function isSignatureValid(actualHex: string, expectedHex: string): boolean {
+  const actual = Buffer.from(actualHex, 'utf8');
+  const expected = Buffer.from(expectedHex, 'utf8');
+  return actual.length === expected.length && crypto.timingSafeEqual(actual, expected);
+}
 
 @Injectable()
 export class PostsService {
@@ -686,7 +700,7 @@ export class PostsService {
   }
 
   private getPreviewSecret(): string {
-    return process.env.SESSION_SECRET || 'preview-secret-key-multi-site-cms-development-2026';
+    return PREVIEW_TOKEN_SECRET;
   }
 
   async generatePreviewToken(
@@ -701,6 +715,13 @@ export class PostsService {
     const postRepo = await this.getPostRepo();
     const post = await postRepo.findOne({ where: { id: postId } });
     if (!post || post.deletedAt) {
+      throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'post.notFound');
+    }
+
+    // Object-level check: `post:read` on any site is not authority over this post.
+    const publicationRepo = await this.getPublicationRepo();
+    const publications = await publicationRepo.find({ where: { postId } });
+    if (!this.canAccessPost(actor, post, publications)) {
       throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'post.notFound');
     }
 
@@ -780,7 +801,17 @@ export class PostsService {
       .update(payload)
       .digest('hex');
 
-    if (tokenSig !== expectedSig) {
+    if (!isSignatureValid(tokenSig, expectedSig)) {
+      throw new ApiException(
+        HttpStatus.UNAUTHORIZED,
+        'UNAUTHENTICATED',
+        'post.previewTokenInvalid',
+      );
+    }
+
+    // The site is part of the signed payload; an unsigned query value must not override it.
+    const signedSiteId = tokenSiteId === 'none' ? undefined : tokenSiteId;
+    if (siteId && siteId !== signedSiteId) {
       throw new ApiException(
         HttpStatus.UNAUTHORIZED,
         'UNAUTHENTICATED',
@@ -810,7 +841,7 @@ export class PostsService {
       throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'revision.notFound');
     }
 
-    const targetSiteId = siteId || (tokenSiteId !== 'none' ? tokenSiteId : undefined);
+    const targetSiteId = signedSiteId;
     let publication: PostPublication | null = null;
     let site: Site | null = null;
 

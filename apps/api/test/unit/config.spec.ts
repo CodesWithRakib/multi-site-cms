@@ -12,6 +12,7 @@ const PRODUCTION_ENV: NodeJS.ProcessEnv = {
   NODE_ENV: 'production',
   DATABASE_URL: 'postgresql://app:secret-password@db.internal:5432/multi_site_cms',
   CORS_ORIGINS: 'https://admin.example.com,https://travel.example.com',
+  PREVIEW_TOKEN_SECRET: 'production-preview-secret-at-least-32-chars',
 };
 
 describe('parseEnv', () => {
@@ -65,6 +66,46 @@ describe('parseEnv', () => {
     expect(() =>
       parseEnv({ NODE_ENV: 'production', CORS_ORIGINS: 'https://admin.example.com' }),
     ).toThrow(/DATABASE_URL/);
+  });
+
+  it('requires PREVIEW_TOKEN_SECRET in production', () => {
+    const withoutPreviewSecret: NodeJS.ProcessEnv = { ...PRODUCTION_ENV };
+    delete withoutPreviewSecret.PREVIEW_TOKEN_SECRET;
+
+    expect(() => parseEnv(withoutPreviewSecret)).toThrow(/PREVIEW_TOKEN_SECRET/);
+  });
+
+  it('rejects short signing secrets', () => {
+    expect(() => parseEnv({ ...DEVELOPMENT_ENV, PREVIEW_TOKEN_SECRET: 'short' })).toThrow(
+      /PREVIEW_TOKEN_SECRET/,
+    );
+    expect(() => parseEnv({ ...DEVELOPMENT_ENV, REVALIDATE_SECRET: 'short' })).toThrow(
+      /REVALIDATE_SECRET/,
+    );
+  });
+
+  it('treats empty secrets copied from .env.example as unset', () => {
+    const config = parseEnv({
+      ...DEVELOPMENT_ENV,
+      PREVIEW_TOKEN_SECRET: '',
+      REVALIDATE_SECRET: ' ',
+    });
+
+    expect(config.PREVIEW_TOKEN_SECRET).toBeUndefined();
+    expect(config.REVALIDATE_SECRET).toBeUndefined();
+  });
+
+  it('requires Cloudinary credentials when Cloudinary storage is selected', () => {
+    expect(() => parseEnv({ ...DEVELOPMENT_ENV, STORAGE_PROVIDER: 'cloudinary' })).toThrow(
+      /requires CLOUDINARY_CLOUD_NAME/,
+    );
+    expect(
+      parseEnv({
+        ...DEVELOPMENT_ENV,
+        STORAGE_PROVIDER: 'cloudinary',
+        CLOUDINARY_URL: 'cloudinary://key:secret@demo-cloud',
+      }).STORAGE_PROVIDER,
+    ).toBe('cloudinary');
   });
 
   it('rejects localhost origins in production', () => {

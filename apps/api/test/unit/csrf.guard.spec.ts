@@ -44,6 +44,23 @@ describe('CsrfGuard', () => {
     expect(guard.canActivate(ctx)).toBe(true);
   });
 
+  it('does not exempt other paths that merely contain /auth/login (regression: SEC-5)', () => {
+    for (const originalUrl of [
+      '/api/v1/posts?next=/auth/login',
+      '/api/v1/posts#/auth/login',
+      '/api/v1/users/auth/login',
+    ]) {
+      const ctx = createMockContext({
+        method: 'POST',
+        url: originalUrl,
+        originalUrl,
+        headers: {},
+        cookies: { [SESSION_COOKIE_NAME]: 'session-123' },
+      });
+      expect(() => guard.canActivate(ctx)).toThrow(ApiException);
+    }
+  });
+
   it('allows state-changing requests when no session cookie is present (bearer / unauthenticated)', () => {
     const ctx = createMockContext({
       method: 'POST',
