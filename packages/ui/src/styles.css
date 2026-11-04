@@ -1,3 +1,6 @@
+/* Tokens and theme inputs: see ./theme/theme.css and ./theme/site-themes.ts. */
+@import './theme/theme.css';
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -24,6 +27,19 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
+
+  /* Theme brand scale: bg-brand-500, text-brand-900, ... (ADR-0027). */
+  --color-brand-50: var(--brand-50);
+  --color-brand-100: var(--brand-100);
+  --color-brand-200: var(--brand-200);
+  --color-brand-300: var(--brand-300);
+  --color-brand-400: var(--brand-400);
+  --color-brand-500: var(--brand-500);
+  --color-brand-600: var(--brand-600);
+  --color-brand-700: var(--brand-700);
+  --color-brand-800: var(--brand-800);
+  --color-brand-900: var(--brand-900);
+  --color-brand-950: var(--brand-950);
 
   --color-sidebar: var(--sidebar-background);
   --color-sidebar-foreground: var(--sidebar-foreground);
@@ -113,82 +129,6 @@
   }
 }
 
-:root {
-  --background: oklch(0.985 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.42 0.12 275);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.955 0.005 275);
-  --secondary-foreground: oklch(0.25 0.03 275);
-  --muted: oklch(0.96 0 0);
-  --muted-foreground: oklch(0.5 0.015 275);
-  --accent: oklch(0.95 0.02 275);
-  --accent-foreground: oklch(0.25 0.03 275);
-  --destructive: oklch(0.55 0.2 25);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.9 0.006 275);
-  --input: oklch(0.9 0.006 275);
-  --ring: oklch(0.55 0.14 275);
-  --radius: 0.75rem;
-
-  --chart-1: oklch(0.64 0.22 40);
-  --chart-2: oklch(0.6 0.18 190);
-  --chart-3: oklch(0.55 0.15 260);
-  --chart-4: oklch(0.7 0.16 85);
-  --chart-5: oklch(0.6 0.2 330);
-
-  --sidebar-background: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.42 0.12 275);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.95 0.02 275);
-  --sidebar-accent-foreground: oklch(0.25 0.03 275);
-  --sidebar-border: oklch(0.9 0.006 275);
-  --sidebar-ring: oklch(0.55 0.14 275);
-}
-
-.dark,
-[data-theme='dark'] {
-  --background: oklch(0.14 0.01 275);
-  --foreground: oklch(0.98 0 0);
-  --card: oklch(0.17 0.015 275);
-  --card-foreground: oklch(0.98 0 0);
-  --popover: oklch(0.17 0.015 275);
-  --popover-foreground: oklch(0.98 0 0);
-  --primary: oklch(0.65 0.16 275);
-  --primary-foreground: oklch(0.12 0.02 275);
-  --secondary: oklch(0.24 0.02 275);
-  --secondary-foreground: oklch(0.95 0 0);
-  --muted: oklch(0.22 0.015 275);
-  --muted-foreground: oklch(0.7 0.02 275);
-  --accent: oklch(0.25 0.03 275);
-  --accent-foreground: oklch(0.98 0 0);
-  --destructive: oklch(0.45 0.2 25);
-  --destructive-foreground: oklch(0.98 0 0);
-  --border: oklch(0.26 0.02 275);
-  --input: oklch(0.26 0.02 275);
-  --ring: oklch(0.65 0.16 275);
-
-  --chart-1: oklch(0.65 0.2 275);
-  --chart-2: oklch(0.65 0.16 190);
-  --chart-3: oklch(0.75 0.15 85);
-  --chart-4: oklch(0.6 0.2 330);
-  --chart-5: oklch(0.7 0.18 40);
-
-  --sidebar-background: oklch(0.13 0.01 275);
-  --sidebar-foreground: oklch(0.98 0 0);
-  --sidebar-primary: oklch(0.65 0.16 275);
-  --sidebar-primary-foreground: oklch(0.12 0.02 275);
-  --sidebar-accent: oklch(0.22 0.02 275);
-  --sidebar-accent-foreground: oklch(0.98 0 0);
-  --sidebar-border: oklch(0.22 0.02 275);
-  --sidebar-ring: oklch(0.65 0.16 275);
-}
-
 @layer base {
   * {
     border-color: var(--border);
@@ -211,4 +151,38 @@
     background-color: var(--primary);
     color: var(--primary-foreground);
   }
+
+  /* App-like touch behavior (ADR-0027). */
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    /* Horizontal swipes never drag the whole page; vertical pull-to-refresh stays. */
+    overscroll-behavior-x: none;
+  }
+
+  a,
+  button,
+  [role='button'],
+  label,
+  summary,
+  input,
+  select,
+  textarea {
+    /* Removes the double-tap-to-zoom delay on interactive elements. */
+    touch-action: manipulation;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+}
+
+/* Room for the fixed mobile tab bar so it never covers page content. */
+@utility pb-tabbar {
+  padding-bottom: calc(3.5rem + env(safe-area-inset-bottom));
 }

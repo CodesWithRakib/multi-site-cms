@@ -4,11 +4,7 @@ import React, { useState, useMemo } from 'react';
 import { Loader2, ChevronLeft, ChevronRight, Image as ImageIcon } from 'lucide-react';
 import { ShellLayout } from '@/components/shell';
 import { useAdmin } from '@/lib/admin-context';
-import {
-  useDeleteMediaMutation,
-  useListMediaQuery,
-  useUpdateMediaMutation,
-} from '@/lib/cms-api';
+import { useDeleteMediaMutation, useListMediaQuery, useUpdateMediaMutation } from '@/lib/cms-api';
 import type { MediaAssetItem } from '@multi-site-cms/types';
 import {
   MediaMetricsCards,
@@ -280,12 +276,13 @@ export default function MediaPage() {
                   {t.media.noMediaFound || 'No media assets found'}
                 </h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm">
-                  {t.media.noMediaSub || 'Upload destination photography, banners, or editorial documents.'}
+                  {t.media.noMediaSub ||
+                    'Upload destination photography, banners, or editorial documents.'}
                 </p>
                 <button
                   type="button"
                   onClick={() => setActiveTab('upload')}
-                  className="mt-5 px-5 py-2.5 bg-gradient-to-r from-[#00e599] to-[#05f292] text-[#072423] rounded-xl text-xs font-bold hover:brightness-105 shadow-md shadow-emerald-500/20 cursor-pointer transition-all"
+                  className="mt-5 px-5 py-2.5 bg-gradient-to-r from-brand-400 to-brand-300 text-brand-950 rounded-xl text-xs font-bold hover:brightness-105 shadow-md shadow-emerald-500/20 cursor-pointer transition-all"
                 >
                   + {t.media.uploadFirst || 'Upload First Asset'}
                 </button>

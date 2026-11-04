@@ -1,0 +1,230 @@
+/*
+ * Central theme (ADR-0027). Do not edit colors here.
+ *
+ * To change a site's colors, edit packages/ui/src/theme/site-themes.ts. Each
+ * app's root <html> receives four inputs from it:
+ *   --brand-h / --brand-c       brand hue and peak chroma (oklch)
+ *   --neutral-h / --neutral-c   tint hue and peak chroma for grays
+ * Everything below is derived from those inputs: 50-950 scales, semantic
+ * tokens for light and dark mode, and aliases that make legacy palette
+ * utilities (bg-emerald-600, text-slate-900, ...) follow the theme.
+ *
+ * Generated layout; keep the step tables in sync with site-themes.ts tests.
+ */
+
+:root {
+  /* Fallback inputs (shared neutral teal) if an app forgets the html style. */
+  --brand-h: 170;
+  --brand-c: 0.16;
+  --neutral-h: 200;
+  --neutral-c: 0.02;
+
+  --brand-50: oklch(0.979 calc(var(--brand-c) * 0.12) var(--brand-h));
+  --brand-100: oklch(0.95 calc(var(--brand-c) * 0.29) var(--brand-h));
+  --brand-200: oklch(0.905 calc(var(--brand-c) * 0.53) var(--brand-h));
+  --brand-300: oklch(0.845 calc(var(--brand-c) * 0.81) var(--brand-h));
+  --brand-400: oklch(0.765 calc(var(--brand-c) * 1) var(--brand-h));
+  --brand-500: oklch(0.696 calc(var(--brand-c) * 0.96) var(--brand-h));
+  --brand-600: oklch(0.596 calc(var(--brand-c) * 0.82) var(--brand-h));
+  --brand-700: oklch(0.508 calc(var(--brand-c) * 0.67) var(--brand-h));
+  --brand-800: oklch(0.432 calc(var(--brand-c) * 0.54) var(--brand-h));
+  --brand-900: oklch(0.378 calc(var(--brand-c) * 0.44) var(--brand-h));
+  --brand-950: oklch(0.262 calc(var(--brand-c) * 0.29) var(--brand-h));
+
+  --neutral-50: oklch(0.984 calc(var(--neutral-c) * 0.07) var(--neutral-h));
+  --neutral-100: oklch(0.968 calc(var(--neutral-c) * 0.16) var(--neutral-h));
+  --neutral-200: oklch(0.929 calc(var(--neutral-c) * 0.3) var(--neutral-h));
+  --neutral-300: oklch(0.869 calc(var(--neutral-c) * 0.5) var(--neutral-h));
+  --neutral-400: oklch(0.704 calc(var(--neutral-c) * 0.9) var(--neutral-h));
+  --neutral-500: oklch(0.554 calc(var(--neutral-c) * 1) var(--neutral-h));
+  --neutral-600: oklch(0.446 calc(var(--neutral-c) * 0.95) var(--neutral-h));
+  --neutral-700: oklch(0.372 calc(var(--neutral-c) * 1) var(--neutral-h));
+  --neutral-800: oklch(0.279 calc(var(--neutral-c) * 0.93) var(--neutral-h));
+  --neutral-900: oklch(0.208 calc(var(--neutral-c) * 0.95) var(--neutral-h));
+  --neutral-950: oklch(0.129 calc(var(--neutral-c) * 0.95) var(--neutral-h));
+}
+
+/* Legacy palette aliases: brand-like families follow the brand scale. Status
+   families (red, rose, amber, orange, yellow, green, lime, blue, indigo,
+   violet, purple, fuchsia, pink) keep Tailwind's fixed colors on purpose. */
+:root {
+  --color-emerald-50: var(--brand-50);
+  --color-emerald-100: var(--brand-100);
+  --color-emerald-200: var(--brand-200);
+  --color-emerald-300: var(--brand-300);
+  --color-emerald-400: var(--brand-400);
+  --color-emerald-500: var(--brand-500);
+  --color-emerald-600: var(--brand-600);
+  --color-emerald-700: var(--brand-700);
+  --color-emerald-800: var(--brand-800);
+  --color-emerald-900: var(--brand-900);
+  --color-emerald-950: var(--brand-950);
+
+  --color-teal-50: var(--brand-50);
+  --color-teal-100: var(--brand-100);
+  --color-teal-200: var(--brand-200);
+  --color-teal-300: var(--brand-300);
+  --color-teal-400: var(--brand-400);
+  --color-teal-500: var(--brand-500);
+  --color-teal-600: var(--brand-600);
+  --color-teal-700: var(--brand-700);
+  --color-teal-800: var(--brand-800);
+  --color-teal-900: var(--brand-900);
+  --color-teal-950: var(--brand-950);
+
+  --color-sky-50: var(--brand-50);
+  --color-sky-100: var(--brand-100);
+  --color-sky-200: var(--brand-200);
+  --color-sky-300: var(--brand-300);
+  --color-sky-400: var(--brand-400);
+  --color-sky-500: var(--brand-500);
+  --color-sky-600: var(--brand-600);
+  --color-sky-700: var(--brand-700);
+  --color-sky-800: var(--brand-800);
+  --color-sky-900: var(--brand-900);
+  --color-sky-950: var(--brand-950);
+
+  --color-cyan-50: var(--brand-50);
+  --color-cyan-100: var(--brand-100);
+  --color-cyan-200: var(--brand-200);
+  --color-cyan-300: var(--brand-300);
+  --color-cyan-400: var(--brand-400);
+  --color-cyan-500: var(--brand-500);
+  --color-cyan-600: var(--brand-600);
+  --color-cyan-700: var(--brand-700);
+  --color-cyan-800: var(--brand-800);
+  --color-cyan-900: var(--brand-900);
+  --color-cyan-950: var(--brand-950);
+
+  --color-slate-50: var(--neutral-50);
+  --color-slate-100: var(--neutral-100);
+  --color-slate-200: var(--neutral-200);
+  --color-slate-300: var(--neutral-300);
+  --color-slate-400: var(--neutral-400);
+  --color-slate-500: var(--neutral-500);
+  --color-slate-600: var(--neutral-600);
+  --color-slate-700: var(--neutral-700);
+  --color-slate-800: var(--neutral-800);
+  --color-slate-900: var(--neutral-900);
+  --color-slate-950: var(--neutral-950);
+
+  --color-gray-50: var(--neutral-50);
+  --color-gray-100: var(--neutral-100);
+  --color-gray-200: var(--neutral-200);
+  --color-gray-300: var(--neutral-300);
+  --color-gray-400: var(--neutral-400);
+  --color-gray-500: var(--neutral-500);
+  --color-gray-600: var(--neutral-600);
+  --color-gray-700: var(--neutral-700);
+  --color-gray-800: var(--neutral-800);
+  --color-gray-900: var(--neutral-900);
+  --color-gray-950: var(--neutral-950);
+
+  --color-zinc-50: var(--neutral-50);
+  --color-zinc-100: var(--neutral-100);
+  --color-zinc-200: var(--neutral-200);
+  --color-zinc-300: var(--neutral-300);
+  --color-zinc-400: var(--neutral-400);
+  --color-zinc-500: var(--neutral-500);
+  --color-zinc-600: var(--neutral-600);
+  --color-zinc-700: var(--neutral-700);
+  --color-zinc-800: var(--neutral-800);
+  --color-zinc-900: var(--neutral-900);
+  --color-zinc-950: var(--neutral-950);
+
+  --color-neutral-50: var(--neutral-50);
+  --color-neutral-100: var(--neutral-100);
+  --color-neutral-200: var(--neutral-200);
+  --color-neutral-300: var(--neutral-300);
+  --color-neutral-400: var(--neutral-400);
+  --color-neutral-500: var(--neutral-500);
+  --color-neutral-600: var(--neutral-600);
+  --color-neutral-700: var(--neutral-700);
+  --color-neutral-800: var(--neutral-800);
+  --color-neutral-900: var(--neutral-900);
+  --color-neutral-950: var(--neutral-950);
+
+  --color-stone-50: var(--neutral-50);
+  --color-stone-100: var(--neutral-100);
+  --color-stone-200: var(--neutral-200);
+  --color-stone-300: var(--neutral-300);
+  --color-stone-400: var(--neutral-400);
+  --color-stone-500: var(--neutral-500);
+  --color-stone-600: var(--neutral-600);
+  --color-stone-700: var(--neutral-700);
+  --color-stone-800: var(--neutral-800);
+  --color-stone-900: var(--neutral-900);
+  --color-stone-950: var(--neutral-950);
+}
+
+/* Semantic tokens, light. */
+:root {
+  --background: var(--neutral-50);
+  --foreground: var(--neutral-950);
+  --card: oklch(1 0 0);
+  --card-foreground: var(--neutral-950);
+  --popover: oklch(1 0 0);
+  --popover-foreground: var(--neutral-950);
+  --primary: var(--brand-600);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: var(--brand-50);
+  --secondary-foreground: var(--brand-900);
+  --muted: var(--neutral-100);
+  --muted-foreground: var(--neutral-600);
+  --accent: var(--brand-100);
+  --accent-foreground: var(--brand-900);
+  --destructive: oklch(0.577 0.245 27.3);
+  --destructive-foreground: oklch(0.99 0 0);
+  --border: var(--neutral-200);
+  --input: var(--neutral-200);
+  --ring: var(--brand-500);
+  --radius: 0.75rem;
+
+  --chart-1: var(--brand-500);
+  --chart-2: oklch(0.65 0.17 calc(var(--brand-h) + 120));
+  --chart-3: oklch(0.72 0.15 75);
+  --chart-4: oklch(0.6 0.2 330);
+  --chart-5: oklch(0.6 0.16 260);
+
+  --sidebar-background: var(--neutral-50);
+  --sidebar-foreground: var(--neutral-950);
+  --sidebar-primary: var(--brand-600);
+  --sidebar-primary-foreground: oklch(0.99 0 0);
+  --sidebar-accent: var(--brand-100);
+  --sidebar-accent-foreground: var(--brand-900);
+  --sidebar-border: var(--neutral-200);
+  --sidebar-ring: var(--brand-500);
+}
+
+/* Semantic tokens, dark. */
+.dark,
+[data-theme='dark'] {
+  --background: var(--neutral-950);
+  --foreground: var(--neutral-50);
+  --card: var(--neutral-900);
+  --card-foreground: var(--neutral-50);
+  --popover: var(--neutral-900);
+  --popover-foreground: var(--neutral-50);
+  --primary: var(--brand-400);
+  --primary-foreground: var(--brand-950);
+  --secondary: var(--neutral-800);
+  --secondary-foreground: var(--neutral-50);
+  --muted: var(--neutral-800);
+  --muted-foreground: var(--neutral-400);
+  --accent: var(--brand-900);
+  --accent-foreground: var(--neutral-50);
+  --destructive: oklch(0.5 0.2 25);
+  --destructive-foreground: oklch(0.99 0 0);
+  --border: var(--neutral-800);
+  --input: var(--neutral-800);
+  --ring: var(--brand-400);
+
+  --sidebar-background: var(--neutral-950);
+  --sidebar-foreground: var(--neutral-50);
+  --sidebar-primary: var(--brand-400);
+  --sidebar-primary-foreground: var(--brand-950);
+  --sidebar-accent: var(--neutral-800);
+  --sidebar-accent-foreground: var(--neutral-50);
+  --sidebar-border: var(--neutral-800);
+  --sidebar-ring: var(--brand-400);
+}

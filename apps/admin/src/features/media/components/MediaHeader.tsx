@@ -42,8 +42,8 @@ export function MediaHeader({
             {title}
           </h1>
           {activeSite ? (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#00e599]/10 text-[#00e599] border border-[#00e599]/20 shadow-xs">
-              <span className="size-2 rounded-full bg-[#00e599] animate-pulse" />
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-brand-400/10 text-brand-400 border border-brand-400/20 shadow-xs">
+              <span className="size-2 rounded-full bg-brand-400 animate-pulse" />
               {activeSite.name}
             </span>
           ) : (
@@ -78,7 +78,7 @@ export function MediaHeader({
             title="Grid View"
             className={`p-2 rounded-lg transition-all cursor-pointer ${
               viewMode === 'grid'
-                ? 'bg-white dark:bg-slate-900 text-[#072423] dark:text-emerald-400 shadow-xs'
+                ? 'bg-white dark:bg-slate-900 text-brand-950 dark:text-emerald-400 shadow-xs'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
             }`}
           >
@@ -90,7 +90,7 @@ export function MediaHeader({
             title="List View"
             className={`p-2 rounded-lg transition-all cursor-pointer ${
               viewMode === 'list'
-                ? 'bg-white dark:bg-slate-900 text-[#072423] dark:text-emerald-400 shadow-xs'
+                ? 'bg-white dark:bg-slate-900 text-brand-950 dark:text-emerald-400 shadow-xs'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
             }`}
           >
@@ -105,7 +105,7 @@ export function MediaHeader({
             onClick={() => onTabChange('browse')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
               activeTab === 'browse'
-                ? 'bg-white dark:bg-slate-900 text-[#072423] dark:text-emerald-400 shadow-xs'
+                ? 'bg-white dark:bg-slate-900 text-brand-950 dark:text-emerald-400 shadow-xs'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
             }`}
           >
@@ -117,7 +117,7 @@ export function MediaHeader({
             onClick={() => onTabChange('upload')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
               activeTab === 'upload'
-                ? 'bg-white dark:bg-slate-900 text-[#072423] dark:text-emerald-400 shadow-xs'
+                ? 'bg-white dark:bg-slate-900 text-brand-950 dark:text-emerald-400 shadow-xs'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
             }`}
           >

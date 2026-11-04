@@ -13,11 +13,10 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [destDropdownOpen, setDestDropdownOpen] = useState(false);
 
-
   const isHome = pathname === '/';
 
   return (
-    <header className="sticky top-0 z-50 w-full transition-colors bg-white/85 dark:bg-neutral-950/85 backdrop-blur-md border-b border-border/80">
+    <header className="sticky top-0 z-50 w-full pt-[env(safe-area-inset-top)] transition-colors bg-white/85 dark:bg-neutral-950/85 backdrop-blur-md border-b border-border/80">
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Brand Logo */}
         <TravelLogo />
@@ -127,7 +126,7 @@ export function Header() {
             href="/search"
             aria-label="Search destinations and articles"
             title="Search"
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card/80 text-muted-foreground hover:text-foreground hover:bg-muted transition-all cursor-pointer shadow-2xs hover:scale-105"
+            className="hidden md:inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card/80 text-muted-foreground hover:text-foreground hover:bg-muted transition-all cursor-pointer shadow-2xs hover:scale-105"
           >
             <Search className="h-4 w-4" />
           </Link>

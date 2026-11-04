@@ -1,145 +1,103 @@
+import 'reflect-metadata';
+
 import { DataSource } from 'typeorm';
-import * as argon2 from '@node-rs/argon2';
-import { buildDataSourceOptions } from '../database-options';
+
+import { PasswordService } from '../../auth/services/password.service';
 import { env } from '../../config/env';
-import { User } from '../entities/user.entity';
+import { buildDataSourceOptions } from '../database-options';
 import { Role } from '../entities/role.entity';
 import { Site } from '../entities/site.entity';
 import { UserRoleAssignment } from '../entities/user-role-assignment.entity';
+import { User } from '../entities/user.entity';
 
-async function main() {
+/**
+ * Development-only helper: creates one site-scoped Admin per seeded site so the
+ * admin UI can be exercised locally.
+ *
+ * Safety rules (SEC-13):
+ * - Refuses to run when NODE_ENV=production.
+ * - The password comes from DEV_SITE_ADMIN_PASSWORD; nothing is hardcoded.
+ * - Only creates missing accounts. Existing users are never modified, so it
+ *   cannot reset a password or reactivate a suspended account.
+ * - Never creates a Super Admin; use `pnpm --filter @multi-site-cms/api
+ *   bootstrap:super-admin` (docs/database/README.md).
+ */
+
+const SITE_ADMINS = [
+  { siteKey: 'travel-blog', email: 'traveladmin@travelblog.internal', name: 'Travel Blog Admin' },
+  { siteKey: 'air-sports', email: 'airsportsadmin@airsports.internal', name: 'Air Sports Admin' },
+] as const;
+
+const MIN_PASSWORD_LENGTH = 12;
+
+async function main(): Promise<void> {
+  if (env.NODE_ENV === 'production') {
+    throw new Error(
+      'provision-site-admins is a development tool and refuses to run in production.',
+    );
+  }
+
+  const password = process.env.DEV_SITE_ADMIN_PASSWORD ?? '';
+  if (password.length < MIN_PASSWORD_LENGTH) {
+    throw new Error(
+      `Set DEV_SITE_ADMIN_PASSWORD (at least ${MIN_PASSWORD_LENGTH} characters) before running this script.`,
+    );
+  }
+
   const dataSource = new DataSource(buildDataSourceOptions(env.DATABASE_URL));
   await dataSource.initialize();
 
-  const userRepo = dataSource.getRepository(User);
-  const roleRepo = dataSource.getRepository(Role);
-  const siteRepo = dataSource.getRepository(Site);
-  const assignmentRepo = dataSource.getRepository(UserRoleAssignment);
-
-  const hashOpts = {
-    algorithm: 2, // Argon2id
-    memoryCost: 19456,
-    timeCost: 2,
-    outputLen: 32,
-    parallelism: 1,
-  };
-
-  const superAdminPass = await argon2.hash('SuperAdmin123!', hashOpts);
-  const travelAdminPass = await argon2.hash('TravelAdmin123!', hashOpts);
-  const airAdminPass = await argon2.hash('AirSportsAdmin123!', hashOpts);
-
-  // 0. Super Admin Platform Alias
-  let superUser = await userRepo.findOne({ where: { email: 'superadmin@platform.internal' } });
-  if (!superUser) {
-    superUser = userRepo.create({
-      email: 'superadmin@platform.internal',
-      displayName: 'Super Admin',
-      passwordHash: superAdminPass,
-      status: 'active',
-    });
-    await userRepo.save(superUser);
-  } else {
-    superUser.passwordHash = superAdminPass;
-    superUser.status = 'active';
-    await userRepo.save(superUser);
-  }
-
-  const superRole = await roleRepo.findOne({ where: { key: 'super_admin', scopeType: 'platform' } });
-  if (superRole) {
-    const existingSuperAssign = await assignmentRepo.findOne({
-      where: { userId: superUser.id, roleId: superRole.id, scopeType: 'platform' },
-    });
-    if (!existingSuperAssign) {
-      await assignmentRepo.save(
-        assignmentRepo.create({
-          userId: superUser.id,
-          roleId: superRole.id,
-          scopeType: 'platform',
-          siteId: null,
-        }),
-      );
+  try {
+    const adminRole = await dataSource
+      .getRepository(Role)
+      .findOne({ where: { key: 'admin', scopeType: 'site' } });
+    if (!adminRole) {
+      throw new Error('Site admin role not found. Run the development seed first.');
     }
-  }
 
-  // 1. Travel Blog Admin
-  let travelUser = await userRepo.findOne({ where: { email: 'traveladmin@travelblog.internal' } });
-  if (!travelUser) {
-    travelUser = userRepo.create({
-      email: 'traveladmin@travelblog.internal',
-      displayName: 'Travel Blog Admin',
-      passwordHash: travelAdminPass,
-      status: 'active',
-    });
-    await userRepo.save(travelUser);
-  } else {
-    travelUser.passwordHash = travelAdminPass;
-    travelUser.status = 'active';
-    await userRepo.save(travelUser);
-  }
+    const passwordHash = await new PasswordService().hash(password);
+    const users = dataSource.getRepository(User);
+    const sites = dataSource.getRepository(Site);
+    const assignments = dataSource.getRepository(UserRoleAssignment);
 
-  // 2. Air Sports Admin
-  let airUser = await userRepo.findOne({ where: { email: 'airsportsadmin@airsports.internal' } });
-  if (!airUser) {
-    airUser = userRepo.create({
-      email: 'airsportsadmin@airsports.internal',
-      displayName: 'Air Sports Admin',
-      passwordHash: airAdminPass,
-      status: 'active',
-    });
-    await userRepo.save(airUser);
-  } else {
-    airUser.passwordHash = airAdminPass;
-    airUser.status = 'active';
-    await userRepo.save(airUser);
-  }
+    for (const admin of SITE_ADMINS) {
+      const site = await sites.findOne({ where: { key: admin.siteKey } });
+      if (!site) {
+        console.warn(`Site "${admin.siteKey}" not found; skipped ${admin.email}.`);
+        continue;
+      }
 
-  // Find Admin Role
-  const adminRole = await roleRepo.findOne({ where: { key: 'admin', scopeType: 'site' } });
-  if (!adminRole) {
-    throw new Error('Admin role not found');
-  }
+      if (await users.exists({ where: { email: admin.email } })) {
+        console.log(`${admin.email} already exists; left unchanged.`);
+        continue;
+      }
 
-  // Find Sites
-  const travelSite = await siteRepo.findOne({ where: { key: 'travel-blog' } });
-  const airSite = await siteRepo.findOne({ where: { key: 'air-sports' } });
-
-  if (travelSite) {
-    const existingTravelAssign = await assignmentRepo.findOne({
-      where: { userId: travelUser.id, roleId: adminRole.id, siteId: travelSite.id },
-    });
-    if (!existingTravelAssign) {
-      await assignmentRepo.save(
-        assignmentRepo.create({
-          userId: travelUser.id,
-          roleId: adminRole.id,
-          scopeType: 'site',
-          siteId: travelSite.id,
-        }),
-      );
+      await dataSource.transaction(async (manager) => {
+        const user = await manager.getRepository(User).save(
+          users.create({
+            email: admin.email,
+            displayName: admin.name,
+            passwordHash,
+            status: 'active',
+          }),
+        );
+        await manager.getRepository(UserRoleAssignment).save(
+          assignments.create({
+            userId: user.id,
+            roleId: adminRole.id,
+            scopeType: 'site',
+            siteId: site.id,
+          }),
+        );
+      });
+      console.log(`Created ${admin.email} as Admin of ${admin.siteKey}.`);
     }
+  } finally {
+    await dataSource.destroy();
   }
-
-  if (airSite) {
-    const existingAirAssign = await assignmentRepo.findOne({
-      where: { userId: airUser.id, roleId: adminRole.id, siteId: airSite.id },
-    });
-    if (!existingAirAssign) {
-      await assignmentRepo.save(
-        assignmentRepo.create({
-          userId: airUser.id,
-          roleId: adminRole.id,
-          scopeType: 'site',
-          siteId: airSite.id,
-        }),
-      );
-    }
-  }
-
-  console.log('Site admins successfully provisioned.');
-  await dataSource.destroy();
 }
 
-main().catch((err) => {
-  console.error(err);
+main().catch((error: unknown) => {
+  console.error(error instanceof Error ? error.message : error);
   process.exit(1);
 });

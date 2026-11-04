@@ -60,8 +60,16 @@ export default function SitesRegistryPage() {
   const statusTabs = [
     { id: '', label: t.sites.allWebsites || 'All Websites', count: stats.totalSites },
     { id: 'active', label: t.status.active, count: stats.activeSites },
-    { id: 'paused', label: t.status.paused, count: sites.filter((s) => s.status === 'paused').length },
-    { id: 'archived', label: t.status.archived, count: sites.filter((s) => s.status === 'archived').length },
+    {
+      id: 'paused',
+      label: t.status.paused,
+      count: sites.filter((s) => s.status === 'paused').length,
+    },
+    {
+      id: 'archived',
+      label: t.status.archived,
+      count: sites.filter((s) => s.status === 'archived').length,
+    },
   ];
 
   const filteredSites = useMemo(() => {
@@ -95,7 +103,8 @@ export default function SitesRegistryPage() {
               </span>
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-              {t.sites.subtitle || 'Multi-tenant configurations, domain bindings, and branding controls.'}
+              {t.sites.subtitle ||
+                'Multi-tenant configurations, domain bindings, and branding controls.'}
             </p>
           </div>
 
@@ -108,13 +117,15 @@ export default function SitesRegistryPage() {
               title="Refresh sites list"
               className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-2xs cursor-pointer disabled:opacity-50"
             >
-              <RefreshCw className={`size-4 ${isFetching ? 'animate-spin text-emerald-500' : ''}`} />
+              <RefreshCw
+                className={`size-4 ${isFetching ? 'animate-spin text-emerald-500' : ''}`}
+              />
             </button>
 
             {/* Create New Site CTA */}
             <Link
               href="/sites/new"
-              className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#00e599] to-[#05f292] text-[#072423] font-bold px-4 py-2 text-xs shadow-xs hover:brightness-105 active:scale-95 transition-all cursor-pointer"
+              className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-brand-400 to-brand-300 text-brand-950 font-bold px-4 py-2 text-xs shadow-xs hover:brightness-105 active:scale-95 transition-all cursor-pointer"
             >
               <Plus className="size-4 stroke-[2.5]" />
               <span>{t.sites.createSite || 'Register New Site'}</span>
@@ -264,7 +275,7 @@ export default function SitesRegistryPage() {
                 onClick={() => setStatusFilter(tab.id)}
                 className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                   isActive
-                    ? 'bg-[#00e599] text-[#072423] font-bold shadow-xs'
+                    ? 'bg-brand-400 text-brand-950 font-bold shadow-xs'
                     : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
                 }`}
               >
@@ -272,7 +283,7 @@ export default function SitesRegistryPage() {
                 <span
                   className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
                     isActive
-                      ? 'bg-[#072423]/20 text-[#072423]'
+                      ? 'bg-brand-950/20 text-brand-950'
                       : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
                   }`}
                 >
@@ -291,7 +302,9 @@ export default function SitesRegistryPage() {
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder={t.sites.searchPlaceholder || 'Search websites by name, key, or domain...'}
+              placeholder={
+                t.sites.searchPlaceholder || 'Search websites by name, key, or domain...'
+              }
               className="w-full pl-10 pr-9 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-hidden focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 shadow-2xs transition-all"
             />
             {searchTerm && (
@@ -333,11 +346,12 @@ export default function SitesRegistryPage() {
               {t.sites.noSitesFound || 'No websites found matching your query.'}
             </p>
             <p className="text-xs text-slate-400 max-w-sm">
-              Provision a new independent publication tenant to begin distributing canonical content.
+              Provision a new independent publication tenant to begin distributing canonical
+              content.
             </p>
             <Link
               href="/sites/new"
-              className="mt-2 flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#00e599] to-[#05f292] text-[#072423] font-bold px-4 py-2 text-xs shadow-xs"
+              className="mt-2 flex items-center gap-2 rounded-xl bg-gradient-to-r from-brand-400 to-brand-300 text-brand-950 font-bold px-4 py-2 text-xs shadow-xs"
             >
               <Plus className="size-4 stroke-[2.5]" />
               <span>{t.sites.createSite || 'Register New Site'}</span>
@@ -367,28 +381,64 @@ export default function SitesRegistryPage() {
                   <div className="relative h-36 w-full overflow-hidden bg-slate-100 dark:bg-slate-800/60">
                     {isAir ? (
                       /* Aerobatics Sports Airplane Vector Art */
-                      <svg className="w-full h-full object-cover" viewBox="0 0 400 160" preserveAspectRatio="xMidYMid slice">
+                      <svg
+                        className="w-full h-full object-cover"
+                        viewBox="0 0 400 160"
+                        preserveAspectRatio="xMidYMid slice"
+                      >
                         <defs>
-                          <linearGradient id={`air-sky-${site.id}`} x1="0%" y1="0%" x2="100%" y2="100%">
+                          <linearGradient
+                            id={`air-sky-${site.id}`}
+                            x1="0%"
+                            y1="0%"
+                            x2="100%"
+                            y2="100%"
+                          >
                             <stop offset="0%" stopColor="#0284c7" />
                             <stop offset="40%" stopColor="#38bdf8" />
                             <stop offset="100%" stopColor="#bae6fd" />
                           </linearGradient>
-                          <linearGradient id={`air-plane-${site.id}`} x1="0%" y1="0%" x2="100%" y2="100%">
+                          <linearGradient
+                            id={`air-plane-${site.id}`}
+                            x1="0%"
+                            y1="0%"
+                            x2="100%"
+                            y2="100%"
+                          >
                             <stop offset="0%" stopColor="#ef4444" />
                             <stop offset="100%" stopColor="#dc2626" />
                           </linearGradient>
                         </defs>
                         <rect width="400" height="160" fill={`url(#air-sky-${site.id})`} />
                         {/* Clouds */}
-                        <path d="M-20 140 Q 60 110, 140 135 T 300 130 T 420 145 L 420 160 L -20 160 Z" fill="#ffffff" opacity="0.8" />
-                        <path d="M20 150 Q 120 125, 220 145 T 400 135 L 400 160 L 20 160 Z" fill="#ffffff" opacity="0.9" />
+                        <path
+                          d="M-20 140 Q 60 110, 140 135 T 300 130 T 420 145 L 420 160 L -20 160 Z"
+                          fill="#ffffff"
+                          opacity="0.8"
+                        />
+                        <path
+                          d="M20 150 Q 120 125, 220 145 T 400 135 L 400 160 L 20 160 Z"
+                          fill="#ffffff"
+                          opacity="0.9"
+                        />
                         {/* Smoke Trail */}
-                        <path d="M40 70 Q 120 75, 195 82" stroke="#ffffff" strokeWidth="4" strokeDasharray="6 4" opacity="0.8" />
+                        <path
+                          d="M40 70 Q 120 75, 195 82"
+                          stroke="#ffffff"
+                          strokeWidth="4"
+                          strokeDasharray="6 4"
+                          opacity="0.8"
+                        />
                         {/* Airplane */}
                         <g transform="translate(190, 60) rotate(10) scale(0.65)">
                           <polygon points="40,20 80,24 60,32 30,26" fill="#b91c1c" />
-                          <ellipse cx="60" cy="24" rx="35" ry="8" fill={`url(#air-plane-${site.id})`} />
+                          <ellipse
+                            cx="60"
+                            cy="24"
+                            rx="35"
+                            ry="8"
+                            fill={`url(#air-plane-${site.id})`}
+                          />
                           <polygon points="50,16 65,0 72,0 60,16" fill="#f87171" />
                           <circle cx="88" cy="24" r="5" fill="#facc15" />
                           <circle cx="93" cy="24" r="3" fill="#ffffff" />
@@ -396,14 +446,30 @@ export default function SitesRegistryPage() {
                       </svg>
                     ) : isTravel ? (
                       /* Scenic Mountain & Lake Vector Art */
-                      <svg className="w-full h-full object-cover" viewBox="0 0 400 160" preserveAspectRatio="xMidYMid slice">
+                      <svg
+                        className="w-full h-full object-cover"
+                        viewBox="0 0 400 160"
+                        preserveAspectRatio="xMidYMid slice"
+                      >
                         <defs>
-                          <linearGradient id={`travel-sky-${site.id}`} x1="0%" y1="0%" x2="0%" y2="100%">
+                          <linearGradient
+                            id={`travel-sky-${site.id}`}
+                            x1="0%"
+                            y1="0%"
+                            x2="0%"
+                            y2="100%"
+                          >
                             <stop offset="0%" stopColor="#0369a1" />
                             <stop offset="60%" stopColor="#38bdf8" />
                             <stop offset="100%" stopColor="#fef08a" />
                           </linearGradient>
-                          <linearGradient id={`travel-lake-${site.id}`} x1="0%" y1="0%" x2="0%" y2="100%">
+                          <linearGradient
+                            id={`travel-lake-${site.id}`}
+                            x1="0%"
+                            y1="0%"
+                            x2="0%"
+                            y2="100%"
+                          >
                             <stop offset="0%" stopColor="#0284c7" />
                             <stop offset="100%" stopColor="#0369a1" />
                           </linearGradient>
@@ -419,23 +485,59 @@ export default function SitesRegistryPage() {
                         <polygon points="55,70 70,60 85,70" fill="#ffffff" />
                         <polygon points="230,125 320,55 410,125" fill="#1e293b" />
                         {/* Lake */}
-                        <rect y="105" width="400" height="55" fill={`url(#travel-lake-${site.id})`} />
+                        <rect
+                          y="105"
+                          width="400"
+                          height="55"
+                          fill={`url(#travel-lake-${site.id})`}
+                        />
                         {/* Lake Reflection Ripples */}
-                        <path d="M60 120 L160 120 M120 132 L240 132 M200 145 L320 145" stroke="#ffffff" strokeWidth="1.5" opacity="0.4" />
+                        <path
+                          d="M60 120 L160 120 M120 132 L240 132 M200 145 L320 145"
+                          stroke="#ffffff"
+                          strokeWidth="1.5"
+                          opacity="0.4"
+                        />
                       </svg>
                     ) : (
                       /* Futuristic Digital Platform Geometric Art */
-                      <svg className="w-full h-full object-cover" viewBox="0 0 400 160" preserveAspectRatio="xMidYMid slice">
+                      <svg
+                        className="w-full h-full object-cover"
+                        viewBox="0 0 400 160"
+                        preserveAspectRatio="xMidYMid slice"
+                      >
                         <defs>
-                          <linearGradient id={`generic-bg-${site.id}`} x1="0%" y1="0%" x2="100%" y2="100%">
+                          <linearGradient
+                            id={`generic-bg-${site.id}`}
+                            x1="0%"
+                            y1="0%"
+                            x2="100%"
+                            y2="100%"
+                          >
                             <stop offset="0%" stopColor="#082625" />
                             <stop offset="50%" stopColor="#0f4644" />
                             <stop offset="100%" stopColor="#00e599" />
                           </linearGradient>
                         </defs>
                         <rect width="400" height="160" fill={`url(#generic-bg-${site.id})`} />
-                        <circle cx="200" cy="80" r="50" stroke="#00e599" strokeWidth="1.5" fill="none" opacity="0.3" />
-                        <circle cx="200" cy="80" r="30" stroke="#ffffff" strokeWidth="1" fill="none" opacity="0.2" />
+                        <circle
+                          cx="200"
+                          cy="80"
+                          r="50"
+                          stroke="#00e599"
+                          strokeWidth="1.5"
+                          fill="none"
+                          opacity="0.3"
+                        />
+                        <circle
+                          cx="200"
+                          cy="80"
+                          r="30"
+                          stroke="#ffffff"
+                          strokeWidth="1"
+                          fill="none"
+                          opacity="0.2"
+                        />
                       </svg>
                     )}
 

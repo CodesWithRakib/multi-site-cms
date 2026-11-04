@@ -1,10 +1,13 @@
 import type { Metadata, Viewport } from 'next';
+import Script from 'next/script';
 import { JetBrains_Mono, Plus_Jakarta_Sans } from 'next/font/google';
 import type { ReactNode } from 'react';
 
 import { Providers } from '@/components/providers';
 import { publicConfig } from '@/config/env';
 import { platformConfig } from '@/config/platform';
+
+import { siteThemeColors, siteThemeStyle, themeInitScript } from '@multi-site-cms/ui';
 
 import './globals.css';
 
@@ -23,6 +26,9 @@ const monoFont = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  // Home-screen install behaves like a native app (ADR-0027).
+  appleWebApp: { capable: true, title: 'CMS Admin', statusBarStyle: 'default' },
+  formatDetection: { telephone: false },
   metadataBase: new URL(publicConfig.appUrl),
   title: {
     default: `${platformConfig.name} — Admin`,
@@ -36,13 +42,19 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  colorScheme: 'light',
-  themeColor: '#312e81',
+  colorScheme: 'light dark',
+  themeColor: siteThemeColors('admin'),
+  viewportFit: 'cover',
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" data-site="admin" style={siteThemeStyle('admin')} suppressHydrationWarning>
+      <head>
+        <Script id="theme-init" strategy="beforeInteractive">
+          {themeInitScript('multi_site_cms_admin_theme')}
+        </Script>
+      </head>
       <body
         className={`${sansFont.variable} ${monoFont.variable} min-h-dvh bg-background font-sans antialiased text-foreground`}
       >

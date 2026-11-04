@@ -223,13 +223,15 @@ export default function PostsPage() {
               title="Refresh Posts"
               aria-label="Refresh Posts"
             >
-              <RefreshCw className={`size-4 ${isFetching ? 'animate-spin text-emerald-500' : ''}`} />
+              <RefreshCw
+                className={`size-4 ${isFetching ? 'animate-spin text-emerald-500' : ''}`}
+              />
             </button>
 
             {/* Gradient Mint Create CTA Button */}
             <Link
               href="/posts/new"
-              className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#00e599] to-[#05f292] hover:from-[#00d68f] hover:to-[#00e599] text-[#072423] font-bold text-xs flex items-center gap-2 shadow-xs transition-all cursor-pointer"
+              className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-brand-400 to-brand-300 hover:from-brand-500 hover:to-brand-400 text-brand-950 font-bold text-xs flex items-center gap-2 shadow-xs transition-all cursor-pointer"
             >
               <Plus className="size-4 stroke-[2.5]" />
               <span>{t.content.newPost}</span>
@@ -377,7 +379,7 @@ export default function PostsPage() {
                 }}
                 className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all shrink-0 flex items-center gap-2 cursor-pointer ${
                   isActive
-                    ? 'bg-[#00e599] text-[#072624] font-bold shadow-md shadow-[#00e599]/20'
+                    ? 'bg-brand-400 text-brand-950 font-bold shadow-md shadow-brand-400/20'
                     : 'bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
                 }`}
               >
@@ -385,7 +387,7 @@ export default function PostsPage() {
                 <span
                   className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                     isActive
-                      ? 'bg-[#072624]/15 text-[#072624]'
+                      ? 'bg-brand-950/15 text-brand-950'
                       : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
                   }`}
                 >
@@ -491,7 +493,7 @@ export default function PostsPage() {
               </p>
               <Link
                 href="/posts/new"
-                className="mt-2 flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#00e599] to-[#05f292] text-[#072423] font-bold px-4 py-2 text-xs shadow-xs"
+                className="mt-2 flex items-center gap-2 rounded-xl bg-gradient-to-r from-brand-400 to-brand-300 text-brand-950 font-bold px-4 py-2 text-xs shadow-xs"
               >
                 <Plus className="size-4 stroke-[2.5]" />
                 <span>{t.content.newPost}</span>
@@ -504,7 +506,9 @@ export default function PostsPage() {
                   <tr className="border-b border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 text-[11px] font-bold uppercase tracking-wider text-slate-400">
                     <th className="py-3.5 px-6">{t.content.tableTitle || 'Post & Summary'}</th>
                     <th className="py-3.5 px-4">{t.content.type || 'Content Type'}</th>
-                    <th className="py-3.5 px-4">{t.content.publicationStatus || 'Site Publication'}</th>
+                    <th className="py-3.5 px-4">
+                      {t.content.publicationStatus || 'Site Publication'}
+                    </th>
                     <th className="py-3.5 px-4">{t.content.updated || 'Last Updated'}</th>
                     <th className="py-3.5 px-6 text-right">{t.content.actions || 'Actions'}</th>
                   </tr>
@@ -519,7 +523,9 @@ export default function PostsPage() {
                     const excerpt = post.currentRevision?.excerpt || 'No excerpt provided.';
                     const status = pub?.status || post.status;
                     const isAir = post.type.toLowerCase().includes('air');
-                    const isTravel = post.type.toLowerCase().includes('travel') || post.type.toLowerCase().includes('guide');
+                    const isTravel =
+                      post.type.toLowerCase().includes('travel') ||
+                      post.type.toLowerCase().includes('guide');
 
                     // Find corresponding target site
                     const targetSite = sites.find((s) => s.id === pub?.siteId);
@@ -540,26 +546,67 @@ export default function PostsPage() {
                             {/* Rich Scenic Vector Thumbnail */}
                             <div className="size-12 rounded-xl overflow-hidden shrink-0 shadow-2xs border border-slate-200/60 dark:border-slate-700/60">
                               {isAir ? (
-                                <svg viewBox="0 0 80 55" className="size-full object-cover" fill="none">
+                                <svg
+                                  viewBox="0 0 80 55"
+                                  className="size-full object-cover"
+                                  fill="none"
+                                >
                                   <defs>
-                                    <linearGradient id={`postSky-${post.id}`} x1="0" y1="0" x2="0" y2="1">
+                                    <linearGradient
+                                      id={`postSky-${post.id}`}
+                                      x1="0"
+                                      y1="0"
+                                      x2="0"
+                                      y2="1"
+                                    >
                                       <stop offset="0%" stopColor="#0284c7" />
                                       <stop offset="100%" stopColor="#7dd3fc" />
                                     </linearGradient>
                                   </defs>
                                   <rect width="80" height="55" fill={`url(#postSky-${post.id})`} />
-                                  <ellipse cx="20" cy="40" rx="18" ry="8" fill="#ffffff" fillOpacity="0.8" />
-                                  <ellipse cx="60" cy="35" rx="20" ry="9" fill="#ffffff" fillOpacity="0.75" />
+                                  <ellipse
+                                    cx="20"
+                                    cy="40"
+                                    rx="18"
+                                    ry="8"
+                                    fill="#ffffff"
+                                    fillOpacity="0.8"
+                                  />
+                                  <ellipse
+                                    cx="60"
+                                    cy="35"
+                                    rx="20"
+                                    ry="9"
+                                    fill="#ffffff"
+                                    fillOpacity="0.75"
+                                  />
                                   <g transform="translate(40, 22) rotate(-15)">
                                     <path d="M -15 -1 L 15 -1 L 12 1 L -12 1 Z" fill="#dc2626" />
-                                    <rect x="-2" y="-7" width="4" height="14" rx="1" fill="#b91c1c" />
+                                    <rect
+                                      x="-2"
+                                      y="-7"
+                                      width="4"
+                                      height="14"
+                                      rx="1"
+                                      fill="#b91c1c"
+                                    />
                                     <path d="M -6 6 L 6 6 L 0 3 Z" fill="#991b1b" />
                                   </g>
                                 </svg>
                               ) : isTravel ? (
-                                <svg viewBox="0 0 80 55" className="size-full object-cover" fill="none">
+                                <svg
+                                  viewBox="0 0 80 55"
+                                  className="size-full object-cover"
+                                  fill="none"
+                                >
                                   <defs>
-                                    <linearGradient id={`postMtn-${post.id}`} x1="0" y1="0" x2="0" y2="1">
+                                    <linearGradient
+                                      id={`postMtn-${post.id}`}
+                                      x1="0"
+                                      y1="0"
+                                      x2="0"
+                                      y2="1"
+                                    >
                                       <stop offset="0%" stopColor="#0284c7" />
                                       <stop offset="60%" stopColor="#38bdf8" />
                                       <stop offset="100%" stopColor="#bae6fd" />
@@ -605,8 +652,8 @@ export default function PostsPage() {
                               isTravel
                                 ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/80'
                                 : isAir
-                                ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border-sky-200 dark:border-sky-800/80'
-                                : 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800/80'
+                                  ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border-sky-200 dark:border-sky-800/80'
+                                  : 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800/80'
                             }`}
                           >
                             {post.type.replace('_', ' ')}
@@ -854,7 +901,9 @@ export default function PostsPage() {
           {totalPages > 1 && (
             <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 text-xs text-slate-500">
               <span className="font-medium text-slate-600 dark:text-slate-400">
-                {t.content.showing || 'Showing'} {((page - 1) * 10) + 1} - {Math.min(page * 10, totalPosts)} {t.content.of || 'of'} {totalPosts} {t.content.posts || 'posts'}
+                {t.content.showing || 'Showing'} {(page - 1) * 10 + 1} -{' '}
+                {Math.min(page * 10, totalPosts)} {t.content.of || 'of'} {totalPosts}{' '}
+                {t.content.posts || 'posts'}
               </span>
               <div className="flex items-center gap-2">
                 <button

@@ -17,7 +17,7 @@ export function Header({ onMenuToggle }: HeaderProps) {
   };
 
   return (
-    <header className="w-full shrink-0 sticky top-0 z-30 bg-[#f3f6f8]/90 dark:bg-[#071918]/90 backdrop-blur-md border-b border-slate-200/50 dark:border-teal-950/50 flex items-center justify-between gap-4 py-3.5 px-4 sm:px-8">
+    <header className="w-full shrink-0 sticky top-0 z-30 bg-neutral-100/90 dark:bg-brand-950/90 backdrop-blur-md border-b border-slate-200/50 dark:border-teal-950/50 flex items-center justify-between gap-4 py-3.5 px-4 sm:px-8">
       {/* Mobile Hamburger Button */}
       <button
         type="button"

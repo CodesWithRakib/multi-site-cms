@@ -123,7 +123,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
       {/* Sidebar container */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col bg-gradient-to-b from-[#082625] via-[#072221] to-[#051a19] text-white border-r border-[#0d3431] transition-transform duration-200 lg:static lg:translate-x-0 h-full shrink-0 ${
+        className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col bg-gradient-to-b from-brand-900 via-brand-950 to-brand-950 text-white border-r border-brand-900 transition-transform duration-200 lg:static lg:translate-x-0 h-full shrink-0 ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
         aria-label="Sidebar navigation"
@@ -166,13 +166,13 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 onClick={onClose}
                 className={`flex items-center gap-3.5 rounded-xl px-4 py-2.5 text-xs font-semibold transition-all ${
                   item.active
-                    ? 'bg-[#00e599] text-[#072624] font-bold shadow-md shadow-[#00e599]/20'
+                    ? 'bg-brand-400 text-brand-950 font-bold shadow-md shadow-brand-400/20'
                     : 'text-slate-300/80 hover:bg-white/[0.07] hover:text-white'
                 }`}
               >
                 <Icon
                   className={`h-4 w-4 shrink-0 ${
-                    item.active ? 'text-[#072624]' : 'text-slate-300/80 group-hover:text-white'
+                    item.active ? 'text-brand-950' : 'text-slate-300/80 group-hover:text-white'
                   }`}
                 />
                 <span className="flex-1">{item.label}</span>
@@ -205,7 +205,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             </p>
             <button
               type="button"
-              className="mt-3.5 w-full py-2 px-3 rounded-xl bg-[#00e599] hover:bg-[#05f292] text-[#072423] font-bold text-xs transition-colors flex items-center justify-center gap-1.5 shadow-sm cursor-pointer"
+              className="mt-3.5 w-full py-2 px-3 rounded-xl bg-brand-400 hover:bg-brand-300 text-brand-950 font-bold text-xs transition-colors flex items-center justify-center gap-1.5 shadow-sm cursor-pointer"
             >
               <span>{t('nav.viewPlans')}</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -214,11 +214,11 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         </div>
 
         {/* User Profile at bottom */}
-        <div className="p-4 border-t border-[#0d3431]/80">
+        <div className="p-4 border-t border-brand-900/80">
           <div className="flex items-center justify-between px-2 py-1.5 rounded-xl hover:bg-white/[0.05] transition-colors cursor-pointer group">
             <div className="flex items-center gap-3 min-w-0">
               {/* Detailed vector avatar for Rakib Islam matching user screenshot */}
-              <div className="relative size-10 rounded-full overflow-hidden border-2 border-emerald-400/40 shrink-0 bg-[#0c3936] shadow-2xs">
+              <div className="relative size-10 rounded-full overflow-hidden border-2 border-emerald-400/40 shrink-0 bg-brand-900 shadow-2xs">
                 <svg viewBox="0 0 100 100" className="size-full object-cover">
                   <defs>
                     <linearGradient id="skin" x1="0%" y1="0%" x2="0%" y2="100%">

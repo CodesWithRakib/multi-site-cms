@@ -2,29 +2,32 @@
 
 ## State at handoff (2026-11-04)
 
-- Phases 1–2 done; Phase 3a done. All changes **uncommitted**.
-- Owner actions: rotate the Cloudinary secret; set `NEXT_PUBLIC_CONTACT_EMAIL`;
-  set `REVALIDATE_SECRET` (+ `SITE_REVALIDATE_URLS` locally); in production also
+- Phases 1–2 done; Phase 3a and 3b done. All changes **uncommitted**.
+- Owner actions: rotate the Cloudinary secret (SEC-0) and any passwords set by
+  the old admin seed (SEC-13); set `NEXT_PUBLIC_CONTACT_EMAIL`,
+  `REVALIDATE_SECRET` (+ `SITE_REVALIDATE_URLS` locally); in production also
   `PREVIEW_TOKEN_SECRET` and `API_BASE_URL`.
-- Migration `1793491211000` is not applied to the dev database yet:
+- Migration `1793491211000` not yet applied to the dev database:
   `pnpm --filter @multi-site-cms/api build && pnpm --filter @multi-site-cms/api db:migration:run`.
+- Colors: edit `packages/ui/src/theme/site-themes.ts` only (ADR-0027).
 
 ## Resume steps
 
 1. Read `AGENTS.md`, `docs/roadmap/PHASE_STATUS.md`, this file.
 2. `git status`.
-3. `pnpm db:up`, then `pnpm lint && pnpm typecheck && pnpm test`,
-   `pnpm --filter @multi-site-cms/api test:integration`, and `npx playwright test`
-   (starts all four servers; first run compiles for ~1 min).
+3. `pnpm db:up`; `pnpm lint && pnpm typecheck && pnpm test`;
+   `pnpm --filter @multi-site-cms/api test:integration`; `npx playwright test`.
 
-## Exact next action — Phase 3b
+## Exact next action — Phase 3c
 
-1. Dark theme + keyboard-only pass over: admin login → posts list → editor →
-   publishing modal; travel home → article → comment form; air-sports home → event.
-   Use Playwright (`page.emulateMedia({ colorScheme: 'dark' })`, `keyboard.press('Tab')`).
-2. Propose adding `@axe-core/playwright` (new dev dependency — needs a short
-   justification in the change) and scan the routes above.
-3. Admin decomposition, one route per change, starting with `apps/admin/src/app/posts/page.tsx`.
+1. Authenticated admin visual review. Needs a local admin login, provided by
+   the user as `E2E_ADMIN_EMAIL` / `E2E_ADMIN_PASSWORD`, then:
+   `VISUAL_TOUR=1 VISUAL_OUT=<dir> npx playwright test e2e/visual-tour.spec.ts`.
+   Check the admin shell on phones (sidebar vs bottom navigation).
+2. Keyboard-only pass of critical flows; `@axe-core/playwright` scan (new dev
+   dependency — confirm with the user first).
+3. Admin decomposition, one route per change, starting with `posts/page.tsx`,
+   moving palette classes to semantic tokens as each route is touched (TD-11).
 
-Then Phase 4: run Playwright in CI (replace `test:e2e:list`), worker concurrency
-test, SSE scaling decision, retention jobs, restore drill, deferred API tests.
+Then Phase 4 (CI E2E against production builds, formatting commit TD-10,
+worker concurrency test, SSE scaling, retention, restore drill).

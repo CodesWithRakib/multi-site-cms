@@ -3,75 +3,9 @@
 
 @custom-variant dark (&:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *));
 
+/* Colors come from @multi-site-cms/ui (theme/site-themes.ts); see ADR-0027. */
+
 @source '../../../../../packages/ui/src';
-
-:root {
-  --background: oklch(0.985 0.005 90);
-  --foreground: oklch(0.18 0.025 185);
-  --card: #ffffff;
-  --card-foreground: oklch(0.18 0.025 185);
-  --popover: #ffffff;
-  --popover-foreground: oklch(0.18 0.025 185);
-  
-  /* Mint Emerald / Teal Primary */
-  --primary: oklch(0.62 0.17 175);
-  --primary-foreground: #ffffff;
-  --primary-hover: oklch(0.54 0.18 175);
-  --primary-tint: oklch(0.96 0.03 175);
-  
-  /* Deep Mountain Spruce (Sidebar / Dark Footer) */
-  --spruce: oklch(0.22 0.045 185);
-  --spruce-foreground: #ffffff;
-  --spruce-border: oklch(0.28 0.03 185);
-
-  /* Warm Amber Rating / Hot Accent */
-  --amber: oklch(0.75 0.16 75);
-  
-  --secondary: oklch(0.95 0.025 175);
-  --secondary-foreground: oklch(0.22 0.05 185);
-  --muted: oklch(0.96 0.008 90);
-  --muted-foreground: oklch(0.48 0.025 185);
-  --accent: oklch(0.94 0.03 175);
-  --accent-foreground: oklch(0.25 0.06 175);
-  --destructive: oklch(0.55 0.2 25);
-  --destructive-foreground: #ffffff;
-  --border: oklch(0.91 0.01 90);
-  --input: oklch(0.91 0.01 90);
-  --ring: oklch(0.62 0.17 175);
-}
-
-.dark,
-[data-theme='dark'] {
-  --background: oklch(0.13 0.02 185);
-  --foreground: oklch(0.96 0.01 90);
-  --card: oklch(0.17 0.025 185);
-  --card-foreground: oklch(0.96 0.01 90);
-  --popover: oklch(0.17 0.025 185);
-  --popover-foreground: oklch(0.96 0.01 90);
-  
-  --primary: oklch(0.72 0.16 175);
-  --primary-foreground: oklch(0.12 0.02 185);
-  --primary-hover: oklch(0.78 0.14 175);
-  --primary-tint: oklch(0.22 0.04 175);
-
-  --spruce: oklch(0.11 0.02 185);
-  --spruce-foreground: #ffffff;
-  --spruce-border: oklch(0.22 0.03 185);
-
-  --amber: oklch(0.78 0.16 75);
-
-  --secondary: oklch(0.22 0.03 185);
-  --secondary-foreground: oklch(0.94 0.01 90);
-  --muted: oklch(0.20 0.02 185);
-  --muted-foreground: oklch(0.70 0.025 185);
-  --accent: oklch(0.24 0.04 175);
-  --accent-foreground: oklch(0.96 0.01 90);
-  --destructive: oklch(0.48 0.18 25);
-  --destructive-foreground: #ffffff;
-  --border: oklch(0.24 0.025 185);
-  --input: oklch(0.24 0.025 185);
-  --ring: oklch(0.72 0.16 175);
-}
 
 /* Custom handwriting script utility */
 .font-handwriting {

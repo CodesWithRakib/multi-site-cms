@@ -43,7 +43,7 @@ export default async function CategoriesPage() {
             >
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <CategoryBadge label={cat.name} slug={cat.slug} />
+                  <CategoryBadge label={cat.name} slug={cat.slug} linked={false} />
                   <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-semibold text-muted-foreground">
                     {cat.postCount} {cat.postCount === 1 ? 'article' : 'articles'}
                   </span>

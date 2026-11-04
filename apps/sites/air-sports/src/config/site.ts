@@ -12,5 +12,4 @@ export const siteConfig = {
   description:
     'A live air sports desk covering competitions, records, events and the people pushing human flight forward.',
   url: publicConfig.appUrl,
-  themeColor: '#b33b16',
 } as const;

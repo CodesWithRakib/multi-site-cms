@@ -25,7 +25,7 @@ export default function UnauthorizedPage() {
       <div className="mt-6 flex items-center justify-center gap-3">
         <Link
           href="/"
-          className="flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 px-4 py-2 text-xs font-bold text-white shadow-xs transition-colors"
+          className="flex items-center gap-2 rounded-xl bg-primary hover:bg-primary/90 px-4 py-2 text-xs font-bold text-primary-foreground shadow-xs transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>{t.auth.returnHome}</span>

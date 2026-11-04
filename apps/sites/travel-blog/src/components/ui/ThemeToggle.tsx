@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Moon, Sun } from 'lucide-react';
-import { useTheme } from './ThemeProvider';
+import { useTheme } from '@multi-site-cms/ui';
 
 interface ThemeToggleProps {
   className?: string;

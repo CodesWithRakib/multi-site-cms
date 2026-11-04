@@ -154,14 +154,14 @@ export function AirSportsSearchContainer({
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search by keywords, flight zones, paragliding, wingsuit..."
             aria-label="Search radar query"
-            className="w-full rounded-2xl border border-border bg-neutral-900/60 pl-12 pr-12 py-3.5 font-mono text-sm sm:text-base text-foreground placeholder:text-muted-foreground focus:outline-hidden focus:ring-1 focus:ring-primary shadow-inner"
+            className="w-full rounded-2xl border border-border bg-muted/60 pl-12 pr-12 py-3.5 font-mono text-sm sm:text-base text-foreground placeholder:text-muted-foreground focus:outline-hidden focus:ring-1 focus:ring-primary shadow-inner"
           />
           {query ? (
             <button
               type="button"
               onClick={() => setQuery('')}
               aria-label="Clear radar query"
-              className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full p-1 text-muted-foreground hover:bg-neutral-800 cursor-pointer"
+              className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full p-1 text-muted-foreground hover:bg-muted cursor-pointer"
             >
               <X className="size-4" />
             </button>

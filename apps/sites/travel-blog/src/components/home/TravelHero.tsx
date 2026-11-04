@@ -2,10 +2,15 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { ArrowRight, Globe, Play, Sparkles, Star, Users, X } from 'lucide-react';
+import { ArrowRight, BookOpen, Compass, Play, Sparkles, X } from 'lucide-react';
 import { PillButton } from '@/components/ui';
 
-export function TravelHero() {
+interface TravelHeroProps {
+  readonly articleCount: number;
+  readonly topicCount: number;
+}
+
+export function TravelHero({ articleCount, topicCount }: TravelHeroProps) {
   const [videoModalOpen, setVideoModalOpen] = useState(false);
 
   return (
@@ -59,38 +64,37 @@ export function TravelHero() {
             </button>
           </div>
 
-          {/* Trust Social Proof Badges */}
-          <div className="pt-6 border-t border-neutral-200/80 dark:border-neutral-800/80 grid grid-cols-3 gap-4 max-w-md mx-auto lg:mx-0">
-            <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                <Globe className="h-4 w-4" />
+          {/* Real publication stats from the CMS (no invented social proof). */}
+          {(articleCount > 0 || topicCount > 0) && (
+            <dl className="pt-6 border-t border-border/80 grid grid-cols-2 gap-4 max-w-xs mx-auto lg:mx-0">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl bg-primary/10 text-primary">
+                  <BookOpen className="h-4 w-4" aria-hidden="true" />
+                </div>
+                <div className="text-left">
+                  <dd className="text-sm font-extrabold text-foreground leading-tight">
+                    {articleCount}
+                  </dd>
+                  <dt className="text-[11px] text-muted-foreground font-medium">
+                    {articleCount === 1 ? 'Published story' : 'Published stories'}
+                  </dt>
+                </div>
               </div>
-              <div className="text-left">
-                <p className="text-sm font-extrabold text-neutral-900 dark:text-white leading-tight">100+</p>
-                <p className="text-[11px] text-muted-foreground font-medium">Destinations</p>
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl bg-primary/10 text-primary">
+                  <Compass className="h-4 w-4" aria-hidden="true" />
+                </div>
+                <div className="text-left">
+                  <dd className="text-sm font-extrabold text-foreground leading-tight">
+                    {topicCount}
+                  </dd>
+                  <dt className="text-[11px] text-muted-foreground font-medium">
+                    {topicCount === 1 ? 'Topic' : 'Topics'}
+                  </dt>
+                </div>
               </div>
-            </div>
-
-            <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-xl bg-teal-500/10 text-teal-600 dark:text-teal-400">
-                <Users className="h-4 w-4" />
-              </div>
-              <div className="text-left">
-                <p className="text-sm font-extrabold text-neutral-900 dark:text-white leading-tight">500K+</p>
-                <p className="text-[11px] text-muted-foreground font-medium">Travelers</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-xl bg-amber-500/10 text-amber-500">
-                <Star className="h-4 w-4 fill-amber-400" />
-              </div>
-              <div className="text-left">
-                <p className="text-sm font-extrabold text-neutral-900 dark:text-white leading-tight">4.9</p>
-                <p className="text-[11px] text-muted-foreground font-medium">User Rating</p>
-              </div>
-            </div>
-          </div>
+            </dl>
+          )}
         </div>
 
         {/* Right Visual Image Column */}
@@ -114,7 +118,9 @@ export function TravelHero() {
                   📍
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-neutral-900 dark:text-white">Swiss Alpine Glaciers</p>
+                  <p className="text-xs font-bold text-neutral-900 dark:text-white">
+                    Swiss Alpine Glaciers
+                  </p>
                   <p className="text-[11px] text-muted-foreground">Most Visited Destination 2026</p>
                 </div>
               </div>
@@ -139,7 +145,9 @@ export function TravelHero() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-white">Experience Travel Blog Cinematic Journey</h3>
+              <h3 className="text-base font-bold text-white">
+                Experience Travel Blog Cinematic Journey
+              </h3>
               <button
                 type="button"
                 onClick={() => setVideoModalOpen(false)}
@@ -150,7 +158,8 @@ export function TravelHero() {
             </div>
             <div className="aspect-video w-full rounded-2xl overflow-hidden bg-neutral-900 flex items-center justify-center text-center p-6 text-neutral-400">
               <p className="text-sm">
-                Cinematic destination showreel is ready. Connect your YouTube or Vimeo travel playlist anytime.
+                Cinematic destination showreel is ready. Connect your YouTube or Vimeo travel
+                playlist anytime.
               </p>
             </div>
           </div>
@@ -159,4 +168,3 @@ export function TravelHero() {
     </section>
   );
 }
-

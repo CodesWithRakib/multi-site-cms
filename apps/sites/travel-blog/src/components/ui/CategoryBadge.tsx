@@ -7,6 +7,8 @@ interface CategoryBadgeProps {
   variant?: 'emerald' | 'cyan' | 'amber' | 'neutral' | 'auto';
   className?: string;
   size?: 'sm' | 'md';
+  /** Set false inside an element that is already a link: nested <a> is invalid HTML. */
+  linked?: boolean;
 }
 
 const colorMap: Record<string, string> = {
@@ -28,11 +30,13 @@ export function CategoryBadge({
   variant = 'auto',
   className = '',
   size = 'md',
+  linked = true,
 }: CategoryBadgeProps) {
   const normalizedKey = (slug || label).toLowerCase().replace(/\s+/g, '-');
   const resolvedColor =
     variant === 'auto'
-      ? colorMap[normalizedKey] || 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/20'
+      ? colorMap[normalizedKey] ||
+        'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/20'
       : {
           emerald: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/20',
           cyan: 'bg-cyan-500/15 text-cyan-700 dark:text-cyan-300 border-cyan-500/20',
@@ -53,7 +57,7 @@ export function CategoryBadge({
     </span>
   );
 
-  if (slug) {
+  if (slug && linked) {
     return (
       <Link href={`/categories/${slug}`} className="inline-block">
         {content}
@@ -63,4 +67,3 @@ export function CategoryBadge({
 
   return content;
 }
-

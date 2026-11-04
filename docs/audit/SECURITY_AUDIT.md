@@ -12,21 +12,23 @@ did not cover; treat this file as the current source of truth.
 
 ## Findings
 
-| ID     | Severity | Area                                              | Status                                                                      |
-| ------ | -------- | ------------------------------------------------- | --------------------------------------------------------------------------- |
-| SEC-0  | Critical | Cloudinary credentials in source                  | Removed from code (Phase 1); **rotation required by owner**                 |
-| SEC-1  | Critical | Preview token signing secret                      | Fixed (Phase 1)                                                             |
-| SEC-2  | High     | Preview token minting (IDOR)                      | Fixed (Phase 1)                                                             |
-| SEC-3  | Medium   | Preview `siteId` not bound                        | Fixed (Phase 1)                                                             |
-| SEC-4  | High     | Site revalidation webhooks                        | Fixed (Phase 1)                                                             |
-| SEC-5  | Medium   | CSRF exemption by substring                       | Fixed (Phase 1)                                                             |
-| SEC-6  | Medium   | Public write endpoints rate                       | Fixed: newsletter at API (Phase 1); comments in travel-blog proxy (Phase 2) |
-| SEC-7  | Low      | Non-constant-time HMAC check                      | Fixed (Phase 1)                                                             |
-| SEC-8  | Info     | Permission check without site                     | By design; full sweep done (Phase 2b) — found SEC-11, SEC-12                |
-| SEC-9  | Medium   | Comments published without moderation             | Fixed (Phase 2): pre-moderation                                             |
-| SEC-10 | Medium   | Test suite wrote to a real Cloudinary account     | Fixed (Phase 1)                                                             |
-| SEC-11 | High     | Cross-site post takeover via publication          | Fixed (Phase 2b)                                                            |
-| SEC-12 | High     | Admin comments not site-scoped (PII + moderation) | Fixed (Phase 2b)                                                            |
+| ID     | Severity | Area                                                                       | Status                                                                      |
+| ------ | -------- | -------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| SEC-0  | Critical | Cloudinary credentials in source                                           | Removed from code (Phase 1); **rotation required by owner**                 |
+| SEC-1  | Critical | Preview token signing secret                                               | Fixed (Phase 1)                                                             |
+| SEC-2  | High     | Preview token minting (IDOR)                                               | Fixed (Phase 1)                                                             |
+| SEC-3  | Medium   | Preview `siteId` not bound                                                 | Fixed (Phase 1)                                                             |
+| SEC-4  | High     | Site revalidation webhooks                                                 | Fixed (Phase 1)                                                             |
+| SEC-5  | Medium   | CSRF exemption by substring                                                | Fixed (Phase 1)                                                             |
+| SEC-6  | Medium   | Public write endpoints rate                                                | Fixed: newsletter at API (Phase 1); comments in travel-blog proxy (Phase 2) |
+| SEC-7  | Low      | Non-constant-time HMAC check                                               | Fixed (Phase 1)                                                             |
+| SEC-8  | Info     | Permission check without site                                              | By design; full sweep done (Phase 2b) — found SEC-11, SEC-12                |
+| SEC-9  | Medium   | Comments published without moderation                                      | Fixed (Phase 2): pre-moderation                                             |
+| SEC-10 | Medium   | Test suite wrote to a real Cloudinary account                              | Fixed (Phase 1)                                                             |
+| SEC-11 | High     | Cross-site post takeover via publication                                   | Fixed (Phase 2b)                                                            |
+| SEC-12 | High     | Admin comments not site-scoped (PII + moderation)                          | Fixed (Phase 2b)                                                            |
+| SEC-13 | High     | Dev seed script with hardcoded passwords that also reset existing accounts | Fixed (Phase 3b)                                                            |
+| SEC-14 | Medium   | Login page lists privileged account emails in every environment            | Fixed (Phase 3b)                                                            |
 
 ### SEC-0 — Real Cloudinary API key and secret committed to source
 
@@ -193,6 +195,27 @@ publication and publishing lookups are all scoped by `(id, siteId)`; media
 checks the asset's site; audit, analytics, and dashboard filter by the caller's
 sites. The two gaps found are SEC-11 and SEC-12 above. Minor: analytics and
 dashboard default a multi-site admin to their first site only (UX, not a leak).
+
+### SEC-13 — `provision-site-admins.ts` hardcoded passwords and reset accounts
+
+- Evidence (before fix): `pnpm db:seed:admins` hashed three literal passwords
+  (Super Admin, Travel Admin, Air Sports Admin), created a Super Admin despite
+  the documented bootstrap policy, and on **existing** accounts overwrote the
+  password and set `status = 'active'` — so running it against a shared
+  database would reset passwords and reactivate suspended users. No production
+  guard existed.
+- Fix: refuses `NODE_ENV=production`; password from `DEV_SITE_ADMIN_PASSWORD`
+  (min 12 chars, no default); creates only missing **site** Admins and never
+  modifies existing users; Super Admins only via `bootstrap:super-admin`.
+- Owner action: if the old script was ever run on a shared or production
+  database, rotate those accounts' passwords. The literals remain in Git history.
+
+### SEC-14 — Login page advertised privileged accounts
+
+- Evidence (before fix): `apps/admin/src/app/login/page.tsx` always rendered a
+  "Local Development Accounts" list with the Super Admin email — including in
+  production, which helps targeted password attacks.
+- Fix: removed; development accounts belong in local docs, not the UI.
 
 ## Verified controls (no change needed)
 

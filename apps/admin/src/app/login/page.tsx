@@ -60,7 +60,7 @@ function LoginForm() {
       <div className="w-full max-w-md">
         {/* Brand Header */}
         <div className="flex flex-col items-center text-center mb-8">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-linear-to-tr from-blue-600 to-indigo-600 text-white shadow-md mb-3">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-linear-to-tr from-brand-500 to-brand-700 text-white shadow-md mb-3">
             <Layers className="h-6 w-6" />
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
@@ -97,7 +97,7 @@ function LoginForm() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="admin@platform.internal"
-                  className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 pl-10 pr-4 py-2.5 text-xs text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 transition-all font-mono"
+                  className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 pl-10 pr-4 py-2.5 text-xs text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:border-ring focus:bg-white dark:focus:bg-slate-800 focus:outline-hidden focus:ring-2 focus:ring-ring/20 transition-all font-mono"
                 />
               </div>
             </div>
@@ -118,7 +118,7 @@ function LoginForm() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••••••"
-                  className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 pl-10 pr-4 py-2.5 text-xs text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 transition-all font-mono"
+                  className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 pl-10 pr-4 py-2.5 text-xs text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:border-ring focus:bg-white dark:focus:bg-slate-800 focus:outline-hidden focus:ring-2 focus:ring-ring/20 transition-all font-mono"
                 />
               </div>
             </div>
@@ -126,7 +126,7 @@ function LoginForm() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full flex items-center justify-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 px-4 py-2.5 text-xs font-bold text-white shadow-xs transition-colors disabled:opacity-50 mt-2"
+              className="w-full flex items-center justify-center gap-2 rounded-xl bg-primary hover:bg-primary/90 px-4 py-2.5 text-xs font-bold text-primary-foreground shadow-xs transition-colors disabled:opacity-50 mt-2"
             >
               {isLoading ? (
                 <>
@@ -138,25 +138,8 @@ function LoginForm() {
               )}
             </button>
           </form>
-
-          {/* Development Hints */}
-          <div className="mt-6 pt-5 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-400">
-            <p className="font-semibold text-slate-500 mb-1">Local Development Accounts:</p>
-            <ul className="space-y-0.5">
-              <li>
-                <span className="font-mono text-blue-600 dark:text-blue-400">
-                  superadmin@platform.internal
-                </span>{' '}
-                (Super Admin)
-              </li>
-              <li>
-                <span className="font-mono text-slate-600 dark:text-slate-300">
-                  traveladmin@travelblog.internal
-                </span>{' '}
-                (Travel Blog Admin)
-              </li>
-            </ul>
-          </div>
+          {/* No account hints here: this page ships to production, and listing
+              privileged emails helps targeted attacks (SEC-14). */}
         </div>
       </div>
     </div>
@@ -168,7 +151,7 @@ export default function LoginPage() {
     <Suspense
       fallback={
         <div className="flex min-h-dvh items-center justify-center bg-slate-50 dark:bg-slate-950">
-          <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
       }
     >

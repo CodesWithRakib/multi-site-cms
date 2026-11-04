@@ -6,6 +6,45 @@
 
 ---
 
+## 0. Changing colors (start here)
+
+All colors for all three apps come from one file:
+[`packages/ui/src/theme/site-themes.ts`](../../packages/ui/src/theme/site-themes.ts)
+([ADR-0027](../adr/0027-centralized-theme-and-mobile-app-shell.md)).
+
+```ts
+export const SITE_THEMES = {
+  admin: { brandHue: 162, brandChroma: 0.19, neutralHue: 200, neutralChroma: 0.022 },
+  'travel-blog': { brandHue: 175, brandChroma: 0.17, neutralHue: 90, neutralChroma: 0.012 },
+  'air-sports': { brandHue: 232, brandChroma: 0.17, neutralHue: 230, neutralChroma: 0.022 },
+};
+```
+
+- **brandHue** (0–360): 25 red, 60 orange, 90 yellow, 150 green, 175 teal, 230 blue, 290 purple, 340 pink.
+- **brandChroma** (0.10–0.22): how saturated the brand is.
+- **neutralHue / neutralChroma**: the tint of grays; chroma `0` gives pure gray.
+
+Changing these updates semantic tokens (light and dark), the `brand-50…950`
+scale, legacy classes such as `bg-emerald-600` or `text-slate-900`, the browser
+`theme-color`, the web app manifest, and the generated app icons. Do not edit
+colors in `theme.css` or in an app's `globals.css`.
+
+For new components use semantic tokens (`bg-primary`, `text-muted-foreground`,
+`border-border`) or `brand-*` utilities. Keep status colors (red, amber, green,
+blue…) for meaning, not branding.
+
+To review the result across the whole system:
+
+```bash
+VISUAL_TOUR=1 VISUAL_OUT=<absolute output dir> npx playwright test e2e/visual-tour.spec.ts
+```
+
+It captures every main route of all apps at 1440 px and 390 px, in light and
+dark mode (admin screens need `E2E_ADMIN_EMAIL` / `E2E_ADMIN_PASSWORD`).
+
+> Sections below describe the earlier per-app token files and are kept for
+> history; the values now live in `site-themes.ts` and `theme.css`.
+
 ## 1. OKLCH Color System & Semantic Tokens
 
 Our design tokens use the modern OKLCH color space for perceptual uniformity and accurate contrast across lightness levels. Hardcoded hex colors or arbitrary Tailwind color classes (`bg-blue-600`, `text-slate-800`) are strictly banned in application code.

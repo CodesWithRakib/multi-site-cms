@@ -20,7 +20,7 @@ export function ShellLayout({
 
   return (
     <AuthGuard requiredPermission={requiredPermission} superAdminOnly={superAdminOnly}>
-      <div className="flex h-screen h-dvh w-full overflow-hidden bg-[#f3f6f8] dark:bg-[#071918] font-sans antialiased text-slate-900 dark:text-slate-100 relative selection:bg-emerald-400 selection:text-emerald-950">
+      <div className="flex h-screen h-dvh w-full overflow-hidden bg-neutral-100 dark:bg-brand-950 font-sans antialiased text-slate-900 dark:text-slate-100 relative selection:bg-emerald-400 selection:text-emerald-950">
         {/* Soft abstract cyan/emerald ambient gradient glow in top-right corner */}
         <div
           className="pointer-events-none absolute -top-40 right-0 w-[550px] h-[550px] rounded-full bg-gradient-to-br from-teal-200/50 via-emerald-100/30 to-transparent blur-3xl -z-10 dark:opacity-20"

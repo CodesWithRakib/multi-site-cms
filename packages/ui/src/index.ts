@@ -102,6 +102,13 @@ export {
   SheetTitle,
   SheetTrigger,
 } from './components/sheet';
+export {
+  isTabActive,
+  MobileTabBar,
+  type MobileTabBarProps,
+  type MobileTabItem,
+  type MobileTabLinkProps,
+} from './components/mobile-tab-bar';
 export { Skeleton, type SkeletonProps } from './components/skeleton';
 export { StatusPage, type StatusPageProps } from './components/status-page';
 export { Slider } from './components/slider';
@@ -121,4 +128,21 @@ export { Textarea, type TextareaProps } from './components/textarea';
 export { Toggle, toggleVariants, type ToggleProps } from './components/toggle';
 export { ToggleGroup, ToggleGroupItem } from './components/toggle-group';
 export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './components/tooltip';
+export {
+  oklchToHex,
+  SITE_THEMES,
+  siteThemeColors,
+  siteThemeHex,
+  siteThemeStyle,
+  type SiteTheme,
+  type SiteThemeKey,
+} from './theme/site-themes';
+export {
+  ThemeProvider,
+  useTheme,
+  type ResolvedTheme,
+  type ThemeMode,
+} from './theme/theme-provider';
+export { themeInitScript } from './theme/theme-script';
+export { appIconElement } from './theme/app-icon';
 export { cn } from './lib/cn';

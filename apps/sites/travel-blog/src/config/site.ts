@@ -12,5 +12,4 @@ export const siteConfig = {
   description:
     'An independent travel publication for considered destination guides, reported stories and visual journeys.',
   url: publicConfig.appUrl,
-  themeColor: '#0f5f5c',
 } as const;

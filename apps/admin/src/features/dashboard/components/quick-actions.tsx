@@ -28,7 +28,7 @@ export function QuickActions() {
         {/* 1. Primary Action: Write New Post */}
         <Link
           href="/posts/new"
-          className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-[#00e599] to-[#05f292] hover:from-[#00d68f] hover:to-[#00e599] text-[#072423] font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-all"
+          className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-brand-400 to-brand-300 hover:from-brand-500 hover:to-brand-400 text-brand-950 font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-all"
         >
           <Pencil className="size-4 stroke-[2.5]" />
           <span>{t('dashboard.writeNewPost')}</span>

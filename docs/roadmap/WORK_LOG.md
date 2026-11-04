@@ -120,3 +120,37 @@ the old `PillButton` (70 px / 12 px); slug test caught the soft-404 regression.
 air-sports files; each was proven format-only (Prettier of the index blob ==
 worktree) and restored from the index. A repo-wide check found no other
 format-only changes.
+
+## 2026-11-04 — Phase 3b (central theme, dark mode, mobile app shell)
+
+**Request (user):** proceed; centralized color theme changeable any time for
+all apps; review how the full system looks; app-like feel on phones.
+
+**Changes (uncommitted):**
+
+- `packages/ui/src/theme/`: `site-themes.ts` (the one place to change colors,
+  OKLCH → hex), `theme.css` (derived scales, light/dark tokens, palette
+  aliases), `theme-provider.tsx` (shared, defaults to system), `theme-script.ts`,
+  `app-icon.tsx`; `components/mobile-tab-bar.tsx`; base touch styles and
+  `pb-tabbar` utility in `styles.css`. Tests: 43 in the UI package.
+- All three apps: token blocks removed from `globals.css`; layouts set theme
+  inputs on `<html>`, run the theme script via `next/script`, derive
+  `theme-color`, add `appleWebApp`; new `manifest.ts`, `icon.tsx`,
+  `apple-icon.tsx`, `icons/[name]/route.tsx`; local theme providers deleted.
+- Admin: 114 hex classes → `brand-*`; login/unauthorized/auth guard on
+  semantic tokens; dev-account list removed (SEC-14).
+- Sites: `AppTabBar` bottom navigation; header search hidden on phones;
+  safe-area headers; `CategoryBadge linked` prop (nested-link fix); Travel
+  hero real stats; Air Sports search field readable.
+- API: `provision-site-admins.ts` rewritten (SEC-13); `DEV_SITE_ADMIN_PASSWORD`.
+- E2E: `mobile-app.spec.ts` (11), `visual-tour.spec.ts` (opt-in).
+- Docs: ADR-0027, design-system "Changing colors", audits.
+
+**Verification:** lint 0, typecheck 0, unit tests all green (UI 43, API 263),
+three app builds OK, **E2E 38 passed** (12 opt-in visual-tour tests skipped).
+Visual review of 60 + 60 screenshots (before/after).
+
+**Not done / blocked:** authenticated admin screens not reviewed — creating a
+temporary admin in the dev database was denied by the permission system;
+needs the user's local credentials. Repo-wide formatting (145 files) left for a
+separate commit (TD-10).

@@ -234,7 +234,7 @@ function MediaDetailModalView({
               <button
                 type="submit"
                 disabled={isUpdating}
-                className="px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-[#00e599] to-[#05f292] hover:from-[#00d68f] hover:to-[#00e599] text-[#072423] shadow-xs flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                className="px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-brand-400 to-brand-300 hover:from-brand-500 hover:to-brand-400 text-brand-950 shadow-xs flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
               >
                 {isUpdating ? <Loader2 className="size-3.5 animate-spin" /> : null}
                 <span>Save Changes</span>

@@ -2,22 +2,22 @@
 
 ## Verdict: **Not production-ready**
 
-Score: **6.5 / 10** for the publishing CMS (up from 5 at the initial audit).
+Score: **7 / 10** for the publishing CMS (up from 5 at the initial audit).
 Booking, payments, and customer accounts are out of scope by business
 decision (2026-11-04) and are not scored.
 
-| Dimension      | Score | Evidence                                                                                                                                                 |
-| -------------- | ----- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Security       | 6     | Secret, preview, CSRF, and webhook issues fixed and regression-tested; comment pre-moderation and rate limit in place; Cloudinary rotation still pending |
-| Correctness    | 7     | API 242/242, integration 56/56; revalidation wired (ADR-0026); contact page honest (`mailto:`). Not verified against a deployed site                     |
-| Test evidence  | 6     | API 263, integration 56, E2E 27/27 locally (first real run); E2E still not run in CI; thin frontend unit tests                                           |
-| UX resilience  | 6     | Branded 404/error pages, mobile overflow fixed, admin build fixed; E2E 27/27 locally. Dark theme, keyboard, axe not yet verified                         |
-| Operations     | 5     | Health / readiness exist; backup restore drill, monitoring, and alerting not verified                                                                    |
-| Data / privacy | 5     | Migrations reviewed; latest one round-trip tested; no retention or erasure policy (DB-4, DB-5)                                                           |
+| Dimension      | Score | Evidence                                                                                                                                                                        |
+| -------------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Security       | 6     | Secret, preview, CSRF, and webhook issues fixed and regression-tested; comment pre-moderation and rate limit in place; Cloudinary rotation still pending                        |
+| Correctness    | 7     | API 242/242, integration 56/56; revalidation wired (ADR-0026); contact page honest (`mailto:`). Not verified against a deployed site                                            |
+| Test evidence  | 6     | API 263, integration 56, E2E 27/27 locally (first real run); E2E still not run in CI; thin frontend unit tests                                                                  |
+| UX resilience  | 7     | Central theme, system dark mode, mobile app shell, no console errors on main routes (E2E-enforced). Authenticated admin screens not visually reviewed; keyboard and axe pending |
+| Operations     | 5     | Health / readiness exist; backup restore drill, monitoring, and alerting not verified                                                                                           |
+| Data / privacy | 5     | Migrations reviewed; latest one round-trip tested; no retention or erasure policy (DB-4, DB-5)                                                                                  |
 
 ## Release blockers
 
-1. Rotate the Cloudinary API secret (SEC-0). Owner action.
+1. Rotate the Cloudinary API secret (SEC-0), and any account passwords set by the old admin seed script on a shared database (SEC-13). Owner action.
 2. Set `PREVIEW_TOKEN_SECRET` (≥32 chars) and `API_BASE_URL` (public, non-localhost) in production; the API refuses to
    boot without it. Breaking change for existing deploy configs.
 3. Set `REVALIDATE_SECRET` (same value) on the API and both sites, and verify

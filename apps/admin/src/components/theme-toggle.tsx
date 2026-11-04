@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Moon, Sun } from 'lucide-react';
-import { useTheme } from './theme-provider';
+import { useTheme } from '@multi-site-cms/ui';
 
 export function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();

@@ -51,7 +51,7 @@ export default async function TravelHomePage() {
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-16 sm:pb-24">
         {/* Editorial Hero */}
-        <TravelHero />
+        <TravelHero articleCount={articlesData.total} topicCount={categories.length} />
 
         {/* Floating Destination Search Filter */}
         <div className="mb-16 sm:mb-24">

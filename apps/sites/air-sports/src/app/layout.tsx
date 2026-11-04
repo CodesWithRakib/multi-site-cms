@@ -1,11 +1,19 @@
 import type { Metadata, Viewport } from 'next';
+import Script from 'next/script';
 import type { ReactNode } from 'react';
 import { Caveat, JetBrains_Mono, Plus_Jakarta_Sans } from 'next/font/google';
 
+import { AppTabBar } from '@/components/layout/AppTabBar';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
-import { ThemeProvider } from '@/components/ui/ThemeProvider';
 import { siteConfig } from '@/config/site';
+
+import {
+  siteThemeColors,
+  siteThemeStyle,
+  ThemeProvider,
+  themeInitScript,
+} from '@multi-site-cms/ui';
 
 import './globals.css';
 
@@ -31,6 +39,9 @@ const monoFont = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  // Home-screen install behaves like a native app (ADR-0027).
+  appleWebApp: { capable: true, title: 'Air Sports', statusBarStyle: 'default' },
+  formatDetection: { telephone: false },
   metadataBase: new URL(siteConfig.url),
   title: {
     default: `${siteConfig.name} — ${siteConfig.tagline}`,
@@ -51,19 +62,31 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   colorScheme: 'light dark',
-  themeColor: '#0284c7',
+  themeColor: siteThemeColors('air-sports'),
+  viewportFit: 'cover',
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html
+      lang="en"
+      data-site="air-sports"
+      style={siteThemeStyle('air-sports')}
+      suppressHydrationWarning
+    >
+      <head>
+        <Script id="theme-init" strategy="beforeInteractive">
+          {themeInitScript('air_sports_theme')}
+        </Script>
+      </head>
       <body
-        className={`${sansFont.variable} ${handwritingFont.variable} ${monoFont.variable} min-h-dvh flex flex-col bg-background font-sans antialiased text-foreground`}
+        className={`${sansFont.variable} ${handwritingFont.variable} ${monoFont.variable} min-h-dvh flex flex-col bg-background pb-tabbar md:pb-0 font-sans antialiased text-foreground`}
       >
-        <ThemeProvider>
+        <ThemeProvider storageKey="air_sports_theme">
           <Header />
           <main className="flex-1">{children}</main>
           <Footer />
+          <AppTabBar />
         </ThemeProvider>
       </body>
     </html>

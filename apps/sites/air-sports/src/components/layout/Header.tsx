@@ -30,7 +30,7 @@ export function Header() {
   const [disciplinesOpen, setDisciplinesOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border/80 bg-background/85 backdrop-blur-md transition-colors">
+    <header className="sticky top-0 z-40 w-full pt-[env(safe-area-inset-top)] border-b border-border/80 bg-background/85 backdrop-blur-md transition-colors">
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Brand Logo */}
         <AirSportsLogo />
@@ -103,7 +103,7 @@ export function Header() {
           <Link
             href="/search"
             aria-label="Search air sports dispatches"
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card text-foreground/80 transition hover:border-sky-500/50 hover:bg-muted"
+            className="hidden md:flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card text-foreground/80 transition hover:border-sky-500/50 hover:bg-muted"
           >
             <Search className="h-4 w-4" />
           </Link>

@@ -249,7 +249,10 @@ export default function SiteDetailPage() {
                 </span>
               </div>
               <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                Site ID: <span className="font-mono font-medium text-slate-700 dark:text-slate-300">{site.id}</span>
+                Site ID:{' '}
+                <span className="font-mono font-medium text-slate-700 dark:text-slate-300">
+                  {site.id}
+                </span>
               </p>
             </div>
           </div>
@@ -273,7 +276,7 @@ export default function SiteDetailPage() {
                 onClick={() => setActiveTab('general')}
                 className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
                   activeTab === 'general'
-                    ? 'bg-white dark:bg-slate-700 text-[#072423] dark:text-emerald-400 font-bold shadow-xs'
+                    ? 'bg-white dark:bg-slate-700 text-brand-950 dark:text-emerald-400 font-bold shadow-xs'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
                 }`}
               >
@@ -284,7 +287,7 @@ export default function SiteDetailPage() {
                 onClick={() => setActiveTab('domains')}
                 className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
                   activeTab === 'domains'
-                    ? 'bg-white dark:bg-slate-700 text-[#072423] dark:text-emerald-400 font-bold shadow-xs'
+                    ? 'bg-white dark:bg-slate-700 text-brand-950 dark:text-emerald-400 font-bold shadow-xs'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
                 }`}
               >
@@ -420,10 +423,10 @@ export default function SiteDetailPage() {
                 <button
                   type="submit"
                   disabled={isUpdatingSite}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#00e599] to-[#05f292] text-[#072423] text-xs font-bold shadow-xs hover:brightness-105 active:scale-95 transition-all disabled:opacity-50 cursor-pointer"
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-brand-400 to-brand-300 text-brand-950 text-xs font-bold shadow-xs hover:brightness-105 active:scale-95 transition-all disabled:opacity-50 cursor-pointer"
                 >
                   {isUpdatingSite ? (
-                    <Loader2 className="size-4 animate-spin text-[#072423]" />
+                    <Loader2 className="size-4 animate-spin text-brand-950" />
                   ) : (
                     <Save className="size-4" />
                   )}
@@ -569,7 +572,10 @@ export default function SiteDetailPage() {
                     onChange={(e) => setIsPrimaryDomain(e.target.checked)}
                     className="size-4 rounded-md border-slate-300 dark:border-slate-700 text-emerald-500 focus:ring-emerald-400/20"
                   />
-                  <label htmlFor="isPrimary" className="text-xs font-medium text-slate-700 dark:text-slate-300 cursor-pointer">
+                  <label
+                    htmlFor="isPrimary"
+                    className="text-xs font-medium text-slate-700 dark:text-slate-300 cursor-pointer"
+                  >
                     Set as Primary Domain for this website
                   </label>
                 </div>
@@ -578,10 +584,10 @@ export default function SiteDetailPage() {
                   <button
                     type="submit"
                     disabled={isAddingDomain}
-                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#00e599] to-[#05f292] text-[#072423] text-xs font-bold shadow-xs hover:brightness-105 active:scale-95 transition-all disabled:opacity-50 cursor-pointer"
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-brand-400 to-brand-300 text-brand-950 text-xs font-bold shadow-xs hover:brightness-105 active:scale-95 transition-all disabled:opacity-50 cursor-pointer"
                   >
                     {isAddingDomain ? (
-                      <Loader2 className="size-4 animate-spin text-[#072423]" />
+                      <Loader2 className="size-4 animate-spin text-brand-950" />
                     ) : (
                       <Plus className="size-4 stroke-[2.5]" />
                     )}
@@ -618,7 +624,9 @@ export default function SiteDetailPage() {
                 </div>
               ) : (
                 <>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">{t.sites.dnsInstructions}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">
+                    {t.sites.dnsInstructions}
+                  </p>
 
                   <div className="space-y-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 p-4 border border-slate-100 dark:border-slate-700/60 text-xs">
                     <div>
@@ -685,9 +693,9 @@ export default function SiteDetailPage() {
                       type="button"
                       onClick={() => handleVerify(challengeData.domainId)}
                       disabled={isVerifying}
-                      className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-[#00e599] to-[#05f292] text-[#072423] text-xs font-bold shadow-xs hover:brightness-105 active:scale-95 transition-all disabled:opacity-50 cursor-pointer"
+                      className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-brand-400 to-brand-300 text-brand-950 text-xs font-bold shadow-xs hover:brightness-105 active:scale-95 transition-all disabled:opacity-50 cursor-pointer"
                     >
-                      {isVerifying && <Loader2 className="size-3.5 animate-spin text-[#072423]" />}
+                      {isVerifying && <Loader2 className="size-3.5 animate-spin text-brand-950" />}
                       <span>Verify DNS Record Now</span>
                     </button>
                   </div>

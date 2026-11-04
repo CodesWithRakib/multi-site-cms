@@ -38,3 +38,19 @@ Playwright, Chromium, against local dev servers with the dev database:
 article slugs return HTTP 404, no horizontal overflow at 375 px on either home
 page, admin unknown route shows no framework page. Not yet covered: dark theme,
 keyboard-only flows, axe accessibility scan, admin screens beyond login.
+
+## Found and fixed in Phase 3b (theme and mobile)
+
+| ID    | Severity | App         | Finding and fix                                                                                                                                                                                                                                                                                      |
+| ----- | -------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| UX-11 | High     | all         | Dark mode never followed the OS: every theme provider defaulted to `light`, and reading storage during render caused hydration mismatches. One shared provider now defaults to `system` and applies the theme before paint (`next/script` `beforeInteractive`). E2E: "follows the system dark mode". |
+| UX-12 | High     | all         | No central theme: ~6,000 hard-coded palette classes and 114 raw hex classes; Air Sports' main buttons were green while its brand is blue. Fixed by ADR-0027 (one `site-themes.ts`, derived tokens, palette aliasing, hex codemod in admin).                                                          |
+| UX-13 | High     | travel-blog | `/categories` nested a link inside a link (`CategoryBadge` inside the card) → full hydration failure. `CategoryBadge` gained `linked={false}`. E2E: "main routes render without console errors".                                                                                                     |
+| UX-14 | Medium   | travel-blog | Hero showed invented "100+ Destinations, 500K+ Travelers, 4.9 User Rating". Replaced with real published-story and topic counts from the CMS.                                                                                                                                                        |
+| UX-15 | Medium   | air-sports  | Search field used a fixed dark background (`bg-neutral-900/60`): dark text on dark field in light mode. Now `bg-muted/60`.                                                                                                                                                                           |
+| UX-16 | High     | all         | No mobile app experience: no bottom navigation, no manifest or icons, no safe-area handling. Added `MobileTabBar`, web app manifest (standalone), generated icons, `appleWebApp`, `viewportFit: cover`, touch defaults. E2E: installability, tab bar, desktop hiding.                                |
+
+Visual review: 60 screenshots before, 60 after (all public routes plus admin
+login, 1440 px and 390 px, light and dark), compared as contact sheets.
+Authenticated admin screens were **not** reviewed: no local credentials were
+available and creating an admin account in the database was not permitted.
