@@ -29,7 +29,7 @@ export function DestinationSearchBar({ categories, className = '' }: Destination
   };
 
   return (
-    <div className={`relative z-20 -mt-6 sm:-mt-8 mx-auto max-w-5xl ${className}`}>
+    <div className={`relative z-20 -mt-6 sm:-mt-8 w-full ${className}`}>
       <form
         onSubmit={handleSearch}
         className="rounded-3xl border border-neutral-200/90 dark:border-neutral-800 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-xl shadow-xl p-3 sm:p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-center"

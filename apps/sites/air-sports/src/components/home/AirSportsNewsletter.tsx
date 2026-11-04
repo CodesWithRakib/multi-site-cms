@@ -77,7 +77,10 @@ export function AirSportsNewsletter() {
             <form onSubmit={handleSubmit} className="space-y-2">
               <div className="relative flex items-center">
                 <input
+                  id="airsports-newsletter-email"
+                  name="email"
                   type="email"
+                  autoComplete="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email address"

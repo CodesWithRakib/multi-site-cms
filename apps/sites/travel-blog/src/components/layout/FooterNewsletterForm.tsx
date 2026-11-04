@@ -36,7 +36,10 @@ export function FooterNewsletterForm() {
     <form onSubmit={handleSubmit} className="space-y-2">
       <div className="relative flex items-center">
         <input
+          id="footer-newsletter-email"
+          name="email"
           type="email"
+          autoComplete="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Enter email address"

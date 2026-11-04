@@ -1,62 +1,40 @@
+'use client';
+
 import React from 'react';
-import Image from 'next/image';
-import { ArrowRight, Compass } from 'lucide-react';
-import { PillButton } from '@/components/ui/PillButton';
+import { Compass, Sparkles } from 'lucide-react';
 
 export function PortalHeroBanner() {
   return (
-    <section className="relative overflow-hidden rounded-3xl shadow-xl">
-      {/* Background Photography */}
-      <div className="relative h-72 sm:h-84 md:h-96 w-full">
-        <Image
-          src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1600&q=85"
-          alt="Panoramic mountain lake and explorer"
-          fill
-          priority
-          sizes="(max-width: 1024px) 100vw, 80vw"
-          className="object-cover object-center"
-        />
-
-        {/* Sophisticated Dark Gradient Wash for Typography Legibility */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/50 to-black/20" />
-      </div>
-
-      {/* Hero Content Overlay */}
-      <div className="absolute inset-0 flex flex-col justify-center px-6 sm:px-12 md:px-16 max-w-2xl text-white space-y-4 sm:space-y-5">
-        {/* Tag Pill */}
-        <div className="inline-flex items-center gap-2 self-start rounded-full border border-emerald-400/30 bg-emerald-950/60 px-3.5 py-1 text-xs font-semibold text-emerald-300 backdrop-blur-sm">
-          <Compass className="h-3.5 w-3.5 text-emerald-400" />
-          <span>Welcome to Travel Blog</span>
+    <section className="relative overflow-hidden rounded-3xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 via-teal-500/5 to-background p-6 sm:p-10 lg:p-12">
+      <div className="relative z-10 max-w-3xl space-y-4">
+        {/* Editorial Pill */}
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-emerald-500/25 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 text-xs font-bold tracking-wide">
+          <Sparkles className="h-3.5 w-3.5 text-emerald-500" />
+          <span>The Explorer Journal</span>
+          <span className="text-emerald-500">•</span>
+          <span>Field Notes & Guides</span>
         </div>
 
-        {/* Headline */}
-        <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.15]">
-          Explore the World <br />
-          <span className="font-handwriting text-4xl sm:text-6xl md:text-7xl font-bold text-emerald-400 select-none">
-            One Story at a Time
+        {/* Editorial Title */}
+        <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-neutral-900 dark:text-white leading-[1.15]">
+          Curated Travel Stories &amp;{' '}
+          <span className="font-handwriting text-4xl sm:text-6xl text-emerald-600 dark:text-emerald-400 font-bold italic select-none">
+            Adventures
           </span>
         </h1>
 
         {/* Subtitle */}
-        <p className="text-sm sm:text-base text-neutral-200 leading-relaxed font-normal max-w-lg">
-          Discover breathtaking destinations, get expert travel tips, and read inspiring travel
-          stories.
+        <p className="text-sm sm:text-base text-neutral-600 dark:text-neutral-300 leading-relaxed max-w-2xl">
+          Dive into authentic firsthand itineraries, practical dispatch notes, cultural highlights,
+          and hidden trails curated by passionate travelers worldwide.
         </p>
+      </div>
 
-        {/* Action Button */}
-        <div className="pt-1">
-          <PillButton
-            href="#blogs-grid"
-            size="md"
-            icon={<ArrowRight className="h-4 w-4" />}
-            iconPosition="right"
-            className="bg-emerald-500 hover:bg-emerald-400 text-white shadow-lg shadow-emerald-900/40"
-          >
-            Explore Blogs
-          </PillButton>
-        </div>
+      {/* Decorative Atmosphere Elements */}
+      <div className="pointer-events-none absolute -right-12 -bottom-12 h-64 w-64 rounded-full bg-emerald-400/10 blur-3xl dark:bg-emerald-500/10" />
+      <div className="pointer-events-none absolute right-12 top-6 opacity-10 dark:opacity-20 hidden md:block">
+        <Compass className="h-36 w-36 text-emerald-600" />
       </div>
     </section>
   );
 }
-
