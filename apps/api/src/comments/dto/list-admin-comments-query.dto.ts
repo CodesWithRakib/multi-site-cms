@@ -42,4 +42,3 @@ export class ListAdminCommentsQueryDto {
   @Max(100)
   limit?: number = 20;
 }
-

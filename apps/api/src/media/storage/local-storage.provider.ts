@@ -17,7 +17,7 @@ export class LocalStorageProvider implements StorageProvider {
     this.storageRoot = path.resolve(
       process.env.MEDIA_STORAGE_DIR || path.join(process.cwd(), 'uploads'),
     );
-    this.baseUrl = (process.env.API_BASE_URL || 'http://localhost:4000/api/v1').replace(/\/+$/, '');
+    this.baseUrl = env.API_BASE_URL;
 
     if (!fs.existsSync(this.storageRoot)) {
       fs.mkdirSync(this.storageRoot, { recursive: true });

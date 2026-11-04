@@ -5,6 +5,7 @@ import type { Request } from 'express';
 import { ApiException } from '../../common/exceptions/api.exception';
 import { PERMISSIONS_KEY } from '../decorators/permissions.decorator';
 import { AuthorizationService, type EffectiveAuthContext } from '../services/authorization.service';
+import { resolveRequestSiteId } from '../utils/resolve-request-site-id';
 
 @Injectable()
 export class PermissionsGuard implements CanActivate {
@@ -40,25 +41,12 @@ export class PermissionsGuard implements CanActivate {
     }
 
     // Resolve site context if present
-    const siteId = this.resolveSiteId(request);
+    const siteId = resolveRequestSiteId(request);
 
     for (const permission of requiredPermissions) {
       this.authorizationService.assertPermission(authContext, permission, siteId);
     }
 
     return true;
-  }
-
-  private resolveSiteId(request: Request): string | null {
-    if (request.params && typeof request.params.siteId === 'string') {
-      return request.params.siteId;
-    }
-    if (request.query && typeof request.query.siteId === 'string') {
-      return request.query.siteId;
-    }
-    if (request.body && typeof request.body.siteId === 'string') {
-      return request.body.siteId;
-    }
-    return null;
   }
 }

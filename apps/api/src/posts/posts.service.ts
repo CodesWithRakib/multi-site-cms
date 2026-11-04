@@ -23,6 +23,7 @@ import { Post } from '../database/entities/post.entity';
 import { Site } from '../database/entities/site.entity';
 import { CreatePostDto, ListPostsQueryDto, RestoreRevisionDto, UpdatePostDto } from './dto';
 import { validateStructuredBody } from './utils/body-validator';
+import { canAccessPost, canManageAllPublications } from './utils/post-access';
 
 /**
  * Production requires PREVIEW_TOKEN_SECRET (enforced by `parseEnv`). Elsewhere a
@@ -54,16 +55,6 @@ export class PostsService {
 
   private async getPublicationRepo(): Promise<Repository<PostPublication>> {
     return getInitializedRepository(this.dataSource, PostPublication);
-  }
-
-  private canAccessPost(
-    actor: EffectiveAuthContext,
-    post: Post,
-    publications: PostPublication[],
-  ): boolean {
-    if (actor.isSuperAdmin) return true;
-    if (post.authorId === actor.user.id) return true;
-    return publications.some((pub) => actor.authorizedSiteIds.includes(pub.siteId));
   }
 
   async createPost(actor: EffectiveAuthContext, dto: CreatePostDto): Promise<PostItem> {
@@ -345,7 +336,7 @@ export class PostsService {
       where: { postId },
     });
 
-    if (!this.canAccessPost(actor, post, publications)) {
+    if (!canAccessPost(actor, post, publications)) {
       throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'post.notFound');
     }
 
@@ -402,7 +393,7 @@ export class PostsService {
       }
 
       const publications = await pubRepo.find({ where: { postId } });
-      if (!this.canAccessPost(actor, post, publications)) {
+      if (!canAccessPost(actor, post, publications)) {
         throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'post.notFound');
       }
 
@@ -512,8 +503,12 @@ export class PostsService {
     }
 
     const publications = await publicationRepo.find({ where: { postId } });
-    if (!this.canAccessPost(actor, post, publications)) {
+    if (!canAccessPost(actor, post, publications)) {
       throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'post.notFound');
+    }
+    // Archiving takes every publication offline; that needs every site's authority.
+    if (!canManageAllPublications(actor, publications)) {
+      throw new ApiException(HttpStatus.FORBIDDEN, 'FORBIDDEN', 'http.forbidden');
     }
 
     await this.dataSource.transaction(async (manager) => {
@@ -576,7 +571,7 @@ export class PostsService {
     }
 
     const publications = await publicationRepo.find({ where: { postId } });
-    if (!this.canAccessPost(actor, post, publications)) {
+    if (!canAccessPost(actor, post, publications)) {
       throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'post.notFound');
     }
 
@@ -603,7 +598,7 @@ export class PostsService {
     }
 
     const publications = await publicationRepo.find({ where: { postId } });
-    if (!this.canAccessPost(actor, post, publications)) {
+    if (!canAccessPost(actor, post, publications)) {
       throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'post.notFound');
     }
 
@@ -635,7 +630,7 @@ export class PostsService {
       }
 
       const publications = await pubRepo.find({ where: { postId } });
-      if (!this.canAccessPost(actor, post, publications)) {
+      if (!canAccessPost(actor, post, publications)) {
         throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'post.notFound');
       }
 
@@ -721,7 +716,7 @@ export class PostsService {
     // Object-level check: `post:read` on any site is not authority over this post.
     const publicationRepo = await this.getPublicationRepo();
     const publications = await publicationRepo.find({ where: { postId } });
-    if (!this.canAccessPost(actor, post, publications)) {
+    if (!canAccessPost(actor, post, publications)) {
       throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'post.notFound');
     }
 
@@ -735,11 +730,7 @@ export class PostsService {
       .digest('hex');
 
     const token = Buffer.from(`${payload}:${signature}`).toString('base64url');
-    const apiBase = (process.env.API_BASE_URL || 'http://localhost:4000/api/v1').replace(
-      /\/+$/,
-      '',
-    );
-    const previewUrl = `${apiBase}/posts/${postId}/preview?token=${token}${siteId ? `&siteId=${siteId}` : ''}`;
+    const previewUrl = `${env.API_BASE_URL}/posts/${postId}/preview?token=${token}${siteId ? `&siteId=${siteId}` : ''}`;
 
     return {
       token,

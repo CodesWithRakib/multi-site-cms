@@ -32,7 +32,11 @@ export class CreatePublicCommentDto {
   @MaxLength(2000)
   content!: string;
 
-  @ApiPropertyOptional({ description: 'Optional 1-5 star rating for the article', minimum: 1, maximum: 5 })
+  @ApiPropertyOptional({
+    description: 'Optional 1-5 star rating for the article',
+    minimum: 1,
+    maximum: 5,
+  })
   @IsOptional()
   @IsInt()
   @Min(1)
@@ -49,4 +53,3 @@ export class CreatePublicCommentDto {
   @IsString()
   website_url?: string;
 }
-

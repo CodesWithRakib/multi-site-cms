@@ -7,23 +7,24 @@ a credential-bearing database URL.
 
 ## Variables
 
-| Variable               | Required        | Default                      | Validation                                                  |
-| ---------------------- | --------------- | ---------------------------- | ----------------------------------------------------------- |
-| `NODE_ENV`             | no              | `development`                | `development` \| `test` \| `production`                     |
-| `HOST`                 | no              | `0.0.0.0`                    | non-empty string                                            |
-| `PORT`                 | no              | `4000`                       | integer 1–65535                                             |
-| `API_PREFIX`           | no              | `api/v1`                     | lowercase segments, no leading slash                        |
-| `CORS_ORIGINS`         | production only | localhost:3000–3002          | comma-separated absolute `http(s)` URLs                     |
-| `DATABASE_URL`         | production only | local Compose database       | `postgresql://` or `postgres://`                            |
-| `TRUST_PROXY`          | no              | `0`                          | integer 0–10                                                |
-| `LOG_LEVEL`            | no              | `info`                       | `debug` \| `info` \| `warn` \| `error` \| `silent`          |
-| `BODY_LIMIT`           | no              | `1mb`                        | `<number><b                                                 | kb                               | mb>` |
-| `DOCS_ENABLED`         | production only | `false`                      | `true` \| `false`                                           |
-| `TEST_DATABASE_URL`    | no (tests)      | derived from the default     | must end with `_test` for destructive suites                |
-| `STORAGE_PROVIDER`     | no              | `local`                      | `local`                                                     | `cloudinary` (needs credentials) |
-| `PREVIEW_TOKEN_SECRET` | production only | random per process           | at least 32 characters                                      |
-| `REVALIDATE_SECRET`    | no              | unset (revalidation skipped) | at least 16 characters                                      |
-| `SITE_REVALIDATE_URLS` | no              | empty                        | `site-key=http(s)://host` pairs, comma-separated (ADR-0026) |
+| Variable               | Required        | Default                        | Validation                                                  |
+| ---------------------- | --------------- | ------------------------------ | ----------------------------------------------------------- |
+| `NODE_ENV`             | no              | `development`                  | `development` \| `test` \| `production`                     |
+| `HOST`                 | no              | `0.0.0.0`                      | non-empty string                                            |
+| `PORT`                 | no              | `4000`                         | integer 1–65535                                             |
+| `API_PREFIX`           | no              | `api/v1`                       | lowercase segments, no leading slash                        |
+| `CORS_ORIGINS`         | production only | localhost:3000–3002            | comma-separated absolute `http(s)` URLs                     |
+| `DATABASE_URL`         | production only | local Compose database         | `postgresql://` or `postgres://`                            |
+| `TRUST_PROXY`          | no              | `0`                            | integer 0–10                                                |
+| `LOG_LEVEL`            | no              | `info`                         | `debug` \| `info` \| `warn` \| `error` \| `silent`          |
+| `BODY_LIMIT`           | no              | `1mb`                          | `<number><b                                                 | kb                               | mb>` |
+| `DOCS_ENABLED`         | production only | `false`                        | `true` \| `false`                                           |
+| `TEST_DATABASE_URL`    | no (tests)      | derived from the default       | must end with `_test` for destructive suites                |
+| `API_BASE_URL`         | production only | `http://localhost:4000/api/v1` | absolute `http(s)` URL; not localhost in production         |
+| `STORAGE_PROVIDER`     | no              | `local`                        | `local`                                                     | `cloudinary` (needs credentials) |
+| `PREVIEW_TOKEN_SECRET` | production only | random per process             | at least 32 characters                                      |
+| `REVALIDATE_SECRET`    | no              | unset (revalidation skipped)   | at least 16 characters                                      |
+| `SITE_REVALIDATE_URLS` | no              | empty                          | `site-key=http(s)://host` pairs, comma-separated (ADR-0026) |
 
 ## Production rules
 

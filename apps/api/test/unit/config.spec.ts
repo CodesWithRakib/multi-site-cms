@@ -13,6 +13,7 @@ const PRODUCTION_ENV: NodeJS.ProcessEnv = {
   DATABASE_URL: 'postgresql://app:secret-password@db.internal:5432/multi_site_cms',
   CORS_ORIGINS: 'https://admin.example.com,https://travel.example.com',
   PREVIEW_TOKEN_SECRET: 'production-preview-secret-at-least-32-chars',
+  API_BASE_URL: 'https://api.example.com/api/v1',
 };
 
 describe('parseEnv', () => {
@@ -127,6 +128,23 @@ describe('parseEnv', () => {
       );
     },
   );
+
+  it('defaults API_BASE_URL in development and strips trailing slashes', () => {
+    expect(parseEnv(DEVELOPMENT_ENV).API_BASE_URL).toBe('http://localhost:4000/api/v1');
+    expect(
+      parseEnv({ ...DEVELOPMENT_ENV, API_BASE_URL: 'http://localhost:4000/api/v1//' }).API_BASE_URL,
+    ).toBe('http://localhost:4000/api/v1');
+  });
+
+  it('requires a non-localhost API_BASE_URL in production', () => {
+    const withoutBaseUrl: NodeJS.ProcessEnv = { ...PRODUCTION_ENV };
+    delete withoutBaseUrl.API_BASE_URL;
+
+    expect(() => parseEnv(withoutBaseUrl)).toThrow(/API_BASE_URL/);
+    expect(() =>
+      parseEnv({ ...PRODUCTION_ENV, API_BASE_URL: 'http://localhost:4000/api/v1' }),
+    ).toThrow(/API_BASE_URL must not point to localhost/);
+  });
 
   it('rejects localhost origins in production', () => {
     expect(() =>

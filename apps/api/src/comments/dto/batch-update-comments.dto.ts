@@ -18,4 +18,3 @@ export class BatchUpdateCommentsDto {
   @IsIn(['approved', 'pending', 'rejected', 'spam'])
   status!: PostCommentStatus;
 }
-

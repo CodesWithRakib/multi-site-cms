@@ -14,7 +14,7 @@ export class CloudinaryStorageProvider implements StorageProvider {
   private readonly baseUrl: string;
 
   constructor() {
-    this.baseUrl = (process.env.API_BASE_URL || 'http://localhost:4000/api/v1').replace(/\/+$/, '');
+    this.baseUrl = env.API_BASE_URL;
 
     // The module instantiates this provider even when local storage is selected,
     // so missing credentials leave it unconfigured instead of failing boot.

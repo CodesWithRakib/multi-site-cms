@@ -37,8 +37,9 @@ export class CommentsAdminController {
   @ApiResponse({ status: 200, description: 'Paginated comments list with counts' })
   async listComments(
     @Query() query: ListAdminCommentsQueryDto,
+    @CurrentUser() actor: EffectiveAuthContext,
   ): Promise<AdminCommentsListResult> {
-    return this.commentsService.listComments(query);
+    return this.commentsService.listComments(actor, query);
   }
 
   @Patch(':id/status')
@@ -50,7 +51,7 @@ export class CommentsAdminController {
     @Body() dto: UpdateCommentStatusDto,
     @CurrentUser() actor: EffectiveAuthContext,
   ): Promise<AdminCommentItem> {
-    return this.commentsService.updateCommentStatus(id, dto.status, actor.user.id);
+    return this.commentsService.updateCommentStatus(actor, id, dto.status);
   }
 
   @Post('batch')
@@ -62,7 +63,7 @@ export class CommentsAdminController {
     @Body() dto: BatchUpdateCommentsDto,
     @CurrentUser() actor: EffectiveAuthContext,
   ): Promise<{ updatedCount: number }> {
-    return this.commentsService.batchUpdateStatus(dto, actor.user.id);
+    return this.commentsService.batchUpdateStatus(actor, dto);
   }
 
   @Delete(':id')
@@ -74,6 +75,6 @@ export class CommentsAdminController {
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @CurrentUser() actor: EffectiveAuthContext,
   ): Promise<void> {
-    await this.commentsService.deleteComment(id, actor.user.id);
+    await this.commentsService.deleteComment(actor, id);
   }
 }

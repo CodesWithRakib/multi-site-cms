@@ -69,6 +69,13 @@ const envSchema = z.object({
    * surface area.
    */
   DOCS_ENABLED: z.enum(['true', 'false']).default('false'),
+  /**
+   * Public base URL of this API including the prefix, used to build absolute
+   * media and preview links. Required (and non-localhost) in production.
+   */
+  API_BASE_URL: httpUrl
+    .default('http://localhost:4000/api/v1')
+    .transform((value) => value.replace(/\/+$/, '')),
   STORAGE_PROVIDER: z.enum(['local', 'cloudinary']).default('local'),
   CLOUDINARY_URL: z.string().optional(),
   CLOUDINARY_CLOUD_NAME: z.string().optional(),
@@ -203,9 +210,9 @@ export function parseEnv(input: NodeJS.ProcessEnv): ApiConfig {
   // Production must not silently inherit development defaults. `envSchema` applies
   // them, so the raw input is what proves intent.
   if (config.NODE_ENV === 'production') {
-    const missing = (['DATABASE_URL', 'CORS_ORIGINS', 'PREVIEW_TOKEN_SECRET'] as const).filter(
-      (key) => !input[key] || input[key]?.trim() === '',
-    );
+    const missing = (
+      ['DATABASE_URL', 'CORS_ORIGINS', 'PREVIEW_TOKEN_SECRET', 'API_BASE_URL'] as const
+    ).filter((key) => !input[key] || input[key]?.trim() === '');
 
     if (missing.length > 0) {
       throw new Error(
@@ -217,6 +224,12 @@ export function parseEnv(input: NodeJS.ProcessEnv): ApiConfig {
     if (localOrigins.length > 0) {
       throw new Error(
         'Invalid API environment configuration:\nCORS_ORIGINS must not contain localhost origins in production.',
+      );
+    }
+
+    if (isLocalhost(config.API_BASE_URL)) {
+      throw new Error(
+        'Invalid API environment configuration:\nAPI_BASE_URL must not point to localhost in production.',
       );
     }
   }

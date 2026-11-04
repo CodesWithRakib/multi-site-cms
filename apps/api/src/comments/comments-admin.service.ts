@@ -6,6 +6,7 @@ import type {
 } from '@multi-site-cms/types';
 import { DataSource, In } from 'typeorm';
 
+import type { EffectiveAuthContext } from '../auth/services/authorization.service';
 import { ApiException } from '../common/exceptions/api.exception';
 import { AuditService } from '../common/audit/audit.service';
 import { DATA_SOURCE } from '../database/database.tokens';
@@ -42,7 +43,20 @@ export class CommentsAdminService {
     private readonly auditService: AuditService,
   ) {}
 
-  async listComments(query: ListAdminCommentsQueryDto): Promise<AdminCommentsListResult> {
+  /**
+   * Comments are site-owned (SEC-12). Super Admins see every site; everyone
+   * else only the sites they are assigned to. Out-of-scope ids answer 404.
+   */
+  private assertCommentAccess(actor: EffectiveAuthContext, comment: PostComment): void {
+    if (!actor.isSuperAdmin && !actor.authorizedSiteIds.includes(comment.siteId)) {
+      throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'post.notFound');
+    }
+  }
+
+  async listComments(
+    actor: EffectiveAuthContext,
+    query: ListAdminCommentsQueryDto,
+  ): Promise<AdminCommentsListResult> {
     const page = Math.max(1, query.page ?? 1);
     const limit = Math.min(100, Math.max(1, query.limit ?? 20));
     const offset = (page - 1) * limit;
@@ -54,6 +68,14 @@ export class CommentsAdminService {
       .leftJoin(Site, 's', 's.id = c.site_id')
       .leftJoin(PostPublication, 'pub', 'pub.id = c.publication_id')
       .leftJoin(PostRevision, 'rev', 'rev.id = pub.revision_id');
+
+    if (!actor.isSuperAdmin) {
+      // An empty IN () is invalid SQL; an admin without sites matches nothing.
+      baseQb.andWhere(
+        actor.authorizedSiteIds.length > 0 ? 'c.site_id IN (:...scopeSiteIds)' : '1 = 0',
+        { scopeSiteIds: actor.authorizedSiteIds },
+      );
+    }
 
     if (query.siteId) {
       baseQb.andWhere('c.site_id = :siteId', { siteId: query.siteId });
@@ -98,7 +120,8 @@ export class CommentsAdminService {
       baseQb.andWhere('c.status = :status', { status: query.status });
     }
 
-    const totalFiltered = query.status && query.status !== 'all' ? counts[query.status] : counts.all;
+    const totalFiltered =
+      query.status && query.status !== 'all' ? counts[query.status] : counts.all;
 
     const rawItems = await baseQb
       .select([
@@ -154,16 +177,18 @@ export class CommentsAdminService {
   }
 
   async updateCommentStatus(
+    actor: EffectiveAuthContext,
     id: string,
     status: PostCommentStatus,
-    actorId?: string,
   ): Promise<AdminCommentItem> {
+    const actorId = actor.user.id;
     const commentRepo = await getInitializedRepository(this.dataSource, PostComment);
     const comment = await commentRepo.findOne({ where: { id } });
 
     if (!comment) {
       throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'post.notFound');
     }
+    this.assertCommentAccess(actor, comment);
 
     comment.status = status;
     comment.updatedAt = new Date();
@@ -179,7 +204,11 @@ export class CommentsAdminService {
       metadata: { status },
     });
 
-    const res = await this.listComments({ siteId: comment.siteId, search: comment.id, limit: 1 });
+    const res = await this.listComments(actor, {
+      siteId: comment.siteId,
+      search: comment.id,
+      limit: 1,
+    });
     const found = res.items.find((i) => i.id === comment.id);
     if (!found) {
       throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'post.notFound');
@@ -188,10 +217,25 @@ export class CommentsAdminService {
   }
 
   async batchUpdateStatus(
+    actor: EffectiveAuthContext,
     dto: BatchUpdateCommentsDto,
-    actorId?: string,
   ): Promise<{ updatedCount: number }> {
+    const actorId = actor.user.id;
     const commentRepo = await getInitializedRepository(this.dataSource, PostComment);
+
+    // All-or-nothing: one out-of-scope (or unknown) id rejects the whole batch,
+    // so a caller cannot probe which ids exist on other sites.
+    const targets = await commentRepo.find({
+      where: { id: In(dto.ids) },
+      select: { id: true, siteId: true },
+    });
+    if (targets.length !== new Set(dto.ids).size) {
+      throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'post.notFound');
+    }
+    for (const target of targets) {
+      this.assertCommentAccess(actor, target);
+    }
+
     const result = await commentRepo
       .createQueryBuilder()
       .update(PostComment)
@@ -212,13 +256,15 @@ export class CommentsAdminService {
     return { updatedCount: count };
   }
 
-  async deleteComment(id: string, actorId?: string): Promise<void> {
+  async deleteComment(actor: EffectiveAuthContext, id: string): Promise<void> {
+    const actorId = actor.user.id;
     const commentRepo = await getInitializedRepository(this.dataSource, PostComment);
     const comment = await commentRepo.findOne({ where: { id } });
 
     if (!comment) {
       throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'post.notFound');
     }
+    this.assertCommentAccess(actor, comment);
 
     await commentRepo.delete(id);
 
@@ -232,4 +278,3 @@ export class CommentsAdminService {
     });
   }
 }
-

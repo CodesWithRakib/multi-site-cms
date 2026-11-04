@@ -18,7 +18,7 @@ decision (2026-11-04) and are not scored.
 ## Release blockers
 
 1. Rotate the Cloudinary API secret (SEC-0). Owner action.
-2. Set `PREVIEW_TOKEN_SECRET` (≥32 chars) in production; the API refuses to
+2. Set `PREVIEW_TOKEN_SECRET` (≥32 chars) and `API_BASE_URL` (public, non-localhost) in production; the API refuses to
    boot without it. Breaking change for existing deploy configs.
 3. Set `REVALIDATE_SECRET` (same value) on the API and both sites, and verify
    each site's primary domain (or set `SITE_REVALIDATE_URLS`), or publishes
@@ -30,13 +30,13 @@ decision (2026-11-04) and are not scored.
 
 ## Business decisions
 
-| Decision                  | Outcome (2026-11-04)                                              |
-| ------------------------- | ----------------------------------------------------------------- |
-| Booking/commerce in scope | No — the platform stays a publishing CMS                          |
-| Comment moderation        | Pre-moderation (`pending` until approved)                         |
-| Contact form              | `mailto:` for now; an inquiry inbox can come later                |
-| Revalidation target       | Override env, else verified primary domain (ADR-0026)             |
-| Newsletter                | **Open** — collect only today; no opt-in, unsubscribe, or sending |
+| Decision                  | Outcome (2026-11-04)                                           |
+| ------------------------- | -------------------------------------------------------------- |
+| Booking/commerce in scope | No — the platform stays a publishing CMS                       |
+| Comment moderation        | Pre-moderation (`pending` until approved)                      |
+| Contact form              | `mailto:` for now; an inquiry inbox can come later             |
+| Revalidation target       | Override env, else verified primary domain (ADR-0026)          |
+| Newsletter                | Collect only (decided); no opt-in, unsubscribe, or sending yet |
 
 ## Not verified (environment or scope limits)
 

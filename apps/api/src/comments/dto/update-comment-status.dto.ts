@@ -12,4 +12,3 @@ export class UpdateCommentStatusDto {
   @IsIn(['approved', 'pending', 'rejected', 'spam'])
   status!: PostCommentStatus;
 }
-

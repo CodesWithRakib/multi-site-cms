@@ -12,19 +12,21 @@ did not cover; treat this file as the current source of truth.
 
 ## Findings
 
-| ID     | Severity | Area                                          | Status                                                                      |
-| ------ | -------- | --------------------------------------------- | --------------------------------------------------------------------------- |
-| SEC-0  | Critical | Cloudinary credentials in source              | Removed from code (Phase 1); **rotation required by owner**                 |
-| SEC-1  | Critical | Preview token signing secret                  | Fixed (Phase 1)                                                             |
-| SEC-2  | High     | Preview token minting (IDOR)                  | Fixed (Phase 1)                                                             |
-| SEC-3  | Medium   | Preview `siteId` not bound                    | Fixed (Phase 1)                                                             |
-| SEC-4  | High     | Site revalidation webhooks                    | Fixed (Phase 1)                                                             |
-| SEC-5  | Medium   | CSRF exemption by substring                   | Fixed (Phase 1)                                                             |
-| SEC-6  | Medium   | Public write endpoints rate                   | Fixed: newsletter at API (Phase 1); comments in travel-blog proxy (Phase 2) |
-| SEC-7  | Low      | Non-constant-time HMAC check                  | Fixed (Phase 1)                                                             |
-| SEC-8  | Info     | Permission check without site                 | Open (by design, documented)                                                |
-| SEC-9  | Medium   | Comments published without moderation         | Fixed (Phase 2): pre-moderation                                             |
-| SEC-10 | Medium   | Test suite wrote to a real Cloudinary account | Fixed (Phase 1)                                                             |
+| ID     | Severity | Area                                              | Status                                                                      |
+| ------ | -------- | ------------------------------------------------- | --------------------------------------------------------------------------- |
+| SEC-0  | Critical | Cloudinary credentials in source                  | Removed from code (Phase 1); **rotation required by owner**                 |
+| SEC-1  | Critical | Preview token signing secret                      | Fixed (Phase 1)                                                             |
+| SEC-2  | High     | Preview token minting (IDOR)                      | Fixed (Phase 1)                                                             |
+| SEC-3  | Medium   | Preview `siteId` not bound                        | Fixed (Phase 1)                                                             |
+| SEC-4  | High     | Site revalidation webhooks                        | Fixed (Phase 1)                                                             |
+| SEC-5  | Medium   | CSRF exemption by substring                       | Fixed (Phase 1)                                                             |
+| SEC-6  | Medium   | Public write endpoints rate                       | Fixed: newsletter at API (Phase 1); comments in travel-blog proxy (Phase 2) |
+| SEC-7  | Low      | Non-constant-time HMAC check                      | Fixed (Phase 1)                                                             |
+| SEC-8  | Info     | Permission check without site                     | By design; full sweep done (Phase 2b) — found SEC-11, SEC-12                |
+| SEC-9  | Medium   | Comments published without moderation             | Fixed (Phase 2): pre-moderation                                             |
+| SEC-10 | Medium   | Test suite wrote to a real Cloudinary account     | Fixed (Phase 1)                                                             |
+| SEC-11 | High     | Cross-site post takeover via publication          | Fixed (Phase 2b)                                                            |
+| SEC-12 | High     | Admin comments not site-scoped (PII + moderation) | Fixed (Phase 2b)                                                            |
 
 ### SEC-0 — Real Cloudinary API key and secret committed to source
 
@@ -156,6 +158,41 @@ storage provider, so `media-upload.e2e-spec.ts` uploaded test images to the
 developer's real Cloudinary account (seen in the baseline run, where the
 returned URL was `res.cloudinary.com/...`). The setup file now forces
 `STORAGE_PROVIDER=local` and blanks all Cloudinary variables.
+
+### SEC-11 — Publishing another site's post granted access to it
+
+- Evidence (before fix): `PublicationsService.createPublication` checked only
+  the _target_ site. A site-B admin who knew a post id that existed only on
+  site A could publish it on site B; `canAccessPost` then passed (the post had
+  a publication on an authorized site), exposing all revisions and edits.
+  `archivePost` additionally archived **every** publication, so that admin
+  could take site A's article offline.
+- Fix: `createPublication` requires `canAccessPost` on the post (opaque 404);
+  `archivePost` requires authority over every site the post is published on
+  (403). Shared rules in `apps/api/src/posts/utils/post-access.ts`.
+- Tests: `preview.e2e-spec.ts` › "Cross-site post isolation" (9 cases; the two
+  regression cases fail on the old code, verified by stashing the fix).
+
+### SEC-12 — Admin comment moderation ignored site membership
+
+- Evidence (before fix): `CommentsAdminService` took no actor. `GET /comments`
+  without `siteId` returned every site's comments including commenter emails;
+  `PATCH /comments/:id/status`, `DELETE /comments/:id`, and `POST /comments/batch`
+  acted on any comment id.
+- Fix: list is filtered to the caller's sites (Super Admin: all); by-id
+  operations return 404 outside scope; a batch is rejected whole if any id is
+  unknown or out of scope.
+- Tests: `comments-admin.e2e-spec.ts` (7 cases; 4 fail on the old code).
+
+### SEC-8 sweep result (Phase 2b)
+
+Checked every id-addressed method in `posts.service.ts`, `publications.service.ts`,
+`publishing.service.ts`, `media.service.ts`, `comments-admin.service.ts`,
+`audit.service.ts`, `analytics.service.ts`, `dashboard.service.ts`:
+publication and publishing lookups are all scoped by `(id, siteId)`; media
+checks the asset's site; audit, analytics, and dashboard filter by the caller's
+sites. The two gaps found are SEC-11 and SEC-12 above. Minor: analytics and
+dashboard default a multi-site admin to their first site only (UX, not a leak).
 
 ## Verified controls (no change needed)
 

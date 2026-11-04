@@ -2,12 +2,13 @@
 
 ## State at handoff (2026-11-04)
 
-- Phase 1 done; Phase 2a done. All changes **uncommitted** (partly staged by the editor).
+- Phases 1 and 2 done (one Phase 2 coverage item moved to Phase 4). All changes **uncommitted**.
 - Owner actions: rotate the Cloudinary secret; set `NEXT_PUBLIC_CONTACT_EMAIL`;
-  set `REVALIDATE_SECRET` (+ `SITE_REVALIDATE_URLS` locally).
+  set `REVALIDATE_SECRET` (+ `SITE_REVALIDATE_URLS` locally); in production also
+  `PREVIEW_TOKEN_SECRET` and `API_BASE_URL`.
 - Migration `1793491211000` is not applied to the dev database yet:
   `pnpm --filter @multi-site-cms/api build && pnpm --filter @multi-site-cms/api db:migration:run`.
-- Open decision: newsletter scope (collect only vs opt-in + sending).
+- All business decisions made (see `docs/audit/PRODUCTION_READINESS.md`).
 
 ## Resume steps
 
@@ -16,15 +17,15 @@
 3. `pnpm db:up`, then `pnpm lint && pnpm typecheck && pnpm test` and
    `pnpm --filter @multi-site-cms/api test:integration`.
 
-## Exact next action — Phase 2b
+## Exact next action — Phase 3, UX-1
 
-SEC-8 sweep: list every method in `apps/api/src/posts/posts.service.ts`,
-`publications.service.ts`, and `apps/api/src/media/media.service.ts` that takes
-an id without `siteId` in the route, confirm each calls `canAccessPost` (or the
-media equivalent), and add one cross-site denial test per method in
-`test/api/rbac-and-site-isolation.e2e-spec.ts`.
+Add route boundaries to the three Next.js apps, following each app's existing
+layout, tokens, and `.agent/skills/ui-ux-design-standards`:
 
-Then: TD-4 (one site-ID resolver shared by `SiteAccessGuard` and
-`PermissionsGuard`), TD-7 (`API_BASE_URL` in `config/env.ts`, required in
-production), and API tests for admin comments, newsletter, users/roles,
-audit-logs, settings.
+- `src/app/not-found.tsx` (branded 404 with navigation back)
+- `src/app/error.tsx` (client component, `reset()` retry, no error details shown)
+- `src/app/global-error.tsx` (minimal, own `<html>`/`<body>`)
+- `loading.tsx` only for routes with slow server data (article detail, event detail)
+
+Then verify in a browser at 1440 / 768 / 375 in both themes, starting the apps
+with `pnpm dev` (API on :4000 needs PostgreSQL via `pnpm db:up`).

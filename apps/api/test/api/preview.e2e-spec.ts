@@ -18,6 +18,8 @@ import { PasswordService } from '../../src/auth/services/password.service';
 import { configureApp } from '../../src/bootstrap';
 import { DATA_SOURCE } from '../../src/database/database.tokens';
 import { Permission } from '../../src/database/entities/permission.entity';
+import { PostPublication } from '../../src/database/entities/post-publication.entity';
+import { Post } from '../../src/database/entities/post.entity';
 import { RolePermission } from '../../src/database/entities/role-permission.entity';
 import { Role } from '../../src/database/entities/role.entity';
 import { Site } from '../../src/database/entities/site.entity';
@@ -372,6 +374,120 @@ describe('Authenticated Post Draft Preview System', () => {
         .set('x-csrf-token', airSportsAdminCsrf);
 
       expect([403, 404]).toContain(res.status);
+    });
+  });
+
+  // Cross-site isolation for canonical posts (SEC-8 sweep). Lives here because
+  // this fixture grants site admins the full post/publication permission set.
+  describe('Cross-site post isolation', () => {
+    async function createTravelOnlyPost(title: string): Promise<string> {
+      const res = await request(app.getHttpServer())
+        .post('/api/v1/posts')
+        .set('Cookie', travelAdminCookie)
+        .set('x-csrf-token', travelAdminCsrf)
+        .send({
+          type: 'article',
+          sourceLocale: 'en',
+          title,
+          body: {
+            type: 'doc',
+            content: [{ type: 'paragraph', content: [{ type: 'text', text: title }] }],
+          },
+          publications: [
+            {
+              siteId: siteTravelId,
+              slug: title
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-|-$/g, ''),
+              status: 'draft',
+            },
+          ],
+        });
+      expect(res.status).toBe(201);
+      return (res.body as ApiSuccess<PostItem>).data.id;
+    }
+
+    it("denies publishing another site's post onto your own site (regression: SEC-11)", async () => {
+      const postId = await createTravelOnlyPost('Travel Only Draft');
+
+      const res = await request(app.getHttpServer())
+        .post(`/api/v1/posts/${postId}/publications`)
+        .set('Cookie', airSportsAdminCookie)
+        .set('x-csrf-token', airSportsAdminCsrf)
+        .send({ siteId: siteAirSportsId, slug: 'hijacked-draft', status: 'draft' });
+
+      expect(res.status).toBe(404);
+      const count = await dataSource
+        .getRepository(PostPublication)
+        .count({ where: { postId, siteId: siteAirSportsId } });
+      expect(count).toBe(0);
+    });
+
+    it.each([
+      ['GET', ''],
+      ['PATCH', ''],
+      ['DELETE', ''],
+      ['GET', '/revisions'],
+      ['GET', '/revisions/1'],
+      ['POST', '/revisions/1/restore'],
+    ])('returns 404 to an admin of another site for %s /posts/:id%s', async (method, suffix) => {
+      const postId = await createTravelOnlyPost(`Isolation ${method} ${suffix || 'root'}`);
+      const url = `/api/v1/posts/${postId}${suffix}`;
+      const server = app.getHttpServer();
+      const req =
+        method === 'GET'
+          ? request(server).get(url)
+          : method === 'PATCH'
+            ? request(server).patch(url).send({ title: 'Hijacked', expectedRevisionNumber: 1 })
+            : method === 'DELETE'
+              ? request(server).delete(url)
+              : request(server).post(url).send({});
+
+      const res = await req
+        .set('Cookie', airSportsAdminCookie)
+        .set('x-csrf-token', airSportsAdminCsrf);
+
+      expect(res.status).toBe(404);
+      const post = await dataSource.getRepository(Post).findOneByOrFail({ id: postId });
+      expect(post.deletedAt).toBeNull();
+    });
+
+    it('forbids archiving a post that is also published on a site you do not manage', async () => {
+      const postId = await createTravelOnlyPost('Shared Across Sites');
+      const travelPublication = await dataSource
+        .getRepository(PostPublication)
+        .findOneByOrFail({ postId, siteId: siteTravelId });
+      // Fixture: the same post is also published on Air Sports (as a Super Admin would do).
+      await dataSource.getRepository(PostPublication).insert({
+        postId,
+        siteId: siteAirSportsId,
+        slug: 'shared-across-sites',
+        status: 'draft',
+        revisionId: travelPublication.revisionId,
+      });
+
+      const res = await request(app.getHttpServer())
+        .delete(`/api/v1/posts/${postId}`)
+        .set('Cookie', travelAdminCookie)
+        .set('x-csrf-token', travelAdminCsrf);
+
+      expect(res.status).toBe(403);
+      const airPublication = await dataSource
+        .getRepository(PostPublication)
+        .findOneByOrFail({ postId, siteId: siteAirSportsId });
+      expect(airPublication.status).toBe('draft');
+    });
+
+    it('still lets an admin archive a post published only on their own site', async () => {
+      const postId = await createTravelOnlyPost('Own Site Only');
+
+      const res = await request(app.getHttpServer())
+        .delete(`/api/v1/posts/${postId}`)
+        .set('Cookie', travelAdminCookie)
+        .set('x-csrf-token', travelAdminCsrf);
+
+      expect(res.status).toBe(204);
     });
   });
 });

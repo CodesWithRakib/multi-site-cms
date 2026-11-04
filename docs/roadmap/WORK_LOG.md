@@ -70,3 +70,30 @@ Phase 1 files were staged in the index by the editor, not by the agent.
 **Verification:** lint 0, typecheck 0; `pnpm test` all 9 tasks green (API
 242/242); `test:integration` 56/56; travel-blog and API production builds OK;
 Prettier clean on all changed files. Not run: Playwright, browser checks.
+
+## 2026-11-04 — Phase 2b
+
+**Decision (user):** newsletter = collect emails only for now.
+
+**Findings fixed:**
+
+- SEC-11 (High): publishing another site's post granted access to it; archiving
+  a post archived other sites' publications. `posts/utils/post-access.ts`
+  (`canAccessPost`, `canManageAllPublications`) used by `PostsService` and
+  `PublicationsService`.
+- SEC-12 (High): admin comment list/moderation ignored site membership (all
+  sites' commenter emails visible; cross-site approve/delete/batch).
+  `CommentsAdminService` now takes the actor and scopes every operation.
+- TD-4: `auth/utils/resolve-request-site-id.ts` shared by both guards.
+- TD-7: `API_BASE_URL` in the validated env (required, non-localhost in production);
+  four direct `process.env` reads removed.
+
+**Tests added:** `comments-admin.e2e-spec.ts` (7), "Cross-site post isolation"
+block in `preview.e2e-spec.ts` (9), `resolve-request-site-id.spec.ts` (3),
+`config.spec.ts` (+2). Old-code check: SEC-11 cases 2/2 and SEC-12 cases 4/7
+fail when the fix is stashed.
+
+**Verification:** lint 0, typecheck 0, `pnpm test` 9/9 tasks (API 263/263),
+`test:integration` 56/56, Prettier clean. Not run: Playwright, browser checks.
+
+**Migrations:** none new in 2b.

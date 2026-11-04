@@ -22,7 +22,10 @@ export class ListPostsQueryDto {
   @IsIn(POST_TYPES)
   type?: PostType;
 
-  @ApiPropertyOptional({ description: 'Filter by editorial or publication status', enum: POST_FILTER_STATUSES })
+  @ApiPropertyOptional({
+    description: 'Filter by editorial or publication status',
+    enum: POST_FILTER_STATUSES,
+  })
   @IsOptional()
   @IsIn(POST_FILTER_STATUSES)
   status?: PostFilterStatus;

@@ -14,6 +14,7 @@ import type {
 import { DataSource, In } from 'typeorm';
 
 import { ApiException } from '../common/exceptions/api.exception';
+import { env } from '../config/env';
 import { DATA_SOURCE } from '../database/database.tokens';
 import { Category } from '../database/entities/category.entity';
 import { Event } from '../database/entities/event.entity';
@@ -44,7 +45,7 @@ export class PublicContentService {
     private readonly postsService: PostsService,
     private readonly auditService: AuditService,
   ) {
-    this.baseUrl = (process.env.API_BASE_URL || 'http://localhost:4000/api/v1').replace(/\/+$/, '');
+    this.baseUrl = env.API_BASE_URL;
   }
 
   private resolveMediaUrl(storageKey: string): string {

@@ -16,6 +16,7 @@ import { PostRevision } from '../database/entities/post-revision.entity';
 import { Post } from '../database/entities/post.entity';
 import { Tag } from '../database/entities/tag.entity';
 import { CreatePublicationDto, ListPublicationsQueryDto, UpdatePublicationDto } from './dto';
+import { canAccessPost } from './utils/post-access';
 
 @Injectable()
 export class PublicationsService {
@@ -78,6 +79,13 @@ export class PublicationsService {
 
     const post = await postRepo.findOne({ where: { id: postId } });
     if (!post || post.deletedAt) {
+      throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'post.notFound');
+    }
+
+    // Access to the target site is not access to the post: without this check a
+    // site admin could publish another site's draft and so gain access to it (SEC-11).
+    const existingPublications = await publicationRepo.find({ where: { postId } });
+    if (!canAccessPost(actor, post, existingPublications)) {
       throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'post.notFound');
     }
 

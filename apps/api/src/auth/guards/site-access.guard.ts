@@ -5,6 +5,7 @@ import type { Request } from 'express';
 import { ApiException } from '../../common/exceptions/api.exception';
 import { REQUIRE_SITE_CONTEXT_KEY } from '../decorators/site-context.decorator';
 import { AuthorizationService, type EffectiveAuthContext } from '../services/authorization.service';
+import { resolveRequestSiteId } from '../utils/resolve-request-site-id';
 
 @Injectable()
 export class SiteAccessGuard implements CanActivate {
@@ -34,7 +35,7 @@ export class SiteAccessGuard implements CanActivate {
       throw new ApiException(HttpStatus.UNAUTHORIZED, 'UNAUTHENTICATED', 'http.unauthenticated');
     }
 
-    const siteId = this.resolveSiteId(request);
+    const siteId = resolveRequestSiteId(request);
     if (!siteId) {
       throw new ApiException(HttpStatus.BAD_REQUEST, 'VALIDATION_ERROR', 'auth.siteRequired');
     }
@@ -42,18 +43,5 @@ export class SiteAccessGuard implements CanActivate {
     this.authorizationService.assertSiteAccess(authContext, siteId);
 
     return true;
-  }
-
-  private resolveSiteId(request: Request): string | null {
-    if (request.params && typeof request.params.siteId === 'string') {
-      return request.params.siteId;
-    }
-    if (request.query && typeof request.query.siteId === 'string') {
-      return request.query.siteId;
-    }
-    if (request.body && typeof request.body.siteId === 'string') {
-      return request.body.siteId;
-    }
-    return null;
   }
 }
