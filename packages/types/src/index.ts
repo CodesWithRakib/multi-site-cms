@@ -911,6 +911,15 @@ export interface PublicCommentItem {
   replies?: PublicCommentItem[];
 }
 
+/**
+ * Response to a public comment submission. Comments are pre-moderated, so
+ * `status` is `pending` until an administrator approves it; only `approved`
+ * comments are ever returned by the public list endpoint.
+ */
+export interface SubmittedPublicComment extends PublicCommentItem {
+  status: 'pending' | 'approved';
+}
+
 export interface CreatePublicCommentPayload {
   authorName: string;
   authorEmail: string;
@@ -980,8 +989,3 @@ export interface BatchUpdateCommentsPayload {
   ids: string[];
   status: CommentStatus;
 }
-
-
-
-
-

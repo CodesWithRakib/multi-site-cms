@@ -43,3 +43,30 @@
 
 **Note:** the user committed unrelated WIP as `e4f26de` during the session; the
 Phase 1 files were staged in the index by the editor, not by the agent.
+
+## 2026-11-04 — Phase 2a (after business decisions)
+
+**Decisions (user):** no commerce; comment pre-moderation; contact via
+`mailto:`; revalidation target = env override else verified primary domain.
+
+**Code changes (uncommitted):**
+
+- Comments: `public-comments.service.ts` stores `pending` (honeypot → `spam`,
+  same response); new `SubmittedPublicComment` type in `@multi-site-cms/types`;
+  travel-blog `CommentForm.tsx` / `lib/comments.ts` show "awaiting review".
+- Migration `1793491211000-PreModeratedComments.ts`: default `pending`, composite
+  FK `FK_post_comments_publication_site`, pre-check aborts on inconsistent rows.
+  Entity default updated. **Not yet applied to the developer database.**
+- Travel-blog `src/lib/rate-limit.ts` + comments proxy: 5/min per client IP, 429 with `Retry-After`.
+- Contact: `src/app/contact/page.tsx` (server component + metadata),
+  `components/contact/ContactForm.tsx`, `lib/contact.ts`; `NEXT_PUBLIC_CONTACT_EMAIL`.
+- Revalidation: `SITE_REVALIDATE_URLS` env, `CacheInvalidationService.resolveSiteBaseUrl`,
+  dispatcher passes the URL, `redirect: 'error'`, error text capped, article
+  paths `/articles/[slug]` + `/articles`. ADR-0026.
+- Tests: `public-content.e2e-spec.ts` (+4), `cache-invalidation.e2e-spec.ts` (11),
+  `config.spec.ts` (+6), `schema.integration-spec.ts` (+2, migration round-trip),
+  stale counts in `wiring/schema.integration-spec.ts`, travel-blog `rate-limit.test.ts`, `contact.test.ts`.
+
+**Verification:** lint 0, typecheck 0; `pnpm test` all 9 tasks green (API
+242/242); `test:integration` 56/56; travel-blog and API production builds OK;
+Prettier clean on all changed files. Not run: Playwright, browser checks.

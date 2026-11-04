@@ -79,7 +79,7 @@ critical journeys.
 - Acceptance: green CI including E2E; documented restore drill; final
   readiness audit re-scored with evidence.
 
-## Phase 5 — Commerce (conditional, not started)
+## Phase 5 — Commerce (out of scope — business decision 2026-11-04)
 
 Only if the business confirms booking/payments are in scope. It requires new
 ADRs (customer identity, commerce domain model, payment provider, PCI scope),

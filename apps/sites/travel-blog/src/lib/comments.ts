@@ -1,7 +1,7 @@
 import type {
   CreatePublicCommentPayload,
-  PublicCommentItem,
   PublicCommentsResult,
+  SubmittedPublicComment,
 } from '@multi-site-cms/types';
 import { siteConfig } from '@/config/site';
 
@@ -43,7 +43,7 @@ export async function fetchArticleComments(slug: string): Promise<PublicComments
 export async function submitArticleComment(
   slug: string,
   payload: CreatePublicCommentPayload,
-): Promise<{ success: boolean; data?: PublicCommentItem; message?: string }> {
+): Promise<{ success: boolean; data?: SubmittedPublicComment; message?: string }> {
   const url = `${API_BASE_URL}/public/sites/${SITE_KEY}/posts/${encodeURIComponent(slug)}/comments`;
 
   try {
@@ -63,11 +63,14 @@ export async function submitArticleComment(
       };
     }
 
-    const json = (await res.json()) as { data: PublicCommentItem };
+    const json = (await res.json()) as { data: SubmittedPublicComment };
     return {
       success: true,
       data: json.data,
-      message: 'Thank you! Your reflection has been posted.',
+      message:
+        json.data.status === 'approved'
+          ? 'Thank you! Your reflection has been posted.'
+          : 'Thank you! Your reflection will appear after review.',
     };
   } catch {
     return {
@@ -76,4 +79,3 @@ export async function submitArticleComment(
     };
   }
 }
-

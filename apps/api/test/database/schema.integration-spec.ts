@@ -146,7 +146,7 @@ describe('migration chain', () => {
       `SELECT "name" FROM "typeorm_migrations" ORDER BY "id"`,
     );
 
-    expect(applied).toHaveLength(6);
+    expect(applied).toHaveLength(12);
   });
 
   it('creates every expected table', async () => {
@@ -932,5 +932,37 @@ describe('sessions and account lockout', () => {
       [userId],
     );
     expect((rows[0] as { locked_until: Date }).locked_until).toBeDefined();
+  });
+});
+
+describe('pre-moderated comments migration', () => {
+  async function statusDefault(): Promise<string | null> {
+    const rows: unknown[] = await dataSource.query(
+      `SELECT "column_default" FROM "information_schema"."columns"
+       WHERE "table_name" = 'post_comments' AND "column_name" = 'status'`,
+    );
+    return (rows[0] as { column_default: string | null }).column_default;
+  }
+
+  async function hasCompositeFk(): Promise<boolean> {
+    const rows: unknown[] = await dataSource.query(
+      `SELECT 1 FROM "pg_constraint" WHERE "conname" = 'FK_post_comments_publication_site'`,
+    );
+    return rows.length === 1;
+  }
+
+  it('defaults new comments to pending and adds the composite site FK', async () => {
+    expect(await statusDefault()).toContain("'pending'");
+    expect(await hasCompositeFk()).toBe(true);
+  });
+
+  it('reverts cleanly and re-applies', async () => {
+    await dataSource.undoLastMigration({ transaction: 'all' });
+    expect(await statusDefault()).toContain("'approved'");
+    expect(await hasCompositeFk()).toBe(false);
+
+    await dataSource.runMigrations({ transaction: 'all' });
+    expect(await statusDefault()).toContain("'pending'");
+    expect(await hasCompositeFk()).toBe(true);
   });
 });

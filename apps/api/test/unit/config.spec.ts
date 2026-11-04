@@ -108,6 +108,26 @@ describe('parseEnv', () => {
     ).toBe('cloudinary');
   });
 
+  it('parses SITE_REVALIDATE_URLS into a site-key map', () => {
+    expect(parseEnv(DEVELOPMENT_ENV).SITE_REVALIDATE_URLS).toEqual({});
+    expect(
+      parseEnv({
+        ...DEVELOPMENT_ENV,
+        SITE_REVALIDATE_URLS:
+          ' travel-blog=http://localhost:5001/ , air-sports=https://air.internal ',
+      }).SITE_REVALIDATE_URLS,
+    ).toEqual({ 'travel-blog': 'http://localhost:5001', 'air-sports': 'https://air.internal' });
+  });
+
+  it.each(['travel-blog', '=http://x', 'Travel=http://x', 'travel-blog=ftp://x', 'a=not a url'])(
+    'rejects malformed SITE_REVALIDATE_URLS %j',
+    (value) => {
+      expect(() => parseEnv({ ...DEVELOPMENT_ENV, SITE_REVALIDATE_URLS: value })).toThrow(
+        /SITE_REVALIDATE_URLS/,
+      );
+    },
+  );
+
   it('rejects localhost origins in production', () => {
     expect(() =>
       parseEnv({

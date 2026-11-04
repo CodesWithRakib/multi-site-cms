@@ -2,7 +2,11 @@
 
 import React, { useState } from 'react';
 import { Send, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
-import type { CreatePublicCommentPayload, PublicCommentItem } from '@multi-site-cms/types';
+import type {
+  CreatePublicCommentPayload,
+  PublicCommentItem,
+  SubmittedPublicComment,
+} from '@multi-site-cms/types';
 import { CommentRatingStars } from './CommentRatingStars';
 
 interface CommentFormProps {
@@ -49,7 +53,7 @@ export function CommentForm({ slug, onCommentSubmitted }: CommentFormProps) {
 
       const data = (await res.json()) as {
         success?: boolean;
-        data?: PublicCommentItem;
+        data?: SubmittedPublicComment;
         message?: string;
       };
 
@@ -58,9 +62,15 @@ export function CommentForm({ slug, onCommentSubmitted }: CommentFormProps) {
         return;
       }
 
-      // Success
-      setSuccessMessage('Thank you! Your reflection has been published.');
-      onCommentSubmitted(data.data);
+      // Comments are pre-moderated: only an approved comment joins the list.
+      if (data.data.status === 'approved') {
+        setSuccessMessage('Thank you! Your reflection has been published.');
+        onCommentSubmitted(data.data);
+      } else {
+        setSuccessMessage(
+          'Thank you! Your reflection was received and will appear after a quick review.',
+        );
+      }
       setContent('');
       setRating(5);
     } catch {
@@ -77,7 +87,8 @@ export function CommentForm({ slug, onCommentSubmitted }: CommentFormProps) {
           Leave a Reader Review
         </h3>
         <p className="mt-1 text-sm text-muted-foreground">
-          Have you traveled here or planning a trip? Share your experiences and tips with our global community.
+          Have you traveled here or planning a trip? Share your experiences and tips with our global
+          community.
         </p>
       </div>
 
@@ -213,4 +224,3 @@ export function CommentForm({ slug, onCommentSubmitted }: CommentFormProps) {
     </div>
   );
 }
-

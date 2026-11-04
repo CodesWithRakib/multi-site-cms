@@ -1,6 +1,8 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
+import type { DataSource } from 'typeorm';
 
 import { env } from '../../config/env';
+import { DATA_SOURCE } from '../../database/database.tokens';
 import type {
   PublicationPublishedPayload,
   PublicationUnpublishedPayload,
@@ -24,6 +26,8 @@ export interface InvalidationResult {
 export class CacheInvalidationService {
   private readonly logger = new Logger(CacheInvalidationService.name);
 
+  constructor(@Inject(DATA_SOURCE) private readonly dataSource: DataSource) {}
+
   /**
    * Derives affected paths for a published or updated publication.
    */
@@ -35,9 +39,10 @@ export class CacheInvalidationService {
     // 1. Root / homepage listing is always affected
     paths.add('/');
 
-    // 2. Specific article / publication detail path
+    // 2. Article detail and index. Both sites serve articles at /articles/[slug].
     if (payload.slug) {
-      paths.add(`/${payload.slug}`);
+      paths.add('/articles');
+      paths.add(`/articles/${payload.slug}`);
     }
 
     // 3. Category archive listings if present
@@ -56,6 +61,42 @@ export class CacheInvalidationService {
     }
 
     return Array.from(paths);
+  }
+
+  /**
+   * Resolves where a site's revalidation webhook lives (ADR-0026):
+   * 1. the operator override in `SITE_REVALIDATE_URLS`, else
+   * 2. `https://<hostname>` of the site's primary, active, DNS-verified domain.
+   * Unverified domains are never used: the request carries the shared secret.
+   */
+  async resolveSiteBaseUrl(
+    siteKey: string,
+    overrides: Readonly<Record<string, string>> = env.SITE_REVALIDATE_URLS,
+  ): Promise<string | null> {
+    const override = overrides[siteKey];
+    if (override) {
+      return override;
+    }
+    if (!this.dataSource.isInitialized) {
+      return null;
+    }
+
+    const rows: Array<{ hostname: string }> = await this.dataSource.query(
+      `
+      SELECT d."hostname"
+      FROM "site_domains" d
+      JOIN "sites" s ON s."id" = d."site_id"
+      WHERE s."key" = $1
+        AND d."is_primary" = true
+        AND d."status" = 'active'
+        AND d."verified_at" IS NOT NULL
+      LIMIT 1
+    `,
+      [siteKey],
+    );
+
+    const hostname = rows[0]?.hostname;
+    return hostname ? `https://${hostname}` : null;
   }
 
   /**
@@ -101,10 +142,13 @@ export class CacheInvalidationService {
         },
         body: JSON.stringify({ paths, tags: [`site:${siteKey}`] }),
         signal: AbortSignal.timeout(5000), // 5s timeout
+        // fetch keeps custom headers across cross-origin redirects; refusing
+        // redirects keeps the shared secret on the configured host.
+        redirect: 'error',
       });
 
       if (!response.ok) {
-        const errorText = await response.text().catch(() => 'Unknown HTTP error');
+        const errorText = (await response.text().catch(() => 'Unknown HTTP error')).slice(0, 200);
         this.logger.warn(
           `Revalidation webhook returned HTTP ${response.status} for site [${siteKey}]: ${errorText}`,
         );

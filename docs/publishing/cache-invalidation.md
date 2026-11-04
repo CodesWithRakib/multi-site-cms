@@ -26,11 +26,11 @@ for (const tagSlug of tagSlugs) {
 
 ### Derived Paths by Lifecycle Event:
 
-| Content State Change | Revalidated Paths                                    | Purpose                                          |
-| -------------------- | ---------------------------------------------------- | ------------------------------------------------ |
-| **Post Published**   | `/`, `/[slug]`, `/categories/[slug]`, `/tags/[slug]` | Renders new article and updates lists/feeds.     |
-| **Post Unpublished** | `/`, `/[slug]`, `/categories/[slug]`, `/tags/[slug]` | Evicts published page; `/slug` renders 404.      |
-| **Post Archived**    | `/`, `/[slug]`, `/categories/[slug]`, `/tags/[slug]` | Removes link from collections and archives slug. |
+| Content State Change | Revalidated Paths                                                          | Purpose                                                |
+| -------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------ |
+| **Post Published**   | `/`, `/articles`, `/articles/[slug]`, `/categories/[slug]`, `/tags/[slug]` | Renders new article and updates lists/feeds.           |
+| **Post Unpublished** | `/`, `/articles`, `/articles/[slug]`, `/categories/[slug]`, `/tags/[slug]` | Evicts published page; `/articles/[slug]` renders 404. |
+| **Post Archived**    | `/`, `/articles`, `/articles/[slug]`, `/categories/[slug]`, `/tags/[slug]` | Removes link from collections and archives slug.       |
 
 ---
 
@@ -65,14 +65,23 @@ and is shared by both site route handlers.
    (`travel-blog-content`; `air-sports-content`, `-events`, `-categories`,
    `-tags`), then every tag and path in the payload, then `/`.
 
-### Known gap: the API does not yet call the webhook
+### Target resolution (ADR-0026)
 
-`OutboxDispatcherWorker` calls `CacheInvalidationService.revalidatePaths(siteKey, paths)`
-without a site base URL, so no request is sent and the result is reported as
-`skipped: true`. Published changes therefore appear after the time-based ISR
-window (`revalidate = 60` on the site pages), not immediately. Wiring a per-site
-base URL is tracked in [`docs/roadmap/MASTER_IMPLEMENTATION_PLAN.md`](../roadmap/MASTER_IMPLEMENTATION_PLAN.md)
-(Phase 2).
+The dispatcher resolves each site's webhook URL with
+`CacheInvalidationService.resolveSiteBaseUrl(siteKey)`:
+
+1. `SITE_REVALIDATE_URLS` override on the API (`travel-blog=http://localhost:5001,...`);
+2. else `https://<hostname>` of the site's primary, active, **DNS-verified** domain;
+3. else the call is skipped (`skipped: true`) and the site relies on its 60 s ISR window.
+
+Redirects are refused so the secret stays on the resolved host. A non-2xx
+answer fails the outbox event, which is retried with backoff. See
+[ADR-0026](../adr/0026-site-revalidation-targets.md).
+
+Local development: set `REVALIDATE_SECRET` to the same value in `apps/api/.env`
+and both sites' `.env.local`, and
+`SITE_REVALIDATE_URLS=travel-blog=http://localhost:5001,air-sports=http://localhost:5002`
+on the API.
 
 ---
 

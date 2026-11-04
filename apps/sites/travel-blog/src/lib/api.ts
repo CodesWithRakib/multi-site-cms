@@ -244,4 +244,3 @@ export type {
 
 export type PublicArticle = PublicArticleSummary;
 export type PublicCategory = PublicCategoryItem;
-

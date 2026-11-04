@@ -9,6 +9,8 @@ import type {
   PublicEventSummary,
   PublicSitemapItem,
   PublicTagItem,
+  PublicCommentsResult,
+  SubmittedPublicComment,
 } from '@multi-site-cms/types';
 import { afterAll, beforeAll, describe, expect, it } from '@jest/globals';
 import request from 'supertest';
@@ -20,6 +22,7 @@ import { PasswordService } from '../../src/auth/services/password.service';
 import { configureApp } from '../../src/bootstrap';
 import { Category } from '../../src/database/entities/category.entity';
 import { Event } from '../../src/database/entities/event.entity';
+import { PostComment } from '../../src/database/entities/post-comment.entity';
 import { PostPublicationCategory } from '../../src/database/entities/post-publication-category.entity';
 import { PostPublicationTag } from '../../src/database/entities/post-publication-tag.entity';
 import { PostPublication } from '../../src/database/entities/post-publication.entity';
@@ -565,6 +568,94 @@ describe('Public Content Discovery API (/api/v1/public/sites/:siteKey/*)', () =>
       await request(app.getHttpServer())
         .get('/api/v1/public/sites/air-sports/events/non-existent-event-slug')
         .expect(404);
+    });
+  });
+
+  describe('Public comments (pre-moderated)', () => {
+    const commentsPath = '/api/v1/public/sites/travel-blog/posts/hidden-fjords-norway/comments';
+
+    async function listComments(): Promise<PublicCommentsResult> {
+      const res = await request(app.getHttpServer()).get(commentsPath).expect(200);
+      return (res.body as ApiSuccess<PublicCommentsResult>).data;
+    }
+
+    it('stores a new comment as pending and keeps it out of the public list', async () => {
+      const res = await request(app.getHttpServer())
+        .post(commentsPath)
+        .send({
+          authorName: 'Reader One',
+          authorEmail: 'reader.one@example.com',
+          content: 'The fjord ferry tip saved our trip.',
+          rating: 5,
+        })
+        .expect(201);
+
+      const created = (res.body as ApiSuccess<SubmittedPublicComment>).data;
+      expect(created.status).toBe('pending');
+
+      const stored = await dataSource
+        .getRepository(PostComment)
+        .findOneByOrFail({ id: created.id });
+      expect(stored.status).toBe('pending');
+      expect(stored.siteId).toBe(siteTravelId);
+
+      const list = await listComments();
+      expect(list.items.some((item) => item.id === created.id)).toBe(false);
+    });
+
+    it('answers a honeypot submission like a normal one but stores it as spam', async () => {
+      const res = await request(app.getHttpServer())
+        .post(commentsPath)
+        .send({
+          authorName: 'Bot',
+          authorEmail: 'bot@example.com',
+          content: 'Buy now',
+          website_url: 'https://spam.example.com',
+        })
+        .expect(201);
+
+      const created = (res.body as ApiSuccess<SubmittedPublicComment>).data;
+      expect(created.status).toBe('pending');
+
+      const stored = await dataSource
+        .getRepository(PostComment)
+        .findOneByOrFail({ id: created.id });
+      expect(stored.status).toBe('spam');
+    });
+
+    it('lists a comment only after it is approved', async () => {
+      const res = await request(app.getHttpServer())
+        .post(commentsPath)
+        .send({
+          authorName: 'Reader Two',
+          authorEmail: 'reader.two@example.com',
+          content: 'Great photos of Geirangerfjord.',
+        })
+        .expect(201);
+      const created = (res.body as ApiSuccess<SubmittedPublicComment>).data;
+
+      await dataSource
+        .getRepository(PostComment)
+        .update({ id: created.id }, { status: 'approved' });
+
+      const list = await listComments();
+      expect(list.items.some((item) => item.id === created.id)).toBe(true);
+    });
+
+    it('rejects a comment whose site does not match its publication (composite FK)', async () => {
+      const publication = await dataSource
+        .getRepository(PostPublication)
+        .findOneByOrFail({ siteId: siteTravelId, slug: 'hidden-fjords-norway' });
+
+      await expect(
+        dataSource.getRepository(PostComment).insert({
+          siteId: siteAirSportsId,
+          publicationId: publication.id,
+          authorName: 'Cross Site',
+          authorEmail: 'cross@example.com',
+          content: 'Should not be stored.',
+        }),
+      ).rejects.toThrow(/FK_post_comments_publication_site/);
     });
   });
 });

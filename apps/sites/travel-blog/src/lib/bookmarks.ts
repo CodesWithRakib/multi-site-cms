@@ -101,4 +101,3 @@ export function isArticleSaved(idOrSlug: string): boolean {
   const current = getSavedArticles();
   return current.some((item) => item.id === idOrSlug || item.slug === idOrSlug);
 }
-

@@ -47,7 +47,7 @@ export class PostComment {
   @Column({ type: 'smallint', nullable: true })
   rating!: number | null;
 
-  @Column({ type: 'varchar', length: 32, default: 'approved' })
+  @Column({ type: 'varchar', length: 32, default: 'pending' })
   status!: PostCommentStatus;
 
   @Column({ name: 'parent_id', type: 'uuid', nullable: true })
@@ -63,4 +63,3 @@ export class PostComment {
   @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
   updatedAt!: Date;
 }
-

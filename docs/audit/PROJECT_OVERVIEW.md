@@ -27,7 +27,8 @@ of these exist** in code, schema, ADRs, or product docs:
 These features are recorded as `MISSING — out of current product scope` in
 [FEATURE_INVENTORY.md](FEATURE_INVENTORY.md). Building them would mean a new
 product (commerce domain, PCI scope, payment merchant account, customer
-identity) and needs a business decision and new ADRs. They are **not** in the
+identity). **Decision 2026-11-04: out of scope** — the platform stays a
+publishing CMS. They are **not** in the
 implementation roadmap until that decision is made.
 
 ## Stack (verified from package manifests)

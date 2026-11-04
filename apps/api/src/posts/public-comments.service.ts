@@ -1,5 +1,9 @@
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import type { PublicCommentItem, PublicCommentsResult } from '@multi-site-cms/types';
+import type {
+  PublicCommentItem,
+  PublicCommentsResult,
+  SubmittedPublicComment,
+} from '@multi-site-cms/types';
 import { DataSource } from 'typeorm';
 
 import { ApiException } from '../common/exceptions/api.exception';
@@ -58,9 +62,12 @@ export class PublicCommentsService {
 
     // Compute average rating
     const rated = comments.filter((c) => typeof c.rating === 'number' && c.rating > 0);
-    const averageRating = rated.length > 0
-      ? Math.round((rated.reduce((acc, curr) => acc + (curr.rating ?? 0), 0) / rated.length) * 10) / 10
-      : null;
+    const averageRating =
+      rated.length > 0
+        ? Math.round(
+            (rated.reduce((acc, curr) => acc + (curr.rating ?? 0), 0) / rated.length) * 10,
+          ) / 10
+        : null;
 
     // Nest threaded replies
     const rootComments: PublicCommentItem[] = [];
@@ -106,13 +113,14 @@ export class PublicCommentsService {
     slug: string,
     dto: CreatePublicCommentDto,
     requestInfo?: { ipAddress?: string | null; requestId?: string | null },
-  ): Promise<PublicCommentItem> {
+  ): Promise<SubmittedPublicComment> {
     const { site, publication } = await this.resolveSiteAndPublication(siteKey, slug);
     const commentRepo = await getInitializedRepository(this.dataSource, PostComment);
 
-    // Spam honeypot trap
+    // Comments are pre-moderated. Honeypot hits are stored as spam but answered
+    // exactly like a normal submission, so bots cannot detect the trap.
     const isSpam = Boolean(dto.website_url && dto.website_url.trim().length > 0);
-    const status: PostCommentStatus = isSpam ? 'spam' : 'approved';
+    const status: PostCommentStatus = isSpam ? 'spam' : 'pending';
 
     let parentId: string | null = null;
     if (dto.parentId) {
@@ -161,6 +169,7 @@ export class PublicCommentsService {
       createdAt: saved.createdAt.toISOString(),
       parentId: saved.parentId,
       replies: [],
+      status: 'pending',
     };
   }
 }

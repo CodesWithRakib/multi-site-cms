@@ -145,7 +145,12 @@ export class OutboxDispatcherWorker implements OnModuleDestroy {
         const typedPayload = payload as unknown as
           PublicationPublishedPayload | PublicationUnpublishedPayload;
         const paths = this.cacheInvalidationService.derivePathsForPublication(typedPayload);
-        const result = await this.cacheInvalidationService.revalidatePaths(siteKey, paths);
+        const siteBaseUrl = await this.cacheInvalidationService.resolveSiteBaseUrl(siteKey);
+        const result = await this.cacheInvalidationService.revalidatePaths(
+          siteKey,
+          paths,
+          siteBaseUrl ?? undefined,
+        );
 
         if (!result.success && result.error) {
           throw new Error(`Cache revalidation failed: ${result.error}`);

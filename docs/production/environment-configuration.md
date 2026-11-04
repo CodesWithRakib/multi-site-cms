@@ -32,6 +32,7 @@ Validated by [`parseEnv()`](file:///C:/Sofof_tech_2026/multi-site-cms/apps/api/s
 | `STORAGE_PROVIDER`     | Enum (`local`/`cloudinary`) | `local`                                                                                   | Optional                     | `cloudinary` requires `CLOUDINARY_CLOUD_NAME` + `CLOUDINARY_API_KEY` + `CLOUDINARY_API_SECRET`, or `CLOUDINARY_URL`. No built-in credentials; boot fails if missing. |
 | `PREVIEW_TOKEN_SECRET` | String (≥32 chars)          | random per process                                                                        | **MANDATORY**                | HMAC key for draft preview tokens. Production boot fails without it.                                                                                                 |
 | `REVALIDATE_SECRET`    | String (≥16 chars)          | None                                                                                      | Recommended                  | Sent as `x-revalidate-secret` to each site's `POST /api/revalidate`. Must equal the sites' value.                                                                    |
+| `SITE_REVALIDATE_URLS` | `siteKey=url` list          | empty                                                                                     | Optional                     | Revalidation target override (ADR-0026). Without it the API uses `https://<verified primary domain>`.                                                                |
 
 ---
 
@@ -46,11 +47,12 @@ Validated by [`parseEnv()`](file:///C:/Sofof_tech_2026/multi-site-cms/apps/api/s
 
 ### Travel Blog (`apps/sites/travel-blog`)
 
-| Variable              | Type   | Default (Local Dev)            | Description                                                                                                                               |
-| :-------------------- | :----- | :----------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------- |
-| `NEXT_PUBLIC_API_URL` | URL    | `http://localhost:4000/api/v1` | Public REST API base URL.                                                                                                                 |
-| `NEXT_PUBLIC_APP_URL` | URL    | `http://localhost:3001`        | Public URL for OpenGraph tags, canonical links, and sitemaps.                                                                             |
-| `REVALIDATE_SECRET`   | String | None                           | Must equal the API value. Checked against the `x-revalidate-secret` header on `POST /api/revalidate`; when unset the webhook returns 503. |
+| Variable                    | Type   | Default (Local Dev)            | Description                                                                                                                               |
+| :-------------------------- | :----- | :----------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_API_URL`       | URL    | `http://localhost:4000/api/v1` | Public REST API base URL.                                                                                                                 |
+| `NEXT_PUBLIC_APP_URL`       | URL    | `http://localhost:3001`        | Public URL for OpenGraph tags, canonical links, and sitemaps.                                                                             |
+| `NEXT_PUBLIC_CONTACT_EMAIL` | Email  | None                           | Public editorial address for `/contact` (mailto). When unset the page shows no address.                                                   |
+| `REVALIDATE_SECRET`         | String | None                           | Must equal the API value. Checked against the `x-revalidate-secret` header on `POST /api/revalidate`; when unset the webhook returns 503. |
 
 ### Air Sports Website (`apps/sites/air-sports`)
 

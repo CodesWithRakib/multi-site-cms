@@ -85,6 +85,33 @@ const envSchema = z.object({
    * the `x-revalidate-secret` header. When absent, revalidation is skipped.
    */
   REVALIDATE_SECRET: optionalSecret(16, 'REVALIDATE_SECRET'),
+  /**
+   * Operator override for revalidation targets, `siteKey=url` pairs separated
+   * by commas (e.g. `travel-blog=http://localhost:5001`). Takes precedence over
+   * the site's verified primary domain. See ADR-0026.
+   */
+  SITE_REVALIDATE_URLS: z
+    .string()
+    .default('')
+    .transform((value, ctx) => {
+      const urls: Record<string, string> = {};
+      for (const entry of value.split(',').map((part) => part.trim())) {
+        if (entry === '') continue;
+        const separator = entry.indexOf('=');
+        const key = entry.slice(0, separator).trim();
+        const url = entry.slice(separator + 1).trim();
+        if (separator <= 0 || !/^[a-z0-9-]+$/.test(key) || !httpUrl.safeParse(url).success) {
+          ctx.addIssue({
+            code: 'custom',
+            message:
+              'SITE_REVALIDATE_URLS must look like "site-key=https://host,other=http://host:port".',
+          });
+          return z.NEVER;
+        }
+        urls[key] = url.replace(/\/+$/, '');
+      }
+      return urls;
+    }),
 });
 
 export type Env = z.infer<typeof envSchema>;

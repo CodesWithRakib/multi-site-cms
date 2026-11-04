@@ -12,19 +12,19 @@ did not cover; treat this file as the current source of truth.
 
 ## Findings
 
-| ID     | Severity | Area                                          | Status                                                      |
-| ------ | -------- | --------------------------------------------- | ----------------------------------------------------------- |
-| SEC-0  | Critical | Cloudinary credentials in source              | Removed from code (Phase 1); **rotation required by owner** |
-| SEC-1  | Critical | Preview token signing secret                  | Fixed (Phase 1)                                             |
-| SEC-2  | High     | Preview token minting (IDOR)                  | Fixed (Phase 1)                                             |
-| SEC-3  | Medium   | Preview `siteId` not bound                    | Fixed (Phase 1)                                             |
-| SEC-4  | High     | Site revalidation webhooks                    | Fixed (Phase 1)                                             |
-| SEC-5  | Medium   | CSRF exemption by substring                   | Fixed (Phase 1)                                             |
-| SEC-6  | Medium   | Public write endpoints rate                   | Partly fixed: newsletter (Phase 1); comments open (Phase 2) |
-| SEC-7  | Low      | Non-constant-time HMAC check                  | Fixed (Phase 1)                                             |
-| SEC-8  | Info     | Permission check without site                 | Open (by design, documented)                                |
-| SEC-9  | Medium   | Comments published without moderation         | Open — product decision                                     |
-| SEC-10 | Medium   | Test suite wrote to a real Cloudinary account | Fixed (Phase 1)                                             |
+| ID     | Severity | Area                                          | Status                                                                      |
+| ------ | -------- | --------------------------------------------- | --------------------------------------------------------------------------- |
+| SEC-0  | Critical | Cloudinary credentials in source              | Removed from code (Phase 1); **rotation required by owner**                 |
+| SEC-1  | Critical | Preview token signing secret                  | Fixed (Phase 1)                                                             |
+| SEC-2  | High     | Preview token minting (IDOR)                  | Fixed (Phase 1)                                                             |
+| SEC-3  | Medium   | Preview `siteId` not bound                    | Fixed (Phase 1)                                                             |
+| SEC-4  | High     | Site revalidation webhooks                    | Fixed (Phase 1)                                                             |
+| SEC-5  | Medium   | CSRF exemption by substring                   | Fixed (Phase 1)                                                             |
+| SEC-6  | Medium   | Public write endpoints rate                   | Fixed: newsletter at API (Phase 1); comments in travel-blog proxy (Phase 2) |
+| SEC-7  | Low      | Non-constant-time HMAC check                  | Fixed (Phase 1)                                                             |
+| SEC-8  | Info     | Permission check without site                 | Open (by design, documented)                                                |
+| SEC-9  | Medium   | Comments published without moderation         | Fixed (Phase 2): pre-moderation                                             |
+| SEC-10 | Medium   | Test suite wrote to a real Cloudinary account | Fixed (Phase 1)                                                             |
 
 ### SEC-0 — Real Cloudinary API key and secret committed to source
 
@@ -141,8 +141,13 @@ method is scheduled for Phase 2. New endpoints must follow the same rule.
 heuristic flags spam; the column default is also `approved`
 (`1793491210000-PostComments.ts`). With no effective rate limit (SEC-6), this
 lets anyone post links or abusive text that appears on the site at once.
-Choosing pre-moderation (`pending` by default) vs post-moderation is a product
-decision; see [PRODUCTION_READINESS.md](PRODUCTION_READINESS.md).
+
+**Resolution (Phase 2, product decision 2026-11-04: pre-moderation).** New
+comments are stored as `pending` (honeypot hits as `spam`, answered identically),
+the column default is `pending` (migration `1793491211000`), and only approved
+comments are listed. The travel-blog proxy limits submissions to 5/min per
+client IP (in-memory, per instance: `src/lib/rate-limit.ts`). Tests:
+`public-content.e2e-spec.ts`, `rate-limit.test.ts`.
 
 ### SEC-10 — API tests uploaded to a real Cloudinary account
 

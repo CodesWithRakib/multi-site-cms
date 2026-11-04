@@ -2,28 +2,29 @@
 
 ## State at handoff (2026-11-04)
 
-- Phase 1 complete in code, **not committed**. Quality gate green.
-- Open owner action: rotate the Cloudinary API secret, then update local
-  `apps/api/.env`.
-- Waiting on decisions (see `docs/audit/PRODUCTION_READINESS.md`): commerce
-  scope, comment moderation, contact form option, newsletter scope.
+- Phase 1 done; Phase 2a done. All changes **uncommitted** (partly staged by the editor).
+- Owner actions: rotate the Cloudinary secret; set `NEXT_PUBLIC_CONTACT_EMAIL`;
+  set `REVALIDATE_SECRET` (+ `SITE_REVALIDATE_URLS` locally).
+- Migration `1793491211000` is not applied to the dev database yet:
+  `pnpm --filter @multi-site-cms/api build && pnpm --filter @multi-site-cms/api db:migration:run`.
+- Open decision: newsletter scope (collect only vs opt-in + sending).
 
 ## Resume steps
 
 1. Read `AGENTS.md`, `docs/roadmap/PHASE_STATUS.md`, this file.
-2. `git status` — confirm the Phase 1 changes are committed or still staged.
-3. `pnpm db:up` (PostgreSQL on host port 5433), then
-   `pnpm lint && pnpm typecheck && pnpm test` to re-establish the baseline.
+2. `git status`.
+3. `pnpm db:up`, then `pnpm lint && pnpm typecheck && pnpm test` and
+   `pnpm --filter @multi-site-cms/api test:integration`.
 
-## Exact next action — Phase 2, item 1
+## Exact next action — Phase 2b
 
-Draft an ADR (next number: 0026) for site revalidation targeting:
-derive `https://<primary active domain>` from `site_domains`, with an optional
-`SITE_REVALIDATE_URLS` (`siteKey=url,...`) env override. Then pass the URL from
-`OutboxDispatcherWorker.dispatchEvent` (`apps/api/src/publishing/jobs/outbox-dispatcher.worker.ts:148`)
-into `CacheInvalidationService.revalidatePaths`, and add an integration test
-with a stub HTTP server asserting header, payload, and retry on non-2xx.
+SEC-8 sweep: list every method in `apps/api/src/posts/posts.service.ts`,
+`publications.service.ts`, and `apps/api/src/media/media.service.ts` that takes
+an id without `siteId` in the route, confirm each calls `canAccessPost` (or the
+media equivalent), and add one cross-site denial test per method in
+`test/api/rbac-and-site-isolation.e2e-spec.ts`.
 
-Items that need no decision and can run in parallel: SEC-8 object-level sweep,
-TD-4 shared site-ID resolver, TD-7 `API_BASE_URL` in the env schema, API tests
-for comments/newsletter/users/audit/settings.
+Then: TD-4 (one site-ID resolver shared by `SiteAccessGuard` and
+`PermissionsGuard`), TD-7 (`API_BASE_URL` in `config/env.ts`, required in
+production), and API tests for admin comments, newsletter, users/roles,
+audit-logs, settings.

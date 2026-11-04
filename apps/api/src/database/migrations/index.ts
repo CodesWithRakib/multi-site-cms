@@ -9,6 +9,7 @@ import { AnalyticsAndTrafficEvents1793491207000 } from './1793491207000-Analytic
 import { PlatformSettingsRegistry1793491208000 } from './1793491208000-PlatformSettingsRegistry';
 import { NewsletterSubscribers1793491209000 } from './1793491209000-NewsletterSubscribers';
 import { PostComments1793491210000 } from './1793491210000-PostComments';
+import { PreModeratedComments1793491211000 } from './1793491211000-PreModeratedComments';
 
 /**
  * Ordered migration registry.
@@ -28,5 +29,5 @@ export const MIGRATIONS = [
   PlatformSettingsRegistry1793491208000,
   NewsletterSubscribers1793491209000,
   PostComments1793491210000,
+  PreModeratedComments1793491211000,
 ] as const;
-
