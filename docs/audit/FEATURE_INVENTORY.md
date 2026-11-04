@@ -71,19 +71,19 @@ Admin app automated tests: 2 files, 11 tests (i18n, dashboard).
 | FEAT-TB-8  | `/about`                                                     | Static page                          | UNVERIFIED            |                                                                                      |
 | FEAT-TB-9  | `/contact`                                                   | Contact form                         | PARTIAL (by decision) | `mailto:` to `NEXT_PUBLIC_CONTACT_EMAIL`; nothing stored. Address must be configured |
 | FEAT-TB-10 | Newsletter forms                                             | Signup                               | PARTIAL               | See FEAT-NEWS-1                                                                      |
-| FEAT-TB-11 | Error / 404 / loading boundaries                             | —                                    | MISSING               | UX-1                                                                                 |
+| FEAT-TB-11 | Error / 404 / loading boundaries                             | —                                    | COMPLETE (code + E2E) | UX-1                                                                                 |
 
 ## Air Sports (`apps/sites/air-sports`)
 
-| ID        | Route                                 | Feature                    | Status              | Notes                                                        |
-| --------- | ------------------------------------- | -------------------------- | ------------------- | ------------------------------------------------------------ |
-| FEAT-AS-1 | `/`                                   | Home, live ticker          | PARTIAL             | `PopularAirSports.tsx` renders hardcoded cards, not CMS data |
-| FEAT-AS-2 | `/articles/[slug]`                    | Article detail             | UNVERIFIED          | No `/articles` index route                                   |
-| FEAT-AS-3 | `/events`, `/events/[slug]`           | Event hubs + live timeline | UNVERIFIED          |                                                              |
-| FEAT-AS-4 | `/categories/*`, `/tags/*`, `/search` | Archives, search           | UNVERIFIED          |                                                              |
-| FEAT-AS-5 | `/preview/[postId]`                   | Draft preview              | COMPLETE (API side) |                                                              |
-| FEAT-AS-6 | Error / 404 / loading boundaries      | —                          | MISSING             | UX-1                                                         |
-| FEAT-AS-7 | About / contact pages                 | —                          | MISSING             | Only if the business wants them                              |
+| ID        | Route                                 | Feature                              | Status                | Notes                                              |
+| --------- | ------------------------------------- | ------------------------------------ | --------------------- | -------------------------------------------------- |
+| FEAT-AS-1 | `/`                                   | Home, live ticker                    | UNVERIFIED            | Popular disciplines now from CMS categories (UX-3) |
+| FEAT-AS-2 | `/articles`, `/articles/[slug]`       | Article index (paginated) and detail | UNVERIFIED            | Index added (UX-4)                                 |
+| FEAT-AS-3 | `/events`, `/events/[slug]`           | Event hubs + live timeline           | UNVERIFIED            |                                                    |
+| FEAT-AS-4 | `/categories/*`, `/tags/*`, `/search` | Archives, search                     | UNVERIFIED            |                                                    |
+| FEAT-AS-5 | `/preview/[postId]`                   | Draft preview                        | COMPLETE (API side)   |                                                    |
+| FEAT-AS-6 | Error / 404 / loading boundaries      | —                                    | COMPLETE (code + E2E) | UX-1                                               |
+| FEAT-AS-7 | About / contact pages                 | —                                    | MISSING               | Only if the business wants them                    |
 
 ## Out of current product scope (directive candidates)
 

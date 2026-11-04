@@ -1,6 +1,8 @@
 import React, { type ReactNode } from 'react';
 import Link from 'next/link';
 
+import { cn } from '@multi-site-cms/ui';
+
 interface PillButtonProps {
   href?: string;
   onClick?: () => void;
@@ -33,8 +35,7 @@ export function PillButton({
   }[size];
 
   const variantClasses = {
-    primary:
-      'bg-sky-600 text-white hover:bg-sky-500 shadow-sm shadow-sky-600/20 active:scale-95',
+    primary: 'bg-sky-600 text-white hover:bg-sky-500 shadow-sm shadow-sky-600/20 active:scale-95',
     secondary:
       'bg-emerald-600 text-white hover:bg-emerald-500 shadow-sm shadow-emerald-600/20 active:scale-95',
     outline:
@@ -51,7 +52,13 @@ export function PillButton({
     </>
   );
 
-  const baseClasses = `inline-flex items-center justify-center gap-2 rounded-full font-semibold transition-all cursor-pointer select-none disabled:opacity-50 disabled:pointer-events-none ${sizeClasses} ${variantClasses} ${className}`;
+  // cn() lets caller classes (e.g. `hidden sm:inline-flex`) override the defaults.
+  const baseClasses = cn(
+    'inline-flex items-center justify-center gap-2 rounded-full font-semibold transition-all cursor-pointer select-none disabled:opacity-50 disabled:pointer-events-none',
+    sizeClasses,
+    variantClasses,
+    className,
+  );
 
   if (href) {
     return (
@@ -67,4 +74,3 @@ export function PillButton({
     </button>
   );
 }
-

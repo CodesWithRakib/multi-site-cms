@@ -103,6 +103,7 @@ export {
   SheetTrigger,
 } from './components/sheet';
 export { Skeleton, type SkeletonProps } from './components/skeleton';
+export { StatusPage, type StatusPageProps } from './components/status-page';
 export { Slider } from './components/slider';
 export { Switch } from './components/switch';
 export {

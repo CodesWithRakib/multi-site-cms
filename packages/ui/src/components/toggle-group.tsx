@@ -1,3 +1,8 @@
+'use client';
+
+// Calls React.createContext at module scope, so it must be a client module;
+// without this, any Server Component importing the package barrel crashes in dev.
+
 import * as ToggleGroupPrimitive from '@radix-ui/react-toggle-group';
 import type { VariantProps } from 'class-variance-authority';
 import * as React from 'react';

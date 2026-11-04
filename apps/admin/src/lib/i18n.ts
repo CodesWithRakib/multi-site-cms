@@ -253,7 +253,8 @@ export const translations = {
     // Analytics
     analytics: {
       title: 'Traffic & Content Analytics',
-      subtitle: 'Real-time performance telemetry, visitor demographics, and reader engagement across your multi-site publications.',
+      subtitle:
+        'Real-time performance telemetry, visitor demographics, and reader engagement across your multi-site publications.',
       allWebsites: 'All Websites',
       filterByWebsite: 'Filter by Website',
       timeframe: 'Timeframe',
@@ -291,7 +292,8 @@ export const translations = {
     // Audit Logs
     auditLogs: {
       title: 'Audit & Compliance Logs',
-      subtitle: 'Immutable record of platform operations, security authentication events, publishing lifecycles, and tenant mutations.',
+      subtitle:
+        'Immutable record of platform operations, security authentication events, publishing lifecycles, and tenant mutations.',
       allWebsites: 'All Sites (Platform-Wide)',
       filterByWebsite: 'Filter by Site',
       allCategories: 'All Categories',
@@ -335,7 +337,8 @@ export const translations = {
     // Platform Settings
     settings: {
       title: 'Platform Settings & Governance',
-      subtitle: 'Centralized platform configurations, enterprise security policies, asset storage, and system health telemetry.',
+      subtitle:
+        'Centralized platform configurations, enterprise security policies, asset storage, and system health telemetry.',
       saveChanges: 'Save Settings',
       saving: 'Saving Changes...',
       savedSuccess: 'Settings saved successfully!',
@@ -357,7 +360,8 @@ export const translations = {
       defaultLocale: 'Default Language / Locale',
       defaultTimezone: 'Default Timezone',
       securityTitle: 'Authentication & Access Controls',
-      securityDesc: 'Enforce enterprise authentication parameters, brute-force defenses, and session lifetimes.',
+      securityDesc:
+        'Enforce enterprise authentication parameters, brute-force defenses, and session lifetimes.',
       sessionTtlHours: 'Session Lifetime (Hours)',
       maxLoginAttempts: 'Max Login Attempts before Lockout',
       lockoutDurationMinutes: 'Account Lockout Duration (Minutes)',
@@ -365,22 +369,26 @@ export const translations = {
       requireStrongPasswords: 'Enforce Password Complexity (Uppercase, digits, symbols)',
       enforceMfaForSuperAdmin: 'Enforce MFA / 2FA for Super Admins',
       allowPublicRegistration: 'Allow Public Self-Registration (Open Signup)',
-      activePolicyNotice: 'Security policies are automatically enforced across all administrative accounts and tenant sessions.',
+      activePolicyNotice:
+        'Security policies are automatically enforced across all administrative accounts and tenant sessions.',
       mediaTitle: 'Asset Storage & Media Optimization',
-      mediaDesc: 'Configure storage provider engines, upload boundaries, and automatic media transformations.',
+      mediaDesc:
+        'Configure storage provider engines, upload boundaries, and automatic media transformations.',
       storageProvider: 'Active Storage Provider',
       maxUploadSizeMb: 'Maximum Upload File Size (MB)',
       autoWebpConversion: 'Automatic WebP Image Optimization',
       allowedMimeTypes: 'Permitted MIME Types (comma-separated)',
       cloudinaryConfigured: 'Cloudinary Cloud CDN is connected and active.',
       publishingTitle: 'Publishing & Editorial Defaults',
-      publishingDesc: 'Platform-wide defaults for canonical content drafts, revisions, and token lifetimes.',
+      publishingDesc:
+        'Platform-wide defaults for canonical content drafts, revisions, and token lifetimes.',
       defaultPostStatus: 'Default Status for New Canonical Posts',
       autoSaveIntervalSeconds: 'Editor Auto-Save Interval (Seconds)',
       maxRevisionHistory: 'Maximum Revisions Retained Per Post',
       previewTokenTtlMinutes: 'Preview Token Lifetime (Minutes)',
       maintenanceTitle: 'Platform Maintenance & Lifecycle',
-      maintenanceDesc: 'Put the platform into maintenance mode and configure audit log retention periods.',
+      maintenanceDesc:
+        'Put the platform into maintenance mode and configure audit log retention periods.',
       maintenanceMode: 'Enable Platform Maintenance Mode',
       maintenanceModeNotice: 'When active, all public publications display a maintenance page.',
       maintenanceNoticeEn: 'Maintenance Message (English)',
@@ -402,9 +410,6 @@ export const translations = {
       healthy: 'Operational & Healthy',
       refreshDiagnostics: 'Refresh Telemetry',
     },
-
-
-
 
     // Sites & Domains
     sites: {
@@ -511,6 +516,15 @@ export const translations = {
       unauthorizedDesc:
         'You do not have permission to access this administrative resource or site.',
       returnHome: 'Return to Dashboard',
+    },
+    boundary: {
+      notFoundTitle: 'Page not found',
+      notFoundDesc:
+        'This admin page does not exist or was moved. Check the address or go back to the dashboard.',
+      errorTitle: 'Something went wrong',
+      errorDesc:
+        'This screen could not be loaded. Your saved work is not affected. Please try again.',
+      retry: 'Try again',
     },
   },
 
@@ -763,7 +777,8 @@ export const translations = {
     // Analytics
     analytics: {
       title: 'ট্রাফিক ও কনটেন্ট অ্যানালিটিক্স',
-      subtitle: 'রিয়েল-টাইম পারফরম্যান্স টেলিমেট্রি, ভিজিটর ডেমোগ্রাফিক এবং পাঠকদের এনগেজমেন্ট পর্যবেক্ষণ করুন।',
+      subtitle:
+        'রিয়েল-টাইম পারফরম্যান্স টেলিমেট্রি, ভিজিটর ডেমোগ্রাফিক এবং পাঠকদের এনগেজমেন্ট পর্যবেক্ষণ করুন।',
       allWebsites: 'সকল ওয়েবসাইট',
       filterByWebsite: 'ওয়েবসাইট অনুযায়ী ফিল্টার',
       timeframe: 'সময়সীমা',
@@ -801,7 +816,8 @@ export const translations = {
     // Audit Logs
     auditLogs: {
       title: 'অডিট ও নিরাপত্তা লগ',
-      subtitle: 'প্ল্যাটফর্মের সমস্ত কার্যক্রম, নিরাপত্তা প্রমাণীকরণ, কনটেন্ট প্রকাশনা ও সিস্টেম পরিবর্তনের অপরিবর্তনীয় অডিট ট্রেইল।',
+      subtitle:
+        'প্ল্যাটফর্মের সমস্ত কার্যক্রম, নিরাপত্তা প্রমাণীকরণ, কনটেন্ট প্রকাশনা ও সিস্টেম পরিবর্তনের অপরিবর্তনীয় অডিট ট্রেইল।',
       allWebsites: 'সকল সাইট (প্ল্যাটফর্ম-ব্যাপী)',
       filterByWebsite: 'সাইট অনুযায়ী ফিল্টার',
       allCategories: 'সকল ক্যাটাগরি',
@@ -845,7 +861,8 @@ export const translations = {
     // Platform Settings
     settings: {
       title: 'প্ল্যাটফর্ম সেটিংস ও গভর্ন্যান্স',
-      subtitle: 'কেন্দ্রীভূত প্ল্যাটফর্ম কনফিগারেশন, এন্টারপ্রাইজ নিরাপত্তা নীতি, অ্যাসেট স্টোরেজ এবং সিস্টেম স্বাস্থ্য টেলিমেট্রি।',
+      subtitle:
+        'কেন্দ্রীভূত প্ল্যাটফর্ম কনফিগারেশন, এন্টারপ্রাইজ নিরাপত্তা নীতি, অ্যাসেট স্টোরেজ এবং সিস্টেম স্বাস্থ্য টেলিমেট্রি।',
       saveChanges: 'সেটিংস সংরক্ষণ করুন',
       saving: 'সংরক্ষণ করা হচ্ছে...',
       savedSuccess: 'সেটিংস সফলভাবে সংরক্ষিত হয়েছে!',
@@ -857,7 +874,8 @@ export const translations = {
       tabMaintenance: 'রক্ষণাবেক্ষণ ও অপারেশন',
       tabDiagnostics: 'সিস্টেম ডায়াগনস্টিকস',
       generalTitle: 'প্ল্যাটফর্ম পরিচয় ও ডিফল্ট মান',
-      generalDesc: 'মূল প্ল্যাটফর্ম ব্র্যান্ডিং, প্রশাসনিক যোগাযোগের বিশদ বিবরণ এবং ডিফল্ট লোকালাইজেশন।',
+      generalDesc:
+        'মূল প্ল্যাটফর্ম ব্র্যান্ডিং, প্রশাসনিক যোগাযোগের বিশদ বিবরণ এবং ডিফল্ট লোকালাইজেশন।',
       platformName: 'প্ল্যাটফর্মের নাম',
       platformNamePlaceholder: 'Multi-Site CMS Enterprise',
       tagline: 'প্ল্যাটফর্ম ট্যাগলাইন',
@@ -867,32 +885,39 @@ export const translations = {
       defaultLocale: 'ডিফল্ট ভাষা / লোকেল',
       defaultTimezone: 'ডিফল্ট টাইমজোন',
       securityTitle: 'অথেন্টিকেশন ও এক্সেস কন্ট্রোল',
-      securityDesc: 'এন্টারপ্রাইজ অথেন্টিকেশন প্যারামিটার, ব্রুট-ফোর্স প্রতিরক্ষা এবং সেশন মেয়াদ পরিচালনা করুন।',
+      securityDesc:
+        'এন্টারপ্রাইজ অথেন্টিকেশন প্যারামিটার, ব্রুট-ফোর্স প্রতিরক্ষা এবং সেশন মেয়াদ পরিচালনা করুন।',
       sessionTtlHours: 'সেশনের মেয়াদ (ঘণ্টায়)',
       maxLoginAttempts: 'লকআউটের পূর্বে সর্বোচ্চ লগইন চেষ্টা',
       lockoutDurationMinutes: 'একাউন্ট লকআউটের সময়কাল (মিনিটে)',
       passwordMinLength: 'ন্যূনতম পাসওয়ার্ড দৈর্ঘ্য',
-      requireStrongPasswords: 'শক্তিশালী পাসওয়ার্ড বাধ্যতামূলক করুন (বড় হাতের অক্ষর, সংখ্যা, প্রতীক)',
+      requireStrongPasswords:
+        'শক্তিশালী পাসওয়ার্ড বাধ্যতামূলক করুন (বড় হাতের অক্ষর, সংখ্যা, প্রতীক)',
       enforceMfaForSuperAdmin: 'সুপার অ্যাডমিনের জন্য 2FA/MFA বাধ্যতামূলক করুন',
       allowPublicRegistration: 'উন্মুক্ত পাবলিক রেজিস্ট্রেশন অনুমোদন করুন',
-      activePolicyNotice: 'নিরাপত্তা নীতিগুলি সমস্ত প্রশাসনিক একাউন্ট এবং টেন্যান্ট সেশনের ওপর সরাসরি প্রয়োগ হয়।',
+      activePolicyNotice:
+        'নিরাপত্তা নীতিগুলি সমস্ত প্রশাসনিক একাউন্ট এবং টেন্যান্ট সেশনের ওপর সরাসরি প্রয়োগ হয়।',
       mediaTitle: 'অ্যাসেট স্টোরেজ ও মিডিয়া অপ্টিমাইজেশন',
-      mediaDesc: 'স্টোরেজ প্রোভাইডার ইঞ্জিন, আপলোড সীমা এবং স্বয়ংক্রিয় মিডিয়া রূপান্তর কনফিগার করুন।',
+      mediaDesc:
+        'স্টোরেজ প্রোভাইডার ইঞ্জিন, আপলোড সীমা এবং স্বয়ংক্রিয় মিডিয়া রূপান্তর কনফিগার করুন।',
       storageProvider: 'সক্রিয় স্টোরেজ প্রোভাইডার',
       maxUploadSizeMb: 'সর্বোচ্চ আপলোড সাইজ (MB)',
       autoWebpConversion: 'স্বয়ংক্রিয় WebP ইমেজ অপ্টিমাইজেশন',
       allowedMimeTypes: 'অনুমোদিত MIME প্রকার (কমা দ্বারা পৃথক)',
       cloudinaryConfigured: 'ক্লাউডিনারি ক্লাউড সিডিএন সংযুক্ত এবং সক্রিয় রয়েছে।',
       publishingTitle: 'প্রকাশনা ও এডিটোরিয়াল ডিফল্ট',
-      publishingDesc: 'ক্যানোনিকাল কনটেন্ট ড্রাফট, রিভিশন সংরক্ষণ এবং প্রিভিউ টোকেনের জন্য প্ল্যাটফর্ম-ব্যাপী ডিফল্ট মান।',
+      publishingDesc:
+        'ক্যানোনিকাল কনটেন্ট ড্রাফট, রিভিশন সংরক্ষণ এবং প্রিভিউ টোকেনের জন্য প্ল্যাটফর্ম-ব্যাপী ডিফল্ট মান।',
       defaultPostStatus: 'নতুন আর্টিকেলের ডিফল্ট স্ট্যাটাস',
       autoSaveIntervalSeconds: 'এডিটরে অটো-সেভ বিরতি (সেকেন্ডে)',
       maxRevisionHistory: 'আর্টিকেল প্রতি সংরক্ষিত সর্বোচ্চ রিভিশন সংখ্যা',
       previewTokenTtlMinutes: 'প্রিভিউ টোকেনের মেয়াদ (মিনিটে)',
       maintenanceTitle: 'প্ল্যাটফর্ম রক্ষণাবেক্ষণ ও লাইফসাইকেল',
-      maintenanceDesc: 'প্ল্যাটফর্মে রক্ষণাবেক্ষণ মোড চালু করুন এবং অডিট লগ সংরক্ষণের মেয়াদ কনফিগার করুন।',
+      maintenanceDesc:
+        'প্ল্যাটফর্মে রক্ষণাবেক্ষণ মোড চালু করুন এবং অডিট লগ সংরক্ষণের মেয়াদ কনফিগার করুন।',
       maintenanceMode: 'প্ল্যাটফর্ম রক্ষণাবেক্ষণ মোড সক্রিয় করুন',
-      maintenanceModeNotice: 'সক্রিয় থাকলে সমস্ত পাবলিক প্রকাশনায় রক্ষণাবেক্ষণ বার্তা প্রদর্শিত হবে।',
+      maintenanceModeNotice:
+        'সক্রিয় থাকলে সমস্ত পাবলিক প্রকাশনায় রক্ষণাবেক্ষণ বার্তা প্রদর্শিত হবে।',
       maintenanceNoticeEn: 'রক্ষণাবেক্ষণ বার্তা (ইংরেজি)',
       maintenanceNoticeBn: 'রক্ষণাবেক্ষণ বার্তা (বাংলা)',
       auditRetentionDays: 'অডিট লগ সংরক্ষণের সময়কাল (দিনে)',
@@ -912,9 +937,6 @@ export const translations = {
       healthy: 'সম্পূর্ণ সক্রিয় ও সুস্থ',
       refreshDiagnostics: 'টেলিমেট্রি রিফ্রেশ করুন',
     },
-
-
-
 
     // Sites & Domains
     sites: {
@@ -1020,6 +1042,14 @@ export const translations = {
       unauthorizedTitle: 'অনুমতি নেই (৪০৩)',
       unauthorizedDesc: 'আপনার এই প্রশাসনিক সংস্থান বা সাইটটি অ্যাক্সেস করার অনুমতি নেই।',
       returnHome: 'ড্যাশবোর্ডে ফিরে যান',
+    },
+    boundary: {
+      notFoundTitle: 'পেজটি পাওয়া যায়নি',
+      notFoundDesc:
+        'এই অ্যাডমিন পেজটি নেই বা সরিয়ে নেওয়া হয়েছে। ঠিকানাটি যাচাই করুন বা ড্যাশবোর্ডে ফিরে যান।',
+      errorTitle: 'কিছু একটা সমস্যা হয়েছে',
+      errorDesc: 'এই স্ক্রিনটি লোড করা যায়নি। আপনার সংরক্ষিত কাজ নিরাপদ আছে। আবার চেষ্টা করুন।',
+      retry: 'আবার চেষ্টা করুন',
     },
   },
 } as const;

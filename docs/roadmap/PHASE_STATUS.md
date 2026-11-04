@@ -2,14 +2,14 @@
 
 Last updated: 2026-11-04
 
-| Phase                              | Status                                  | Evidence / blocker                                                                                   |
-| ---------------------------------- | --------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| 0 — Audit                          | Done                                    | `docs/audit/*`                                                                                       |
-| 1 — Secrets and security hardening | **Done in code; one owner action open** | Open: rotate Cloudinary secret (SEC-0)                                                               |
-| 2 — Core workflow correctness      | **Done** (one coverage item deferred)   | API 263/263, integration 56/56. Deferred to Phase 4: API tests for newsletter, users/roles, settings |
-| 3 — UX resilience                  | **Next** (contact page already done)    |                                                                                                      |
-| 4 — Production operations          | Not started                             |                                                                                                      |
-| 5 — Commerce                       | **Out of scope**                        | Business decision 2026-11-04                                                                         |
+| Phase                              | Status                                  | Evidence / blocker                                                                                                                  |
+| ---------------------------------- | --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| 0 — Audit                          | Done                                    | `docs/audit/*`                                                                                                                      |
+| 1 — Secrets and security hardening | **Done in code; one owner action open** | Open: rotate Cloudinary secret (SEC-0)                                                                                              |
+| 2 — Core workflow correctness      | **Done** (one coverage item deferred)   | API 263/263, integration 56/56. Deferred to Phase 4: API tests for newsletter, users/roles, settings                                |
+| 3 — UX resilience                  | **In progress (3a done)**               | Boundaries, overflow, admin build fixed; E2E 27/27 locally. Remaining: dark theme + keyboard QA, axe scan, admin page decomposition |
+| 4 — Production operations          | Not started                             |                                                                                                                                     |
+| 5 — Commerce                       | **Out of scope**                        | Business decision 2026-11-04                                                                                                        |
 
 All changes are uncommitted.
 
@@ -34,9 +34,13 @@ All changes are uncommitted.
 ## Phase 3 checklist
 
 - [x] FEAT-TB-9 contact page: `mailto:`, server component with metadata
-- [ ] UX-1 `error.tsx`, `not-found.tsx`, `global-error.tsx`, key `loading.tsx` in all three apps
-- [ ] UX-3 `PopularAirSports` from CMS data
-- [ ] UX-4 Air Sports `/articles` index
-- [ ] Browser verification at 1440 / 768 / 375, both themes; keyboard flows
-- [ ] `@axe-core/playwright` on critical routes
-- [ ] Admin page decomposition, starting with `posts/page.tsx`
+- [x] UX-1 `not-found`, `error`, `global-error` in all three apps (shared `StatusPage`)
+- [x] UX-3 `PopularAirSports` from CMS categories; invented ratings/reviews removed
+- [x] UX-4 Air Sports `/articles` index with pagination, nav link, sitemap entry
+- [x] UX-8 admin production build fixed (`/taxonomy` Suspense boundary)
+- [x] UX-9 `toggle-group` marked `'use client'` (dev crash on every route)
+- [x] UX-10 mobile horizontal overflow on both sites (`PillButton` + `cn()`)
+- [x] Browser verification of 404 pages at 1440 / 768 / 375 (screenshots reviewed)
+- [ ] Dark theme and keyboard-only QA of critical flows
+- [ ] `@axe-core/playwright` on critical routes (needs a new dev dependency)
+- [ ] Admin page decomposition, starting with `posts/page.tsx` (901 lines)

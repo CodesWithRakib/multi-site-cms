@@ -2,7 +2,7 @@
 
 ## Verdict: **Not production-ready**
 
-Score: **6 / 10** for the publishing CMS (up from 5 at the initial audit).
+Score: **6.5 / 10** for the publishing CMS (up from 5 at the initial audit).
 Booking, payments, and customer accounts are out of scope by business
 decision (2026-11-04) and are not scored.
 
@@ -10,8 +10,8 @@ decision (2026-11-04) and are not scored.
 | -------------- | ----- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Security       | 6     | Secret, preview, CSRF, and webhook issues fixed and regression-tested; comment pre-moderation and rate limit in place; Cloudinary rotation still pending |
 | Correctness    | 7     | API 242/242, integration 56/56; revalidation wired (ADR-0026); contact page honest (`mailto:`). Not verified against a deployed site                     |
-| Test evidence  | 5     | Strong API coverage; E2E never runs in CI; thin frontend tests                                                                                           |
-| UX resilience  | 4     | No error / 404 / loading boundaries (UX-1); no browser verification yet                                                                                  |
+| Test evidence  | 6     | API 263, integration 56, E2E 27/27 locally (first real run); E2E still not run in CI; thin frontend unit tests                                           |
+| UX resilience  | 6     | Branded 404/error pages, mobile overflow fixed, admin build fixed; E2E 27/27 locally. Dark theme, keyboard, axe not yet verified                         |
 | Operations     | 5     | Health / readiness exist; backup restore drill, monitoring, and alerting not verified                                                                    |
 | Data / privacy | 5     | Migrations reviewed; latest one round-trip tested; no retention or erasure policy (DB-4, DB-5)                                                           |
 
@@ -25,8 +25,7 @@ decision (2026-11-04) and are not scored.
    only appear after the 60 s ISR window.
 4. Run migration `1793491211000-PreModeratedComments` (`pnpm --filter @multi-site-cms/api db:migration:run` after build).
 5. Set `NEXT_PUBLIC_CONTACT_EMAIL` on the travel blog, or `/contact` shows no address.
-6. Add branded `error.tsx` / `not-found.tsx` to all three apps (UX-1).
-7. Run the Playwright suite in CI against a real stack.
+6. Run the Playwright suite in CI against a real stack (passes locally: 27/27).
 
 ## Business decisions
 

@@ -5,18 +5,18 @@ below are from actual runs in this session.
 
 ## Results
 
-| Workspace                | Runner                              | Baseline (before changes)                  | After Phase 1 changes                             |
-| ------------------------ | ----------------------------------- | ------------------------------------------ | ------------------------------------------------- |
-| `apps/api`               | Jest + supertest (needs PostgreSQL) | 22 suites, **4 failed** / 211 passed       | 22 suites, **221 passed**, 0 failed               |
-| `packages/config`        | Vitest                              | 4 passed                                   | 21 passed (+17 revalidation contract)             |
-| `packages/ui`            | Vitest                              | 16 passed                                  | not re-run separately; passed in full `pnpm test` |
-| `packages/validation`    | Vitest                              | 12 passed                                  | passed in full run                                |
-| `packages/api-client`    | Vitest                              | 5 passed                                   | passed in full run                                |
-| `packages/redux`         | Vitest                              | 3 passed                                   | passed in full run                                |
-| `apps/admin`             | Vitest                              | 2 files, 11 passed                         | passed in full run                                |
-| `apps/sites/travel-blog` | Vitest                              | 1 file, 6 passed                           | 6 passed                                          |
-| `apps/sites/air-sports`  | Vitest                              | 2 files, 10 passed                         | 10 passed                                         |
-| `e2e/platform.spec.ts`   | Playwright                          | 16 tests; **not run** (CI only lists them) | not run                                           |
+| Workspace                | Runner                              | Baseline (before changes)                    | After Phase 1 changes                                                                                   |
+| ------------------------ | ----------------------------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `apps/api`               | Jest + supertest (needs PostgreSQL) | 22 suites, **4 failed** / 211 passed         | 22 suites, **221 passed**, 0 failed                                                                     |
+| `packages/config`        | Vitest                              | 4 passed                                     | 21 passed (+17 revalidation contract)                                                                   |
+| `packages/ui`            | Vitest                              | 16 passed                                    | not re-run separately; passed in full `pnpm test`                                                       |
+| `packages/validation`    | Vitest                              | 12 passed                                    | passed in full run                                                                                      |
+| `packages/api-client`    | Vitest                              | 5 passed                                     | passed in full run                                                                                      |
+| `packages/redux`         | Vitest                              | 3 passed                                     | passed in full run                                                                                      |
+| `apps/admin`             | Vitest                              | 2 files, 11 passed                           | passed in full run                                                                                      |
+| `apps/sites/travel-blog` | Vitest                              | 1 file, 6 passed                             | 6 passed                                                                                                |
+| `apps/sites/air-sports`  | Vitest                              | 2 files, 10 passed                           | 10 passed                                                                                               |
+| `e2e/*.spec.ts`          | Playwright                          | 16 tests; **never run** (CI only lists them) | **27/27 passed locally** (16 existing + 11 new in `route-boundaries.spec.ts`); still not executed in CI |
 
 Baseline failures: 3 × `media-upload.e2e-spec.ts` (uploads went to a real
 Cloudinary account; fixed by pinning local storage in `test/setup-env.ts`),

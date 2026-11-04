@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { Suspense, useState, useMemo } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Loader2, CheckCircle2, AlertCircle, X } from 'lucide-react';
 import { ShellLayout } from '@/components/shell';
@@ -28,7 +28,7 @@ import {
   type TaxonomyActionMessage,
 } from '@/features/taxonomy';
 
-export default function TaxonomyPage() {
+function TaxonomyWorkspace() {
   const { t, activeSiteId, activeSite, availableSites, setActiveSiteId } = useAdmin();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -125,13 +125,19 @@ export default function TaxonomyPage() {
         categoryId: editingCategory.id,
         data: payload,
       }).unwrap();
-      setActionMessage({ type: 'success', text: `Category "${payload.name}" updated successfully.` });
+      setActionMessage({
+        type: 'success',
+        text: `Category "${payload.name}" updated successfully.`,
+      });
     } else {
       await createCategory({
         siteId: effectiveSiteId,
         data: payload,
       }).unwrap();
-      setActionMessage({ type: 'success', text: `Category "${payload.name}" created successfully.` });
+      setActionMessage({
+        type: 'success',
+        text: `Category "${payload.name}" created successfully.`,
+      });
     }
     refetchCategories();
   };
@@ -180,9 +186,7 @@ export default function TaxonomyPage() {
   };
 
   const currentSiteName =
-    activeSite?.name ||
-    availableSites.find((s) => s.id === effectiveSiteId)?.name ||
-    'Select Site';
+    activeSite?.name || availableSites.find((s) => s.id === effectiveSiteId)?.name || 'Select Site';
 
   const isLoading = isLoadingCategories || isLoadingTags;
   const isFetching = isFetchingCategories || isFetchingTags;
@@ -324,5 +328,24 @@ export default function TaxonomyPage() {
         isSaving={isCreatingTag || isUpdatingTag}
       />
     </ShellLayout>
+  );
+}
+
+/**
+ * `useSearchParams` opts the page into client rendering; Next.js requires a
+ * Suspense boundary around it or the production build fails to prerender.
+ */
+export default function TaxonomyPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-dvh items-center justify-center" role="status">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" aria-hidden="true" />
+          <span className="sr-only">Loading taxonomy</span>
+        </div>
+      }
+    >
+      <TaxonomyWorkspace />
+    </Suspense>
   );
 }

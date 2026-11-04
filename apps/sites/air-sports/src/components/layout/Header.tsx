@@ -11,6 +11,7 @@ import { ThemeToggle } from '@/components/ui/ThemeToggle';
 const NAV_ITEMS = [
   { label: 'Home', href: '/' },
   { label: 'Disciplines', href: '/categories', hasDropdown: true },
+  { label: 'Dispatches', href: '/articles' },
   { label: 'Events & Races', href: '/events' },
   { label: 'Field Notes', href: '/tags' },
 ];

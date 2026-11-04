@@ -97,3 +97,26 @@ fail when the fix is stashed.
 `test:integration` 56/56, Prettier clean. Not run: Playwright, browser checks.
 
 **Migrations:** none new in 2b.
+
+## 2026-11-04 — Phase 3a (UX resilience)
+
+**Changes (uncommitted):**
+
+- `packages/ui`: new `StatusPage` (+ test); `toggle-group.tsx` marked `'use client'` (UX-9).
+- Both sites: `not-found.tsx`, `error.tsx`, `global-error.tsx`; `PillButton` uses `cn()` (UX-10).
+- Admin: `not-found.tsx`, `error.tsx`, `global-error.tsx` with EN/BN `boundary` keys;
+  `/taxonomy` wrapped in Suspense — admin production build was failing at HEAD (UX-8).
+- Air Sports: `/articles` paginated index, header link, sitemap entry (UX-4);
+  `PopularAirSports` from CMS categories, invented ratings/reviews/favorites removed (UX-3).
+- `e2e/route-boundaries.spec.ts` (11 tests).
+- Tried `loading.tsx` on detail routes, removed it: streaming turned unknown slugs into HTTP 200.
+
+**Verification:** lint 0, typecheck 0, all unit/API tests (API 263), all three
+apps build, **first real Playwright run: 27/27 passed** (one earlier attempt had a
+cold-compile timeout; re-runs clean). Old-code checks: overflow test fails with
+the old `PillButton` (70 px / 12 px); slug test caught the soft-404 regression.
+
+**Process note:** an over-broad `prettier --write` reformatted 17 unrelated
+air-sports files; each was proven format-only (Prettier of the index blob ==
+worktree) and restored from the index. A repo-wide check found no other
+format-only changes.

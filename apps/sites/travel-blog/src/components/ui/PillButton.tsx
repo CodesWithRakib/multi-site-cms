@@ -1,6 +1,8 @@
 import React from 'react';
 import Link from 'next/link';
 
+import { cn } from '@multi-site-cms/ui';
+
 interface PillButtonProps {
   children: React.ReactNode;
   href?: string;
@@ -38,12 +40,10 @@ export function PillButton({
   const variantClasses = {
     primary:
       'bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs hover:shadow-md hover:shadow-emerald-600/20',
-    secondary:
-      'bg-teal-900 hover:bg-teal-950 text-white shadow-xs',
+    secondary: 'bg-teal-900 hover:bg-teal-950 text-white shadow-xs',
     outline:
       'border-2 border-emerald-600 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40',
-    ghost:
-      'text-foreground hover:bg-muted/70',
+    ghost: 'text-foreground hover:bg-muted/70',
     glass:
       'bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md border border-neutral-200/80 dark:border-neutral-800 text-foreground shadow-2xs hover:bg-white dark:hover:bg-neutral-900',
   }[variant];
@@ -58,7 +58,7 @@ export function PillButton({
 
   if (href) {
     return (
-      <Link href={href} className={`${baseClasses} ${sizeClasses} ${variantClasses} ${className}`}>
+      <Link href={href} className={cn(baseClasses, sizeClasses, variantClasses, className)}>
         {content}
       </Link>
     );
@@ -69,10 +69,9 @@ export function PillButton({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`${baseClasses} ${sizeClasses} ${variantClasses} ${className}`}
+      className={cn(baseClasses, sizeClasses, variantClasses, className)}
     >
       {content}
     </button>
   );
 }
-

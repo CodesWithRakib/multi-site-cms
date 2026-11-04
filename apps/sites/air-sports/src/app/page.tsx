@@ -7,7 +7,7 @@ import { FlyHigherBanner } from '@/components/home/FlyHigherBanner';
 import { LiveDispatchesSection } from '@/components/home/LiveDispatchesSection';
 import { PopularAirSports } from '@/components/home/PopularAirSports';
 import { siteConfig } from '@/config/site';
-import { fetchArticles, fetchEvents } from '@/lib/api';
+import { fetchArticles, fetchCategories, fetchEvents } from '@/lib/api';
 
 export const revalidate = 30; // ISR 30s
 
@@ -17,9 +17,10 @@ export const metadata: Metadata = {
 };
 
 export default async function AirSportsHomePage() {
-  const [allArticlesRes, events] = await Promise.all([
+  const [allArticlesRes, events, categories] = await Promise.all([
     fetchArticles({ limit: 8 }),
     fetchEvents(),
+    fetchCategories(),
   ]);
 
   const articles = allArticlesRes.items;
@@ -43,8 +44,8 @@ export default async function AirSportsHomePage() {
         {/* Sky Hero & Feature Badges */}
         <AirSportsHero />
 
-        {/* Popular Air Sports Activities (Paragliding, Skydiving, Balloon, Ultralight) */}
-        <PopularAirSports />
+        {/* Most-covered disciplines, from CMS categories */}
+        <PopularAirSports categories={categories} />
 
         {/* "Fly Higher, Live Better" Value Banner */}
         <FlyHigherBanner />
