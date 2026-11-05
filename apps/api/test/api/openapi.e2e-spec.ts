@@ -118,6 +118,7 @@ describe('OpenAPI document', () => {
       `/${env.API_PREFIX}/sites/{siteId}/tags`,
       `/${env.API_PREFIX}/sites/{siteId}/tags/{tagId}`,
       `/${env.API_PREFIX}/users`,
+      `/${env.API_PREFIX}/users/stats`,
       `/${env.API_PREFIX}/users/{id}`,
       `/${env.API_PREFIX}/users/{id}/roles`,
       `/${env.API_PREFIX}/users/{id}/roles/{assignmentId}`,

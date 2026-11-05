@@ -123,9 +123,7 @@ export function MediaCard({
           type="button"
           onClick={(e) => {
             e.stopPropagation();
-            if (confirm('Are you sure you want to delete this media asset?')) {
-              onDelete(asset.id);
-            }
+            onDelete(asset.id);
           }}
           className="absolute top-2 right-2 p-1.5 rounded-lg bg-black/50 hover:bg-red-600 text-white opacity-0 group-hover:opacity-100 transition-opacity"
           title="Delete Media"

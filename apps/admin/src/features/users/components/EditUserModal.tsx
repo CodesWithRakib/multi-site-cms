@@ -5,6 +5,10 @@ import { X, Edit2, Shield, Globe, Loader2, AlertCircle, Plus, Trash2 } from 'luc
 import type { UserItem, UserStatus } from '@multi-site-cms/types';
 import { useUpdateUserMutation, useAssignRoleMutation, useRevokeRoleMutation } from '@/lib/cms-api';
 import { useAdmin } from '@/lib/admin-context';
+import { ConfirmDialog } from '@/components/feedback';
+import { apiErrorMessage } from '@/lib/api-error';
+
+import { USER_STATUS_OPTIONS } from '../roles';
 
 export interface EditUserModalProps {
   user: UserItem | null;
@@ -35,6 +39,7 @@ export function EditUserModal({
   const [showAddRole, setShowAddRole] = useState(false);
   const [roleKey, setRoleKey] = useState<string>('admin');
   const [selectedSiteId, setSelectedSiteId] = useState<string>(sites[0]?.id || '');
+  const [pendingRevokeId, setPendingRevokeId] = useState<string | null>(null);
 
   const [updateUser, { isLoading: isUpdating }] = useUpdateUserMutation();
   const [assignRole, { isLoading: isAssigning }] = useAssignRoleMutation();
@@ -76,8 +81,7 @@ export function EditUserModal({
         onClose();
       }, 1000);
     } catch (err: unknown) {
-      const apiErr = err as { data?: { error?: { message?: string } }; message?: string };
-      setErrorMsg(apiErr?.data?.error?.message || apiErr?.message || 'Failed to update user.');
+      setErrorMsg(apiErrorMessage(err, 'Failed to update user.'));
     }
   };
 
@@ -102,23 +106,23 @@ export function EditUserModal({
       setShowAddRole(false);
       onUpdated();
     } catch (err: unknown) {
-      const apiErr = err as { data?: { error?: { message?: string } }; message?: string };
-      setErrorMsg(apiErr?.data?.error?.message || apiErr?.message || 'Failed to assign role.');
+      setErrorMsg(apiErrorMessage(err, 'Failed to assign role.'));
     }
   };
 
-  const handleRevokeRole = async (assignmentId: string) => {
-    if (confirm('Are you sure you want to revoke this role assignment?')) {
-      try {
-        await revokeRole({
-          userId: user.id,
-          assignmentId,
-        }).unwrap();
-        onUpdated();
-      } catch (err: unknown) {
-        const apiErr = err as { data?: { error?: { message?: string } }; message?: string };
-        setErrorMsg(apiErr?.data?.error?.message || apiErr?.message || 'Failed to revoke role.');
-      }
+  /** Step 1: ask for confirmation (ConfirmDialog below). */
+  const handleRevokeRole = (assignmentId: string) => setPendingRevokeId(assignmentId);
+
+  /** Step 2: confirmed. */
+  const confirmRevokeRole = async () => {
+    if (!pendingRevokeId) return;
+    try {
+      await revokeRole({ userId: user.id, assignmentId: pendingRevokeId }).unwrap();
+      onUpdated();
+    } catch (err: unknown) {
+      setErrorMsg(apiErrorMessage(err, 'Failed to revoke role.'));
+    } finally {
+      setPendingRevokeId(null);
     }
   };
 
@@ -190,9 +194,11 @@ export function EditUserModal({
               onChange={(e) => setStatus(e.target.value as UserStatus)}
               className="w-full px-3.5 py-2 text-xs sm:text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 disabled:opacity-50 cursor-pointer"
             >
-              <option value="active">Active</option>
-              <option value="suspended">Suspended</option>
-              <option value="locked">Locked</option>
+              {USER_STATUS_OPTIONS.map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
             </select>
             {isDeactivationLocked && (
               <p className="text-[11px] text-amber-600 dark:text-amber-400 mt-1">
@@ -346,6 +352,17 @@ export function EditUserModal({
           </div>
         </form>
       </div>
+
+      <ConfirmDialog
+        open={pendingRevokeId !== null}
+        title="Revoke this role?"
+        description={`${user.displayName} loses the access this role grants as soon as it is revoked.`}
+        confirmLabel="Revoke role"
+        busyLabel="Revoking…"
+        isBusy={isRevoking}
+        onConfirm={() => void confirmRevokeRole()}
+        onCancel={() => setPendingRevokeId(null)}
+      />
     </div>
   );
 }

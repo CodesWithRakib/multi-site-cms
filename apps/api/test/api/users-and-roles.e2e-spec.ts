@@ -5,6 +5,7 @@ import type {
   ApiSuccess,
   PaginatedResult,
   UserItem,
+  UserStats,
 } from '@multi-site-cms/types';
 import { afterAll, beforeAll, describe, expect, it } from '@jest/globals';
 import request from 'supertest';
@@ -157,6 +158,57 @@ describe('Users and roles (/api/v1/users)', () => {
     const owner = page.items.find((item) => item.id === ownerId);
     expect(owner?.roles.map((role) => role.roleKey)).toEqual(['super_admin']);
     expect(JSON.stringify(res.body)).not.toMatch(/password/i);
+  });
+
+  it('searches, filters by role and site, and counts users in the database', async () => {
+    const editor = await createUser('desk_editor@example.test');
+    await dataSource.getRepository(UserRoleAssignment).save({
+      userId: editor.id,
+      roleId: adminRoleId,
+      scopeType: 'site',
+      siteId,
+    });
+    await createUser('plain.reader@example.test');
+
+    const list = async (query: string) => {
+      const res = await request(app.getHttpServer())
+        .get(`/api/v1/users?${query}`)
+        .set('Cookie', ownerCookie)
+        .expect(200);
+      return (res.body as ApiSuccess<PaginatedResult<UserItem>>).data.items.map((u) => u.email);
+    };
+
+    // Regression: the admin search used to answer 400 (unknown "search" field).
+    expect(await list('search=DESK_ED')).toEqual(['desk_editor@example.test']);
+    // LIKE wildcards are literal: "_" must not match any character.
+    expect(await list('search=desk_')).toEqual(['desk_editor@example.test']);
+    expect(await list('search=%25')).toEqual([]);
+    expect(await list('roleKey=admin')).toEqual(['desk_editor@example.test']);
+    expect(await list(`siteId=${siteId}`)).toEqual(['desk_editor@example.test']);
+    expect(await list('roleKey=super_admin')).toEqual(['owner@example.test']);
+
+    await request(app.getHttpServer())
+      .get('/api/v1/users?status=locked')
+      .set('Cookie', ownerCookie)
+      .expect(400);
+
+    const stats = await request(app.getHttpServer())
+      .get('/api/v1/users/stats')
+      .set('Cookie', ownerCookie)
+      .expect(200);
+    expect((stats.body as ApiSuccess<UserStats>).data).toMatchObject({
+      superAdmins: 1,
+      activeSuperAdmins: 1,
+      siteAdmins: 1,
+      byStatus: expect.objectContaining({ active: expect.any(Number) }),
+    });
+    const total = (stats.body as ApiSuccess<UserStats>).data.total;
+    const [countRow] = (await dataSource.query(
+      `SELECT COUNT(*)::int AS "n" FROM "users"`,
+    )) as Array<{
+      n: number;
+    }>;
+    expect(total).toBe(countRow?.n);
   });
 
   it('creates a user with a normalized email and rejects duplicates and bad input', async () => {

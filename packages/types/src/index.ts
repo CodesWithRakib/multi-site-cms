@@ -71,6 +71,16 @@ export interface ReadinessResponse {
 }
 
 export type UserStatus = 'active' | 'invited' | 'suspended' | 'disabled';
+
+/** `GET /users/stats`: counts computed in the database. */
+export interface UserStats {
+  total: number;
+  byStatus: Record<UserStatus, number>;
+  superAdmins: number;
+  /** Guards the "keep one active Super Admin" rule in the UI. */
+  activeSuperAdmins: number;
+  siteAdmins: number;
+}
 export type RoleScope = 'platform' | 'site';
 
 export interface UserRoleSummary {

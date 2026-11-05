@@ -1,22 +1,33 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { AlertCircle, CheckCircle2, X } from 'lucide-react';
 
-import type { WorkspaceNotice } from '../hooks/usePostsWorkspace';
+export interface Notice {
+  readonly tone: 'success' | 'error';
+  readonly text: string;
+}
 
 const AUTO_DISMISS_MS = 6000;
 
+/** Notice state for a screen: success and error results of user actions. */
+export function useActionNotice() {
+  const [notice, setNotice] = useState<Notice | null>(null);
+  const dismiss = useCallback(() => setNotice(null), []);
+  const success = useCallback((text: string) => setNotice({ tone: 'success', text }), []);
+  const error = useCallback((text: string) => setNotice({ tone: 'error', text }), []);
+  return { notice, success, error, dismiss };
+}
+
 /**
- * Result of a workspace action (replaces native `alert()`). Errors use
- * role="alert" so screen readers announce them at once; successes are polite
- * and dismiss themselves.
+ * Result of an action (replaces native `alert()`). Errors use role="alert" so
+ * they are announced at once; successes are polite and dismiss themselves.
  */
-export function WorkspaceNoticeBanner({
+export function ActionNotice({
   notice,
   onDismiss,
 }: {
-  readonly notice: WorkspaceNotice | null;
+  readonly notice: Notice | null;
   readonly onDismiss: () => void;
 }) {
   useEffect(() => {

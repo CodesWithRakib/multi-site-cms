@@ -78,6 +78,9 @@ export const en = {
   'category.cycleDetected': 'Category hierarchy cannot have circular references.',
   'category.cannotDeleteWithChildren': 'Category has subcategories and cannot be deleted.',
   'tag.notFound': 'Tag not found.',
+  'tag.inUse': 'This tag is used by published content. Remove it from those posts first.',
+  'category.inUse':
+    'This category is used by published content. Move those posts to another category first.',
   'tag.slugConflict': 'A tag with this slug already exists for this site.',
   'media.notFound': 'Media asset not found.',
   'media.invalidMimeType': 'Unsupported media MIME type.',
@@ -184,6 +187,9 @@ export const bn: Record<MessageKey, string> = {
   'category.cycleDetected': 'ক্যাটাগরি হায়ারার্কিতে চক্রাকার রেফারেন্স থাকতে পারবে না।',
   'category.cannotDeleteWithChildren': 'সাবক্যাটাগরি থাকা ক্যাটাগরি মুছে ফেলা যাবে না।',
   'tag.notFound': 'ট্যাগ পাওয়া যায়নি।',
+  'tag.inUse': 'এই ট্যাগটি প্রকাশিত কনটেন্টে ব্যবহৃত হচ্ছে। আগে সেই পোস্টগুলো থেকে সরান।',
+  'category.inUse':
+    'এই ক্যাটাগরিটি প্রকাশিত কনটেন্টে ব্যবহৃত হচ্ছে। আগে সেই পোস্টগুলো অন্য ক্যাটাগরিতে সরান।',
   'tag.slugConflict': 'এই সাইটে এই স্লাগের একটি ট্যাগ ইতিমধ্যে রয়েছে।',
   'media.notFound': 'মিডিয়া ফাইলটি পাওয়া যায়নি।',
   'media.invalidMimeType': 'অসমর্থিত মিডিয়া ফাইল টাইপ।',

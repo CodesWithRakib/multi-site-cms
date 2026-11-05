@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { Search, Filter, Loader2, ArrowLeft, ArrowRight, X } from 'lucide-react';
+import { ConfirmDialog } from '@/components/feedback';
+import { apiErrorMessage } from '@/lib/api-error';
 import { useDeleteMediaMutation, useListMediaQuery } from '@/lib/cms-api';
 import type { MediaAssetItem } from '@multi-site-cms/types';
 import { MediaCard } from './MediaCard';
@@ -26,6 +28,8 @@ export function MediaLibraryModal({
   const [searchTerm, setSearchTerm] = useState('');
   const [mimeFilter, setMimeFilter] = useState('');
   const [page, setPage] = useState(1);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const { data: mediaData, isLoading } = useListMediaQuery(
     {
@@ -38,7 +42,7 @@ export function MediaLibraryModal({
     { skip: !isOpen },
   );
 
-  const [deleteMedia] = useDeleteMediaMutation();
+  const [deleteMedia, { isLoading: isDeleting }] = useDeleteMediaMutation();
 
   if (!isOpen) return null;
 
@@ -47,11 +51,23 @@ export function MediaLibraryModal({
     onClose();
   };
 
-  const handleDelete = async (id: string) => {
+  /** Step 1: ask (ConfirmDialog below). */
+  const handleDelete = (id: string) => {
+    setDeleteError(null);
+    setPendingDeleteId(id);
+  };
+
+  /** Step 2: confirmed. */
+  const confirmDelete = async () => {
+    if (!pendingDeleteId) return;
     try {
-      await deleteMedia(id).unwrap();
-    } catch (err) {
-      alert('Failed to delete media asset: ' + ((err as Error).message || 'Server error'));
+      await deleteMedia(pendingDeleteId).unwrap();
+    } catch (err: unknown) {
+      setDeleteError(
+        apiErrorMessage(err, 'The media item could not be deleted; it may be in use.'),
+      );
+    } finally {
+      setPendingDeleteId(null);
     }
   };
 
@@ -110,6 +126,14 @@ export function MediaLibraryModal({
             </div>
           ) : (
             <div className="flex flex-col h-full gap-4">
+              {deleteError && (
+                <p
+                  role="alert"
+                  className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-800 dark:border-rose-900 dark:bg-rose-950/50 dark:text-rose-200"
+                >
+                  {deleteError}
+                </p>
+              )}
               {/* Search & Filters */}
               <div className="flex flex-wrap items-center justify-between gap-3 pb-2">
                 <div className="relative flex-1 min-w-[200px] max-w-md">
@@ -206,6 +230,17 @@ export function MediaLibraryModal({
           )}
         </div>
       </div>
+
+      <ConfirmDialog
+        open={pendingDeleteId !== null}
+        title="Delete this media item?"
+        description="It is removed from the library. Items still used by a post cannot be deleted."
+        confirmLabel="Delete"
+        busyLabel="Deleting…"
+        isBusy={isDeleting}
+        onConfirm={() => void confirmDelete()}
+        onCancel={() => setPendingDeleteId(null)}
+      />
     </div>
   );
 }

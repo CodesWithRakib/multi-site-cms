@@ -1,5 +1,5 @@
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import type { PaginatedResult, UserItem, UserRoleSummary } from '@multi-site-cms/types';
+import type { PaginatedResult, UserItem, UserRoleSummary, UserStats } from '@multi-site-cms/types';
 import { In, type DataSource, type EntityManager, type Repository } from 'typeorm';
 
 import { PasswordService } from '../auth/services/password.service';
@@ -71,7 +71,24 @@ export class UsersService {
     const qb = userRepo.createQueryBuilder('user');
 
     if (query.status) {
-      qb.where('user.status = :status', { status: query.status });
+      qb.andWhere('user.status = :status', { status: query.status });
+    }
+    if (query.search) {
+      // Escape LIKE wildcards so "%" or "_" in the search are literal.
+      const term = `%${query.search.replace(/[\\%_]/g, (c) => `\\${c}`)}%`;
+      qb.andWhere('(user.email ILIKE :term OR user.displayName ILIKE :term)', { term });
+    }
+    if (query.roleKey) {
+      qb.andWhere(
+        'EXISTS (SELECT 1 FROM user_role_assignments ura JOIN roles r ON r.id = ura.role_id WHERE ura.user_id = user.id AND r.key = :roleKey)',
+        { roleKey: query.roleKey },
+      );
+    }
+    if (query.siteId) {
+      qb.andWhere(
+        'EXISTS (SELECT 1 FROM user_role_assignments ura WHERE ura.user_id = user.id AND ura.site_id = :siteId)',
+        { siteId: query.siteId },
+      );
     }
 
     qb.orderBy('user.createdAt', 'DESC').skip(skip).take(limit);
@@ -99,6 +116,43 @@ export class UsersService {
       page,
       limit,
       totalPages: Math.ceil(total / limit) || 1,
+    };
+  }
+
+  /** Headline counts for the users screen, computed in the database. */
+  async getUserStats(): Promise<UserStats> {
+    const [row] = (await this.dataSource.query(`
+      SELECT
+        COUNT(*)::int AS "total",
+        COUNT(*) FILTER (WHERE u.status = 'active')::int AS "active",
+        COUNT(*) FILTER (WHERE u.status = 'invited')::int AS "invited",
+        COUNT(*) FILTER (WHERE u.status = 'suspended')::int AS "suspended",
+        COUNT(*) FILTER (WHERE u.status = 'disabled')::int AS "disabled",
+        COUNT(*) FILTER (WHERE EXISTS (
+          SELECT 1 FROM user_role_assignments ura JOIN roles r ON r.id = ura.role_id
+          WHERE ura.user_id = u.id AND r.key = 'super_admin'
+        ))::int AS "superAdmins",
+        COUNT(*) FILTER (WHERE u.status = 'active' AND EXISTS (
+          SELECT 1 FROM user_role_assignments ura JOIN roles r ON r.id = ura.role_id
+          WHERE ura.user_id = u.id AND r.key = 'super_admin'
+        ))::int AS "activeSuperAdmins",
+        COUNT(*) FILTER (WHERE EXISTS (
+          SELECT 1 FROM user_role_assignments ura JOIN roles r ON r.id = ura.role_id
+          WHERE ura.user_id = u.id AND r.key = 'admin'
+        ))::int AS "siteAdmins"
+      FROM users u`)) as Array<Record<string, number>>;
+    const n = (key: string) => Number(row?.[key] ?? 0);
+    return {
+      total: n('total'),
+      byStatus: {
+        active: n('active'),
+        invited: n('invited'),
+        suspended: n('suspended'),
+        disabled: n('disabled'),
+      },
+      superAdmins: n('superAdmins'),
+      activeSuperAdmins: n('activeSuperAdmins'),
+      siteAdmins: n('siteAdmins'),
     };
   }
 

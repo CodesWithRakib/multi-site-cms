@@ -1,9 +1,11 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import type { PostPublicationItem } from '@multi-site-cms/types';
 
 import type { PublishingActionType } from '@/features/posts/components/PublishingModal';
+import { useActionNotice } from '@/components/feedback';
+import { apiErrorMessage } from '@/lib/api-error';
 import { useAdmin } from '@/lib/admin-context';
 import {
   useDeletePostMutation,
@@ -29,16 +31,6 @@ export interface PendingDelete {
   title: string;
 }
 
-export interface WorkspaceNotice {
-  tone: 'success' | 'error';
-  text: string;
-}
-
-function errorMessage(err: unknown): string {
-  const message = (err as { message?: unknown } | null)?.message;
-  return typeof message === 'string' && message ? message : 'Server error';
-}
-
 export interface PublishingTarget {
   action: PublishingActionType;
   publication: PostPublicationItem;
@@ -58,7 +50,7 @@ export function usePostsWorkspace() {
   const [page, setPage] = useState(1);
   const [publishingTarget, setPublishingTarget] = useState<PublishingTarget | null>(null);
   const [pendingDelete, setPendingDelete] = useState<PendingDelete | null>(null);
-  const [notice, setNotice] = useState<WorkspaceNotice | null>(null);
+  const notices = useActionNotice();
   const [isDeleting, setIsDeleting] = useState(false);
 
   const { data: sites = [] } = useListSitesQuery();
@@ -112,10 +104,10 @@ export function usePostsWorkspace() {
   const submitPublicationForReview = async (publication: PostPublicationItem) => {
     try {
       await submitForReview({ siteId: publication.siteId, publicationId: publication.id }).unwrap();
-      setNotice({ tone: 'success', text: 'Submitted for review.' });
+      notices.success('Submitted for review.');
       refetch();
     } catch (err: unknown) {
-      setNotice({ tone: 'error', text: `Review submission failed: ${errorMessage(err)}` });
+      notices.error(`Review submission failed: ${apiErrorMessage(err, 'Server error')}`);
     }
   };
 
@@ -129,17 +121,15 @@ export function usePostsWorkspace() {
     setIsDeleting(true);
     try {
       await deletePost(postId).unwrap();
-      setNotice({ tone: 'success', text: `Deleted "${title}".` });
+      notices.success(`Deleted "${title}".`);
       refetch();
     } catch (err: unknown) {
-      setNotice({ tone: 'error', text: `Failed to delete post: ${errorMessage(err)}` });
+      notices.error(`Failed to delete post: ${apiErrorMessage(err, 'Server error')}`);
     } finally {
       setIsDeleting(false);
       setPendingDelete(null);
     }
   };
-
-  const dismissNotice = useCallback(() => setNotice(null), []);
 
   /** Any filter change returns to the first page. */
   const withPageReset =
@@ -179,8 +169,8 @@ export function usePostsWorkspace() {
     isDeleting,
     cancelDelete: () => setPendingDelete(null),
     confirmDelete,
-    notice,
-    dismissNotice,
+    notice: notices.notice,
+    dismissNotice: notices.dismiss,
     publishingTarget,
     openPublishing,
     closePublishing: () => setPublishingTarget(null),

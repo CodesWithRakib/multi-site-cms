@@ -4,6 +4,8 @@ import React from 'react';
 import { Search, RefreshCw, X, Filter } from 'lucide-react';
 import { useAdmin } from '@/lib/admin-context';
 
+import { ASSIGNABLE_ROLES, USER_STATUS_OPTIONS } from '../roles';
+
 export interface UserFilterBarProps {
   searchTerm: string;
   onSearchChange: (value: string) => void;
@@ -78,10 +80,11 @@ export function UserFilterBar({
           className="px-3 py-2 text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 cursor-pointer"
         >
           <option value="all">{t.users.allRoles || 'All Roles'}</option>
-          <option value="super_admin">{t.users.platformRole || 'Super Admin'}</option>
-          <option value="site_admin">{t.users.siteRole || 'Site Admin'}</option>
-          <option value="site_editor">Site Editor</option>
-          <option value="site_author">Site Author</option>
+          {ASSIGNABLE_ROLES.map((role) => (
+            <option key={role.key} value={role.key}>
+              {role.label}
+            </option>
+          ))}
         </select>
 
         {/* Status Filter */}
@@ -91,9 +94,11 @@ export function UserFilterBar({
           className="px-3 py-2 text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 cursor-pointer"
         >
           <option value="all">{t.users.allStatuses || 'All Statuses'}</option>
-          <option value="active">Active</option>
-          <option value="suspended">Suspended</option>
-          <option value="locked">Locked</option>
+          {USER_STATUS_OPTIONS.map(([value, label]) => (
+            <option key={value} value={value}>
+              {label}
+            </option>
+          ))}
         </select>
 
         {/* Site Filter */}

@@ -1,6 +1,7 @@
 'use client';
 
 import type {
+  UserStats,
   EffectivePlatformPolicy,
   AdminCommentItem,
   AdminCommentsListResult,
@@ -109,6 +110,8 @@ export interface ListMediaParams {
 export interface ListUsersParams {
   search?: string;
   status?: string;
+  roleKey?: string;
+  siteId?: string;
   page?: number;
   limit?: number;
 }
@@ -329,6 +332,12 @@ export const cmsApi = platformApi.injectEndpoints({
               { type: 'User' as const, id: 'LIST' },
             ]
           : [{ type: 'User' as const, id: 'LIST' }],
+    }),
+
+    getUserStats: build.query<UserStats, void>({
+      query: () => ({ path: '/users/stats' }),
+      transformResponse: (response: ApiSuccess<unknown>) => response.data as UserStats,
+      providesTags: ['User'],
     }),
 
     getUser: build.query<UserItem, string>({
@@ -1033,6 +1042,7 @@ export const {
 
   // Users
   useListUsersQuery,
+  useGetUserStatsQuery,
   useGetUserQuery,
   useCreateUserMutation,
   useUpdateUserMutation,

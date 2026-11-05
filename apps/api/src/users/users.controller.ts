@@ -10,7 +10,7 @@ import {
   Query,
   Req,
 } from '@nestjs/common';
-import type { PaginatedResult, UserItem } from '@multi-site-cms/types';
+import type { PaginatedResult, UserItem, UserStats } from '@multi-site-cms/types';
 import type { Request } from 'express';
 
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
@@ -30,6 +30,13 @@ export class UsersController {
   @RequirePermissions('user:read')
   async list(@Query() query: ListUsersQueryDto): Promise<PaginatedResult<UserItem>> {
     return this.usersService.listUsers(query);
+  }
+
+  // Declared before ':id' so "stats" is not parsed as a user id.
+  @Get('stats')
+  @RequirePermissions('user:read')
+  async stats(): Promise<UserStats> {
+    return this.usersService.getUserStats();
   }
 
   @Get(':id')

@@ -14,6 +14,7 @@ import { CommentsBatchActions } from './CommentsBatchActions';
 import { CommentsFilterBar } from './CommentsFilterBar';
 import { CommentsPagination } from './CommentsPagination';
 import { CommentsStatusTabs } from './CommentsStatusTabs';
+import { ConfirmDialog } from '@/components/feedback';
 
 export function CommentsModerationContainer() {
   const [activeStatus, setActiveStatus] = useState<string>('all');
@@ -22,6 +23,7 @@ export function CommentsModerationContainer() {
   const [page, setPage] = useState<number>(1);
   const [limit, setLimit] = useState<number>(20);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [pendingDeleteIds, setPendingDeleteIds] = useState<string[] | null>(null);
   const [toastMessage, setToastMessage] = useState<{
     type: 'success' | 'error';
     text: string;
@@ -78,27 +80,29 @@ export function CommentsModerationContainer() {
     }
   };
 
-  const handleDeleteSingle = async (id: string) => {
-    if (!window.confirm('Are you sure you want to permanently delete this comment?')) return;
-    try {
-      await deleteComment(id).unwrap();
-      showToast('success', 'Comment permanently deleted.');
-      setSelectedIds((prev) => prev.filter((item) => item !== id));
-    } catch {
-      showToast('error', 'Failed to delete comment.');
-    }
+  // Deletion is permanent, so it is confirmed in a dialog (was native confirm()).
+  const handleDeleteSingle = (id: string) => setPendingDeleteIds([id]);
+  const handleBatchDelete = () => {
+    if (selectedIds.length > 0) setPendingDeleteIds([...selectedIds]);
   };
 
-  const handleBatchDelete = async () => {
-    if (selectedIds.length === 0) return;
-    if (!window.confirm(`Permanently delete ${selectedIds.length} selected comments?`)) return;
-    try {
-      await Promise.all(selectedIds.map((id) => deleteComment(id).unwrap()));
-      showToast('success', `Permanently deleted ${selectedIds.length} comments.`);
-      setSelectedIds([]);
-    } catch {
-      showToast('error', 'Failed to delete some comments.');
+  const confirmDelete = async () => {
+    if (!pendingDeleteIds) return;
+    const ids = pendingDeleteIds;
+    const results = await Promise.allSettled(ids.map((id) => deleteComment(id).unwrap()));
+    const deleted = ids.filter((_, index) => results[index]?.status === 'fulfilled');
+    setSelectedIds((prev) => prev.filter((item) => !deleted.includes(item)));
+    if (deleted.length === ids.length) {
+      showToast(
+        'success',
+        ids.length === 1
+          ? 'Comment permanently deleted.'
+          : `Permanently deleted ${ids.length} comments.`,
+      );
+    } else {
+      showToast('error', `Deleted ${deleted.length} of ${ids.length} comments; the rest failed.`);
     }
+    setPendingDeleteIds(null);
   };
 
   const comments = data?.items ?? [];
@@ -239,6 +243,21 @@ export function CommentsModerationContainer() {
           setLimit(l);
           setPage(1);
         }}
+      />
+
+      <ConfirmDialog
+        open={pendingDeleteIds !== null}
+        title={
+          pendingDeleteIds && pendingDeleteIds.length > 1
+            ? `Permanently delete ${pendingDeleteIds.length} comments?`
+            : 'Permanently delete this comment?'
+        }
+        description="Deleted comments cannot be recovered. To hide a comment but keep it, reject it instead."
+        confirmLabel="Delete permanently"
+        busyLabel="Deleting…"
+        isBusy={isDeleting}
+        onConfirm={() => void confirmDelete()}
+        onCancel={() => setPendingDeleteIds(null)}
       />
     </div>
   );

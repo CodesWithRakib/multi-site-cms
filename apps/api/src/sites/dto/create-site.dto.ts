@@ -5,6 +5,7 @@ import {
   IsObject,
   IsOptional,
   IsString,
+  IsTimeZone,
   Matches,
   MaxLength,
   MinLength,
@@ -42,6 +43,7 @@ export class CreateSiteDto {
   @IsString()
   @IsOptional()
   @MaxLength(100)
+  @IsTimeZone({ message: 'timezone must be an IANA time zone such as Asia/Dhaka' })
   @Transform(({ value }: { value: unknown }) => (typeof value === 'string' ? value.trim() : 'UTC'))
   timezone?: string = 'UTC';
 

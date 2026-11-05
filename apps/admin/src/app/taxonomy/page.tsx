@@ -3,7 +3,9 @@
 import React, { Suspense, useState, useMemo } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Loader2, CheckCircle2, AlertCircle, X } from 'lucide-react';
+import { ConfirmDialog } from '@/components/feedback';
 import { ShellLayout } from '@/components/shell';
+import { apiErrorMessage } from '@/lib/api-error';
 import { useAdmin } from '@/lib/admin-context';
 import {
   useListCategoriesQuery,
@@ -45,6 +47,12 @@ function TaxonomyWorkspace() {
 
   const [searchTerm, setSearchTerm] = useState('');
   const [actionMessage, setActionMessage] = useState<TaxonomyActionMessage | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<{
+    kind: 'category' | 'tag';
+    id: string;
+    name: string;
+  } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Modals state
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
@@ -142,17 +150,8 @@ function TaxonomyWorkspace() {
     refetchCategories();
   };
 
-  const handleDeleteCategory = async (cat: CategoryItem) => {
-    if (!effectiveSiteId) return;
-    if (!window.confirm(`Delete category "${cat.name}"? Subcategories may be unlinked.`)) return;
-    try {
-      await deleteCategory({ siteId: effectiveSiteId, categoryId: cat.id }).unwrap();
-      setActionMessage({ type: 'success', text: `Category "${cat.name}" deleted.` });
-      refetchCategories();
-    } catch {
-      setActionMessage({ type: 'error', text: `Failed to delete category "${cat.name}".` });
-    }
-  };
+  const handleDeleteCategory = (cat: CategoryItem) =>
+    setPendingDelete({ kind: 'category', id: cat.id, name: cat.name });
 
   const handleSaveTag = async (payload: { name: string; slug: string; description?: string }) => {
     if (!effectiveSiteId) return;
@@ -173,15 +172,34 @@ function TaxonomyWorkspace() {
     refetchTags();
   };
 
-  const handleDeleteTag = async (tag: TagItem) => {
-    if (!effectiveSiteId) return;
-    if (!window.confirm(`Delete tag "${tag.name}"?`)) return;
+  const handleDeleteTag = (tag: TagItem) =>
+    setPendingDelete({ kind: 'tag', id: tag.id, name: tag.name });
+
+  /** Confirmed in the dialog (replaces native confirm()). */
+  const confirmDelete = async () => {
+    if (!pendingDelete || !effectiveSiteId) return;
+    const { kind, id, name } = pendingDelete;
+    setIsDeleting(true);
     try {
-      await deleteTag({ siteId: effectiveSiteId, tagId: tag.id }).unwrap();
-      setActionMessage({ type: 'success', text: `Tag "${tag.name}" deleted.` });
-      refetchTags();
-    } catch {
-      setActionMessage({ type: 'error', text: `Failed to delete tag "${tag.name}".` });
+      if (kind === 'category') {
+        await deleteCategory({ siteId: effectiveSiteId, categoryId: id }).unwrap();
+        refetchCategories();
+      } else {
+        await deleteTag({ siteId: effectiveSiteId, tagId: id }).unwrap();
+        refetchTags();
+      }
+      setActionMessage({
+        type: 'success',
+        text: `${kind === 'category' ? 'Category' : 'Tag'} "${name}" deleted.`,
+      });
+    } catch (err: unknown) {
+      setActionMessage({
+        type: 'error',
+        text: apiErrorMessage(err, `Failed to delete "${name}".`),
+      });
+    } finally {
+      setIsDeleting(false);
+      setPendingDelete(null);
     }
   };
 
@@ -328,6 +346,20 @@ function TaxonomyWorkspace() {
         editingTag={editingTag}
         onSave={handleSaveTag}
         isSaving={isCreatingTag || isUpdatingTag}
+      />
+      <ConfirmDialog
+        open={pendingDelete !== null}
+        title={pendingDelete?.kind === 'category' ? 'Delete this category?' : 'Delete this tag?'}
+        description={
+          pendingDelete?.kind === 'category'
+            ? `"${pendingDelete.name}" is removed from this site. A category that has subcategories or is used by posts cannot be deleted.`
+            : `"${pendingDelete?.name ?? ''}" is removed from this site. A tag that is used by posts cannot be deleted.`
+        }
+        confirmLabel="Delete"
+        busyLabel="Deleting…"
+        isBusy={isDeleting}
+        onConfirm={() => void confirmDelete()}
+        onCancel={() => setPendingDelete(null)}
       />
     </ShellLayout>
   );

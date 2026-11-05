@@ -2,7 +2,9 @@
 
 import React, { useState, useMemo } from 'react';
 import { Loader2, ChevronLeft, ChevronRight, Image as ImageIcon } from 'lucide-react';
+import { ActionNotice, ConfirmDialog, useActionNotice } from '@/components/feedback';
 import { ShellLayout } from '@/components/shell';
+import { apiErrorMessage } from '@/lib/api-error';
 import { useAdmin } from '@/lib/admin-context';
 import { useDeleteMediaMutation, useListMediaQuery, useUpdateMediaMutation } from '@/lib/cms-api';
 import type { MediaAssetItem } from '@multi-site-cms/types';
@@ -35,7 +37,9 @@ export default function MediaPage() {
   const [selectedAsset, setSelectedAsset] = useState<MediaAssetItem | null>(null);
   const [selectedBatchIds, setSelectedBatchIds] = useState<Set<string>>(new Set());
   const [isUpdating, setIsUpdating] = useState(false);
-  const [isBatchDeleting, setIsBatchDeleting] = useState(false);
+  const [pendingDelete, setPendingDelete] = useState<{ ids: string[] } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const notices = useActionNotice();
 
   // Queries and mutations
   const {
@@ -95,26 +99,39 @@ export default function MediaPage() {
     }
   };
 
-  // Delete single media asset
-  const handleDelete = async (id: string) => {
-    if (confirm(t.media.deleteConfirm || 'Are you sure you want to delete this media asset?')) {
-      try {
-        await deleteMedia(id).unwrap();
-        if (selectedAsset?.id === id) setSelectedAsset(null);
-        setSelectedBatchIds((prev) => {
-          const next = new Set(prev);
-          next.delete(id);
-          return next;
-        });
-        refetch();
-      } catch (err: unknown) {
-        const errorObj = err as { data?: { error?: { message?: string } }; message?: string };
-        alert(
-          'Failed to delete: ' +
-            (errorObj?.data?.error?.message || errorObj?.message || 'Media is currently in use.'),
-        );
-      }
+  // Deletion asks once, here (cards and the detail modal only report intent).
+  const handleDelete = (id: string) => setPendingDelete({ ids: [id] });
+
+  const confirmDelete = async () => {
+    if (!pendingDelete) return;
+    const { ids } = pendingDelete;
+    setIsDeleting(true);
+    // allSettled: one asset still in use must not hide the others' results.
+    const results = await Promise.allSettled(ids.map((id) => deleteMedia(id).unwrap()));
+    const deleted = ids.filter((_, index) => results[index]?.status === 'fulfilled');
+    const failed = results.find((r): r is PromiseRejectedResult => r.status === 'rejected');
+
+    if (selectedAsset && deleted.includes(selectedAsset.id)) setSelectedAsset(null);
+    setSelectedBatchIds((prev) => {
+      const next = new Set(prev);
+      deleted.forEach((id) => next.delete(id));
+      return next;
+    });
+    if (!failed) {
+      notices.success(
+        deleted.length === 1 ? 'Media deleted.' : `Deleted ${deleted.length} media items.`,
+      );
+    } else {
+      const reason = apiErrorMessage(failed.reason, 'it may be in use');
+      notices.error(
+        ids.length === 1
+          ? `Could not delete: ${reason}`
+          : `Deleted ${deleted.length} of ${ids.length}. Some could not be deleted: ${reason}`,
+      );
     }
+    setIsDeleting(false);
+    setPendingDelete(null);
+    refetch();
   };
 
   // Batch selection handlers
@@ -135,22 +152,9 @@ export default function MediaPage() {
     });
   };
 
-  const handleBatchDelete = async () => {
+  const handleBatchDelete = () => {
     if (selectedBatchIds.size === 0) return;
-    const count = selectedBatchIds.size;
-    if (!confirm(`Are you sure you want to delete ${count} selected media assets?`)) return;
-
-    setIsBatchDeleting(true);
-    try {
-      await Promise.all(Array.from(selectedBatchIds).map((id) => deleteMedia(id).unwrap()));
-      setSelectedBatchIds(new Set());
-      refetch();
-    } catch {
-      alert('Some items could not be deleted as they may be in use.');
-      refetch();
-    } finally {
-      setIsBatchDeleting(false);
-    }
+    setPendingDelete({ ids: Array.from(selectedBatchIds) });
   };
 
   const allSelectedOnPage = items.length > 0 && items.every((i) => selectedBatchIds.has(i.id));
@@ -172,6 +176,8 @@ export default function MediaPage() {
           browseLabel={t.media.browseLibrary || 'Browse Library'}
           uploadLabel={t.media.uploadTitle}
         />
+
+        <ActionNotice notice={notices.notice} onDismiss={notices.dismiss} />
 
         <MediaMetricsCards stats={stats} />
 
@@ -307,7 +313,22 @@ export default function MediaPage() {
         onSelectAllOnPage={handleSelectAllOnPage}
         onClearSelection={() => setSelectedBatchIds(new Set())}
         onDeleteSelected={handleBatchDelete}
-        isDeleting={isBatchDeleting}
+        isDeleting={isDeleting}
+      />
+
+      <ConfirmDialog
+        open={pendingDelete !== null}
+        title={
+          pendingDelete && pendingDelete.ids.length > 1
+            ? `Delete ${pendingDelete.ids.length} media items?`
+            : 'Delete this media item?'
+        }
+        description="Deleted media is removed from the library. Items still used by a post cannot be deleted and stay in place."
+        confirmLabel="Delete"
+        busyLabel="Deleting…"
+        isBusy={isDeleting}
+        onConfirm={() => void confirmDelete()}
+        onCancel={() => setPendingDelete(null)}
       />
     </ShellLayout>
   );

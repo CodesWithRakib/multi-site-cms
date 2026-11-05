@@ -724,6 +724,19 @@ describe('CMS Core (Posts, Publications, Taxonomy, Media, OCC & Tenant Isolation
       expect(pub.categoryIds).toContain(childCategoryId);
       expect(pub.tagIds).toContain(tagId);
     });
+
+    it('refuses to delete a category or tag that a publication uses, with 409 (not 500)', async () => {
+      const del = (path: string) =>
+        request(app.getHttpServer())
+          .delete(`/api/v1/sites/${siteTravelId}/${path}`)
+          .set('Cookie', travelAdminCookie)
+          .set('x-csrf-token', travelAdminCsrf);
+
+      const tagRes = await del(`tags/${tagId}`).expect(409);
+      expect((tagRes.body as ApiErrorResponse).error.code).toBe('CONFLICT');
+      const catRes = await del(`categories/${childCategoryId}`).expect(409);
+      expect((catRes.body as ApiErrorResponse).error.message).toMatch(/used by published content/);
+    });
   });
 
   describe('5. Media Metadata Foundation & Active Usage Deletion Protection', () => {

@@ -259,6 +259,16 @@ export class TaxonomyService {
       );
     }
 
+    // Checked here so the answer is a clear 409; the RESTRICT foreign key
+    // would otherwise surface as an internal error.
+    const [catUse] = (await this.dataSource.query(
+      `SELECT COUNT(*)::int AS "n" FROM "post_publication_categories" WHERE "category_id" = $1`,
+      [categoryId],
+    )) as Array<{ n: number }>;
+    if ((catUse?.n ?? 0) > 0) {
+      throw new ApiException(HttpStatus.CONFLICT, 'CONFLICT', 'category.inUse');
+    }
+
     await categoryRepo.remove(category);
 
     await this.auditService.record({
@@ -420,6 +430,14 @@ export class TaxonomyService {
 
     if (!tag) {
       throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'tag.notFound');
+    }
+
+    const [tagUse] = (await this.dataSource.query(
+      `SELECT COUNT(*)::int AS "n" FROM "post_publication_tags" WHERE "tag_id" = $1`,
+      [tagId],
+    )) as Array<{ n: number }>;
+    if ((tagUse?.n ?? 0) > 0) {
+      throw new ApiException(HttpStatus.CONFLICT, 'CONFLICT', 'tag.inUse');
     }
 
     await tagRepo.remove(tag);

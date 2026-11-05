@@ -264,8 +264,7 @@ function MediaDetailModalView({
               <button
                 type="button"
                 onClick={() => {
-                  if (confirm('Are you sure you want to delete this media asset?'))
-                    onDelete(asset.id);
+                  onDelete(asset.id);
                 }}
                 className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
               >

@@ -15,7 +15,14 @@ import {
 } from 'lucide-react';
 import { ShellLayout } from '@/components/shell';
 import { useAdmin } from '@/lib/admin-context';
-import { useCreateUserMutation, useAssignRoleMutation, useListSitesQuery } from '@/lib/cms-api';
+import {
+  useCreateUserMutation,
+  useAssignRoleMutation,
+  useListSitesQuery,
+  useGetEffectivePolicyQuery,
+} from '@/lib/cms-api';
+import { roleScope, type AssignableRoleKey } from '@/features/users/roles';
+import { apiErrorMessage } from '@/lib/api-error';
 
 export default function NewUserPage() {
   const router = useRouter();
@@ -25,15 +32,14 @@ export default function NewUserPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [initialRole, setInitialRole] = useState<
-    'none' | 'super_admin' | 'site_admin' | 'site_editor'
-  >('site_admin');
+  const [initialRole, setInitialRole] = useState<'none' | AssignableRoleKey>('admin');
   const [selectedSiteId, setSelectedSiteId] = useState<string>('');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const { data: sitesData } = useListSitesQuery();
   const [createUser, { isLoading: isCreating }] = useCreateUserMutation();
   const [assignRole, { isLoading: isAssigning }] = useAssignRoleMutation();
+  const { data: policy } = useGetEffectivePolicyQuery();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,40 +50,45 @@ export default function NewUserPage() {
       return;
     }
 
-    if (password.length < 8) {
-      setErrorMsg('Password must be at least 8 characters long.');
+    // Early hint only; the API enforces the platform password policy.
+    const minLength = policy?.passwordMinLength ?? 8;
+    if (password.length < minLength) {
+      setErrorMsg(`Password must be at least ${minLength} characters long.`);
       return;
     }
 
-    if (initialRole !== 'none' && initialRole !== 'super_admin' && !selectedSiteId) {
+    if (initialRole !== 'none' && roleScope(initialRole) === 'site' && !selectedSiteId) {
       setErrorMsg('Please select a site for site-scoped roles.');
       return;
     }
 
+    let createdUserId: string | null = null;
     try {
       const createdUser = await createUser({
         displayName: displayName.trim(),
         email: email.trim().toLowerCase(),
         password,
       }).unwrap();
+      createdUserId = createdUser.id;
 
       if (initialRole !== 'none') {
-        const isPlatform = initialRole === 'super_admin';
+        const scope = roleScope(initialRole);
         await assignRole({
           userId: createdUser.id,
           data: {
             roleKey: initialRole,
-            scopeType: isPlatform ? 'platform' : 'site',
-            siteId: isPlatform ? undefined : selectedSiteId || undefined,
+            scopeType: scope,
+            siteId: scope === 'site' ? selectedSiteId || undefined : undefined,
           },
         }).unwrap();
       }
 
       router.push(`/users/${createdUser.id}`);
     } catch (err: unknown) {
-      const apiErr = err as { data?: { error?: { message?: string } }; message?: string };
       setErrorMsg(
-        apiErr?.data?.error?.message || apiErr?.message || 'Failed to create administrator.',
+        createdUserId
+          ? `The account was created, but the role could not be assigned: ${apiErrorMessage(err, 'unknown error')}. Assign it from the user page.`
+          : apiErrorMessage(err, 'Failed to create the account.'),
       );
     }
   };
@@ -209,7 +220,7 @@ export default function NewUserPage() {
 
               <label
                 className={`flex items-start gap-3 p-3.5 rounded-xl border cursor-pointer transition-all ${
-                  initialRole === 'site_admin'
+                  initialRole === 'admin'
                     ? 'border-blue-500 bg-blue-50/30 dark:bg-blue-950/20'
                     : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/40'
                 }`}
@@ -217,9 +228,9 @@ export default function NewUserPage() {
                 <input
                   type="radio"
                   name="initialRole"
-                  value="site_admin"
-                  checked={initialRole === 'site_admin'}
-                  onChange={() => setInitialRole('site_admin')}
+                  value="admin"
+                  checked={initialRole === 'admin'}
+                  onChange={() => setInitialRole('admin')}
                   className="mt-1 text-blue-600 focus:ring-blue-500"
                 />
                 <div>

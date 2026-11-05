@@ -1,5 +1,6 @@
 'use client';
 
+import { ActionNotice } from '@/components/feedback';
 import { ShellLayout } from '@/components/shell';
 import { DeletePostDialog } from '@/features/posts/components/DeletePostDialog';
 import { PostsFilterBar } from '@/features/posts/components/PostsFilterBar';
@@ -8,7 +9,6 @@ import { PostsStatusTabs } from '@/features/posts/components/PostsStatusTabs';
 import { PostsTable } from '@/features/posts/components/PostsTable';
 import { PostsWorkspaceHeader } from '@/features/posts/components/PostsWorkspaceHeader';
 import { PublishingModal } from '@/features/posts/components/PublishingModal';
-import { WorkspaceNoticeBanner } from '@/features/posts/components/WorkspaceNoticeBanner';
 import { usePostsWorkspace } from '@/features/posts/hooks/usePostsWorkspace';
 import { useAdmin } from '@/lib/admin-context';
 
@@ -29,7 +29,7 @@ export default function PostsPage() {
           onRefresh={() => workspace.refetch()}
         />
 
-        <WorkspaceNoticeBanner notice={workspace.notice} onDismiss={workspace.dismissNotice} />
+        <ActionNotice notice={workspace.notice} onDismiss={workspace.dismissNotice} />
 
         <PostsStatsCards stats={workspace.stats} isLoading={workspace.isStatsLoading} />
 
