@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import type { PostPublicationItem } from '@multi-site-cms/types';
 
 import type { PublishingActionType } from '@/features/posts/components/PublishingModal';
@@ -24,6 +24,21 @@ export interface PostsStats {
   archived: number;
 }
 
+export interface PendingDelete {
+  postId: string;
+  title: string;
+}
+
+export interface WorkspaceNotice {
+  tone: 'success' | 'error';
+  text: string;
+}
+
+function errorMessage(err: unknown): string {
+  const message = (err as { message?: unknown } | null)?.message;
+  return typeof message === 'string' && message ? message : 'Server error';
+}
+
 export interface PublishingTarget {
   action: PublishingActionType;
   publication: PostPublicationItem;
@@ -42,7 +57,9 @@ export function usePostsWorkspace() {
   const [statusFilter, setStatusFilter] = useState('');
   const [page, setPage] = useState(1);
   const [publishingTarget, setPublishingTarget] = useState<PublishingTarget | null>(null);
-  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<PendingDelete | null>(null);
+  const [notice, setNotice] = useState<WorkspaceNotice | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const { data: sites = [] } = useListSitesQuery();
   const {
@@ -90,29 +107,39 @@ export function usePostsWorkspace() {
     title: string,
   ) => {
     setPublishingTarget({ action, publication, title });
-    setOpenDropdownId(null);
   };
 
   const submitPublicationForReview = async (publication: PostPublicationItem) => {
     try {
       await submitForReview({ siteId: publication.siteId, publicationId: publication.id }).unwrap();
+      setNotice({ tone: 'success', text: 'Submitted for review.' });
       refetch();
     } catch (err: unknown) {
-      const errorObj = err as { message?: string };
-      alert('Review submission failed: ' + (errorObj?.message || 'Server error'));
+      setNotice({ tone: 'error', text: `Review submission failed: ${errorMessage(err)}` });
     }
   };
 
-  const removePost = async (postId: string, title: string) => {
-    if (!confirm(`Are you sure you want to delete post "${title}"?`)) return;
+  /** Step 1: ask for confirmation (rendered as an AlertDialog). */
+  const removePost = (postId: string, title: string) => setPendingDelete({ postId, title });
+
+  /** Step 2: the user confirmed. */
+  const confirmDelete = async () => {
+    if (!pendingDelete) return;
+    const { postId, title } = pendingDelete;
+    setIsDeleting(true);
     try {
       await deletePost(postId).unwrap();
+      setNotice({ tone: 'success', text: `Deleted "${title}".` });
       refetch();
     } catch (err: unknown) {
-      const errorObj = err as { message?: string };
-      alert('Failed to delete post: ' + (errorObj?.message || 'Server error'));
+      setNotice({ tone: 'error', text: `Failed to delete post: ${errorMessage(err)}` });
+    } finally {
+      setIsDeleting(false);
+      setPendingDelete(null);
     }
   };
+
+  const dismissNotice = useCallback(() => setNotice(null), []);
 
   /** Any filter change returns to the first page. */
   const withPageReset =
@@ -148,9 +175,12 @@ export function usePostsWorkspace() {
     setStatusFilter: withPageReset(setStatusFilter),
     hasActiveFilters: Boolean(searchTerm || typeFilter || statusFilter),
     clearFilters,
-    openDropdownId,
-    toggleDropdown: (postId: string) =>
-      setOpenDropdownId((current) => (current === postId ? null : postId)),
+    pendingDelete,
+    isDeleting,
+    cancelDelete: () => setPendingDelete(null),
+    confirmDelete,
+    notice,
+    dismissNotice,
     publishingTarget,
     openPublishing,
     closePublishing: () => setPublishingTarget(null),

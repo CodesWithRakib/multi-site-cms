@@ -84,3 +84,16 @@ critical journeys.
 Only if the business confirms booking/payments are in scope. It requires new
 ADRs (customer identity, commerce domain model, payment provider, PCI scope),
 a merchant account, and sandbox credentials. Not estimated until then.
+
+## Phase 6 — Coverage and hardening backlog
+
+**Objective:** close the test gaps and debt carried over from Phases 2–4 (Phase 5
+is out of scope).
+
+- API tests for newsletter, users/roles, platform settings; fix what they expose.
+- Posts workspace: AlertDialog + notices instead of native dialogs (TD-13),
+  accessible actions menu that clears the phone tab bar (TD-15).
+- SVG asset sandbox CSP.
+- Decide whether platform settings are enforced or shown read-only (SEC-18).
+- Then: remaining admin page decompositions (TD-5), native dialogs on other
+  screens (TD-13), personal-data erasure (DB-5).

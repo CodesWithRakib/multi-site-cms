@@ -14,8 +14,6 @@ import { PostTypeBadge } from './PostTypeBadge';
 export interface PostListItemProps {
   readonly post: PostItem;
   readonly sites: SiteItem[];
-  readonly isMenuOpen: boolean;
-  readonly onToggleMenu: () => void;
   readonly onPublishingAction: (
     action: PublishingActionType,
     publication: PostPublicationItem,

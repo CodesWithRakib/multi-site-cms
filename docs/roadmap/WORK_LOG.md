@@ -248,3 +248,32 @@ owner decision.
 data-ownership (retention, cleanup); testing.md (server modes, CI); audit
 registers (TD-8/9/10/12/14 fixed, TD-15, DB-4 fixed, DB-6, dependency scan);
 PRODUCTION_READINESS 8.5/10; free-tier deployment (one API instance).
+
+## 2026-11-05 — Phase 6 (coverage and hardening backlog)
+
+**Baseline:** Phase 4 committed (`8588690`); tree clean.
+
+**Code changes (uncommitted):**
+
+- `posts/public-content.service.ts` — newsletter: atomic `INSERT … ON CONFLICT`,
+  message names the site, audit metadata without the email.
+- `users/users.service.ts` — last-Super-Admin checks inside a transaction with
+  `pg_advisory_xact_lock`; revoke from an inactive Super Admin allowed; roles
+  batch-loaded for the user list.
+- `settings/dto/update-platform-settings.dto.ts` — nested validated DTOs;
+  `settings.service.ts` merges only defined fields.
+- `media/media.controller.ts` — sandbox CSP for SVG.
+- Admin posts: `PostRowActions` on Radix `DropdownMenu`; `DeletePostDialog`,
+  `WorkspaceNoticeBanner`; hook without menu state or native dialogs.
+- Tests: `users-and-roles.e2e-spec.ts` (8), `platform-settings.e2e-spec.ts`
+  (12), newsletter block in `public-content.e2e-spec.ts` (7), SVG/PNG CSP
+  assertions, `e2e/admin-posts.spec.ts` (menu above tab bar, keyboard, delete
+  dialog cancel).
+
+**Verification:** format, lint, typecheck pass; tests: API 294, admin 19, ui 57,
+config 21, travel 21, air 13, validation 12, api-client 5, redux 3; integration
+67/67; Playwright posts + keyboard + accessibility 12/12 (dev servers). Lock
+test fails with the lock removed (mutation check), passes with it.
+
+**Found, not changed (owner decision):** SEC-18 — platform settings are stored
+but enforced nowhere.

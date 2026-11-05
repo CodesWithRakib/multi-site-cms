@@ -19,8 +19,6 @@ type PostsTableProps = Pick<
   | 'setPage'
   | 'totalPages'
   | 'totalPosts'
-  | 'openDropdownId'
-  | 'toggleDropdown'
   | 'openPublishing'
   | 'submitPublicationForReview'
   | 'removePost'
@@ -35,21 +33,17 @@ export function PostsTable({
   setPage,
   totalPages,
   totalPosts,
-  openDropdownId,
-  toggleDropdown,
   openPublishing,
   submitPublicationForReview,
   removePost,
 }: PostsTableProps) {
   const { t } = useAdmin();
 
-  const itemActions = (postId: string) => ({
-    isMenuOpen: openDropdownId === postId,
-    onToggleMenu: () => toggleDropdown(postId),
+  const itemActions = {
     onPublishingAction: openPublishing,
     onSubmitForReview: submitPublicationForReview,
     onDelete: removePost,
-  });
+  };
 
   return (
     <div className="rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs overflow-hidden">
@@ -88,7 +82,7 @@ export function PostsTable({
             aria-label={t.content.tableTitle || 'Posts'}
           >
             {displayPosts.map((post) => (
-              <PostCard key={post.id} post={post} sites={sites} {...itemActions(post.id)} />
+              <PostCard key={post.id} post={post} sites={sites} {...itemActions} />
             ))}
           </ul>
 
@@ -115,7 +109,7 @@ export function PostsTable({
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-xs">
                 {displayPosts.map((post) => (
-                  <PostTableRow key={post.id} post={post} sites={sites} {...itemActions(post.id)} />
+                  <PostTableRow key={post.id} post={post} sites={sites} {...itemActions} />
                 ))}
               </tbody>
             </table>

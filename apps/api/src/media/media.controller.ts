@@ -81,6 +81,15 @@ export class MediaController {
     res.setHeader('Content-Type', mimeType);
     res.setHeader('Content-Length', byteSize);
     res.setHeader('X-Content-Type-Options', 'nosniff');
+    if (mimeType === 'image/svg+xml') {
+      // SVG is a document that can carry script. Upload sanitizing is a regex
+      // pass, so opening the file directly is also sandboxed: no script, no
+      // same-origin access, styles only. <img> rendering is unaffected.
+      res.setHeader(
+        'Content-Security-Policy',
+        "default-src 'none'; style-src 'unsafe-inline'; img-src data:; sandbox",
+      );
+    }
     res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
     res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
     res.setHeader('Access-Control-Allow-Origin', '*');

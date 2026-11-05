@@ -1,8 +1,8 @@
 # Next Session
 
-## State at handoff (2026-11-05)
+## State at handoff (2026-11-05, Phase 6)
 
-- Phases 1–4 done in code. Phase 4 changes are **uncommitted**; the user commits.
+- Phases 1–4 done and committed. Phase 6 (coverage and hardening) in progress; its changes are **uncommitted**; the user commits.
 - Owner actions: rotate the Cloudinary secret (SEC-0) and any passwords set by
   the old admin seed (SEC-13); set `NEXT_PUBLIC_CONTACT_EMAIL`,
   `REVALIDATE_SECRET` (+ `SITE_REVALIDATE_URLS` locally); in production also
@@ -11,6 +11,7 @@
   databases with `pnpm --filter @multi-site-cms/api db:cleanup:generated-analytics`
   (dry run), then `--apply` after a backup. Dev DB: 4,468 of 4,468 page views
   are generated.
+- **Decision pending (SEC-18):** platform settings are stored but enforced nowhere. Option A: wire lockout/session/password/upload settings into auth and media (changes authentication behavior; needs approval). Option B (recommended first): make the settings page read-only with the real values and remove controls for features that do not exist (MFA, S3).
 - Dev database: `POSTGRES_PORT=5433 pnpm db:up`; all migrations applied.
 - Colors: edit `packages/ui/src/theme/site-themes.ts` only (ADR-0027).
 
@@ -25,12 +26,11 @@
 
 ## Exact next action
 
-1. After the owner pushes: check the first GitHub Actions run of `verify` and
-   `e2e`; fix anything environment-specific.
-2. API tests for newsletter, users/roles, settings (carried over from Phase 2).
-3. Decompose `sites/[siteId]`, `users/[userId]`, `sites` admin pages (TD-5).
-4. TD-15 (actions menu vs phone tab bar), TD-13 (native confirm/alert).
-5. Erasure procedure for personal data (DB-5) when legally required.
+1. Apply the owner's SEC-18 decision.
+2. Decompose `sites/[siteId]`, `users/[userId]`, `sites` admin pages (TD-5), replacing
+   their native dialogs on the way (TD-13; 24 calls remain).
+3. Check the first GitHub Actions run of `verify` and `e2e` after a push.
+4. DB-5 personal-data erasure procedure when legally required.
 
 Role, admin, accessibility and keyboard E2E need local accounts:
 `E2E_ADMIN_EMAIL/PASSWORD`, `E2E_SITE_ADMIN_EMAIL/PASSWORD` (never commit them).

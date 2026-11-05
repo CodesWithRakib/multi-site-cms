@@ -19,6 +19,17 @@ import { getInitializedRepository } from '../database/ensure-connected';
 import { PlatformSettingsEntity } from '../database/entities/platform-settings.entity';
 import type { UpdatePlatformSettingsDto } from './dto/update-platform-settings.dto';
 
+/**
+ * Fields that were actually sent. Validated DTO instances can carry unset
+ * optional fields as `undefined` own properties; spreading those would
+ * erase stored values in a partial update.
+ */
+function definedOnly<T extends object>(section: T): Partial<T> {
+  return Object.fromEntries(
+    Object.entries(section).filter(([, value]) => value !== undefined),
+  ) as Partial<T>;
+}
+
 interface CountResult {
   count?: string | number;
 }
@@ -115,23 +126,23 @@ export class SettingsService {
     const updatedSections: string[] = [];
 
     if (dto.general) {
-      entity.general = { ...entity.general, ...dto.general };
+      entity.general = { ...entity.general, ...definedOnly(dto.general) };
       updatedSections.push('general');
     }
     if (dto.security) {
-      entity.security = { ...entity.security, ...dto.security };
+      entity.security = { ...entity.security, ...definedOnly(dto.security) };
       updatedSections.push('security');
     }
     if (dto.media) {
-      entity.media = { ...entity.media, ...dto.media };
+      entity.media = { ...entity.media, ...definedOnly(dto.media) };
       updatedSections.push('media');
     }
     if (dto.publishing) {
-      entity.publishing = { ...entity.publishing, ...dto.publishing };
+      entity.publishing = { ...entity.publishing, ...definedOnly(dto.publishing) };
       updatedSections.push('publishing');
     }
     if (dto.maintenance) {
-      entity.maintenance = { ...entity.maintenance, ...dto.maintenance };
+      entity.maintenance = { ...entity.maintenance, ...definedOnly(dto.maintenance) };
       updatedSections.push('maintenance');
     }
 

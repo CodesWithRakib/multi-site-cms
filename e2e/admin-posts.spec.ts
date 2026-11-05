@@ -91,14 +91,55 @@ test('phones get a card list without sideways scrolling', async ({ browser }) =>
   );
   expect(overflow).toBeLessThanOrEqual(0);
 
-  // The actions menu of a card opens inside the viewport.
+  // The actions menu opens fully inside the viewport and clear of the bottom
+  // tab bar (TD-15), even for a card near the bottom of the screen.
   const card = cards.first();
-  await card.getByRole('button', { expanded: false }).last().click();
+  await card.getByRole('button', { name: /open actions/i }).click();
   const menu = page.getByRole('menu');
   await expect(menu).toBeVisible();
   const box = await menu.boundingBox();
   if (!box) throw new Error('Actions menu has no layout box.');
+  const TAB_BAR_HEIGHT = 56;
   expect(box.x).toBeGreaterThanOrEqual(0);
   expect(box.x + box.width).toBeLessThanOrEqual(390);
+  expect(box.y).toBeGreaterThanOrEqual(0);
+  expect(box.y + box.height).toBeLessThanOrEqual(844 - TAB_BAR_HEIGHT);
+  await context.close();
+});
+
+test('the actions menu works from the keyboard and delete asks first', async ({ browser }) => {
+  const context = await browser.newContext({
+    storageState: state,
+    viewport: { width: 1440, height: 900 },
+  });
+  const page = await context.newPage();
+  await page.goto(`${adminUrl}/posts`);
+  const rows = page.locator('table tbody tr');
+  await expect(rows.first().or(page.getByText(/no content found/i))).toBeVisible();
+  test.skip((await rows.count()) === 0, 'No posts in the development database.');
+
+  const trigger = rows.first().getByRole('button', { name: /open actions/i });
+  await trigger.focus();
+  await page.keyboard.press('Enter');
+  const menu = page.getByRole('menu');
+  await expect(menu).toBeVisible();
+  await expect(menu.getByRole('menuitem').first()).toBeFocused();
+
+  await page.keyboard.press('Escape');
+  await expect(menu).toBeHidden();
+  await expect(trigger).toBeFocused();
+
+  // Delete opens a confirmation dialog; cancelling changes nothing.
+  const totalBefore = await page.getByRole('navigation', { name: 'Pagination' }).count();
+  const firstTitle = await rows.first().getByRole('link').nth(0).innerText();
+  await trigger.click();
+  await menu.getByRole('menuitem', { name: /delete/i }).click();
+  const dialog = page.getByRole('alertdialog');
+  await expect(dialog).toBeVisible();
+  await expect(dialog).toContainText(firstTitle.trim());
+  await dialog.getByRole('button', { name: 'Cancel' }).click();
+  await expect(dialog).toBeHidden();
+  await expect(rows.first().getByRole('link').nth(0)).toHaveText(firstTitle);
+  expect(await page.getByRole('navigation', { name: 'Pagination' }).count()).toBe(totalBefore);
   await context.close();
 });

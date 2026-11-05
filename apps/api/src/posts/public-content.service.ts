@@ -19,7 +19,6 @@ import { DATA_SOURCE } from '../database/database.tokens';
 import { Category } from '../database/entities/category.entity';
 import { Event } from '../database/entities/event.entity';
 import { MediaAsset } from '../database/entities/media-asset.entity';
-import { NewsletterSubscriber } from '../database/entities/newsletter-subscriber.entity';
 import { PostPublicationCategory } from '../database/entities/post-publication-category.entity';
 import { PostPublicationTag } from '../database/entities/post-publication-tag.entity';
 import { PostPublication } from '../database/entities/post-publication.entity';
@@ -912,47 +911,36 @@ export class PublicContentService {
     requestInfo?: { ipAddress?: string | null; requestId?: string | null },
   ): Promise<{ subscribed: boolean; message: string }> {
     const site = await this.resolveSite(siteKey);
-    const subscriberRepo = await getInitializedRepository(this.dataSource, NewsletterSubscriber);
 
-    let subscriber = await subscriberRepo.findOne({
-      where: { siteId: site.id, email: dto.email },
-    });
+    // One atomic statement: concurrent identical requests cannot race into a
+    // unique-constraint error, and a repeat subscription is idempotent.
+    const rows = (await this.dataSource.query(
+      `INSERT INTO "newsletter_subscribers" ("site_id", "email", "status", "metadata")
+       VALUES ($1, $2, 'subscribed', '{"source":"public_web"}'::jsonb)
+       ON CONFLICT ("site_id", "email")
+       DO UPDATE SET "status" = 'subscribed', "updated_at" = now()
+       RETURNING "id"`,
+      [site.id, dto.email],
+    )) as Array<{ id: string }>;
 
-    if (subscriber) {
-      if (subscriber.status !== 'subscribed') {
-        subscriber.status = 'subscribed';
-        subscriber.updatedAt = new Date();
-        await subscriberRepo.save(subscriber);
-      }
-    } else {
-      subscriber = subscriberRepo.create({
-        siteId: site.id,
-        email: dto.email,
-        status: 'subscribed',
-        metadata: {
-          source: 'public_web',
-        },
-      });
-      await subscriberRepo.save(subscriber);
-    }
-
+    // The address itself stays out of the append-only audit log (personal
+    // data, DB-5); the subscriber id is enough to trace it.
     await this.auditService.record({
       actorType: 'system',
       siteId: site.id,
       action: 'newsletter.subscribed',
       entityType: 'newsletter_subscriber',
-      entityId: subscriber.id,
+      entityId: rows[0]?.id ?? null,
       requestId: requestInfo?.requestId ?? null,
       ipAddress: requestInfo?.ipAddress ?? null,
-      metadata: {
-        email: dto.email,
-        siteKey,
-      },
+      metadata: { siteKey },
     });
 
+    // Same answer whether or not the address was already subscribed, so the
+    // endpoint cannot be used to test which addresses are on the list.
     return {
       subscribed: true,
-      message: 'Thank you for subscribing to our travel newsletter!',
+      message: `Thank you for subscribing to ${site.name}!`,
     };
   }
 }

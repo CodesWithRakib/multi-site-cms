@@ -1,6 +1,6 @@
 # Phase Status
 
-Last updated: 2026-11-05
+Last updated: 2026-11-05 (Phase 6)
 
 | Phase                              | Status                                  | Evidence / blocker                                                                                                                                                             |
 | ---------------------------------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -10,8 +10,9 @@ Last updated: 2026-11-05
 | 3 — UX resilience                  | **Done (3a–3d)**                        | WCAG 2.2 AA: 0 serious/critical (axe, light+dark, public+admin); keyboard flows tested; `/posts` decomposed. E2E 51/51. Remaining page decompositions moved to Phase 4 backlog |
 | 4 — Production operations          | **Done in code; owner/CI checks open**  | API 267/267, integration 67/67, E2E full suite green on production builds locally. Open: first GitHub CI run, DB-6 cleanup decision, provider PITR drill                       |
 | 5 — Commerce                       | **Out of scope**                        | Business decision 2026-11-04                                                                                                                                                   |
+| 6 — Coverage and hardening backlog | **In progress**                         | API 294/294, integration 67/67, E2E posts/keyboard/axe 12/12. Open: SEC-18 decision, TD-5 decompositions, TD-13 other screens                                                  |
 
-Phases 1–3 are committed by the owner; Phase 4 changes are uncommitted.
+Phases 1–3 are committed by the owner; Phase 4 committed; Phase 6 changes are uncommitted.
 
 ## Phase 1 checklist
 
@@ -74,3 +75,16 @@ Phases 1–3 are committed by the owner; Phase 4 changes are uncommitted.
 - [ ] API tests for newsletter, users/roles, settings (carried over)
 - [ ] Decompose `sites/[siteId]`, `users/[userId]`, `sites` pages (carried over)
 - [ ] TD-15 post actions menu can sit behind the phone tab bar
+
+## Phase 6 checklist
+
+- [x] Newsletter API tests (7): site-named message (Air Sports showed "travel newsletter"), atomic upsert, no email in audit log, throttle (DB-7)
+- [x] Users/roles API tests (8): validation, role scoping, session revocation, last-Super-Admin invariant (SEC-15 race fixed, lock test proven by mutation), revoke from inactive Super Admin (false refusal fixed); N+1 removed
+- [x] Platform settings API tests (12): Super Admin only, partial update keeps fields, nested validation (SEC-16)
+- [x] SVG sandbox CSP (SEC-17)
+- [x] TD-13 `/posts`: AlertDialog + notice; TD-15 Radix menu above the tab bar (E2E)
+- [ ] SEC-18 platform settings enforced nowhere (**owner decision**)
+- [ ] TD-5 decompose `sites/[siteId]`, `users/[userId]`, `sites` pages
+- [ ] TD-13 remaining 24 native dialogs
+- [ ] DB-5 personal-data erasure procedure
+- [ ] DB-6 cleanup `--apply` (**owner decision**, carried from Phase 4)

@@ -1,12 +1,14 @@
 'use client';
 
 import { ShellLayout } from '@/components/shell';
+import { DeletePostDialog } from '@/features/posts/components/DeletePostDialog';
 import { PostsFilterBar } from '@/features/posts/components/PostsFilterBar';
 import { PostsStatsCards } from '@/features/posts/components/PostsStatsCards';
 import { PostsStatusTabs } from '@/features/posts/components/PostsStatusTabs';
 import { PostsTable } from '@/features/posts/components/PostsTable';
 import { PostsWorkspaceHeader } from '@/features/posts/components/PostsWorkspaceHeader';
 import { PublishingModal } from '@/features/posts/components/PublishingModal';
+import { WorkspaceNoticeBanner } from '@/features/posts/components/WorkspaceNoticeBanner';
 import { usePostsWorkspace } from '@/features/posts/hooks/usePostsWorkspace';
 import { useAdmin } from '@/lib/admin-context';
 
@@ -26,6 +28,8 @@ export default function PostsPage() {
           isFetching={workspace.isFetching}
           onRefresh={() => workspace.refetch()}
         />
+
+        <WorkspaceNoticeBanner notice={workspace.notice} onDismiss={workspace.dismissNotice} />
 
         <PostsStatsCards stats={workspace.stats} isLoading={workspace.isStatsLoading} />
 
@@ -51,6 +55,13 @@ export default function PostsPage() {
 
         <PostsTable {...workspace} />
       </div>
+
+      <DeletePostDialog
+        target={workspace.pendingDelete}
+        isDeleting={workspace.isDeleting}
+        onCancel={workspace.cancelDelete}
+        onConfirm={() => void workspace.confirmDelete()}
+      />
 
       {publishingTarget && (
         <PublishingModal

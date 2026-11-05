@@ -34,6 +34,7 @@ import { Tag } from '../../src/database/entities/tag.entity';
 import { UserRoleAssignment } from '../../src/database/entities/user-role-assignment.entity';
 import { User } from '../../src/database/entities/user.entity';
 import { PostsService } from '../../src/posts/posts.service';
+import { PublicContentService } from '../../src/posts/public-content.service';
 import { createTestDataSource, resetTestSchema } from '../database/test-database';
 
 describe('Public Content Discovery API (/api/v1/public/sites/:siteKey/*)', () => {
@@ -656,6 +657,77 @@ describe('Public Content Discovery API (/api/v1/public/sites/:siteKey/*)', () =>
           content: 'Should not be stored.',
         }),
       ).rejects.toThrow(/FK_post_comments_publication_site/);
+    });
+  });
+
+  describe('POST /api/v1/public/sites/:siteKey/newsletter', () => {
+    // The route allows five requests per minute per client; these tests send
+    // exactly five, then prove the sixth is refused.
+    const subscribe = (siteKey: string, email: unknown) =>
+      request(app.getHttpServer())
+        .post(`/api/v1/public/sites/${siteKey}/newsletter`)
+        .send({ email });
+
+    const subscribersOf = (siteId: string) =>
+      dataSource.query(
+        `SELECT "email", "status" FROM "newsletter_subscribers" WHERE "site_id" = $1 ORDER BY "email"`,
+        [siteId],
+      ) as Promise<Array<{ email: string; status: string }>>;
+
+    it('subscribes with a message naming the site, normalizing the address', async () => {
+      const res = await subscribe('air-sports', '  Pilot@Example.COM ').expect(200);
+      expect((res.body as ApiSuccess<{ message: string }>).data).toEqual({
+        subscribed: true,
+        message: 'Thank you for subscribing to SkyPulse Live Updates!',
+      });
+      expect(await subscribersOf(siteAirSportsId)).toEqual([
+        { email: 'pilot@example.com', status: 'subscribed' },
+      ]);
+    });
+
+    it('answers a repeat subscription identically and keeps one row', async () => {
+      const res = await subscribe('air-sports', 'pilot@example.com').expect(200);
+      expect((res.body as ApiSuccess<{ subscribed: boolean }>).data.subscribed).toBe(true);
+      expect(await subscribersOf(siteAirSportsId)).toHaveLength(1);
+    });
+
+    it('keeps lists separate per site', async () => {
+      const res = await subscribe('travel-blog', 'pilot@example.com').expect(200);
+      expect((res.body as ApiSuccess<{ message: string }>).data.message).toContain(
+        'Wanderlust Chronicles',
+      );
+      expect(await subscribersOf(siteTravelId)).toHaveLength(1);
+    });
+
+    it('rejects an invalid address and an unknown site', async () => {
+      await subscribe('travel-blog', 'not-an-email').expect(400);
+      await subscribe('no-such-site', 'reader@example.com').expect(404);
+    });
+
+    it('throttles the sixth request within a minute', async () => {
+      await subscribe('travel-blog', 'late@example.com').expect(429);
+    });
+
+    it('never writes the address into the audit log', async () => {
+      const rows = (await dataSource.query(
+        `SELECT "metadata" FROM "audit_events" WHERE "action" = 'newsletter.subscribed'`,
+      )) as Array<{ metadata: Record<string, unknown> }>;
+      expect(rows.length).toBeGreaterThan(0);
+      expect(JSON.stringify(rows)).not.toContain('pilot@example.com');
+    });
+
+    it('stays consistent under concurrent identical subscriptions', async () => {
+      const service = app.get(PublicContentService);
+      const results = await Promise.all(
+        Array.from({ length: 5 }, () =>
+          service.subscribeNewsletter('travel-blog', { email: 'race@example.com' }),
+        ),
+      );
+      expect(results.every((result) => result.subscribed)).toBe(true);
+      const rows = (await subscribersOf(siteTravelId)).filter(
+        (row) => row.email === 'race@example.com',
+      );
+      expect(rows).toHaveLength(1);
     });
   });
 });

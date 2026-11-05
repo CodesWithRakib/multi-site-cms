@@ -257,6 +257,8 @@ describe('Media Upload & Storage System', () => {
       expect(res.headers['cache-control']).toContain('public');
       expect(res.headers['content-disposition']).toContain('inline');
       expect(res.body).toEqual(validPngBuffer);
+      // Raster images keep the default policy; only SVG is sandboxed.
+      expect(String(res.headers['content-security-policy'])).not.toContain('sandbox');
     });
 
     it('rejects an executable file disguised as a JPEG (magic byte spoof check)', async () => {
@@ -309,6 +311,11 @@ describe('Media Upload & Storage System', () => {
       expect(content).not.toContain('onload=');
       expect(content).not.toContain('javascript:');
       expect(content).toContain('<circle');
+      // Defense in depth: opened directly, the SVG runs sandboxed without script.
+      const csp = String(streamRes.headers['content-security-policy']);
+      expect(csp).toContain('sandbox');
+      expect(csp).toContain("default-src 'none'");
+      expect(csp).not.toContain('script-src');
     });
 
     it('enforces tenant isolation: Air Sports admin cannot upload media to Travel Blog site', async () => {

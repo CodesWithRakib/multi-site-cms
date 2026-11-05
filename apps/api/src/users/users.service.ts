@@ -1,6 +1,6 @@
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import type { PaginatedResult, UserItem, UserRoleSummary } from '@multi-site-cms/types';
-import { type DataSource, type Repository } from 'typeorm';
+import { In, type DataSource, type EntityManager, type Repository } from 'typeorm';
 
 import { PasswordService } from '../auth/services/password.service';
 import { SessionService } from '../auth/services/session.service';
@@ -17,6 +17,13 @@ import { type AssignRoleDto } from './dto/assign-role.dto';
 import { type CreateUserDto } from './dto/create-user.dto';
 import { type ListUsersQueryDto } from './dto/list-users-query.dto';
 import { type UpdateUserDto } from './dto/update-user.dto';
+
+/**
+ * Advisory lock serializing every change that can reduce the number of active
+ * Super Admins. Without it, two concurrent requests could each see "two
+ * remain", both proceed, and leave the platform with none.
+ */
+const SUPER_ADMIN_INVARIANT_LOCK = 7_316_002;
 
 @Injectable()
 export class UsersService {
@@ -59,10 +66,23 @@ export class UsersService {
 
     const [users, total] = await qb.getManyAndCount();
 
-    const userItems = await Promise.all(users.map((u) => this.toUserItem(u)));
+    // Roles of every user on the page in one query (was one query per user).
+    const assignmentRepo = await this.getAssignmentRepo();
+    const assignments =
+      users.length > 0
+        ? await assignmentRepo.find({
+            where: { userId: In(users.map((u) => u.id)) },
+            relations: { role: true },
+          })
+        : [];
 
     return {
-      items: userItems,
+      items: users.map((u) =>
+        this.toUserItem(
+          u,
+          assignments.filter((a) => a.userId === u.id),
+        ),
+      ),
       total,
       page,
       limit,
@@ -76,7 +96,7 @@ export class UsersService {
     if (!user) {
       throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'user.notFound');
     }
-    return this.toUserItem(user);
+    return this.loadUserItem(user);
   }
 
   async createUser(
@@ -120,7 +140,7 @@ export class UsersService {
       metadata: { email: user.email, status: user.status },
     });
 
-    return this.toUserItem(user);
+    return this.loadUserItem(user);
   }
 
   async updateUser(
@@ -129,44 +149,40 @@ export class UsersService {
     actorContext: EffectiveAuthContext,
     requestId?: string,
   ): Promise<UserItem> {
-    const userRepo = await this.getUserRepo();
-    const user = await userRepo.findOne({ where: { id } });
-    if (!user) {
-      throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'user.notFound');
-    }
+    // Hash outside the transaction: it is slow and needs no database state.
+    const newPasswordHash = dto.password ? await this.passwordService.hash(dto.password) : null;
 
-    // Invariant: cannot deactivate/suspend the last active Super Admin
-    if (
-      dto.status &&
-      dto.status !== 'active' &&
-      user.status === 'active' &&
-      (await this.isUserSuperAdmin(user.id))
-    ) {
-      const activeSuperAdminCount = await this.countActiveSuperAdmins();
-      if (activeSuperAdminCount <= 1) {
-        throw new ApiException(HttpStatus.BAD_REQUEST, 'VALIDATION_ERROR', 'auth.lastSuperAdmin');
+    const user = await this.dataSource.transaction(async (manager) => {
+      const users = manager.getRepository(User);
+      const target = await users.findOne({ where: { id } });
+      if (!target) {
+        throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'user.notFound');
       }
-    }
 
-    if (dto.displayName !== undefined) {
-      user.displayName = dto.displayName.trim();
-    }
-
-    if (dto.status !== undefined) {
-      user.status = dto.status;
-      if (dto.status !== 'active') {
-        // Immediately revoke all active sessions
-        await this.sessionService.revokeAllUserSessions(user.id);
+      // Invariant: the last active Super Admin cannot be deactivated.
+      const deactivating =
+        dto.status !== undefined && dto.status !== 'active' && target.status === 'active';
+      if (deactivating && (await this.isUserSuperAdmin(manager, target.id))) {
+        await this.assertAnotherActiveSuperAdmin(manager);
       }
-    }
 
-    if (dto.password) {
-      user.passwordHash = await this.passwordService.hash(dto.password);
-      // Revoke sessions to require re-login with new password
+      if (dto.displayName !== undefined) {
+        target.displayName = dto.displayName.trim();
+      }
+      if (dto.status !== undefined) {
+        target.status = dto.status;
+      }
+      if (newPasswordHash) {
+        target.passwordHash = newPasswordHash;
+      }
+
+      return users.save(target);
+    });
+
+    // A deactivated account or a changed password must sign in again.
+    if ((dto.status !== undefined && dto.status !== 'active') || newPasswordHash) {
       await this.sessionService.revokeAllUserSessions(user.id);
     }
-
-    await userRepo.save(user);
 
     await this.auditService.record({
       actorId: actorContext.user.id,
@@ -180,7 +196,7 @@ export class UsersService {
       },
     });
 
-    return this.toUserItem(user);
+    return this.loadUserItem(user);
   }
 
   async assignRole(
@@ -247,7 +263,6 @@ export class UsersService {
         siteId: dto.siteId ?? null,
         createdBy: actorContext.user.id,
       });
-
       await assignmentRepo.save(assignment);
 
       await this.auditService.record({
@@ -267,7 +282,7 @@ export class UsersService {
       });
     }
 
-    return this.toUserItem(user);
+    return this.loadUserItem(user);
   }
 
   async revokeRole(
@@ -276,37 +291,36 @@ export class UsersService {
     actorContext: EffectiveAuthContext,
     requestId?: string,
   ): Promise<UserItem> {
-    const userRepo = await this.getUserRepo();
-    const assignmentRepo = await this.getAssignmentRepo();
+    const { user, assignment } = await this.dataSource.transaction(async (manager) => {
+      const target = await manager.getRepository(User).findOne({ where: { id: userId } });
+      if (!target) {
+        throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'user.notFound');
+      }
 
-    const user = await userRepo.findOne({ where: { id: userId } });
-    if (!user) {
-      throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'user.notFound');
-    }
+      const assignments = manager.getRepository(UserRoleAssignment);
+      const found = await assignments.findOne({
+        where: { id: assignmentId, userId: target.id },
+        relations: { role: true },
+      });
+      if (!found) {
+        throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'role.assignmentNotFound');
+      }
 
-    const assignment = await assignmentRepo.findOne({
-      where: { id: assignmentId, userId: user.id },
-      relations: { role: true },
+      if (found.role.key === 'super_admin') {
+        // Invariant: only a Super Admin can revoke a super_admin role.
+        if (!actorContext.isSuperAdmin) {
+          throw new ApiException(HttpStatus.FORBIDDEN, 'FORBIDDEN', 'auth.roleNotAssignable');
+        }
+        // Invariant: the last active Super Admin keeps the role. Revoking it
+        // from an inactive account never reduces the active count.
+        if (target.status === 'active') {
+          await this.assertAnotherActiveSuperAdmin(manager);
+        }
+      }
+
+      await assignments.delete(found.id);
+      return { user: target, assignment: found };
     });
-
-    if (!assignment) {
-      throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'role.assignmentNotFound');
-    }
-
-    // Invariant: Only Super Admin can revoke a super_admin role
-    if (assignment.role.key === 'super_admin') {
-      if (!actorContext.isSuperAdmin) {
-        throw new ApiException(HttpStatus.FORBIDDEN, 'FORBIDDEN', 'auth.roleNotAssignable');
-      }
-
-      // Invariant: cannot remove the last active Super Admin
-      const activeSuperAdminCount = await this.countActiveSuperAdmins();
-      if (activeSuperAdminCount <= 1) {
-        throw new ApiException(HttpStatus.BAD_REQUEST, 'VALIDATION_ERROR', 'auth.lastSuperAdmin');
-      }
-    }
-
-    await assignmentRepo.delete(assignment.id);
 
     await this.auditService.record({
       actorId: actorContext.user.id,
@@ -323,12 +337,24 @@ export class UsersService {
       },
     });
 
-    return this.toUserItem(user);
+    return this.loadUserItem(user);
   }
 
-  private async isUserSuperAdmin(userId: string): Promise<boolean> {
-    const assignmentRepo = await this.getAssignmentRepo();
-    const assignment = await assignmentRepo
+  /**
+   * Fails unless at least one other active Super Admin remains. Takes the
+   * invariant lock first, so the count reflects every concurrent change that
+   * committed before this transaction got the lock.
+   */
+  private async assertAnotherActiveSuperAdmin(manager: EntityManager): Promise<void> {
+    await manager.query('SELECT pg_advisory_xact_lock($1)', [SUPER_ADMIN_INVARIANT_LOCK]);
+    if ((await this.countActiveSuperAdmins(manager)) <= 1) {
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'VALIDATION_ERROR', 'auth.lastSuperAdmin');
+    }
+  }
+
+  private async isUserSuperAdmin(manager: EntityManager, userId: string): Promise<boolean> {
+    const assignment = await manager
+      .getRepository(UserRoleAssignment)
       .createQueryBuilder('ura')
       .innerJoin('ura.role', 'role')
       .where('ura.userId = :userId', { userId })
@@ -338,26 +364,27 @@ export class UsersService {
     return Boolean(assignment);
   }
 
-  private async countActiveSuperAdmins(): Promise<number> {
-    const assignmentRepo = await this.getAssignmentRepo();
-    const count = await assignmentRepo
+  private async countActiveSuperAdmins(manager: EntityManager): Promise<number> {
+    return manager
+      .getRepository(UserRoleAssignment)
       .createQueryBuilder('ura')
       .innerJoin('ura.role', 'role')
       .innerJoin('ura.user', 'user')
       .where('role.key = :key', { key: 'super_admin' })
       .andWhere('user.status = :status', { status: 'active' })
       .getCount();
-
-    return count;
   }
 
-  private async toUserItem(user: User): Promise<UserItem> {
+  private async loadUserItem(user: User): Promise<UserItem> {
     const assignmentRepo = await this.getAssignmentRepo();
     const assignments = await assignmentRepo.find({
       where: { userId: user.id },
       relations: { role: true },
     });
+    return this.toUserItem(user, assignments);
+  }
 
+  private toUserItem(user: User, assignments: UserRoleAssignment[]): UserItem {
     const roles: UserRoleSummary[] = assignments.map((a) => ({
       assignmentId: a.id,
       roleId: a.role.id,
