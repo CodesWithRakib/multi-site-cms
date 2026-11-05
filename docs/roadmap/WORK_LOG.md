@@ -362,3 +362,26 @@ phone, intended accounts.
 travel 23, air 13, config 21, validation 12, api-client 5, redux 3;
 integration 71/71. Travel blog builds in 51 s with an unreachable API. Admin
 production build proxies login correctly (cookies host-only).
+
+## 2026-11-05 — Phase 9 (part 2: final URLs, launch content)
+
+- Final URLs: admin `rakib-studio`, travel `shomik-travel-blog`, air
+  `shomik-air-sports` (`.vercel.app`); API `multi-site-cms.onrender.com`.
+  All `.env.prod` files updated (git-ignored); API production env validates.
+- Admin: hardcoded `localhost:5001/5002` links removed (post editor "View
+  live", dashboard "Open live sites"); live links come from each site's
+  verified primary domain (`publicationLiveUrl` uses `primaryDomainUrl`).
+- Launch content: `seeds/production/bangladesh-content.ts` (8 travel guides on
+  Bangladesh, 5 air-sports guides; editorial rules in the file header),
+  `seed-production-content.ts` (sites, verified primary domains from
+  `SITE_REVALIDATE_URLS`, taxonomy, illustrated SVG covers uploaded to storage,
+  published articles; idempotent), CLI `seed:production-content --confirm`.
+- Fix: the API no longer loads the development `.env` when
+  `NODE_ENV=production` (local operator commands were picking up development
+  Cloudinary credentials). Cloudinary round trip verified on the production
+  cloud; test assets deleted.
+- Turborepo strict env: build and test variables declared in `turbo.json`
+  (CI tests and Vercel build-time variables were being dropped).
+
+Verification: format, lint, typecheck; tests API 311, admin 31, ui 59, travel
+23, air 13, config 21, validation 12, api-client 5, redux 3; integration 73/73.

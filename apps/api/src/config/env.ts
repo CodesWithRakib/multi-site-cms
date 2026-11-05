@@ -3,7 +3,11 @@ import { z } from 'zod';
 
 // Load local development values before validation. Hosting platforms inject
 // environment variables directly, so a missing file is expected in production.
-if (existsSync('.env')) {
+// Never in production: an operator running a command locally with
+// `node --env-file=.env.prod` would otherwise get any variable missing from
+// .env.prod (e.g. development Cloudinary credentials) filled in from the
+// development .env, silently mixing environments.
+if (process.env.NODE_ENV !== 'production' && existsSync('.env')) {
   process.loadEnvFile('.env');
 }
 

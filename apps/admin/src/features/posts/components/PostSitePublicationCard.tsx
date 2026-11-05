@@ -7,6 +7,7 @@ import type { PostPublicationItem, PublicationStatus, SiteItem } from '@multi-si
 import { useListCategoriesQuery } from '@/lib/cms-api';
 import type { PublishingActionType } from './PublishingModal';
 import { PublicationStatusActions } from './PublicationStatusActions';
+import { publicationLiveUrl } from '../utils/post-display';
 
 export interface SitePubConfig {
   enabled: boolean;
@@ -37,11 +38,7 @@ export function PostSitePublicationCard({
     skip: !config.enabled,
   });
 
-  const getPublicSiteUrl = (siteKey: string, slug: string) => {
-    if (siteKey === 'air-sports') return `http://localhost:5002/articles/${slug}`;
-    if (siteKey === 'travel-blog') return `http://localhost:5001/articles/${slug}`;
-    return `http://localhost:5001/articles/${slug}`;
-  };
+  const liveUrl = publicationLiveUrl(site, existingPub ?? undefined);
 
   return (
     <div
@@ -66,9 +63,9 @@ export function PostSitePublicationCard({
           </span>
         </label>
         <div className="flex items-center gap-2">
-          {existingPub && existingPub.status === 'published' && (
+          {existingPub && existingPub.status === 'published' && liveUrl && (
             <Link
-              href={getPublicSiteUrl(site.key, existingPub.slug)}
+              href={liveUrl}
               target="_blank"
               rel="noreferrer"
               className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 hover:underline"

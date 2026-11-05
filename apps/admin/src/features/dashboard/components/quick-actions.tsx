@@ -4,10 +4,15 @@ import React from 'react';
 import Link from 'next/link';
 import { Pencil, Globe, BarChart2, ExternalLink, ArrowRight } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@multi-site-cms/ui';
+import { primaryDomainUrl } from '@/features/sites/utils/site-url';
 import { useAdmin } from '@/lib/admin-context';
 
 export function QuickActions() {
-  const { t } = useAdmin();
+  const { t, availableSites } = useAdmin();
+  const liveSites = availableSites.flatMap((site) => {
+    const url = primaryDomainUrl(site.domains ?? []);
+    return url ? [{ id: site.id, name: site.name, url }] : [];
+  });
 
   return (
     <Card className="rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs h-full">
@@ -53,16 +58,24 @@ export function QuickActions() {
           <span>{t('dashboard.viewAnalytics')}</span>
         </Link>
 
-        {/* 4. Open Live Sites */}
-        <a
-          href="http://localhost:5001"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="w-full py-3 px-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 font-semibold text-xs flex items-center justify-center gap-2.5 shadow-2xs transition-all"
-        >
-          <ExternalLink className="size-4 text-slate-500 dark:text-slate-400" />
-          <span>{t('dashboard.openLiveSites')}</span>
-        </a>
+        {/* 4. Open live sites: one link per site with a verified primary domain. */}
+        {liveSites.map((site) => (
+          <a
+            key={site.id}
+            href={site.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full py-3 px-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 font-semibold text-xs flex items-center justify-center gap-2.5 shadow-2xs transition-all"
+          >
+            <ExternalLink
+              className="size-4 text-slate-500 dark:text-slate-400"
+              aria-hidden="true"
+            />
+            <span>
+              {t('dashboard.openLiveSites')}: {site.name}
+            </span>
+          </a>
+        ))}
       </CardContent>
     </Card>
   );

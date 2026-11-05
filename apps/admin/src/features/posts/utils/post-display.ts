@@ -1,5 +1,7 @@
 import type { PostItem, PostPublicationItem, SiteItem } from '@multi-site-cms/types';
 
+import { primaryDomainUrl } from '@/features/sites/utils/site-url';
+
 /** Most advanced first; mirrors `effectiveStatusSql` in the API. */
 const STATUS_PRECEDENCE = ['published', 'scheduled', 'in_review', 'draft'];
 
@@ -51,9 +53,9 @@ export function publicationLiveUrl(
   publication: PostPublicationItem | undefined,
 ): string | null {
   if (!site || !publication?.slug) return null;
-  const hostname =
-    site.domains?.find((domain) => domain.isPrimary)?.hostname ?? site.domains?.[0]?.hostname;
-  return hostname ? `https://${hostname}/articles/${publication.slug}` : null;
+  // Same rule as the site screens: only a verified, active primary domain.
+  const origin = primaryDomainUrl(site.domains ?? []);
+  return origin ? `${origin}/articles/${publication.slug}` : null;
 }
 
 /** Up to two initials from a display name, for the avatar circle. */

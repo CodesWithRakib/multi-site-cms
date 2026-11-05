@@ -57,8 +57,14 @@ values are compiled into the bundle: changing them needs a redeploy.
    SUPER_ADMIN_PASSWORD='<typed here>' node --env-file=.env.prod dist/database/cli/bootstrap-super-admin.js
    ```
    Then clear the shell history line that contains the password.
-5. Sign in to the admin, create the sites (keys `travel-blog`, `air-sports`),
-   then other users (e.g. site Admins) from Users → Add user.
+5. Seed the launch content (sites, verified primary domains from
+   `SITE_REVALIDATE_URLS`, taxonomy, 13 articles for readers in Bangladesh with
+   illustrated covers uploaded to Cloudinary). Idempotent; safe to re-run:
+   ```bash
+   cd apps/api && pnpm build
+   node --env-file=.env.prod dist/database/cli/seed-production-content.js --confirm
+   ```
+   Then add other users (e.g. site Admins) from Users → Add user.
 6. Monitoring and keep-alive: UptimeRobot (free) HTTP monitor on
    `/api/v1/health` every 5 minutes with email alerts; optionally set the
    GitHub repository variable `API_HEALTH_URL` to enable
@@ -95,3 +101,9 @@ silently empty there (locally it may still "work" through defaults). Declare:
 
 Runtime-only server variables (e.g. `REVALIDATE_SECRET` in a route handler)
 come from the hosting platform at request time and need no declaration.
+
+## Local operator commands
+
+With `NODE_ENV=production` the API does not read the development `.env`, so
+`node --env-file=.env.prod …` uses production values only (previously, missing
+keys such as Cloudinary credentials were filled in from development).

@@ -15,8 +15,18 @@ const pub = (siteId: string, status: string, slug = 'hidden-fjords') =>
 const post = (publications: PostPublicationItem[], status = 'draft') =>
   ({ id: 'p1', status, type: 'travel_guide', publications }) as unknown as PostItem;
 
-const site = (domains: Array<{ hostname: string; isPrimary: boolean }>) =>
-  ({ id: 's1', key: 'travel-blog', name: 'Travel', domains }) as unknown as SiteItem;
+const site = (domains: Array<{ hostname: string; isPrimary: boolean; verified?: boolean }>) =>
+  ({
+    id: 's1',
+    key: 'travel-blog',
+    name: 'Travel',
+    domains: domains.map((d) => ({
+      hostname: d.hostname,
+      isPrimary: d.isPrimary,
+      status: 'active',
+      verifiedAt: d.verified === false ? null : '2026-11-01T00:00:00.000Z',
+    })),
+  }) as unknown as SiteItem;
 
 describe('displayedPublication / effectiveStatus', () => {
   it('uses the active site publication when a site is selected', () => {
@@ -59,6 +69,12 @@ describe('publicationLiveUrl', () => {
 
   it('never invents a domain (regression: "<key>.yourdomain.com")', () => {
     expect(publicationLiveUrl(site([]), pub('s1', 'published'))).toBeNull();
+    expect(
+      publicationLiveUrl(
+        site([{ hostname: 'unverified.example.org', isPrimary: true, verified: false }]),
+        pub('s1', 'published'),
+      ),
+    ).toBeNull();
     expect(publicationLiveUrl(undefined, pub('s1', 'published'))).toBeNull();
   });
 });
