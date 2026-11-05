@@ -18,6 +18,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { MEDIA_UPLOAD_HARD_LIMIT_BYTES } from '../settings/platform-policy';
 import { ApiConsumes, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import type { MediaAssetItem, MediaUploadResponse, PaginatedResult } from '@multi-site-cms/types';
@@ -39,7 +40,11 @@ export class MediaController {
 
   @Post('upload')
   @RequirePermissions('media:upload')
-  @UseInterceptors(FileInterceptor('file'))
+  // Hard ceiling before the file is buffered in memory; the settings limit
+  // (never above this) is applied in the service.
+  @UseInterceptors(
+    FileInterceptor('file', { limits: { fileSize: MEDIA_UPLOAD_HARD_LIMIT_BYTES, files: 1 } }),
+  )
   @ApiConsumes('multipart/form-data')
   @ApiOperation({ summary: 'Upload a binary media asset file' })
   @ApiResponse({ status: 201, description: 'Media file uploaded and asset created' })

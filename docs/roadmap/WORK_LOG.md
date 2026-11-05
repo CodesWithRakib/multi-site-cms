@@ -277,3 +277,36 @@ test fails with the lock removed (mutation check), passes with it.
 
 **Found, not changed (owner decision):** SEC-18 — platform settings are stored
 but enforced nowhere.
+
+## 2026-11-05 — Phase 7 (enforced platform settings)
+
+**Owner decisions:** wire platform settings into auth/media (approved); delete
+generated analytics on the dev DB (approved).
+
+**Data:** dev DB `analytics_page_views` backed up (`/tmp/analytics_before_cleanup.dump`
+in the Postgres container), dry run 4,468, `--apply` deleted 4,468; table now empty.
+
+**Code changes (uncommitted):**
+
+- API: `settings/platform-policy.ts` (policy, clamping, safe defaults, password
+  rule), `SettingsService.getPolicy()` (15 s cache, invalidated on save),
+  `GET /settings/policy`; DTO without MFA/registration/S3/WebP, audit ≥ 365;
+  mapper exposes documented fields only; audit IP from `req.ip`.
+- Auth: lockout from policy with atomic counter; session TTL/idle from policy,
+  checked against session age; cookie max-age from the session.
+- Users: password policy on create/update. Media: settings size/types on
+  upload and registration; multer 100 MB limit. Posts: default status, preview
+  TTL, revision pruning. Retention: audit days from settings; env var removed.
+- Types/validation: `EffectivePlatformPolicy`; removed unimplemented fields.
+- Admin: settings forms without unimplemented controls; audit options ≥ 1 year;
+  `useGetEffectivePolicyQuery`; `AutosaveScheduler` + `maxWaitMs`; diagnostics
+  placeholder no longer claims Cloudinary.
+- UI: `MaintenanceBanner`. Sites: `SiteMaintenanceBanner` in both layouts.
+- Tests: `platform-policy.e2e-spec.ts` (6), `test/unit/platform-policy.spec.ts`
+  (6), `autosave-scheduler.test.ts` (3), `maintenance-banner.test.tsx` (2),
+  OpenAPI path list.
+
+**Verification:** format, lint, typecheck pass; tests: API 306, admin 22, ui 59,
+travel 21, air 13, config 21, validation 12, api-client 5, redux 3; integration
+67/67; Playwright 54/54 (dev servers). Maintenance banner verified in a
+browser (appeared after 24 s; maintenance switched off again afterwards).

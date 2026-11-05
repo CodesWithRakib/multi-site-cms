@@ -20,8 +20,6 @@ export function SecuritySettingsForm({ initialData, onSave, isSaving }: Security
     lockoutDurationMinutes: initialData?.lockoutDurationMinutes ?? 15,
     passwordMinLength: initialData?.passwordMinLength ?? 8,
     requireStrongPasswords: initialData?.requireStrongPasswords ?? true,
-    enforceMfaForSuperAdmin: initialData?.enforceMfaForSuperAdmin ?? false,
-    allowPublicRegistration: initialData?.allowPublicRegistration ?? false,
   });
 
   const [statusMessage, setStatusMessage] = useState<{
@@ -174,34 +172,6 @@ export function SecuritySettingsForm({ initialData, onSave, isSaving }: Security
           />
           <span className="text-xs font-medium text-neutral-800 dark:text-neutral-200">
             {t('settings.requireStrongPasswords')}
-          </span>
-        </label>
-
-        <label className="flex items-center gap-3 p-3.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-800/40 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={formData.enforceMfaForSuperAdmin}
-            onChange={(e) =>
-              setFormData({ ...formData, enforceMfaForSuperAdmin: e.target.checked })
-            }
-            className="size-4 text-emerald-600 dark:text-emerald-400 rounded-md border-neutral-300 focus:ring-emerald-500"
-          />
-          <span className="text-xs font-medium text-neutral-800 dark:text-neutral-200">
-            {t('settings.enforceMfaForSuperAdmin')}
-          </span>
-        </label>
-
-        <label className="flex items-center gap-3 p-3.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-800/40 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={formData.allowPublicRegistration}
-            onChange={(e) =>
-              setFormData({ ...formData, allowPublicRegistration: e.target.checked })
-            }
-            className="size-4 text-emerald-600 dark:text-emerald-400 rounded-md border-neutral-300 focus:ring-emerald-500"
-          />
-          <span className="text-xs font-medium text-neutral-800 dark:text-neutral-200">
-            {t('settings.allowPublicRegistration')}
           </span>
         </label>
       </div>

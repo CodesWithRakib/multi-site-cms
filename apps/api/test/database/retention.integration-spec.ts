@@ -4,6 +4,7 @@ import type { DataSource } from 'typeorm';
 
 import { AuditService } from '../../src/common/audit/audit.service';
 import { RetentionJob, type RetentionWindows } from '../../src/maintenance/retention.job';
+import { SettingsService } from '../../src/settings/settings.service';
 import { createTestDataSource, resetTestSchema } from './test-database';
 
 /**
@@ -34,7 +35,10 @@ async function firstRow<T>(sql: string, params: unknown[] = []): Promise<T> {
 const count = async (table: string) =>
   Number((await firstRow<{ count: string }>(`SELECT COUNT(*) AS "count" FROM "${table}"`)).count);
 
-const job = () => new RetentionJob(dataSource, new AuditService(dataSource));
+const job = () => {
+  const audit = new AuditService(dataSource);
+  return new RetentionJob(dataSource, audit, new SettingsService(dataSource, audit));
+};
 
 async function insertPageViews(createdAt: string, rows = 1): Promise<void> {
   await dataSource.query(

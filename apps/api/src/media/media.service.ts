@@ -17,21 +17,8 @@ import {
   type StorageProvider,
   type UploadedFilePayload,
 } from './storage/storage-provider.interface';
+import { SettingsService } from '../settings/settings.service';
 import { validateAndInspectFile } from './utils/file-validator';
-
-const ALLOWED_MIME_TYPES = new Set([
-  'image/jpeg',
-  'image/png',
-  'image/webp',
-  'image/gif',
-  'image/svg+xml',
-  'image/avif',
-  'application/pdf',
-  'video/mp4',
-  'video/webm',
-  'audio/mpeg',
-  'audio/wav',
-]);
 
 @Injectable()
 export class MediaService {
@@ -39,6 +26,7 @@ export class MediaService {
     @Inject(DATA_SOURCE) private readonly dataSource: DataSource,
     @Inject(STORAGE_PROVIDER) private readonly storageProvider: StorageProvider,
     private readonly auditService: AuditService,
+    private readonly settingsService: SettingsService,
   ) {}
 
   private async getMediaRepo(): Promise<Repository<MediaAsset>> {
@@ -70,8 +58,10 @@ export class MediaService {
     this.checkSiteAccess(actor, dto.siteId);
 
     const mime = dto.mimeType.toLowerCase().trim();
-    if (!ALLOWED_MIME_TYPES.has(mime) && !mime.startsWith('image/')) {
-      throw new ApiException(HttpStatus.BAD_REQUEST, 'VALIDATION_ERROR', 'media.invalidMimeType');
+    // Platform settings (Media → allowed types), already narrowed to the code allowlist.
+    const { media: policy } = await this.settingsService.getPolicy();
+    if (!policy.allowedMimeTypes.includes(mime)) {
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'VALIDATION_ERROR', 'media.typeNotAllowed');
     }
 
     const storageKey =
@@ -278,10 +268,9 @@ export class MediaService {
 
     this.checkSiteAccess(actor, dto.siteId);
 
-    const isVideoOrAudio = file.mimetype.startsWith('video/') || file.mimetype.startsWith('audio/');
-    const maxSizeBytes = isVideoOrAudio ? 50 * 1024 * 1024 : 15 * 1024 * 1024;
-
-    if (file.size > maxSizeBytes) {
+    // Platform settings (Media → maximum upload size and allowed types).
+    const { media: policy } = await this.settingsService.getPolicy();
+    if (file.size > policy.maxUploadBytes) {
       throw new ApiException(
         HttpStatus.PAYLOAD_TOO_LARGE,
         'PAYLOAD_TOO_LARGE',
@@ -300,6 +289,11 @@ export class MediaService {
 
     const finalBuffer = inspection.sanitizedBuffer ?? file.buffer;
     const finalMime = inspection.detectedMimeType;
+
+    // Checked on the type detected from the file signature, not the client's claim.
+    if (!policy.allowedMimeTypes.includes(finalMime)) {
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'VALIDATION_ERROR', 'media.typeNotAllowed');
+    }
 
     const extMatch = (file.originalname || '').match(/\.([a-zA-Z0-9]+)$/);
     let ext = extMatch && extMatch[1] ? extMatch[1].toLowerCase() : '';

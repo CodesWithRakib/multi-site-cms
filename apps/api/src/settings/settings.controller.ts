@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Patch, Req } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import type {
+  EffectivePlatformPolicy,
   PlatformSettings,
   PlatformSystemDiagnostics,
   PublicPlatformSettings,
@@ -36,13 +37,32 @@ export class SettingsController {
     @Body() dto: UpdatePlatformSettingsDto,
     @Req() req: Request,
   ): Promise<PlatformSettings> {
-    const ipAddress =
-      (req.headers['x-forwarded-for'] as string) || req.socket.remoteAddress || null;
-    const requestId = (req.headers['x-request-id'] as string) || null;
+    // req.ip honors TRUST_PROXY; a raw X-Forwarded-For header is client-controlled.
+    const ipAddress = req.ip ?? req.socket.remoteAddress ?? null;
+    const requestId = (req as Request & { id?: string }).id ?? null;
     return this.settingsService.updatePlatformSettings(actor, dto, {
       ipAddress,
       requestId,
     });
+  }
+
+  @Get('policy')
+  @RequirePermissions('post:read')
+  @ApiOperation({
+    summary: 'Enforced limits the admin UI needs (uploads, autosave, sign-in rules)',
+  })
+  @ApiResponse({ status: 200, description: 'Effective platform policy' })
+  async getEffectivePolicy(): Promise<EffectivePlatformPolicy> {
+    const policy = await this.settingsService.getPolicy();
+    return {
+      maxUploadSizeBytes: policy.media.maxUploadBytes,
+      allowedMimeTypes: [...policy.media.allowedMimeTypes],
+      autoSaveIntervalSeconds: policy.publishing.autoSaveIntervalSeconds,
+      defaultPostStatus: policy.publishing.defaultPostStatus,
+      previewTokenTtlMinutes: policy.publishing.previewTokenTtlMs / 60_000,
+      passwordMinLength: policy.password.minLength,
+      requireStrongPasswords: policy.password.requireStrong,
+    };
   }
 
   @Get('diagnostics')

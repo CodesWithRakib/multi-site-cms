@@ -371,16 +371,12 @@ export const translations = {
       lockoutDurationMinutes: 'Account Lockout Duration (Minutes)',
       passwordMinLength: 'Minimum Password Length',
       requireStrongPasswords: 'Enforce Password Complexity (Uppercase, digits, symbols)',
-      enforceMfaForSuperAdmin: 'Enforce MFA / 2FA for Super Admins',
-      allowPublicRegistration: 'Allow Public Self-Registration (Open Signup)',
       activePolicyNotice:
         'Security policies are automatically enforced across all administrative accounts and tenant sessions.',
       mediaTitle: 'Asset Storage & Media Optimization',
       mediaDesc:
         'Configure storage provider engines, upload boundaries, and automatic media transformations.',
-      storageProvider: 'Active Storage Provider',
       maxUploadSizeMb: 'Maximum Upload File Size (MB)',
-      autoWebpConversion: 'Automatic WebP Image Optimization',
       allowedMimeTypes: 'Permitted MIME Types (comma-separated)',
       cloudinaryConfigured: 'Cloudinary Cloud CDN is connected and active.',
       publishingTitle: 'Publishing & Editorial Defaults',
@@ -901,16 +897,12 @@ export const translations = {
       passwordMinLength: 'ন্যূনতম পাসওয়ার্ড দৈর্ঘ্য',
       requireStrongPasswords:
         'শক্তিশালী পাসওয়ার্ড বাধ্যতামূলক করুন (বড় হাতের অক্ষর, সংখ্যা, প্রতীক)',
-      enforceMfaForSuperAdmin: 'সুপার অ্যাডমিনের জন্য 2FA/MFA বাধ্যতামূলক করুন',
-      allowPublicRegistration: 'উন্মুক্ত পাবলিক রেজিস্ট্রেশন অনুমোদন করুন',
       activePolicyNotice:
         'নিরাপত্তা নীতিগুলি সমস্ত প্রশাসনিক একাউন্ট এবং টেন্যান্ট সেশনের ওপর সরাসরি প্রয়োগ হয়।',
       mediaTitle: 'অ্যাসেট স্টোরেজ ও মিডিয়া অপ্টিমাইজেশন',
       mediaDesc:
         'স্টোরেজ প্রোভাইডার ইঞ্জিন, আপলোড সীমা এবং স্বয়ংক্রিয় মিডিয়া রূপান্তর কনফিগার করুন।',
-      storageProvider: 'সক্রিয় স্টোরেজ প্রোভাইডার',
       maxUploadSizeMb: 'সর্বোচ্চ আপলোড সাইজ (MB)',
-      autoWebpConversion: 'স্বয়ংক্রিয় WebP ইমেজ অপ্টিমাইজেশন',
       allowedMimeTypes: 'অনুমোদিত MIME প্রকার (কমা দ্বারা পৃথক)',
       cloudinaryConfigured: 'ক্লাউডিনারি ক্লাউড সিডিএন সংযুক্ত এবং সক্রিয় রয়েছে।',
       publishingTitle: 'প্রকাশনা ও এডিটোরিয়াল ডিফল্ট',

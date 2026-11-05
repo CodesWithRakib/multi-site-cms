@@ -15,7 +15,6 @@ export function MediaSettingsForm({ initialData, onSave, isSaving }: MediaSettin
   const { t } = useAdmin();
 
   const [formData, setFormData] = useState<PlatformMediaSettings>({
-    storageProvider: initialData?.storageProvider ?? 'cloudinary',
     maxUploadSizeBytes: initialData?.maxUploadSizeBytes ?? 10485760,
     allowedMimeTypes: initialData?.allowedMimeTypes ?? [
       'image/jpeg',
@@ -25,7 +24,6 @@ export function MediaSettingsForm({ initialData, onSave, isSaving }: MediaSettin
       'image/svg+xml',
       'application/pdf',
     ],
-    autoWebpConversion: initialData?.autoWebpConversion ?? true,
   });
 
   const [mimeString, setMimeString] = useState(formData.allowedMimeTypes.join(', '));
@@ -91,27 +89,6 @@ export function MediaSettingsForm({ initialData, onSave, isSaving }: MediaSettin
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 text-sm">
-        {/* Storage Provider */}
-        <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
-            {t('settings.storageProvider')}
-          </label>
-          <select
-            value={formData.storageProvider}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                storageProvider: e.target.value as 'cloudinary' | 'local' | 's3',
-              })
-            }
-            className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50/70 dark:bg-neutral-800/80 text-neutral-900 dark:text-neutral-100 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 cursor-pointer"
-          >
-            <option value="cloudinary">Cloudinary CDN (Recommended)</option>
-            <option value="local">Local Filesystem</option>
-            <option value="s3">Amazon S3 / Compatible Object Storage</option>
-          </select>
-        </div>
-
         {/* Max Upload Size (MB) */}
         <div className="space-y-1.5">
           <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
@@ -143,21 +120,6 @@ export function MediaSettingsForm({ initialData, onSave, isSaving }: MediaSettin
             className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50/70 dark:bg-neutral-800/80 text-neutral-900 dark:text-neutral-100 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all font-mono text-xs"
           />
         </div>
-      </div>
-
-      {/* Auto WebP conversion toggle */}
-      <div className="pt-2">
-        <label className="flex items-center gap-3 p-3.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-800/40 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={formData.autoWebpConversion}
-            onChange={(e) => setFormData({ ...formData, autoWebpConversion: e.target.checked })}
-            className="size-4 text-emerald-600 dark:text-emerald-400 rounded-md border-neutral-300 focus:ring-emerald-500"
-          />
-          <span className="text-xs font-medium text-neutral-800 dark:text-neutral-200">
-            {t('settings.autoWebpConversion')}
-          </span>
-        </label>
       </div>
 
       <div className="pt-4 border-t border-neutral-100 dark:border-neutral-800 flex justify-end">

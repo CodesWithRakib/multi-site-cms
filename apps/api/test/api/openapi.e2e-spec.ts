@@ -90,6 +90,7 @@ describe('OpenAPI document', () => {
       `/${env.API_PREFIX}/realtime/{siteKey}/stream`,
       `/${env.API_PREFIX}/settings/diagnostics`,
       `/${env.API_PREFIX}/settings/platform`,
+      `/${env.API_PREFIX}/settings/policy`,
       `/${env.API_PREFIX}/settings/public`,
       `/${env.API_PREFIX}/sites`,
       `/${env.API_PREFIX}/sites/{siteId}`,

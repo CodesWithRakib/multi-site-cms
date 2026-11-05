@@ -1,6 +1,12 @@
 import crypto from 'node:crypto';
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { In, type DataSource, type Repository, type SelectQueryBuilder } from 'typeorm';
+import {
+  In,
+  type DataSource,
+  type EntityManager,
+  type Repository,
+  type SelectQueryBuilder,
+} from 'typeorm';
 
 import type {
   PaginatedResult,
@@ -22,6 +28,7 @@ import { PostPublication } from '../database/entities/post-publication.entity';
 import { PostRevision } from '../database/entities/post-revision.entity';
 import { Post } from '../database/entities/post.entity';
 import { Site } from '../database/entities/site.entity';
+import { SettingsService } from '../settings/settings.service';
 import { CreatePostDto, ListPostsQueryDto, RestoreRevisionDto, UpdatePostDto } from './dto';
 import { validateStructuredBody } from './utils/body-validator';
 import {
@@ -50,7 +57,29 @@ export class PostsService {
   constructor(
     @Inject(DATA_SOURCE) private readonly dataSource: DataSource,
     private readonly auditService: AuditService,
+    private readonly settingsService: SettingsService,
   ) {}
+
+  /**
+   * Platform settings (Publishing → revision history): keeps the newest N
+   * revisions of a post. A revision that any publication points to is never
+   * removed (and the foreign key would refuse it anyway), so live content and
+   * scheduled content always keep their snapshot.
+   */
+  private async pruneRevisionHistory(manager: EntityManager, postId: string): Promise<void> {
+    const { publishing } = await this.settingsService.getPolicy();
+    await manager.query(
+      `DELETE FROM "post_revisions" r
+        WHERE r."post_id" = $1
+          AND r."revision_number" <= (
+            SELECT MAX("revision_number") FROM "post_revisions" WHERE "post_id" = $1
+          ) - $2
+          AND NOT EXISTS (
+            SELECT 1 FROM "post_publications" pp WHERE pp."revision_id" = r."id"
+          )`,
+      [postId, publishing.maxRevisionHistory],
+    );
+  }
 
   private async getPostRepo(): Promise<Repository<Post>> {
     return getInitializedRepository(this.dataSource, Post);
@@ -78,6 +107,8 @@ export class PostsService {
       }
     }
 
+    const defaultPostStatus = (await this.settingsService.getPolicy()).publishing.defaultPostStatus;
+
     return this.dataSource.transaction(async (manager) => {
       const postRepo = manager.getRepository(Post);
       const revRepo = manager.getRepository(PostRevision);
@@ -88,7 +119,8 @@ export class PostsService {
       const post = postRepo.create({
         authorId: actor.user.id,
         type: dto.type ?? 'article',
-        status: dto.status ?? 'draft',
+        // Platform settings (Publishing → default status) when none is given.
+        status: dto.status ?? defaultPostStatus,
         sourceLocale: dto.sourceLocale?.trim() || 'en',
         deletedAt: null,
       });
@@ -508,6 +540,7 @@ export class PostsService {
           createdBy: actor.user.id,
         });
         activeRev = await revRepo.save(newRev);
+        await this.pruneRevisionHistory(manager, postId);
       }
 
       if (dto.type) post.type = dto.type;
@@ -729,6 +762,7 @@ export class PostsService {
       });
 
       const savedRev = await revRepo.save(restoredRev);
+      await this.pruneRevisionHistory(manager, postId);
 
       post.updatedAt = new Date();
       await postRepo.save(post);
@@ -789,8 +823,9 @@ export class PostsService {
       throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'post.notFound');
     }
 
-    const ttlMs = 15 * 60 * 1000; // 15 minutes
-    const expiresAt = new Date(Date.now() + ttlMs);
+    // Platform settings (Publishing → preview link lifetime).
+    const { publishing } = await this.settingsService.getPolicy();
+    const expiresAt = new Date(Date.now() + publishing.previewTokenTtlMs);
     const exp = Math.floor(expiresAt.getTime() / 1000);
     const payload = `${postId}:${siteId || 'none'}:${actor.user.id}:${exp}`;
     const signature = crypto

@@ -6,14 +6,15 @@ import { getInitializedRepository } from '../../database/ensure-connected';
 import { DATA_SOURCE } from '../../database/database.tokens';
 import { Session } from '../../database/entities/session.entity';
 import { type User } from '../../database/entities/user.entity';
+import { SettingsService } from '../../settings/settings.service';
 
 export const SESSION_COOKIE_NAME = 'cms_session';
 export const CSRF_COOKIE_NAME = 'cms_csrf';
 
-/** 7 days absolute session lifetime */
-export const SESSION_ABSOLUTE_LIFETIME_MS = 7 * 24 * 60 * 60 * 1000;
-/** 24 hours idle timeout */
-export const SESSION_IDLE_TIMEOUT_MS = 24 * 60 * 60 * 1000;
+/*
+ * Absolute lifetime and idle timeout come from platform settings
+ * (Security → session TTL); see settings/platform-policy.ts.
+ */
 /** 5 minutes touch throttle to avoid write amplification on read-heavy traffic */
 export const SESSION_TOUCH_INTERVAL_MS = 5 * 60 * 1000;
 
@@ -29,7 +30,10 @@ export interface CreatedSession {
 
 @Injectable()
 export class SessionService {
-  constructor(@Inject(DATA_SOURCE) private readonly dataSource: DataSource) {}
+  constructor(
+    @Inject(DATA_SOURCE) private readonly dataSource: DataSource,
+    private readonly settingsService: SettingsService,
+  ) {}
 
   private async getSessionRepo(): Promise<Repository<Session>> {
     return getInitializedRepository(this.dataSource, Session);
@@ -67,7 +71,8 @@ export class SessionService {
     const rawToken = crypto.randomBytes(32).toString('base64url');
     const tokenHash = this.hashToken(rawToken);
     const now = new Date();
-    const expiresAt = new Date(now.getTime() + SESSION_ABSOLUTE_LIFETIME_MS);
+    const { session: policy } = await this.settingsService.getPolicy();
+    const expiresAt = new Date(now.getTime() + policy.absoluteTtlMs);
 
     const session = sessionRepo.create({
       userId: options.userId,
@@ -111,9 +116,12 @@ export class SessionService {
       return null;
     }
 
-    // Check idle timeout
+    // Idle timeout, and the current absolute TTL measured from creation: a
+    // shortened TTL applies to sessions that already exist, not only new ones.
+    const { session: policy } = await this.settingsService.getPolicy();
     const idleTime = now.getTime() - session.lastActiveAt.getTime();
-    if (idleTime > SESSION_IDLE_TIMEOUT_MS) {
+    const age = now.getTime() - session.createdAt.getTime();
+    if (idleTime > policy.idleTimeoutMs || age > policy.absoluteTtlMs) {
       session.revokedAt = now;
       await sessionRepo.save(session);
       return null;

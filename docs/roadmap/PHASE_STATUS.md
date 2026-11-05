@@ -11,8 +11,9 @@ Last updated: 2026-11-05 (Phase 6)
 | 4 — Production operations          | **Done in code; owner/CI checks open**  | API 267/267, integration 67/67, E2E full suite green on production builds locally. Open: first GitHub CI run, DB-6 cleanup decision, provider PITR drill                       |
 | 5 — Commerce                       | **Out of scope**                        | Business decision 2026-11-04                                                                                                                                                   |
 | 6 — Coverage and hardening backlog | **In progress**                         | API 294/294, integration 67/67, E2E posts/keyboard/axe 12/12. Open: SEC-18 decision, TD-5 decompositions, TD-13 other screens                                                  |
+| 7 — Enforced platform settings     | **Done**                                | Owner approved (SEC-18). API 306/306, integration 67/67, E2E 54/54 (dev servers), maintenance banner verified in browser                                                       |
 
-Phases 1–3 are committed by the owner; Phase 4 committed; Phase 6 changes are uncommitted.
+Phases 1–3 are committed by the owner; Phases 6–7 changes are uncommitted.
 
 ## Phase 1 checklist
 
@@ -83,8 +84,22 @@ Phases 1–3 are committed by the owner; Phase 4 committed; Phase 6 changes are 
 - [x] Platform settings API tests (12): Super Admin only, partial update keeps fields, nested validation (SEC-16)
 - [x] SVG sandbox CSP (SEC-17)
 - [x] TD-13 `/posts`: AlertDialog + notice; TD-15 Radix menu above the tab bar (E2E)
-- [ ] SEC-18 platform settings enforced nowhere (**owner decision**)
+- [x] SEC-18 → Phase 7
 - [ ] TD-5 decompose `sites/[siteId]`, `users/[userId]`, `sites` pages
 - [ ] TD-13 remaining 24 native dialogs
 - [ ] DB-5 personal-data erasure procedure
-- [ ] DB-6 cleanup `--apply` (**owner decision**, carried from Phase 4)
+- [x] DB-6 cleanup applied on the dev DB (owner approved; 4,468 rows; table backup in the container)
+
+## Phase 7 checklist (owner approved 2026-11-05)
+
+- [x] `SettingsService.getPolicy()`: cached, clamped to safe bounds, safe defaults on failure (unit tests)
+- [x] Login lockout from settings; atomic failed-attempt counter (SEC-21)
+- [x] Session TTL from settings, applied to existing sessions; cookie max-age follows the session
+- [x] Password min length / strength on user create and update
+- [x] Upload size and types from settings (types narrowed to the code allowlist); multer 100 MB hard limit (SEC-19)
+- [x] Default post status, preview lifetime, revision history (publication-referenced revisions kept)
+- [x] Autosave interval in the editor via `GET /settings/policy` (`AutosaveScheduler`, tested)
+- [x] Maintenance banner on both sites (shared `MaintenanceBanner`), verified in a browser (~24 s ISR delay)
+- [x] Audit retention from settings (min 365); `AUDIT_RETENTION_DAYS` env removed
+- [x] MFA, public registration, S3, WebP removed from settings (never implemented)
+- [x] Settings audit IP from `req.ip` (SEC-20)

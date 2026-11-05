@@ -9,9 +9,10 @@ import { MediaService } from './media.service';
 import { CloudinaryStorageProvider } from './storage/cloudinary-storage.provider';
 import { LocalStorageProvider } from './storage/local-storage.provider';
 import { STORAGE_PROVIDER } from './storage/storage-provider.interface';
+import { SettingsModule } from '../settings/settings.module';
 
 @Module({
-  imports: [DatabaseModule, AuthModule, AuditModule],
+  imports: [DatabaseModule, AuthModule, AuditModule, SettingsModule],
   controllers: [MediaController],
   providers: [
     MediaService,

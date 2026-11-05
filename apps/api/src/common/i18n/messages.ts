@@ -36,6 +36,10 @@ export const en = {
   'auth.siteRequired': 'A site identifier is required for site-scoped roles.',
   'auth.siteForbidden': 'A site identifier cannot be provided for platform-scoped roles.',
   'auth.siteNotFound': 'The specified site was not found.',
+  'auth.passwordTooShort': 'The password is shorter than the platform minimum length.',
+  'auth.passwordTooWeak':
+    'The password must contain an uppercase letter, a lowercase letter, and a number.',
+  'media.typeNotAllowed': 'This file type is not allowed by the platform media settings.',
 
   'user.notFound': 'User not found.',
   'user.emailConflict': 'A user with this email address already exists.',
@@ -138,6 +142,10 @@ export const bn: Record<MessageKey, string> = {
   'auth.siteRequired': 'সাইট-ভিত্তিক রোলের জন্য সাইট আইডি আবশ্যক।',
   'auth.siteForbidden': 'প্ল্যাটফর্ম রোলের জন্য সাইট আইডি প্রদান করা যাবে না।',
   'auth.siteNotFound': 'নির্দিষ্ট সাইটটি পাওয়া যায়নি।',
+  'auth.passwordTooShort': 'পাসওয়ার্ডটি প্ল্যাটফর্মের ন্যূনতম দৈর্ঘ্যের চেয়ে ছোট।',
+  'auth.passwordTooWeak':
+    'পাসওয়ার্ডে একটি বড় হাতের অক্ষর, একটি ছোট হাতের অক্ষর এবং একটি সংখ্যা থাকতে হবে।',
+  'media.typeNotAllowed': 'প্ল্যাটফর্মের মিডিয়া সেটিংসে এই ফাইল টাইপ অনুমোদিত নয়।',
 
   'user.notFound': 'ব্যবহারকারী পাওয়া যায়নি।',
   'user.emailConflict': 'এই ইমেইল ঠিকানার একজন ব্যবহারকারী ইতিমধ্যে বিদ্যমান।',

@@ -1,6 +1,7 @@
 'use client';
 
 import type {
+  EffectivePlatformPolicy,
   AdminCommentItem,
   AdminCommentsListResult,
   AnalyticsOverviewData,
@@ -470,6 +471,14 @@ export const cmsApi = platformApi.injectEndpoints({
       transformResponse: (response: ApiSuccess<unknown>) =>
         response.data as PlatformSystemDiagnostics,
       providesTags: ['Health'],
+    }),
+
+    // Enforced limits (upload size/types, autosave interval, password rules).
+    getEffectivePolicy: build.query<EffectivePlatformPolicy, void>({
+      query: () => ({ path: '/settings/policy' }),
+      transformResponse: (response: ApiSuccess<unknown>) =>
+        response.data as EffectivePlatformPolicy,
+      providesTags: ['Site', 'User'],
     }),
 
     getPublicPlatformSettings: build.query<PublicPlatformSettings, void>({
@@ -1047,6 +1056,7 @@ export const {
   useUpdatePlatformSettingsMutation,
   useGetPlatformDiagnosticsQuery,
   useGetPublicPlatformSettingsQuery,
+  useGetEffectivePolicyQuery,
 
   // Posts
   useListPostsQuery,

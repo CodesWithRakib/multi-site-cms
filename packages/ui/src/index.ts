@@ -112,6 +112,7 @@ export {
 export { SkipLink, type SkipLinkProps } from './components/skip-link';
 export { Skeleton, type SkeletonProps } from './components/skeleton';
 export { StatusPage, type StatusPageProps } from './components/status-page';
+export { MaintenanceBanner, type MaintenanceBannerProps } from './components/maintenance-banner';
 export { Slider } from './components/slider';
 export { Switch } from './components/switch';
 export {

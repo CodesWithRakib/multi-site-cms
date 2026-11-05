@@ -67,3 +67,34 @@ Adding a variable requires, in one change:
 3. this document,
 4. the deployment environment (secret store or dashboard),
 5. a test for the new rule if it has a non-trivial constraint.
+
+## Platform settings (admin-editable, enforced at runtime)
+
+Super Admins edit these in the admin under **Settings**. They are stored in
+`platform_settings` and read through `SettingsService.getPolicy()`
+(`apps/api/src/settings/platform-policy.ts`), cached for 15 s and refreshed
+immediately on this instance when saved (one API instance, ADR-0028).
+
+Every value is clamped to safe bounds before use, so a stored row can never
+weaken a control below its floor. If the settings cannot be read, the
+previously hardcoded values apply (`SAFE_DEFAULT_POLICY`).
+
+| Setting                       | Enforced in                                                  | Bounds / notes                                                          |
+| ----------------------------- | ------------------------------------------------------------ | ----------------------------------------------------------------------- |
+| Max login attempts, lockout   | `AuthService.login` (atomic failed-attempt counter)          | 1–20 attempts, 1–1440 min                                               |
+| Session TTL (hours)           | `SessionService` (new and existing sessions), cookie max-age | 1–720 h; idle timeout is min(24 h, TTL)                                 |
+| Password min length, strength | `UsersService` create/update                                 | 8–64; strong = upper + lower + digit                                    |
+| Max upload size               | `MediaService.uploadMedia`                                   | ≤ 100 MB (multer hard limit applies before buffering)                   |
+| Allowed upload types          | upload (detected signature) and metadata registration        | Only types in the code allowlist; settings can narrow, never widen      |
+| Default post status           | `PostsService.createPost` when none is given                 | `draft` or `in_review`                                                  |
+| Preview link lifetime         | `PostsService.generatePreviewToken`                          | 5–1440 min                                                              |
+| Revision history              | after each new revision                                      | 1–100; revisions referenced by a publication are never deleted          |
+| Autosave interval             | admin editor (`GET /settings/policy`)                        | 5–300 s: longest unsaved stretch while typing (2.5 s debounce on pause) |
+| Maintenance mode + notices    | banner on both public sites (`GET /settings/public`)         | Informational; appears within ~30–60 s (ISR)                            |
+| Audit retention               | daily retention job                                          | 365–3650 days                                                           |
+
+General settings (platform name, tagline, contact email, default locale and
+timezone) are stored and shown; no API behavior depends on them yet. The
+storage provider is deployment configuration (`STORAGE_PROVIDER`), shown in
+diagnostics. MFA, public registration, S3 storage, and WebP conversion do not
+exist and are not offered.

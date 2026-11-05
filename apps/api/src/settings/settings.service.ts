@@ -18,6 +18,10 @@ import { DATA_SOURCE } from '../database/database.tokens';
 import { getInitializedRepository } from '../database/ensure-connected';
 import { PlatformSettingsEntity } from '../database/entities/platform-settings.entity';
 import type { UpdatePlatformSettingsDto } from './dto/update-platform-settings.dto';
+import { policyFromSettings, SAFE_DEFAULT_POLICY, type PlatformPolicy } from './platform-policy';
+
+/** Settings change rarely; enforcement points read them on every login/upload. */
+const POLICY_CACHE_MS = 15_000;
 
 /**
  * Fields that were actually sent. Validated DTO instances can carry unset
@@ -42,6 +46,30 @@ export class SettingsService {
     @Inject(DATA_SOURCE) private readonly dataSource: DataSource,
     private readonly auditService: AuditService,
   ) {}
+
+  private policyCache: { value: PlatformPolicy; expiresAt: number } | null = null;
+
+  /**
+   * The enforced policy derived from the stored settings (see platform-policy.ts).
+   * Cached briefly; an update on this instance invalidates it at once (one API
+   * instance, ADR-0028). If settings cannot be read, the safe defaults apply.
+   */
+  async getPolicy(): Promise<PlatformPolicy> {
+    const now = Date.now();
+    if (this.policyCache && this.policyCache.expiresAt > now) {
+      return this.policyCache.value;
+    }
+    try {
+      const value = policyFromSettings(await this.getPlatformSettings());
+      this.policyCache = { value, expiresAt: now + POLICY_CACHE_MS };
+      return value;
+    } catch (err: unknown) {
+      this.logger.error(
+        `Platform settings unavailable; enforcing safe defaults: ${err instanceof Error ? err.message : String(err)}`,
+      );
+      return SAFE_DEFAULT_POLICY;
+    }
+  }
 
   private async getSettingsRepo(): Promise<Repository<PlatformSettingsEntity>> {
     return getInitializedRepository(this.dataSource, PlatformSettingsEntity);
@@ -70,11 +98,8 @@ export class SettingsService {
           lockoutDurationMinutes: 15,
           passwordMinLength: 8,
           requireStrongPasswords: true,
-          enforceMfaForSuperAdmin: false,
-          allowPublicRegistration: false,
         },
         media: {
-          storageProvider: 'cloudinary',
           maxUploadSizeBytes: 10485760,
           allowedMimeTypes: [
             'image/jpeg',
@@ -84,7 +109,6 @@ export class SettingsService {
             'image/svg+xml',
             'application/pdf',
           ],
-          autoWebpConversion: true,
         },
         publishing: {
           defaultPostStatus: 'draft',
@@ -150,6 +174,7 @@ export class SettingsService {
     entity.updatedAt = new Date();
 
     const saved = await repo.save(entity);
+    this.policyCache = null;
 
     await this.auditService.record({
       actorId: actor.user.id,
@@ -181,7 +206,6 @@ export class SettingsService {
       maintenanceMode: settings.maintenance.maintenanceMode,
       maintenanceNoticeEn: settings.maintenance.maintenanceNoticeEn,
       maintenanceNoticeBn: settings.maintenance.maintenanceNoticeBn,
-      allowPublicRegistration: settings.security.allowPublicRegistration,
       defaultLocale: settings.general.defaultLocale,
       defaultTimezone: settings.general.defaultTimezone,
     };
@@ -227,14 +251,49 @@ export class SettingsService {
     };
   }
 
+  /**
+   * Only the documented fields leave the service. Rows written by older
+   * versions can still hold keys for features that were never built (MFA,
+   * public registration, S3, WebP conversion); they are not exposed.
+   */
   private mapEntityToSettings(entity: PlatformSettingsEntity): PlatformSettings {
+    const general = entity.general as PlatformGeneralSettings;
+    const security = entity.security as PlatformSecuritySettings;
+    const media = entity.media as PlatformMediaSettings;
+    const publishing = entity.publishing as PlatformPublishingSettings;
+    const maintenance = entity.maintenance as PlatformMaintenanceSettings;
     return {
       id: entity.id,
-      general: entity.general as PlatformGeneralSettings,
-      security: entity.security as PlatformSecuritySettings,
-      media: entity.media as PlatformMediaSettings,
-      publishing: entity.publishing as PlatformPublishingSettings,
-      maintenance: entity.maintenance as PlatformMaintenanceSettings,
+      general: {
+        platformName: general.platformName,
+        tagline: general.tagline,
+        contactEmail: general.contactEmail,
+        defaultLocale: general.defaultLocale,
+        defaultTimezone: general.defaultTimezone,
+      },
+      security: {
+        sessionTtlHours: security.sessionTtlHours,
+        maxLoginAttempts: security.maxLoginAttempts,
+        lockoutDurationMinutes: security.lockoutDurationMinutes,
+        passwordMinLength: security.passwordMinLength,
+        requireStrongPasswords: security.requireStrongPasswords,
+      },
+      media: {
+        maxUploadSizeBytes: media.maxUploadSizeBytes,
+        allowedMimeTypes: media.allowedMimeTypes,
+      },
+      publishing: {
+        defaultPostStatus: publishing.defaultPostStatus,
+        autoSaveIntervalSeconds: publishing.autoSaveIntervalSeconds,
+        maxRevisionHistory: publishing.maxRevisionHistory,
+        previewTokenTtlMinutes: publishing.previewTokenTtlMinutes,
+      },
+      maintenance: {
+        maintenanceMode: maintenance.maintenanceMode,
+        maintenanceNoticeEn: maintenance.maintenanceNoticeEn,
+        maintenanceNoticeBn: maintenance.maintenanceNoticeBn,
+        auditRetentionDays: maintenance.auditRetentionDays,
+      },
       updatedAt: entity.updatedAt.toISOString(),
       updatedBy: entity.updatedBy,
     };

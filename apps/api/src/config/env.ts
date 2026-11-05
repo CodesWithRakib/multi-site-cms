@@ -95,11 +95,10 @@ const envSchema = z.object({
   /**
    * Retention windows for the daily purge job (see docs/database/data-ownership.md).
    * Analytics keeps two years because the one-year view compares with the
-   * previous year. Audit history never drops below one year.
+   * previous year. Audit retention is a platform setting (Maintenance tab).
    */
   RETENTION_JOB_ENABLED: z.enum(['true', 'false']).default('true'),
   ANALYTICS_RETENTION_DAYS: z.coerce.number().int().min(30).max(3650).default(730),
-  AUDIT_RETENTION_DAYS: z.coerce.number().int().min(365).max(3650).default(730),
   SESSION_RETENTION_DAYS: z.coerce.number().int().min(1).max(365).default(30),
   OUTBOX_RETENTION_DAYS: z.coerce.number().int().min(7).max(365).default(30),
   /**

@@ -97,3 +97,9 @@ is out of scope).
 - Decide whether platform settings are enforced or shown read-only (SEC-18).
 - Then: remaining admin page decompositions (TD-5), native dialogs on other
   screens (TD-13), personal-data erasure (DB-5).
+
+## Phase 7 — Enforced platform settings (owner approved 2026-11-05)
+
+Wire every admin platform setting into the API path it governs (auth, sessions,
+passwords, uploads, publishing, retention, maintenance banner), with safe
+clamping and fallbacks; remove settings for features that do not exist.

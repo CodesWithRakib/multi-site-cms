@@ -7,6 +7,7 @@ import { ApiException } from '../../common/exceptions/api.exception';
 import { getInitializedRepository } from '../../database/ensure-connected';
 import { DATA_SOURCE } from '../../database/database.tokens';
 import { User } from '../../database/entities/user.entity';
+import { SettingsService } from '../../settings/settings.service';
 import { AuthorizationService } from './authorization.service';
 import { PasswordService } from './password.service';
 import { SessionService } from './session.service';
@@ -18,9 +19,6 @@ export interface LoginResult {
   user: AuthUser;
 }
 
-const MAX_FAILED_ATTEMPTS = 5;
-const LOCKOUT_DURATION_MS = 15 * 60 * 1000; // 15 minutes
-
 @Injectable()
 export class AuthService {
   constructor(
@@ -29,6 +27,7 @@ export class AuthService {
     private readonly sessionService: SessionService,
     private readonly authorizationService: AuthorizationService,
     private readonly auditService: AuditService,
+    private readonly settingsService: SettingsService,
   ) {}
 
   private async getUserRepo(): Promise<Repository<User>> {
@@ -118,11 +117,22 @@ export class AuthService {
     const isValidPassword = await this.passwordService.verify(user.passwordHash, options.password);
 
     if (!isValidPassword) {
-      user.failedLoginCount += 1;
-      if (user.failedLoginCount >= MAX_FAILED_ATTEMPTS) {
-        user.lockedUntil = new Date(now.getTime() + LOCKOUT_DURATION_MS);
-      }
-      await userRepo.save(user);
+      // Lockout thresholds come from platform settings (Security).
+      const { login } = await this.settingsService.getPolicy();
+      // Atomic increment: concurrent wrong guesses cannot undercount, so the
+      // lockout cannot be outrun by sending attempts in parallel.
+      const [updatedRows] = (await this.dataSource.query(
+        `UPDATE "users"
+            SET "failed_login_count" = "failed_login_count" + 1,
+                "locked_until" = CASE
+                  WHEN "failed_login_count" + 1 >= $2 THEN $3::timestamptz
+                  ELSE "locked_until"
+                END
+          WHERE "id" = $1
+          RETURNING "failed_login_count" AS "failedLoginCount"`,
+        [user.id, login.maxAttempts, new Date(now.getTime() + login.lockoutMs)],
+      )) as [Array<{ failedLoginCount: number }>, number];
+      user.failedLoginCount = updatedRows[0]?.failedLoginCount ?? user.failedLoginCount + 1;
 
       await this.auditService.record({
         actorId: user.id,

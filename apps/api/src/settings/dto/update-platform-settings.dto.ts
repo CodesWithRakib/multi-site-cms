@@ -48,13 +48,9 @@ class SecuritySettingsDto implements Partial<PlatformSecuritySettings> {
   @IsOptional() @IsInt() @Min(1) @Max(1440) lockoutDurationMinutes?: number;
   @IsOptional() @IsInt() @Min(8) @Max(64) passwordMinLength?: number;
   @IsOptional() @IsBoolean() requireStrongPasswords?: boolean;
-  @IsOptional() @IsBoolean() enforceMfaForSuperAdmin?: boolean;
-  @IsOptional() @IsBoolean() allowPublicRegistration?: boolean;
 }
 
 class MediaSettingsDto implements Partial<PlatformMediaSettings> {
-  @IsOptional() @IsIn(['cloudinary', 'local', 's3']) storageProvider?:
-    'cloudinary' | 'local' | 's3';
   @IsOptional() @IsInt() @Min(1) @Max(100 * 1024 * 1024) maxUploadSizeBytes?: number;
   @IsOptional()
   @IsArray()
@@ -62,7 +58,6 @@ class MediaSettingsDto implements Partial<PlatformMediaSettings> {
   @IsString({ each: true })
   @Matches(/^[a-z]+\/[a-z0-9.+-]+$/, { each: true })
   allowedMimeTypes?: string[];
-  @IsOptional() @IsBoolean() autoWebpConversion?: boolean;
 }
 
 class PublishingSettingsDto implements Partial<PlatformPublishingSettings> {
@@ -76,7 +71,8 @@ class MaintenanceSettingsDto implements Partial<PlatformMaintenanceSettings> {
   @IsOptional() @IsBoolean() maintenanceMode?: boolean;
   @IsOptional() @IsString() @MaxLength(500) maintenanceNoticeEn?: string;
   @IsOptional() @IsString() @MaxLength(500) maintenanceNoticeBn?: string;
-  @IsOptional() @IsInt() @Min(1) @Max(3650) auditRetentionDays?: number;
+  // Audit history is kept at least a year (enforced again in platform-policy.ts).
+  @IsOptional() @IsInt() @Min(365) @Max(3650) auditRetentionDays?: number;
 }
 
 export class UpdatePlatformSettingsDto implements UpdatePlatformSettingsPayload {

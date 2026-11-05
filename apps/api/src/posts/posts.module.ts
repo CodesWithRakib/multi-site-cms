@@ -10,9 +10,10 @@ import { PublicContentController } from './public-content.controller';
 import { PublicContentService } from './public-content.service';
 import { PublicationsController } from './publications.controller';
 import { PublicationsService } from './publications.service';
+import { SettingsModule } from '../settings/settings.module';
 
 @Module({
-  imports: [DatabaseModule, AuthModule, AuditModule],
+  imports: [DatabaseModule, AuthModule, AuditModule, SettingsModule],
   controllers: [PostsController, PublicationsController, PublicContentController],
   providers: [PostsService, PublicationsService, PublicContentService, PublicCommentsService],
   exports: [PostsService, PublicationsService, PublicContentService, PublicCommentsService],

@@ -1,17 +1,14 @@
 # Next Session
 
-## State at handoff (2026-11-05, Phase 6)
+## State at handoff (2026-11-05, Phase 7)
 
-- Phases 1–4 done and committed. Phase 6 (coverage and hardening) in progress; its changes are **uncommitted**; the user commits.
+- Phases 1–4 committed. Phases 6 and 7 done; their changes are **uncommitted**; the user commits.
 - Owner actions: rotate the Cloudinary secret (SEC-0) and any passwords set by
   the old admin seed (SEC-13); set `NEXT_PUBLIC_CONTACT_EMAIL`,
   `REVALIDATE_SECRET` (+ `SITE_REVALIDATE_URLS` locally); in production also
   `PREVIEW_TOKEN_SECRET` and `API_BASE_URL`. Deploy one API instance (ADR-0028).
-- **Decision pending (DB-6):** remove generated analytics from existing
-  databases with `pnpm --filter @multi-site-cms/api db:cleanup:generated-analytics`
-  (dry run), then `--apply` after a backup. Dev DB: 4,468 of 4,468 page views
-  are generated.
-- **Decision pending (SEC-18):** platform settings are stored but enforced nowhere. Option A: wire lockout/session/password/upload settings into auth and media (changes authentication behavior; needs approval). Option B (recommended first): make the settings page read-only with the real values and remove controls for features that do not exist (MFA, S3).
+- DB-6: generated analytics deleted from the dev DB (approved). Other existing databases: run `db:cleanup:generated-analytics` (dry run, backup, `--apply`).
+- Platform settings are enforced (Phase 7); see `docs/backend/configuration.md`. Changing them in the dev admin changes real behavior (lockout, uploads, sessions).
 - Dev database: `POSTGRES_PORT=5433 pnpm db:up`; all migrations applied.
 - Colors: edit `packages/ui/src/theme/site-themes.ts` only (ADR-0027).
 
@@ -26,10 +23,11 @@
 
 ## Exact next action
 
-1. Apply the owner's SEC-18 decision.
-2. Decompose `sites/[siteId]`, `users/[userId]`, `sites` admin pages (TD-5), replacing
+1. Decompose `sites/[siteId]`, `users/[userId]`, `sites` admin pages (TD-5), replacing
    their native dialogs on the way (TD-13; 24 calls remain).
-3. Check the first GitHub Actions run of `verify` and `e2e` after a push.
+2. Check the first GitHub Actions run of `verify` and `e2e` after a push.
+3. Optional: revalidate the `platform-settings` tag on save so the maintenance
+   banner appears immediately instead of within ~30–60 s.
 4. DB-5 personal-data erasure procedure when legally required.
 
 Role, admin, accessibility and keyboard E2E need local accounts:

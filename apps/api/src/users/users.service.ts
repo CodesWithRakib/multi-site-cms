@@ -13,6 +13,8 @@ import { Role } from '../database/entities/role.entity';
 import { Site } from '../database/entities/site.entity';
 import { UserRoleAssignment } from '../database/entities/user-role-assignment.entity';
 import { User } from '../database/entities/user.entity';
+import { passwordPolicyViolation } from '../settings/platform-policy';
+import { SettingsService } from '../settings/settings.service';
 import { type AssignRoleDto } from './dto/assign-role.dto';
 import { type CreateUserDto } from './dto/create-user.dto';
 import { type ListUsersQueryDto } from './dto/list-users-query.dto';
@@ -32,7 +34,17 @@ export class UsersService {
     private readonly passwordService: PasswordService,
     private readonly sessionService: SessionService,
     private readonly auditService: AuditService,
+    private readonly settingsService: SettingsService,
   ) {}
+
+  /** Password rules from platform settings (Security: minimum length, strength). */
+  private async assertPasswordAllowed(password: string): Promise<void> {
+    const { password: policy } = await this.settingsService.getPolicy();
+    const violation = passwordPolicyViolation(password, policy);
+    if (violation) {
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'VALIDATION_ERROR', violation);
+    }
+  }
 
   private async getUserRepo(): Promise<Repository<User>> {
     return getInitializedRepository(this.dataSource, User);
@@ -114,6 +126,7 @@ export class UsersService {
 
     let passwordHash: string | null = null;
     if (dto.password) {
+      await this.assertPasswordAllowed(dto.password);
       passwordHash = await this.passwordService.hash(dto.password);
     }
 
@@ -149,6 +162,7 @@ export class UsersService {
     actorContext: EffectiveAuthContext,
     requestId?: string,
   ): Promise<UserItem> {
+    if (dto.password) await this.assertPasswordAllowed(dto.password);
     // Hash outside the transaction: it is slow and needs no database state.
     const newPasswordHash = dto.password ? await this.passwordService.hash(dto.password) : null;
 

@@ -151,7 +151,6 @@ describe('Platform settings (/api/v1/settings)', () => {
     const data = (res.body as ApiSuccess<PublicPlatformSettings>).data;
     expect(Object.keys(data).sort()).toEqual(
       [
-        'allowPublicRegistration',
         'defaultLocale',
         'defaultTimezone',
         'maintenanceMode',

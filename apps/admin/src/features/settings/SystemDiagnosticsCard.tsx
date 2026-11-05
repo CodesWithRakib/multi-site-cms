@@ -158,7 +158,7 @@ export function SystemDiagnosticsCard({
           <span>
             Storage Engine:{' '}
             <strong className="text-neutral-900 dark:text-neutral-100 uppercase">
-              {diagnostics?.storageProvider ?? 'CLOUDINARY'}
+              {diagnostics?.storageProvider ?? '—'}
             </strong>
           </span>
         </div>

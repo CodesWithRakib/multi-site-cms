@@ -846,15 +846,12 @@ export interface PlatformSecuritySettings {
   lockoutDurationMinutes: number;
   passwordMinLength: number;
   requireStrongPasswords: boolean;
-  enforceMfaForSuperAdmin: boolean;
-  allowPublicRegistration: boolean;
 }
 
+/** The storage provider is deployment configuration (API env), shown in diagnostics. */
 export interface PlatformMediaSettings {
-  storageProvider: 'cloudinary' | 'local' | 's3';
   maxUploadSizeBytes: number;
   allowedMimeTypes: string[];
-  autoWebpConversion: boolean;
 }
 
 export interface PlatformPublishingSettings {
@@ -890,13 +887,23 @@ export interface UpdatePlatformSettingsPayload {
   maintenance?: Partial<PlatformMaintenanceSettings>;
 }
 
+/** `GET /settings/policy`: limits the API enforces, for admin UI hints. */
+export interface EffectivePlatformPolicy {
+  maxUploadSizeBytes: number;
+  allowedMimeTypes: string[];
+  autoSaveIntervalSeconds: number;
+  defaultPostStatus: 'draft' | 'in_review';
+  previewTokenTtlMinutes: number;
+  passwordMinLength: number;
+  requireStrongPasswords: boolean;
+}
+
 export interface PublicPlatformSettings {
   platformName: string;
   tagline: string;
   maintenanceMode: boolean;
   maintenanceNoticeEn: string;
   maintenanceNoticeBn: string;
-  allowPublicRegistration: boolean;
   defaultLocale: string;
   defaultTimezone: string;
 }

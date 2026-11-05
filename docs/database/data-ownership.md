@@ -80,18 +80,18 @@ Never share implicitly through a join that ignores `site_id`.
 
 ## Retention and deletion
 
-| Data             | Policy                                                                                                 |
-| ---------------- | ------------------------------------------------------------------------------------------------------ |
-| Posts            | Archived, not hard-deleted from the UI; `deleted_at` is recoverable                                    |
-| Revisions        | Retained while the post exists; legal deletion is a Super Admin workflow                               |
-| Publications     | Archived; slug stays reserved for URL stability                                                        |
-| Media            | Deletion blocked while referenced (`RESTRICT`), or soft-delete + storage cleanup                       |
-| Taxonomy, events | Deleted with the site (`CASCADE`); a category in use is restricted                                     |
-| Audit events     | Append-only, never updated; purged after `AUDIT_RETENTION_DAYS` (default 730, min 365)                 |
-| Users            | Disabled/suspended; deletion restricted while content references them                                  |
-| Page views       | Purged after `ANALYTICS_RETENTION_DAYS` (default 730: the 1-year view compares with the previous year) |
-| Sessions         | Purged `SESSION_RETENTION_DAYS` (default 30) after expiry or revocation                                |
-| Outbox events    | Completed and dead-lettered events purged after `OUTBOX_RETENTION_DAYS` (default 30)                   |
+| Data             | Policy                                                                                                                     |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Posts            | Archived, not hard-deleted from the UI; `deleted_at` is recoverable                                                        |
+| Revisions        | Retained while the post exists; legal deletion is a Super Admin workflow                                                   |
+| Publications     | Archived; slug stays reserved for URL stability                                                                            |
+| Media            | Deletion blocked while referenced (`RESTRICT`), or soft-delete + storage cleanup                                           |
+| Taxonomy, events | Deleted with the site (`CASCADE`); a category in use is restricted                                                         |
+| Audit events     | Append-only, never updated; purged after the admin setting Settings → Maintenance → audit retention (default 730, min 365) |
+| Users            | Disabled/suspended; deletion restricted while content references them                                                      |
+| Page views       | Purged after `ANALYTICS_RETENTION_DAYS` (default 730: the 1-year view compares with the previous year)                     |
+| Sessions         | Purged `SESSION_RETENTION_DAYS` (default 30) after expiry or revocation                                                    |
+| Outbox events    | Completed and dead-lettered events purged after `OUTBOX_RETENTION_DAYS` (default 30)                                       |
 
 The purge runs inside the API (`src/maintenance/retention.job.ts`) shortly after
 boot and then daily, in batches of 5,000 rows, under a PostgreSQL advisory lock

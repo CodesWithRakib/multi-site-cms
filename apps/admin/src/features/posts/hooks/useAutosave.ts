@@ -2,12 +2,16 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 
+import { AutosaveScheduler } from './autosave-scheduler';
+
 export type AutosaveStatus = 'saved' | 'unsaved' | 'saving' | 'failed' | 'offline';
 
 export interface UseAutosaveOptions<T> {
   data: T;
   onSave: (data: T) => Promise<void>;
   debounceMs?: number;
+  /** Longest time changes stay unsaved while typing continues (platform setting). */
+  maxWaitMs?: number;
   enabled?: boolean;
 }
 
@@ -15,6 +19,7 @@ export function useAutosave<T>({
   data,
   onSave,
   debounceMs = 2000,
+  maxWaitMs = 30_000,
   enabled = true,
 }: UseAutosaveOptions<T>) {
   const [status, setStatus] = useState<AutosaveStatus>('saved');
@@ -27,7 +32,7 @@ export function useAutosave<T>({
     dataRef.current = data;
   }, [data]);
 
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const schedulerRef = useRef<AutosaveScheduler | null>(null);
 
   // Online / Offline tracking
   useEffect(() => {
@@ -74,12 +79,19 @@ export function useAutosave<T>({
     [onSave],
   );
 
+  useEffect(() => {
+    const scheduler = new AutosaveScheduler(
+      () => void executeSave(dataRef.current),
+      debounceMs,
+      Math.max(debounceMs, maxWaitMs),
+    );
+    schedulerRef.current = scheduler;
+    return () => scheduler.cancel();
+  }, [debounceMs, maxWaitMs, executeSave]);
+
   // Trigger immediate manual save
   const triggerManualSave = useCallback(async () => {
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-      timerRef.current = null;
-    }
+    schedulerRef.current?.cancel();
     await executeSave(dataRef.current);
   }, [executeSave]);
 
@@ -89,14 +101,8 @@ export function useAutosave<T>({
     setIsDirty(true);
     setStatus('unsaved');
 
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-    }
-
-    timerRef.current = setTimeout(() => {
-      void executeSave(dataRef.current);
-    }, debounceMs);
-  }, [debounceMs, enabled, executeSave]);
+    schedulerRef.current?.touch();
+  }, [enabled]);
 
   // Global Ctrl+S / Cmd+S shortcut to save immediately
   useEffect(() => {
@@ -114,15 +120,6 @@ export function useAutosave<T>({
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [enabled, triggerManualSave]);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
-      }
-    };
-  }, []);
 
   return {
     status,

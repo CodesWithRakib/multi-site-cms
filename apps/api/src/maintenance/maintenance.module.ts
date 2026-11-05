@@ -4,10 +4,11 @@ import { AuditModule } from '../common/audit/audit.module';
 import { env } from '../config/env';
 import { DatabaseModule } from '../database/database.module';
 import { RetentionJob } from './retention.job';
+import { SettingsModule } from '../settings/settings.module';
 
 /** Background housekeeping: data retention. */
 @Module({
-  imports: [DatabaseModule, AuditModule],
+  imports: [DatabaseModule, AuditModule, SettingsModule],
   providers: [RetentionJob],
   exports: [RetentionJob],
 })

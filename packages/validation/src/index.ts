@@ -200,12 +200,9 @@ export const platformSecuritySettingsSchema = z.object({
   lockoutDurationMinutes: z.number().int().min(1).max(1440).optional(),
   passwordMinLength: z.number().int().min(8).max(64).optional(),
   requireStrongPasswords: z.boolean().optional(),
-  enforceMfaForSuperAdmin: z.boolean().optional(),
-  allowPublicRegistration: z.boolean().optional(),
 });
 
 export const platformMediaSettingsSchema = z.object({
-  storageProvider: z.enum(['cloudinary', 'local', 's3']).optional(),
   maxUploadSizeBytes: z
     .number()
     .int()
@@ -213,7 +210,6 @@ export const platformMediaSettingsSchema = z.object({
     .max(100 * 1024 * 1024)
     .optional(),
   allowedMimeTypes: z.array(z.string().max(128)).optional(),
-  autoWebpConversion: z.boolean().optional(),
 });
 
 export const platformPublishingSettingsSchema = z.object({
@@ -227,7 +223,7 @@ export const platformMaintenanceSettingsSchema = z.object({
   maintenanceMode: z.boolean().optional(),
   maintenanceNoticeEn: z.string().max(512).optional(),
   maintenanceNoticeBn: z.string().max(512).optional(),
-  auditRetentionDays: z.number().int().min(7).max(3650).optional(),
+  auditRetentionDays: z.number().int().min(365).max(3650).optional(),
 });
 
 export const updatePlatformSettingsSchema = z.object({

@@ -43,13 +43,15 @@ export class AuthController {
     });
 
     const isProd = env.NODE_ENV === 'production';
+    // Cookies expire with the server-side session (settings: session TTL).
+    const maxAge = Math.max(0, result.expiresAt.getTime() - Date.now());
 
     res.cookie(SESSION_COOKIE_NAME, result.sessionToken, {
       httpOnly: true,
       secure: isProd,
       sameSite: 'lax',
       path: '/',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge,
     });
 
     res.cookie(CSRF_COOKIE_NAME, result.csrfToken, {
@@ -57,7 +59,7 @@ export class AuthController {
       secure: isProd,
       sameSite: 'lax',
       path: '/',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge,
     });
 
     return {

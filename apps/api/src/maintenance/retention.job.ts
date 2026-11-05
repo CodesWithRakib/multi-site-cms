@@ -4,6 +4,8 @@ import type { DataSource, QueryRunner } from 'typeorm';
 import { AuditService } from '../common/audit/audit.service';
 import { env } from '../config/env';
 import { DATA_SOURCE } from '../database/database.tokens';
+import { SAFE_DEFAULT_POLICY } from '../settings/platform-policy';
+import { SettingsService } from '../settings/settings.service';
 
 /** Retention windows in days; defaults come from the environment. */
 export interface RetentionWindows {
@@ -73,7 +75,8 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 
 export const DEFAULT_RETENTION_WINDOWS: RetentionWindows = {
   analyticsDays: env.ANALYTICS_RETENTION_DAYS,
-  auditDays: env.AUDIT_RETENTION_DAYS,
+  // Audit retention is a platform setting (Maintenance); this is the fallback.
+  auditDays: SAFE_DEFAULT_POLICY.retention.auditDays,
   sessionDays: env.SESSION_RETENTION_DAYS,
   outboxDays: env.OUTBOX_RETENTION_DAYS,
 };
@@ -93,6 +96,7 @@ export class RetentionJob implements OnModuleDestroy {
   constructor(
     @Inject(DATA_SOURCE) private readonly dataSource: DataSource,
     private readonly auditService: AuditService,
+    private readonly settingsService: SettingsService,
   ) {}
 
   /** Runs once shortly after boot, then on every interval (default daily). */
@@ -190,7 +194,11 @@ export class RetentionJob implements OnModuleDestroy {
     if (this.isProcessing) return;
     this.isProcessing = true;
     try {
-      const result = await this.purge();
+      const { retention } = await this.settingsService.getPolicy();
+      const result = await this.purge({
+        ...DEFAULT_RETENTION_WINDOWS,
+        auditDays: retention.auditDays,
+      });
       if (result.status === 'skipped') {
         this.logger.log(`Retention purge skipped: ${result.reason}`);
       }

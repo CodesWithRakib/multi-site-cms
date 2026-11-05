@@ -17,6 +17,7 @@ import {
 } from '@multi-site-cms/ui';
 
 import './globals.css';
+import { SiteMaintenanceBanner } from '@/components/layout/SiteMaintenanceBanner';
 
 const sansFont = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -92,6 +93,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       >
         <ThemeProvider storageKey="travel_blog_theme">
           <SkipLink />
+          <SiteMaintenanceBanner />
           <Header />
           <main id="main-content" tabIndex={-1} className="flex-1 focus:outline-none">
             {children}

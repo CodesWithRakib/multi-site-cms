@@ -5,7 +5,11 @@ import type { Editor } from '@tiptap/react';
 import type { MediaAssetItem, PostItem, PostPublicationItem } from '@multi-site-cms/types';
 import { RichTextEditor } from '@/features/editor';
 import { MediaLibraryModal } from '@/features/media';
-import { useListSitesQuery, useUpdatePostMutation } from '@/lib/cms-api';
+import {
+  useGetEffectivePolicyQuery,
+  useListSitesQuery,
+  useUpdatePostMutation,
+} from '@/lib/cms-api';
 import { useAutosave } from '../hooks/useAutosave';
 import { useDraftRecovery } from '../hooks/useDraftRecovery';
 import { usePostSubmit } from '../hooks/usePostSubmit';
@@ -54,6 +58,7 @@ export function PostForm({ initialPost, isCreateMode = false }: PostFormProps) {
 
   const [updatePost] = useUpdatePostMutation();
   const { data: sitesData = [] } = useListSitesQuery();
+  const { data: policy } = useGetEffectivePolicyQuery();
   const currentRevisionNumber = initialPost?.currentRevisionNumber || 1;
 
   // Autosave handler for existing posts
@@ -87,6 +92,8 @@ export function PostForm({ initialPost, isCreateMode = false }: PostFormProps) {
     data: { title, excerpt, type, bodyJson },
     onSave: handleAutosave,
     debounceMs: 2500,
+    // Settings → Publishing → autosave interval (enforced as the longest unsaved stretch).
+    maxWaitMs: (policy?.autoSaveIntervalSeconds ?? 30) * 1000,
     enabled: !isCreateMode,
   });
 
