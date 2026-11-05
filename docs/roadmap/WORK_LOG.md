@@ -154,3 +154,26 @@ Visual review of 60 + 60 screenshots (before/after).
 temporary admin in the dev database was denied by the permission system;
 needs the user's local credentials. Repo-wide formatting (145 files) left for a
 separate commit (TD-10).
+
+## 2026-11-05 — Phase 3c (authenticated admin review)
+
+**Environment:** Docker Desktop was not running; started it. `pnpm db:up`
+without `POSTGRES_PORT` recreated the container on 5432 while `apps/api/.env`
+uses 5433 (login failed with "unexpected error"); restored with
+`POSTGRES_PORT=5433 pnpm db:up`, data intact (named volume). The dev database
+was **3 migrations behind** (`PlatformSettingsRegistry`, `NewsletterSubscribers`,
+`PreModeratedComments`); applied with `db:migration:run`.
+
+**Changes (uncommitted):** dashboard metrics from real data (analytics API for
+page views), `DashboardMetricItem` without default trend/sparkline, upsell card
+removed, permission-aware sidebar, `/settings` guarded by `platform:configure`,
+`AdminTabBar` + safe-area padding in `ShellLayout`, two-column stat grids on
+phones (7 components), short tab labels (EN/BN), `e2e/admin-roles.spec.ts`.
+
+**Verification:** lint 0, typecheck 0, unit tests green (admin 12, UI 43,
+API 263), admin build OK, **E2E 42 passed** (role tests run with local
+accounts via env). Old-code check: site-admin sidebar test fails without the fix.
+
+**Note:** E2E logins share the API's 5-per-minute login limit; role specs log
+in once per role. `Sidebar.tsx` was already unformatted at HEAD and was
+formatted as part of this change.

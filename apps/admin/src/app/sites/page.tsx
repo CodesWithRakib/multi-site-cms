@@ -134,7 +134,7 @@ export default function SitesRegistryPage() {
         </div>
 
         {/* 2. Top Metric Cards (matching Dashboard & Posts style) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Total Websites */}
           <div className="relative overflow-hidden rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs">
             <div className="flex items-center justify-between">

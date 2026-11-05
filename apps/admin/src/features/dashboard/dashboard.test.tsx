@@ -60,6 +60,39 @@ describe('Dashboard Components (Unit Tests)', () => {
     expect(html).toContain('2');
   });
 
+  it('shows only real numbers: no estimated views or authors (regression)', () => {
+    const metrics = {
+      totalContent: 24,
+      publishedCount: 19,
+      draftsCount: 1,
+      scheduledCount: 1,
+      archivedCount: 0,
+      activeSitesCount: 2,
+    };
+
+    const withoutAnalytics = renderWithProviders(
+      <DashboardMetrics metrics={metrics} isLoading={false} />,
+    );
+    // The old code showed publishedCount × 128.4 as "2440K" and a fixed "+18.7%".
+    expect(withoutAnalytics).not.toContain('2440K');
+    expect(withoutAnalytics).not.toContain('+18.7%');
+    // Cards without a real comparison show no trend badge (old default was 12.5%).
+    expect(withoutAnalytics).not.toContain('12.5%');
+    expect(withoutAnalytics).not.toContain('%');
+    expect(withoutAnalytics).toContain('—');
+    expect(withoutAnalytics).toContain('Drafts: 1 · Scheduled: 1');
+
+    const withAnalytics = renderWithProviders(
+      <DashboardMetrics
+        metrics={metrics}
+        isLoading={false}
+        pageViews={{ total: 1536, growth: 12.94 }}
+      />,
+    );
+    expect(withAnalytics).toContain('1.5K');
+    expect(withAnalytics).toContain('+12.9%');
+  });
+
   it('renders ContentActivityChart with data points and legend', () => {
     const series = [
       { date: '2026-10-30', published: 2, drafts: 1, scheduled: 0 },

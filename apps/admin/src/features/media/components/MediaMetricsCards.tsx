@@ -10,7 +10,7 @@ interface MediaMetricsCardsProps {
 
 export function MediaMetricsCards({ stats }: MediaMetricsCardsProps) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
       {/* Card 1: Total Assets */}
       <div className="relative overflow-hidden p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-2xs">
         <div className="flex items-center justify-between">

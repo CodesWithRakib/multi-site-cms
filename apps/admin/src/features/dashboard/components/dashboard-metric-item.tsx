@@ -1,75 +1,72 @@
 'use client';
 
 import React from 'react';
-import { ArrowUp, type LucideIcon } from 'lucide-react';
+import { ArrowDown, ArrowUp, type LucideIcon } from 'lucide-react';
 import { Skeleton } from '@multi-site-cms/ui';
 
 export interface DashboardMetricItemProps {
   label: string;
   value: string | number;
   subtext?: string;
+  /** Real change only, e.g. "+12.9%". Omit when no comparison exists: no badge is shown. */
   trend?: string;
-  trendDirection?: 'up' | 'down';
   icon: LucideIcon;
   iconGradient?: string;
-  sparklineColor?: string;
-  iconColorClass?: string;
   isLoading?: boolean;
 }
 
+/**
+ * One headline number. It never invents a trend or a sparkline: both used to
+ * be decorative defaults that suggested growth regardless of the data.
+ */
 export function DashboardMetricItem({
   label,
   value,
   subtext,
-  trend = '12.5%',
+  trend,
   icon: Icon,
   iconGradient = 'bg-gradient-to-br from-emerald-400 to-teal-500',
-  sparklineColor = '#10b981',
   isLoading = false,
 }: DashboardMetricItemProps) {
-  return (
-    <div className="rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs flex items-center justify-between transition-all hover:shadow-sm">
-      <div className="flex items-center gap-4">
-        {/* Rounded square gradient icon */}
-        <div
-          className={`size-12 rounded-xl flex items-center justify-center text-white shrink-0 shadow-xs ${iconGradient}`}
-        >
-          <Icon className="size-6" />
-        </div>
+  const isDown = trend?.trim().startsWith('-') ?? false;
+  const TrendIcon = isDown ? ArrowDown : ArrowUp;
 
-        {/* Value and label */}
-        <div className="flex flex-col">
-          <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
-            {label}
-          </span>
-          <div className="flex items-baseline gap-2 mt-0.5">
-            {isLoading ? (
-              <Skeleton className="h-7 w-16" />
-            ) : (
-              <span className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white font-sans">
-                {value}
-              </span>
-            )}
-            <div className="flex items-center text-emerald-500 text-xs font-semibold gap-0.5">
-              <ArrowUp className="size-3 stroke-[2.5]" />
-              <span>{trend}</span>
-            </div>
-          </div>
-          {subtext && <span className="sr-only">{subtext}</span>}
-        </div>
+  return (
+    <div className="rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-5 shadow-xs flex items-center gap-3 sm:gap-4 transition-all hover:shadow-sm min-w-0">
+      <div
+        className={`size-10 sm:size-12 rounded-xl flex items-center justify-center text-white shrink-0 shadow-xs ${iconGradient}`}
+      >
+        <Icon className="size-5 sm:size-6" aria-hidden="true" />
       </div>
 
-      {/* Decorative smooth wavy sparkline SVG on right */}
-      <div className="hidden sm:block w-20 h-10 shrink-0">
-        <svg viewBox="0 0 80 40" className="w-full h-full overflow-visible" fill="none">
-          <path
-            d="M 2 28 C 15 28, 20 12, 32 18 C 42 24, 52 8, 62 14 C 70 19, 75 10, 78 6"
-            stroke={sparklineColor}
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
+      <div className="flex flex-col min-w-0">
+        <span className="text-xs font-medium text-slate-500 dark:text-slate-400 truncate">
+          {label}
+        </span>
+        <div className="flex flex-wrap items-baseline gap-x-2 mt-0.5">
+          {isLoading ? (
+            <Skeleton className="h-7 w-16" />
+          ) : (
+            <span className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white font-sans">
+              {value}
+            </span>
+          )}
+          {trend && !isLoading && (
+            <span
+              className={`flex items-center text-xs font-semibold gap-0.5 ${
+                isDown ? 'text-rose-500' : 'text-emerald-500'
+              }`}
+            >
+              <TrendIcon className="size-3 stroke-[2.5]" aria-hidden="true" />
+              <span>{trend}</span>
+            </span>
+          )}
+        </div>
+        {subtext && (
+          <span className="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400 truncate">
+            {subtext}
+          </span>
+        )}
       </div>
     </div>
   );

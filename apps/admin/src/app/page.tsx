@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { ShellLayout } from '@/components/shell';
 import { useAdmin } from '@/lib/admin-context';
-import { useGetDashboardOverviewQuery } from '@/lib/cms-api';
+import { useGetAnalyticsOverviewQuery, useGetDashboardOverviewQuery } from '@/lib/cms-api';
 import { DashboardHeader } from '@/features/dashboard/components/dashboard-header';
 import { DashboardMetrics } from '@/features/dashboard/components/dashboard-metrics';
 import { YourWebsites } from '@/features/dashboard/components/your-websites';
@@ -26,6 +26,15 @@ export default function AdminDashboardPage() {
     days,
   });
 
+  // Same site and period as the overview, so every number on the page agrees.
+  const { data: analytics, isLoading: isAnalyticsLoading } = useGetAnalyticsOverviewQuery({
+    siteId: activeSiteId || undefined,
+    days,
+  });
+  const pageViews = analytics
+    ? { total: analytics.summary.totalPageViews, growth: analytics.summary.pageViewsGrowth }
+    : undefined;
+
   return (
     <ShellLayout>
       <div className="flex flex-col gap-6 w-full">
@@ -42,6 +51,8 @@ export default function AdminDashboardPage() {
           metrics={overview?.metrics}
           isLoading={isLoading}
           isPlatformView={!activeSiteId}
+          pageViews={pageViews}
+          isPageViewsLoading={isAnalyticsLoading}
         />
 
         {/* 2. Middle Row: Dynamic Websites (5 cols) | Real Activity Logs (4 cols) | Quick Actions (3 cols) */}

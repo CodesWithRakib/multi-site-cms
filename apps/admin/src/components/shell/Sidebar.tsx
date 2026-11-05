@@ -15,8 +15,6 @@ import {
   BarChart2,
   Settings,
   ShieldCheck,
-  Crown,
-  ArrowRight,
   ChevronDown,
   Calendar,
   MessageSquare,
@@ -30,7 +28,7 @@ interface SidebarProps {
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
-  const { t } = useAdmin();
+  const { t, isSuperAdmin, can } = useAdmin();
   const { data: commentsData } = useListCommentsQuery({ limit: 1 });
   const pendingCommentsCount = commentsData?.counts.pending ?? 0;
 
@@ -62,6 +60,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     },
     {
       href: '/sites',
+      superAdminOnly: true,
       label: t('nav.websites'),
       icon: Globe,
       active: pathname.startsWith('/sites'),
@@ -86,6 +85,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     },
     {
       href: '/users',
+      requiredPermission: 'user:read',
       label: t('nav.users'),
       icon: Users,
       active: pathname.startsWith('/users'),
@@ -98,6 +98,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     },
     {
       href: '/settings',
+      requiredPermission: 'platform:configure',
       label: t('nav.settings'),
       icon: Settings,
       active: pathname.startsWith('/settings'),
@@ -133,15 +134,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           <Link href="/" className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center shrink-0">
               <svg viewBox="0 0 40 40" className="w-9 h-9" fill="none" aria-hidden="true">
-                <path
-                  d="M6 31L16 11L21 21L25 14L34 31H26L21 23L17 31H6Z"
-                  fill="#00e599"
-                />
-                <path
-                  d="M12 31L16 23L20 31H12Z"
-                  fill="#05f292"
-                  opacity="0.6"
-                />
+                <path d="M6 31L16 11L21 21L25 14L34 31H26L21 23L17 31H6Z" fill="#00e599" />
+                <path d="M12 31L16 23L20 31H12Z" fill="#05f292" opacity="0.6" />
               </svg>
             </div>
             <div className="flex flex-col">
@@ -157,61 +151,43 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
         {/* Navigation list */}
         <nav className="flex-1 space-y-1 overflow-y-auto px-4 py-2 scrollbar-thin">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.label}
-                href={item.href}
-                onClick={onClose}
-                className={`flex items-center gap-3.5 rounded-xl px-4 py-2.5 text-xs font-semibold transition-all ${
-                  item.active
-                    ? 'bg-brand-400 text-brand-950 font-bold shadow-md shadow-brand-400/20'
-                    : 'text-slate-300/80 hover:bg-white/[0.07] hover:text-white'
-                }`}
-              >
-                <Icon
-                  className={`h-4 w-4 shrink-0 ${
-                    item.active ? 'text-brand-950' : 'text-slate-300/80 group-hover:text-white'
+          {navItems
+            // Hide links the user cannot open; the API enforces access either way.
+            .filter((item) =>
+              'superAdminOnly' in item && item.superAdminOnly
+                ? isSuperAdmin
+                : 'requiredPermission' in item && item.requiredPermission
+                  ? can(item.requiredPermission)
+                  : true,
+            )
+            .map((item) => {
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  onClick={onClose}
+                  className={`flex items-center gap-3.5 rounded-xl px-4 py-2.5 text-xs font-semibold transition-all ${
+                    item.active
+                      ? 'bg-brand-400 text-brand-950 font-bold shadow-md shadow-brand-400/20'
+                      : 'text-slate-300/80 hover:bg-white/[0.07] hover:text-white'
                   }`}
-                />
-                <span className="flex-1">{item.label}</span>
-                {typeof item.badge === 'number' && (
-                  <span className="inline-flex items-center justify-center rounded-full bg-amber-400 px-1.5 py-0.5 text-[10px] font-bold text-slate-900 shadow-2xs">
-                    {item.badge}
-                  </span>
-                )}
-              </Link>
-            );
-          })}
+                >
+                  <Icon
+                    className={`h-4 w-4 shrink-0 ${
+                      item.active ? 'text-brand-950' : 'text-slate-300/80 group-hover:text-white'
+                    }`}
+                  />
+                  <span className="flex-1">{item.label}</span>
+                  {typeof item.badge === 'number' && (
+                    <span className="inline-flex items-center justify-center rounded-full bg-amber-400 px-1.5 py-0.5 text-[10px] font-bold text-slate-900 shadow-2xs">
+                      {item.badge}
+                    </span>
+                  )}
+                </Link>
+              );
+            })}
         </nav>
-
-        {/* Upgrade to Pro Card */}
-        <div className="px-4 py-2">
-          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-b from-white/[0.08] to-white/[0.02] border border-white/10 p-4">
-            {/* Subtle decorative mountain contour in the background */}
-            <div className="absolute -bottom-2 -right-4 w-28 h-20 opacity-20 pointer-events-none">
-              <svg viewBox="0 0 100 80" fill="currentColor" className="text-emerald-400">
-                <polygon points="10,80 50,20 75,55 90,35 110,80" />
-              </svg>
-            </div>
-
-            <div className="flex items-center gap-2 mb-1">
-              <Crown className="w-4 h-4 text-amber-400 fill-amber-400/20" />
-              <h4 className="font-bold text-xs text-white">{t('nav.upgradeToPro')}</h4>
-            </div>
-            <p className="text-[11px] text-teal-100/70 leading-snug">
-              {t('nav.upgradeDesc')}
-            </p>
-            <button
-              type="button"
-              className="mt-3.5 w-full py-2 px-3 rounded-xl bg-brand-400 hover:bg-brand-300 text-brand-950 font-bold text-xs transition-colors flex items-center justify-center gap-1.5 shadow-sm cursor-pointer"
-            >
-              <span>{t('nav.viewPlans')}</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </div>
 
         {/* User Profile at bottom */}
         <div className="p-4 border-t border-brand-900/80">
@@ -288,9 +264,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 </svg>
               </div>
               <div className="flex flex-col min-w-0 leading-tight">
-                <span className="text-xs font-bold text-white truncate">
-                  Rakib Islam
-                </span>
+                <span className="text-xs font-bold text-white truncate">Rakib Islam</span>
                 <span className="text-[10px] text-teal-300/80 font-medium truncate">
                   {t('nav.superAdmin')}
                 </span>

@@ -87,7 +87,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <ShellLayout>
+    <ShellLayout requiredPermission="platform:configure">
       <div className="w-full space-y-6 pb-12">
         {/* Page Header */}
         <div>

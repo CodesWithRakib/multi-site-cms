@@ -52,5 +52,15 @@ keyboard-only flows, axe accessibility scan, admin screens beyond login.
 
 Visual review: 60 screenshots before, 60 after (all public routes plus admin
 login, 1440 px and 390 px, light and dark), compared as contact sheets.
-Authenticated admin screens were **not** reviewed: no local credentials were
-available and creating an admin account in the database was not permitted.
+
+## Found and fixed in Phase 3c (authenticated admin review)
+
+Reviewed with local Super Admin and Travel site-admin accounts: 13 admin
+routes × 1440/390 px × light/dark, plus the site-admin view.
+
+| ID    | Severity | Finding and fix                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| ----- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| UX-17 | **High** | Dashboard numbers were invented while labelled "real": _Total Views_ = published posts × 128.4 shown as "2440K" with a fixed "+18.7%"; _Total Authors_ = published × 1.5; every card defaulted to a "+12.5%" trend and drew the same rising sparkline. Now: real page views and growth from the analytics API (same site and period), Published with drafts/scheduled subtext, trend badges only for real comparisons, no fake sparklines. Unit and E2E regression tests. |
+| UX-18 | Medium   | Sidebar "Upgrade to Pro / View Plans" card with a button that did nothing; the product has no plans. Removed with its translations.                                                                                                                                                                                                                                                                                                                                       |
+| UX-19 | Medium   | Sidebar was not permission-aware: site admins saw Websites, Users, and Settings, which led to 403 pages or (Settings) an editable form filled with defaults. The API already returned 403. Sidebar now filters by role/permission; `/settings` requires `platform:configure`. E2E (`admin-roles.spec.ts`).                                                                                                                                                                |
+| UX-20 | Medium   | Admin on phones: stat cards stacked one per row (long scroll before content) and navigation only through the drawer. Stat grids are two columns on phones; added a bottom tab bar (Home, Posts, Calendar, Comments, Media) limited to sections every role can open.                                                                                                                                                                                                       |

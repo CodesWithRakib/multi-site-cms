@@ -2,6 +2,7 @@
 
 import React, { useState, type ReactNode } from 'react';
 import { AuthGuard } from './AuthGuard';
+import { AdminTabBar } from './AdminTabBar';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 
@@ -34,10 +35,14 @@ export function ShellLayout({
         <div className="flex flex-1 flex-col h-full min-w-0 overflow-hidden relative">
           <Header onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
 
-          <main className="flex-1 overflow-y-auto overflow-x-hidden px-4 sm:px-8 pb-10" role="main">
+          <main
+            className="flex-1 overflow-y-auto overflow-x-hidden px-4 sm:px-8 pb-[calc(4.5rem+env(safe-area-inset-bottom))] md:pb-10"
+            role="main"
+          >
             {children}
           </main>
         </div>
+        <AdminTabBar />
       </div>
     </AuthGuard>
   );

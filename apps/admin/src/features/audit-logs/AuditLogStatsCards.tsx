@@ -73,7 +73,7 @@ export function AuditLogStatsCards({
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 w-full">
       {cards.map((card) => {
         const IconComponent = card.icon;
         const isSelected = activeCategory === card.category;

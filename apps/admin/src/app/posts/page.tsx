@@ -240,7 +240,7 @@ export default function PostsPage() {
         </div>
 
         {/* 2. Top Metric Cards Row (4 Stat Cards matching Dashboard Style) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
           {/* Card 1: Total Posts */}
           <div className="rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs flex items-center justify-between transition-all hover:shadow-sm">
             <div className="flex items-center gap-4">
