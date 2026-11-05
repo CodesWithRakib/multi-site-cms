@@ -109,6 +109,11 @@ Seeds:
 
 Visual verification performed with `chrome-devtools-mcp`:
 
+> Note (2026-11-05 audit): the screenshot files listed below were never
+> committed; `docs/screenshots` was empty and has been removed. Current visual
+> evidence comes from `e2e/visual-tour.spec.ts` (opt-in, written outside the
+> repository).
+
 1. **Desktop (1440 × 900 px)**: Full 2-column editorial dashboard with SVG chart, responsive metrics grid, and audit feed (`docs/screenshots/dashboard-desktop-dark-1440.png`, `docs/screenshots/dashboard-desktop-light-1440.png`).
 2. **Tablet (768 × 1024 px)**: Responsive collapsible sidebar, 2-row wrapped metric cards, responsive tables (`docs/screenshots/dashboard-tablet-768.png`).
 3. **Mobile (375 × 667 px)**: Single-column stacked cards, horizontal table scrolling, touch targets >= 44px (`docs/screenshots/dashboard-mobile-375.png`).

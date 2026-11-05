@@ -190,4 +190,3 @@ export function EditorFormattingGroup({ editor }: EditorFormattingGroupProps) {
     </>
   );
 }
-

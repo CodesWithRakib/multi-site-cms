@@ -34,7 +34,9 @@ export function PostBasicFields({
           >
             Post Title *
           </label>
-          <span className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">{title.length} / 255</span>
+          <span className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
+            {title.length} / 255
+          </span>
         </div>
         <input
           id="post-title-input"
@@ -57,7 +59,9 @@ export function PostBasicFields({
           >
             Summary / Excerpt
           </label>
-          <span className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">{excerpt.length} / 1000</span>
+          <span className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
+            {excerpt.length} / 1000
+          </span>
         </div>
         <textarea
           id="post-excerpt-input"
@@ -115,4 +119,3 @@ export function PostBasicFields({
     </div>
   );
 }
-

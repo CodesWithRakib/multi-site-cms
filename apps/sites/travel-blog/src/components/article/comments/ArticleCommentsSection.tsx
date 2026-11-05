@@ -11,10 +11,7 @@ interface ArticleCommentsSectionProps {
   initialData?: PublicCommentsResult | null;
 }
 
-export function ArticleCommentsSection({
-  slug,
-  initialData,
-}: ArticleCommentsSectionProps) {
+export function ArticleCommentsSection({ slug, initialData }: ArticleCommentsSectionProps) {
   const [comments, setComments] = useState<PublicCommentItem[]>(initialData?.items ?? []);
   const [total, setTotal] = useState<number>(initialData?.total ?? 0);
   const [averageRating, setAverageRating] = useState<number | null>(
@@ -80,7 +77,9 @@ export function ArticleCommentsSection({
             <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
             <span className="font-bold text-foreground">{averageRating.toFixed(1)}</span>
             <span className="text-muted-foreground text-xs">/ 5.0</span>
-            <span className="text-xs text-muted-foreground">({total} {total === 1 ? 'review' : 'reviews'})</span>
+            <span className="text-xs text-muted-foreground">
+              ({total} {total === 1 ? 'review' : 'reviews'})
+            </span>
           </div>
         )}
       </div>
@@ -93,4 +92,3 @@ export function ArticleCommentsSection({
     </section>
   );
 }
-

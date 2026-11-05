@@ -23,4 +23,3 @@ export function AirSportsCallout({ type = 'info', children }: AirSportsCalloutPr
     </div>
   );
 }
-

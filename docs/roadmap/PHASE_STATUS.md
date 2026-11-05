@@ -1,6 +1,6 @@
 # Phase Status
 
-Last updated: 2026-11-04
+Last updated: 2026-11-05
 
 | Phase                              | Status                                  | Evidence / blocker                                                                                                                                                             |
 | ---------------------------------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -8,10 +8,10 @@ Last updated: 2026-11-04
 | 1 — Secrets and security hardening | **Done in code; one owner action open** | Open: rotate Cloudinary secret (SEC-0)                                                                                                                                         |
 | 2 — Core workflow correctness      | **Done** (one coverage item deferred)   | API 263/263, integration 56/56. Deferred to Phase 4: API tests for newsletter, users/roles, settings                                                                           |
 | 3 — UX resilience                  | **Done (3a–3d)**                        | WCAG 2.2 AA: 0 serious/critical (axe, light+dark, public+admin); keyboard flows tested; `/posts` decomposed. E2E 51/51. Remaining page decompositions moved to Phase 4 backlog |
-| 4 — Production operations          | Not started                             |                                                                                                                                                                                |
+| 4 — Production operations          | **Done in code; owner/CI checks open**  | API 267/267, integration 67/67, E2E full suite green on production builds locally. Open: first GitHub CI run, DB-6 cleanup decision, provider PITR drill                       |
 | 5 — Commerce                       | **Out of scope**                        | Business decision 2026-11-04                                                                                                                                                   |
 
-All changes are uncommitted.
+Phases 1–3 are committed by the owner; Phase 4 changes are uncommitted.
 
 ## Phase 1 checklist
 
@@ -54,3 +54,23 @@ All changes are uncommitted.
 - [x] 3d `@axe-core/playwright` scan: ~80 → 0 serious/critical findings; central AA-safe ramps with guard tests (needs a new dev dependency)
 - [x] 3d `/posts` decomposed (952 → 65 lines; hook + 9 components); real author, honest stats, correct live links
 - [ ] Decompose `sites/[siteId]`, `users/[userId]`, `sites` pages (moved to Phase 4 backlog)
+
+## Phase 4 checklist
+
+- [x] TD-10 repository formatted (142 files, format-only); `format:check` passes
+- [x] CI: `verify` job gets PostgreSQL (API suite needed it; CI test step could not pass before) + DB integration tests
+- [x] CI: `e2e` job against production builds; throwaway accounts with masked random passwords; reproduced locally (`E2E_SERVER_MODE=production`)
+- [x] Two-worker scheduled publishing test (SKIP LOCKED): no double publish, no duplicate outbox event
+- [x] TD-12 `GET /posts/stats` server-side counts; status filter uses the same SQL rule (fixed short pages from client re-filtering)
+- [x] TD-14 phone card list for posts; unique ids for menus/gradients (table + card render together)
+- [x] DB-4 retention job (analytics, audit, sessions, outbox) with advisory lock; env windows
+- [x] DB-6 found: analytics migration fabricated page views (100% of dev data); insert removed; `db:cleanup:generated-analytics` (dry run default)
+- [ ] DB-6 run cleanup with `--apply` on existing databases (**owner decision**)
+- [x] Restore drill (local pg_dump → pg_restore), timings recorded; stale “verified” claims corrected
+- [x] TD-9 SSE scaling decision: ADR-0028 (one API instance)
+- [x] `pnpm audit` reviewed: 0 high/critical
+- [x] TD-8 empty folders removed
+- [ ] First green GitHub Actions run (needs a push)
+- [ ] API tests for newsletter, users/roles, settings (carried over)
+- [ ] Decompose `sites/[siteId]`, `users/[userId]`, `sites` pages (carried over)
+- [ ] TD-15 post actions menu can sit behind the phone tab bar

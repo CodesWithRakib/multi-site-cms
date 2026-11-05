@@ -39,7 +39,9 @@ export function EventTimelineCard({
       : 'border-border/80 bg-card';
 
   return (
-    <aside className={`my-6 rounded-xl border p-5 shadow-xs font-sans transition-all ${cardBorder}`}>
+    <aside
+      className={`my-6 rounded-xl border p-5 shadow-xs font-sans transition-all ${cardBorder}`}
+    >
       <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
         <div className="flex items-center gap-2.5">
           <span className="flex items-center gap-1 font-mono text-xs font-bold px-2.5 py-1 rounded-md bg-foreground/10 text-foreground">
@@ -84,4 +86,3 @@ export function EventTimelineCard({
     </aside>
   );
 }
-

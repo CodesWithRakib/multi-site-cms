@@ -9,10 +9,7 @@ export interface CountryDemographicsCardProps {
   isLoading?: boolean;
 }
 
-export function CountryDemographicsCard({
-  countries,
-  isLoading,
-}: CountryDemographicsCardProps) {
+export function CountryDemographicsCard({ countries, isLoading }: CountryDemographicsCardProps) {
   const { t } = useAdmin();
 
   // Helper to convert 2-letter ISO code to flag emoji
@@ -31,9 +28,7 @@ export function CountryDemographicsCard({
         <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
           {t('analytics.geographicDistribution')}
         </h3>
-        <p className="text-xs text-slate-500 dark:text-slate-400">
-          {t('analytics.geoSubtitle')}
-        </p>
+        <p className="text-xs text-slate-500 dark:text-slate-400">{t('analytics.geoSubtitle')}</p>
       </div>
 
       <div className="space-y-3.5 my-auto">
@@ -81,4 +76,3 @@ export function CountryDemographicsCard({
     </div>
   );
 }
-

@@ -49,8 +49,12 @@ export function YourWebsites({ recentContent = [] }: YourWebsitesProps) {
         {availableSites.length === 0 ? (
           <div className="flex flex-col items-center justify-center p-8 text-center border border-dashed border-slate-200 dark:border-slate-800 rounded-xl">
             <Globe className="size-8 text-slate-500 dark:text-slate-400 mb-2" />
-            <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">No websites found</p>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Create your first website property to begin publishing.</p>
+            <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+              No websites found
+            </p>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+              Create your first website property to begin publishing.
+            </p>
             <Link
               href="/sites"
               className="mt-3 px-3.5 py-1.5 rounded-lg bg-emerald-500 text-white text-xs font-semibold hover:bg-emerald-600 transition-colors"
@@ -92,7 +96,14 @@ export function YourWebsites({ recentContent = [] }: YourWebsitesProps) {
                         <rect width="160" height="110" fill={`url(#airSky-${site.id})`} />
                         <ellipse cx="30" cy="80" rx="35" ry="14" fill="#ffffff" fillOpacity="0.8" />
                         <ellipse cx="60" cy="85" rx="30" ry="12" fill="#ffffff" fillOpacity="0.9" />
-                        <ellipse cx="130" cy="75" rx="40" ry="16" fill="#ffffff" fillOpacity="0.75" />
+                        <ellipse
+                          cx="130"
+                          cy="75"
+                          rx="40"
+                          ry="16"
+                          fill="#ffffff"
+                          fillOpacity="0.75"
+                        />
                         <g transform="translate(68, 42) rotate(-15)">
                           <path d="M -28 -2 L 28 -2 L 22 2 L -22 2 Z" fill="#dc2626" />
                           <rect x="-3" y="-14" width="6" height="28" rx="2" fill="#b91c1c" />
@@ -121,8 +132,14 @@ export function YourWebsites({ recentContent = [] }: YourWebsitesProps) {
                         <polygon points="40,35 50,25 60,35 55,38 50,33 45,38" fill="#f8fafc" />
                         <polygon points="65,65 105,18 145,65" fill="#475569" />
                         <polygon points="95,29 105,18 115,29 110,32 105,27 100,32" fill="#f8fafc" />
-                        <path d="M0 70 Q40 50 80 68 Q120 52 160 65 L160 110 L0 110 Z" fill="#15803d" />
-                        <path d="M0 78 C30 74 130 74 160 78 L160 110 L0 110 Z" fill={`url(#travelLake-${site.id})`} />
+                        <path
+                          d="M0 70 Q40 50 80 68 Q120 52 160 65 L160 110 L0 110 Z"
+                          fill="#15803d"
+                        />
+                        <path
+                          d="M0 78 C30 74 130 74 160 78 L160 110 L0 110 Z"
+                          fill={`url(#travelLake-${site.id})`}
+                        />
                         <polygon points="15,75 18,65 21,75" fill="#14532d" />
                         <polygon points="20,78 24,67 28,78" fill="#166534" />
                         <polygon points="135,76 138,66 141,76" fill="#14532d" />
@@ -148,7 +165,9 @@ export function YourWebsites({ recentContent = [] }: YourWebsitesProps) {
                             isActive ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'
                           }`}
                         />
-                        <span className="capitalize">{isActive ? t('dashboard.active') : site.status}</span>
+                        <span className="capitalize">
+                          {isActive ? t('dashboard.active') : site.status}
+                        </span>
                       </div>
                     </div>
 
@@ -164,7 +183,9 @@ export function YourWebsites({ recentContent = [] }: YourWebsitesProps) {
                   <div className="flex flex-col text-left sm:text-right text-[11px] text-slate-500 dark:text-slate-400 font-medium">
                     <div className="flex items-center gap-1 sm:justify-end">
                       <FileText className="size-3 text-slate-500 dark:text-slate-400" />
-                      <span>{postsCount} {t('dashboard.posts')}</span>
+                      <span>
+                        {postsCount} {t('dashboard.posts')}
+                      </span>
                     </div>
                     <div className="flex items-center gap-1 sm:justify-end mt-0.5">
                       <Eye className="size-3 text-slate-500 dark:text-slate-400" />

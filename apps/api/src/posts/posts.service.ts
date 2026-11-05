@@ -1,12 +1,13 @@
 import crypto from 'node:crypto';
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { In, type DataSource, type Repository } from 'typeorm';
+import { In, type DataSource, type Repository, type SelectQueryBuilder } from 'typeorm';
 
 import type {
   PaginatedResult,
   PostItem,
   PostPreviewData,
   PostRevisionItem,
+  PostStatusCounts,
   PreviewTokenResponse,
 } from '@multi-site-cms/types';
 import type { EffectiveAuthContext } from '../auth/services/authorization.service';
@@ -23,6 +24,12 @@ import { Post } from '../database/entities/post.entity';
 import { Site } from '../database/entities/site.entity';
 import { CreatePostDto, ListPostsQueryDto, RestoreRevisionDto, UpdatePostDto } from './dto';
 import { validateStructuredBody } from './utils/body-validator';
+import {
+  effectiveStatusSql,
+  isPostStatsStatus,
+  POST_STATS_STATUSES,
+  type PostStatsStatus,
+} from './utils/effective-status';
 import { canAccessPost, canManageAllPublications } from './utils/post-access';
 
 /**
@@ -196,23 +203,19 @@ export class PostsService {
     });
   }
 
-  async listPosts(
+  /**
+   * Posts the actor may see, with every list filter except status and paging
+   * applied. Shared by the list and the status counts so both see one scope.
+   */
+  private async scopedPostsQuery(
     actor: EffectiveAuthContext,
-    query: ListPostsQueryDto,
-  ): Promise<PaginatedResult<PostItem>> {
-    const page = Math.max(1, query.page ?? 1);
-    const limit = Math.min(100, Math.max(1, query.limit ?? 20));
-    const skip = (page - 1) * limit;
-
+    query: Pick<
+      ListPostsQueryDto,
+      'type' | 'authorId' | 'siteId' | 'search' | 'startDate' | 'endDate'
+    >,
+  ): Promise<SelectQueryBuilder<Post>> {
     const postRepo = await this.getPostRepo();
-    const revisionRepo = await this.getRevisionRepo();
-
-    // Author name only: never load password hashes or other user fields here.
-    const qb = postRepo
-      .createQueryBuilder('p')
-      .leftJoin('p.author', 'author')
-      .addSelect(['author.id', 'author.displayName'])
-      .where('p.deleted_at IS NULL');
+    const qb = postRepo.createQueryBuilder('p').where('p.deleted_at IS NULL');
 
     if (!actor.isSuperAdmin) {
       if (actor.authorizedSiteIds.length > 0) {
@@ -229,13 +232,6 @@ export class PostsService {
       qb.andWhere('p.type = :type', { type: query.type });
     }
 
-    if (query.status) {
-      qb.andWhere(
-        '(p.status = :status OR EXISTS (SELECT 1 FROM post_publications pp WHERE pp.post_id = p.id AND pp.status = :status))',
-        { status: query.status },
-      );
-    }
-
     if (query.authorId) {
       qb.andWhere('p.author_id = :filterAuthor', { filterAuthor: query.authorId });
     }
@@ -248,6 +244,7 @@ export class PostsService {
         'EXISTS (SELECT 1 FROM post_publications pp WHERE pp.post_id = p.id AND pp.site_id = :filterSite)',
         { filterSite: query.siteId },
       );
+      qb.setParameter('effectiveStatusSiteId', query.siteId);
     }
 
     if (query.search) {
@@ -263,6 +260,62 @@ export class PostsService {
 
     if (query.endDate) {
       qb.andWhere('p.created_at <= :endDate', { endDate: new Date(query.endDate) });
+    }
+
+    return qb;
+  }
+
+  /**
+   * Post counts per effective status (see `effectiveStatusSql`) for the
+   * workspace cards and tabs. Counted in the database, so they stay correct
+   * for any number of posts.
+   */
+  async getPostStats(
+    actor: EffectiveAuthContext,
+    query: Pick<ListPostsQueryDto, 'siteId' | 'type'>,
+  ): Promise<PostStatusCounts> {
+    const qb = await this.scopedPostsQuery(actor, query);
+    const rows = await qb
+      .select(effectiveStatusSql('p', Boolean(query.siteId)), 'status')
+      .addSelect('COUNT(*)::int', 'count')
+      .groupBy('1')
+      .getRawMany<{ status: string; count: number | string }>();
+
+    const byStatus = Object.fromEntries(POST_STATS_STATUSES.map((status) => [status, 0])) as Record<
+      PostStatsStatus,
+      number
+    >;
+    let total = 0;
+    for (const row of rows) {
+      const count = Number(row.count);
+      total += count;
+      if (isPostStatsStatus(row.status)) {
+        byStatus[row.status] = count;
+      }
+    }
+    return { total, byStatus };
+  }
+
+  async listPosts(
+    actor: EffectiveAuthContext,
+    query: ListPostsQueryDto,
+  ): Promise<PaginatedResult<PostItem>> {
+    const page = Math.max(1, query.page ?? 1);
+    const limit = Math.min(100, Math.max(1, query.limit ?? 20));
+    const skip = (page - 1) * limit;
+
+    const revisionRepo = await this.getRevisionRepo();
+
+    // Author name only: never load password hashes or other user fields here.
+    const qb = (await this.scopedPostsQuery(actor, query))
+      .leftJoin('p.author', 'author')
+      .addSelect(['author.id', 'author.displayName']);
+
+    // Same definition as the status counts, so a tab's count matches its rows.
+    if (query.status) {
+      qb.andWhere(`${effectiveStatusSql('p', Boolean(query.siteId))} = :status`, {
+        status: query.status,
+      });
     }
 
     const sortField = query.sortBy === 'updatedAt' ? 'p.updated_at' : 'p.created_at';

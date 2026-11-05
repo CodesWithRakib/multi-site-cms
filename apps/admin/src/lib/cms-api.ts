@@ -30,6 +30,7 @@ import type {
   PlatformSystemDiagnostics,
   PublicPlatformSettings,
   PostItem,
+  PostStatusCounts,
   PostPreviewData,
   PostPublicationItem,
   PreviewTokenResponse,
@@ -88,6 +89,12 @@ export interface ListPostsParams {
   search?: string;
   page?: number;
   limit?: number;
+}
+
+/** Scope of the posts workspace status counts. */
+export interface PostStatsParams {
+  siteId?: string;
+  type?: string;
 }
 
 export interface ListMediaParams {
@@ -470,8 +477,6 @@ export const cmsApi = platformApi.injectEndpoints({
       transformResponse: (response: ApiSuccess<unknown>) => response.data as PublicPlatformSettings,
     }),
 
-
-
     // ==========================================
     // Posts & Revisions
     // ==========================================
@@ -489,6 +494,16 @@ export const cmsApi = platformApi.injectEndpoints({
               { type: 'Post' as const, id: 'LIST' },
             ]
           : [{ type: 'Post' as const, id: 'LIST' }],
+    }),
+
+    getPostStats: build.query<PostStatusCounts, PostStatsParams | void>({
+      query: (params) => ({
+        path: '/posts/stats',
+        query: params as Record<string, string | undefined> | undefined,
+      }),
+      transformResponse: (response: ApiSuccess<unknown>) => response.data as PostStatusCounts,
+      // Any post or publication change can move a post between statuses.
+      providesTags: ['Post', 'Publication'],
     }),
 
     getPost: build.query<PostItem, string>({
@@ -953,17 +968,13 @@ export const cmsApi = platformApi.injectEndpoints({
       providesTags: ['Comment'],
     }),
 
-    updateCommentStatus: build.mutation<
-      AdminCommentItem,
-      { id: string; status: CommentStatus }
-    >({
+    updateCommentStatus: build.mutation<AdminCommentItem, { id: string; status: CommentStatus }>({
       query: ({ id, status }) => ({
         path: `/comments/${id}/status`,
         method: 'PATCH',
         body: { status },
       }),
-      transformResponse: (response: ApiSuccess<unknown>) =>
-        response.data as AdminCommentItem,
+      transformResponse: (response: ApiSuccess<unknown>) => response.data as AdminCommentItem,
       invalidatesTags: ['Comment'],
     }),
 
@@ -1037,10 +1048,9 @@ export const {
   useGetPlatformDiagnosticsQuery,
   useGetPublicPlatformSettingsQuery,
 
-
-
   // Posts
   useListPostsQuery,
+  useGetPostStatsQuery,
   useGetPostQuery,
   useCreatePostMutation,
   useUpdatePostMutation,

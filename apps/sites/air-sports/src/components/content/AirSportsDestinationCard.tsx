@@ -41,7 +41,9 @@ export function AirSportsDestinationCard({
           <div className="flex items-start gap-2">
             <Calendar className="size-3.5 text-primary shrink-0 mt-0.5" />
             <div>
-              <span className="block font-semibold uppercase text-muted-foreground">Best Season</span>
+              <span className="block font-semibold uppercase text-muted-foreground">
+                Best Season
+              </span>
               <span className="text-foreground font-medium">{bestSeason}</span>
             </div>
           </div>
@@ -50,7 +52,9 @@ export function AirSportsDestinationCard({
           <div className="flex items-start gap-2">
             <Mountain className="size-3.5 text-primary shrink-0 mt-0.5" />
             <div>
-              <span className="block font-semibold uppercase text-muted-foreground">Launch Elevation</span>
+              <span className="block font-semibold uppercase text-muted-foreground">
+                Launch Elevation
+              </span>
               <span className="text-foreground font-medium">{elevation}</span>
             </div>
           </div>
@@ -94,4 +98,3 @@ export function AirSportsDestinationCard({
     </div>
   );
 }
-

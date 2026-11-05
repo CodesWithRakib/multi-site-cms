@@ -24,7 +24,7 @@ export function PortalContentContainer({
       return initialArticles;
     }
     return initialArticles.filter((article) =>
-      article.categories?.some((cat: { slug: string }) => cat.slug === activeCategorySlug)
+      article.categories?.some((cat: { slug: string }) => cat.slug === activeCategorySlug),
     );
   }, [initialArticles, activeCategorySlug]);
 
@@ -65,10 +65,7 @@ export function PortalContentContainer({
         {/* Right 4-Column Sticky Sidebar */}
         <div className="lg:col-span-4">
           <div className="sticky top-28">
-            <PortalRightSidebar
-              categories={categories}
-              popularArticles={initialArticles}
-            />
+            <PortalRightSidebar categories={categories} popularArticles={initialArticles} />
           </div>
         </div>
       </div>

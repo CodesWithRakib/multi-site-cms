@@ -74,7 +74,9 @@ export function TimelineBlockModal({ onClose, onInsert }: TimelineBlockModalProp
           </label>
           <select
             value={timelineStatus}
-            onChange={(e) => setTimelineStatus(e.target.value as EventTimelineBlockAttributes['status'])}
+            onChange={(e) =>
+              setTimelineStatus(e.target.value as EventTimelineBlockAttributes['status'])
+            }
             className="w-full px-3 py-2 border rounded-xl border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-medium"
           >
             <option value="scheduled">Scheduled</option>
@@ -90,7 +92,9 @@ export function TimelineBlockModal({ onClose, onInsert }: TimelineBlockModalProp
           </label>
           <select
             value={alertLevel}
-            onChange={(e) => setAlertLevel(e.target.value as EventTimelineBlockAttributes['alertLevel'])}
+            onChange={(e) =>
+              setAlertLevel(e.target.value as EventTimelineBlockAttributes['alertLevel'])
+            }
             className="w-full px-3 py-2 border rounded-xl border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-medium"
           >
             <option value="normal">Normal</option>

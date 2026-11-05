@@ -167,7 +167,8 @@ export function AuditLogTimeline({
                         )}
                       </div>
                       <span className="font-medium text-neutral-800 dark:text-neutral-200">
-                        {log.actorName || (log.actorType === 'system' ? 'System Service' : 'Bootstrap')}
+                        {log.actorName ||
+                          (log.actorType === 'system' ? 'System Service' : 'Bootstrap')}
                       </span>
                       {log.actorEmail && (
                         <span className="text-neutral-400 font-mono">({log.actorEmail})</span>

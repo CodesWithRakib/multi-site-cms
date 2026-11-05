@@ -31,7 +31,8 @@ export function PostDraftRecoveryBanner({
             Unsaved Local Draft Recovered
           </h4>
           <p className="text-[11px] text-amber-700/80 dark:text-amber-400/80">
-            A newer revision from this browser was backed up at {formattedTime}. Would you like to restore it?
+            A newer revision from this browser was backed up at {formattedTime}. Would you like to
+            restore it?
           </p>
         </div>
       </div>
@@ -58,4 +59,3 @@ export function PostDraftRecoveryBanner({
     </div>
   );
 }
-

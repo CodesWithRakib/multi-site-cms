@@ -34,11 +34,7 @@ export default async function ArticlesPortalPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <PortalContentContainer
-        initialArticles={articlesData.items}
-        categories={categories}
-      />
+      <PortalContentContainer initialArticles={articlesData.items} categories={categories} />
     </>
   );
 }
-

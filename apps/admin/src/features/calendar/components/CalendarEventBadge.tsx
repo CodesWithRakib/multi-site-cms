@@ -64,9 +64,7 @@ export function CalendarEventBadge({ event, onClick, timezone = 'UTC' }: Calenda
       title={`${event.title} • ${event.status.toUpperCase()} • ${timeFormatted} (${event.siteName})`}
     >
       {getStatusIcon()}
-      <span className="font-mono text-[9px] font-bold shrink-0">
-        {timeFormatted}
-      </span>
+      <span className="font-mono text-[9px] font-bold shrink-0">{timeFormatted}</span>
       <span className="truncate flex-1 font-semibold">{event.title}</span>
       <span className="shrink-0 text-[8px] font-bold px-1 py-0.2 rounded bg-black/5 dark:bg-white/10 uppercase">
         {siteAbbr}
@@ -74,4 +72,3 @@ export function CalendarEventBadge({ event, onClick, timezone = 'UTC' }: Calenda
     </button>
   );
 }
-

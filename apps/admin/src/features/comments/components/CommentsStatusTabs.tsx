@@ -25,7 +25,8 @@ export function CommentsStatusTabs({
       key: 'pending',
       label: 'Pending',
       count: counts.pending,
-      color: 'bg-amber-100 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300 ring-1 ring-amber-500/30',
+      color:
+        'bg-amber-100 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300 ring-1 ring-amber-500/30',
       highlightBadge: counts.pending > 0,
     },
     {
@@ -80,4 +81,3 @@ export function CommentsStatusTabs({
     </div>
   );
 }
-

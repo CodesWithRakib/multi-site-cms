@@ -29,6 +29,30 @@ pnpm test:e2e                # full smoke suite
 `playwright.config.ts` `webServer`, unless a matching server is already running
 (or `CI` is set). Install browsers once: `pnpm exec playwright install chromium`.
 
+Server mode:
+
+- default (`dev`): watch-mode servers; the first visit to each route compiles it,
+  so local timeouts are longer. Editing API files during a run restarts the API
+  and fails in-flight tests.
+- `E2E_SERVER_MODE=production`: `next start` / `node dist/main.js` from a prior
+  `pnpm build`. This is what CI runs. `E2E_REUSE_SERVERS=1` reuses servers that
+  are already running even when `CI` is set.
+
+Admin, role, accessibility and keyboard specs need accounts through env
+(never committed): `E2E_ADMIN_EMAIL/PASSWORD` (Super Admin) and
+`E2E_SITE_ADMIN_EMAIL/PASSWORD` (site Admin). Without them those specs skip.
+
+### CI
+
+`.github/workflows/ci.yml` has two jobs:
+
+- `verify`: format, lint, typecheck, unit + API tests, database integration
+  tests (PostgreSQL service, `*_test` database), build.
+- `e2e`: fresh PostgreSQL, migrations and seeds, throwaway accounts with random
+  masked passwords (no repository secret), API started before the sites are
+  built (their ISR pages prerender from it), then the full Playwright suite
+  against production builds. The report is uploaded on failure.
+
 ## What must be tested
 
 1. **Behavior, not implementation.** Assert response bodies, rendered accessible

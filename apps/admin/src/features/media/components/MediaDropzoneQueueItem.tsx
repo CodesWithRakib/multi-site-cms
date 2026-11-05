@@ -1,7 +1,15 @@
 'use client';
 
 import React from 'react';
-import { CheckCircle2, AlertCircle, Loader2, X, FileText, Image as ImageIcon, Video } from 'lucide-react';
+import {
+  CheckCircle2,
+  AlertCircle,
+  Loader2,
+  X,
+  FileText,
+  Image as ImageIcon,
+  Video,
+} from 'lucide-react';
 
 export interface QueueItem {
   id: string;
@@ -92,9 +100,7 @@ export function MediaDropzoneQueueItem({
         {item.status === 'success' && (
           <CheckCircle2 className="size-4 text-emerald-600 dark:text-emerald-400" />
         )}
-        {item.status === 'error' && (
-          <AlertCircle className="size-4 text-rose-500" />
-        )}
+        {item.status === 'error' && <AlertCircle className="size-4 text-rose-500" />}
 
         {item.status !== 'success' && (
           <button
@@ -111,4 +117,3 @@ export function MediaDropzoneQueueItem({
     </div>
   );
 }
-

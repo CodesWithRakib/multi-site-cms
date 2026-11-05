@@ -28,10 +28,13 @@ export function StarRating({
       {showScore && <span className="font-bold">{rating.toFixed(1)}</span>}
       {reviewsCount && (
         <span className="text-muted-foreground text-xs font-normal">
-          ({typeof reviewsCount === 'number' ? `${reviewsCount.toLocaleString()} reviews` : reviewsCount})
+          (
+          {typeof reviewsCount === 'number'
+            ? `${reviewsCount.toLocaleString()} reviews`
+            : reviewsCount}
+          )
         </span>
       )}
     </div>
   );
 }
-

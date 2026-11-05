@@ -1,14 +1,7 @@
 'use client';
 
 import React from 'react';
-import {
-  Folder,
-  Edit2,
-  Trash2,
-  Plus,
-  ChevronRight,
-  Layers,
-} from 'lucide-react';
+import { Folder, Edit2, Trash2, Plus, ChevronRight, Layers } from 'lucide-react';
 import type { CategoryItem } from '@multi-site-cms/types';
 
 interface CategoryHierarchyTreeProps {
@@ -44,7 +37,8 @@ export function CategoryHierarchyTree({
           No categories found
         </h3>
         <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm mx-auto">
-          Create hierarchical categories to organize and group content publications across this site.
+          Create hierarchical categories to organize and group content publications across this
+          site.
         </p>
       </div>
     );
@@ -56,7 +50,10 @@ export function CategoryHierarchyTree({
         const subcategories = childrenMap.get(rootCat.id) || [];
 
         return (
-          <div key={rootCat.id} className="p-4 space-y-3 hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
+          <div
+            key={rootCat.id}
+            className="p-4 space-y-3 hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors"
+          >
             {/* Root Category Item Row */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex items-center gap-3">

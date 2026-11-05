@@ -22,14 +22,13 @@ export function MediaMetricsCards({ stats }: MediaMetricsCardsProps) {
           </span>
         </div>
         <div className="mt-3">
-          <div className="text-2xl font-black text-slate-900 dark:text-white">
-            {stats.total}
-          </div>
-          <div className="text-xs font-medium text-slate-500 dark:text-slate-400">
-            Total Assets
-          </div>
+          <div className="text-2xl font-black text-slate-900 dark:text-white">{stats.total}</div>
+          <div className="text-xs font-medium text-slate-500 dark:text-slate-400">Total Assets</div>
         </div>
-        <svg className="absolute bottom-0 right-0 w-24 h-10 opacity-20 pointer-events-none" viewBox="0 0 100 40">
+        <svg
+          className="absolute bottom-0 right-0 w-24 h-10 opacity-20 pointer-events-none"
+          viewBox="0 0 100 40"
+        >
           <path d="M0 35 Q 25 10, 50 25 T 100 5" fill="none" stroke="#3b82f6" strokeWidth="3" />
         </svg>
       </div>
@@ -48,11 +47,12 @@ export function MediaMetricsCards({ stats }: MediaMetricsCardsProps) {
           <div className="text-2xl font-black text-slate-900 dark:text-white">
             {stats.storageFormatted}
           </div>
-          <div className="text-xs font-medium text-slate-500 dark:text-slate-400">
-            Storage Used
-          </div>
+          <div className="text-xs font-medium text-slate-500 dark:text-slate-400">Storage Used</div>
         </div>
-        <svg className="absolute bottom-0 right-0 w-24 h-10 opacity-20 pointer-events-none" viewBox="0 0 100 40">
+        <svg
+          className="absolute bottom-0 right-0 w-24 h-10 opacity-20 pointer-events-none"
+          viewBox="0 0 100 40"
+        >
           <path d="M0 30 Q 30 5, 60 20 T 100 8" fill="none" stroke="#00e599" strokeWidth="3" />
         </svg>
       </div>
@@ -68,14 +68,15 @@ export function MediaMetricsCards({ stats }: MediaMetricsCardsProps) {
           </span>
         </div>
         <div className="mt-3">
-          <div className="text-2xl font-black text-slate-900 dark:text-white">
-            {stats.images}
-          </div>
+          <div className="text-2xl font-black text-slate-900 dark:text-white">{stats.images}</div>
           <div className="text-xs font-medium text-slate-500 dark:text-slate-400">
             Images & Photos
           </div>
         </div>
-        <svg className="absolute bottom-0 right-0 w-24 h-10 opacity-20 pointer-events-none" viewBox="0 0 100 40">
+        <svg
+          className="absolute bottom-0 right-0 w-24 h-10 opacity-20 pointer-events-none"
+          viewBox="0 0 100 40"
+        >
           <path d="M0 38 Q 35 15, 70 25 T 100 12" fill="none" stroke="#f59e0b" strokeWidth="3" />
         </svg>
       </div>
@@ -98,11 +99,13 @@ export function MediaMetricsCards({ stats }: MediaMetricsCardsProps) {
             Documents & Other
           </div>
         </div>
-        <svg className="absolute bottom-0 right-0 w-24 h-10 opacity-20 pointer-events-none" viewBox="0 0 100 40">
+        <svg
+          className="absolute bottom-0 right-0 w-24 h-10 opacity-20 pointer-events-none"
+          viewBox="0 0 100 40"
+        >
           <path d="M0 25 Q 20 35, 60 10 T 100 15" fill="none" stroke="#a855f7" strokeWidth="3" />
         </svg>
       </div>
     </div>
   );
 }
-

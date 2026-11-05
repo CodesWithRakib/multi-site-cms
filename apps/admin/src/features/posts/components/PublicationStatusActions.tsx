@@ -9,7 +9,10 @@ interface PublicationStatusActionsProps {
   onOpenPublishModal: (pub: PostPublicationItem, action: PublishingActionType) => void;
 }
 
-export function PublicationStatusActions({ pub, onOpenPublishModal }: PublicationStatusActionsProps) {
+export function PublicationStatusActions({
+  pub,
+  onOpenPublishModal,
+}: PublicationStatusActionsProps) {
   const badgeColor =
     pub.status === 'published'
       ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
@@ -72,4 +75,3 @@ export function PublicationStatusActions({ pub, onOpenPublishModal }: Publicatio
     </div>
   );
 }
-

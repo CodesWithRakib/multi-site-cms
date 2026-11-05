@@ -32,9 +32,7 @@ export function MediaBatchActionBar({
           <div className="size-6 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
             <CheckSquare className="size-3.5" />
           </div>
-          <span className="text-xs font-semibold whitespace-nowrap">
-            {selectedCount} selected
-          </span>
+          <span className="text-xs font-semibold whitespace-nowrap">{selectedCount} selected</span>
         </div>
 
         {/* Quick select/deselect page toggle */}
@@ -74,4 +72,3 @@ export function MediaBatchActionBar({
     </div>
   );
 }
-

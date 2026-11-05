@@ -2,10 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import type { MediaAssetItem, PostItem, SiteItem } from '@multi-site-cms/types';
-import {
-  useCreatePostMutation,
-  useCreatePublicationMutation,
-} from '@/lib/cms-api';
+import { useCreatePostMutation, useCreatePublicationMutation } from '@/lib/cms-api';
 import type { SitePubConfig } from '../components/PostSitePublicationCard';
 
 export interface UsePostSubmitProps {

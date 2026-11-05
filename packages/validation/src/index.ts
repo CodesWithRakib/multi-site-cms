@@ -187,7 +187,10 @@ export const platformGeneralSettingsSchema = z.object({
   platformName: z.string().min(1).max(128).optional(),
   tagline: z.string().max(256).optional(),
   contactEmail: z.string().email().max(256).optional(),
-  defaultLocale: z.string().regex(/^[a-z]{2}(-[A-Z]{2})?$/).optional(),
+  defaultLocale: z
+    .string()
+    .regex(/^[a-z]{2}(-[A-Z]{2})?$/)
+    .optional(),
   defaultTimezone: z.string().max(64).optional(),
 });
 
@@ -203,7 +206,12 @@ export const platformSecuritySettingsSchema = z.object({
 
 export const platformMediaSettingsSchema = z.object({
   storageProvider: z.enum(['cloudinary', 'local', 's3']).optional(),
-  maxUploadSizeBytes: z.number().int().min(1024 * 1024).max(100 * 1024 * 1024).optional(),
+  maxUploadSizeBytes: z
+    .number()
+    .int()
+    .min(1024 * 1024)
+    .max(100 * 1024 * 1024)
+    .optional(),
   allowedMimeTypes: z.array(z.string().max(128)).optional(),
   autoWebpConversion: z.boolean().optional(),
 });
@@ -231,6 +239,3 @@ export const updatePlatformSettingsSchema = z.object({
 });
 
 export type UpdatePlatformSettingsInput = z.infer<typeof updatePlatformSettingsSchema>;
-
-
-

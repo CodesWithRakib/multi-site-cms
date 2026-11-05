@@ -22,7 +22,10 @@ export function CommentsModerationContainer() {
   const [page, setPage] = useState<number>(1);
   const [limit, setLimit] = useState<number>(20);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [toastMessage, setToastMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [toastMessage, setToastMessage] = useState<{
+    type: 'success' | 'error';
+    text: string;
+  } | null>(null);
 
   const { data, isLoading, isFetching, refetch } = useListCommentsQuery({
     status: activeStatus !== 'all' ? activeStatus : undefined,
@@ -189,9 +192,7 @@ export function CommentsModerationContainer() {
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
             <MessageSquare className="h-7 w-7" />
           </div>
-          <h3 className="mt-4 font-semibold text-foreground text-base">
-            No comments found
-          </h3>
+          <h3 className="mt-4 font-semibold text-foreground text-base">No comments found</h3>
           <p className="mt-1 text-xs text-muted-foreground max-w-sm">
             {search
               ? 'No reflections matched your search query. Try clearing filters.'
@@ -242,4 +243,3 @@ export function CommentsModerationContainer() {
     </div>
   );
 }
-

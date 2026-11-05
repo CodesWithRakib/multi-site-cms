@@ -10,6 +10,7 @@ import type {
   PostItem,
   PostPublicationItem,
   PostRevisionItem,
+  PostStatusCounts,
   TagItem,
 } from '@multi-site-cms/types';
 import { afterAll, beforeAll, describe, expect, it } from '@jest/globals';
@@ -421,6 +422,69 @@ describe('CMS Core (Posts, Publications, Taxonomy, Media, OCC & Tenant Isolation
 
       const body = res.body as ApiErrorResponse;
       expect(body.error.code).toBe('CONFLICT');
+    });
+
+    it('filters by the publication status on the selected site, not on any site', async () => {
+      const listIds = async (query: string) => {
+        const res = await request(app.getHttpServer())
+          .get(`/api/v1/posts?limit=100&${query}`)
+          .set('Cookie', superAdminCookie)
+          .expect(200);
+        return (res.body as ApiSuccess<PaginatedResult<PostItem>>).data.items.map((p) => p.id);
+      };
+
+      // Published on Travel, draft on Air Sports.
+      expect(await listIds(`siteId=${siteTravelId}&status=published`)).toContain(canonicalPostId);
+      expect(await listIds(`siteId=${siteAirSportsId}&status=published`)).not.toContain(
+        canonicalPostId,
+      );
+      expect(await listIds(`siteId=${siteAirSportsId}&status=draft`)).toContain(canonicalPostId);
+      // Across all sites a post shows its most advanced publication status.
+      expect(await listIds('status=published')).toContain(canonicalPostId);
+      expect(await listIds('status=draft')).not.toContain(canonicalPostId);
+    });
+
+    it('counts posts per status in the database, matching the filtered lists', async () => {
+      const getJson = async <T>(path: string, cookie = superAdminCookie, status = 200) =>
+        (
+          (await request(app.getHttpServer()).get(path).set('Cookie', cookie).expect(status))
+            .body as ApiSuccess<T>
+        ).data;
+
+      for (const scope of ['', `siteId=${siteTravelId}`, `siteId=${siteAirSportsId}`]) {
+        const stats = await getJson<PostStatusCounts>(`/api/v1/posts/stats?${scope}`);
+        const all = await getJson<PaginatedResult<PostItem>>(`/api/v1/posts?limit=1&${scope}`);
+        expect(stats.total).toBe(all.total);
+
+        for (const [status, expected] of Object.entries(stats.byStatus)) {
+          const filtered = await getJson<PaginatedResult<PostItem>>(
+            `/api/v1/posts?limit=1&status=${status}&${scope}`,
+          );
+          expect({ scope, status, count: filtered.total }).toEqual({
+            scope,
+            status,
+            count: expected,
+          });
+        }
+      }
+
+      const airStats = await getJson<PostStatusCounts>(
+        `/api/v1/posts/stats?siteId=${siteAirSportsId}`,
+      );
+      expect(airStats.byStatus.draft).toBeGreaterThanOrEqual(1);
+      expect(airStats.byStatus.published).toBe(0);
+    });
+
+    it('refuses status counts for a site the admin cannot access', async () => {
+      await request(app.getHttpServer())
+        .get(`/api/v1/posts/stats?siteId=${siteAirSportsId}`)
+        .set('Cookie', travelAdminCookie)
+        .expect(404);
+      await request(app.getHttpServer())
+        .get('/api/v1/posts/stats?siteId=not-a-uuid')
+        .set('Cookie', superAdminCookie)
+        .expect(400);
+      await request(app.getHttpServer()).get('/api/v1/posts/stats').expect(401);
     });
   });
 

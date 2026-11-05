@@ -27,7 +27,7 @@ export default function PostsPage() {
           onRefresh={() => workspace.refetch()}
         />
 
-        <PostsStatsCards stats={workspace.stats} isLoading={workspace.isLoading} />
+        <PostsStatsCards stats={workspace.stats} isLoading={workspace.isStatsLoading} />
 
         <PostsStatusTabs
           stats={workspace.stats}

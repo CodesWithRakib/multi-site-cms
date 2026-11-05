@@ -63,6 +63,7 @@ describe('OpenAPI document', () => {
       `/${env.API_PREFIX}/media/upload`,
       `/${env.API_PREFIX}/media/{mediaId}`,
       `/${env.API_PREFIX}/posts`,
+      `/${env.API_PREFIX}/posts/stats`,
       `/${env.API_PREFIX}/posts/{postId}`,
       `/${env.API_PREFIX}/posts/{postId}/preview`,
       `/${env.API_PREFIX}/posts/{postId}/preview-token`,

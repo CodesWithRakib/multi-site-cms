@@ -7,4 +7,3 @@ export interface MediaStats {
   images: number;
   docsAndOther: number;
 }
-

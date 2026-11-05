@@ -26,4 +26,3 @@ export class NewsletterSubscribers1793491209000 implements MigrationInterface {
     await queryRunner.query(`DROP TABLE IF EXISTS "newsletter_subscribers";`);
   }
 }
-

@@ -173,19 +173,41 @@ export function PostForm({ initialPost, isCreateMode = false }: PostFormProps) {
 
       <PostBasicFields
         title={title}
-        onTitleChange={(val) => { setTitle(val); setIsLocalDirty(true); markDirty(); }}
+        onTitleChange={(val) => {
+          setTitle(val);
+          setIsLocalDirty(true);
+          markDirty();
+        }}
         excerpt={excerpt}
-        onExcerptChange={(val) => { setExcerpt(val); setIsLocalDirty(true); markDirty(); }}
+        onExcerptChange={(val) => {
+          setExcerpt(val);
+          setIsLocalDirty(true);
+          markDirty();
+        }}
         type={type}
-        onTypeChange={(val) => { setType(val); setIsLocalDirty(true); markDirty(); }}
+        onTypeChange={(val) => {
+          setType(val);
+          setIsLocalDirty(true);
+          markDirty();
+        }}
         sourceLocale={sourceLocale}
-        onLocaleChange={(val) => { setSourceLocale(val); setIsLocalDirty(true); markDirty(); }}
+        onLocaleChange={(val) => {
+          setSourceLocale(val);
+          setIsLocalDirty(true);
+          markDirty();
+        }}
       />
 
       <PostFeaturedImagePicker
         featuredImage={featuredImage}
-        onSelectClick={() => { setMediaTarget('featured'); setIsMediaLibraryOpen(true); }}
-        onRemove={() => { setFeaturedImage(null); markDirty(); }}
+        onSelectClick={() => {
+          setMediaTarget('featured');
+          setIsMediaLibraryOpen(true);
+        }}
+        onRemove={() => {
+          setFeaturedImage(null);
+          markDirty();
+        }}
       />
 
       <div className="flex flex-col gap-2">

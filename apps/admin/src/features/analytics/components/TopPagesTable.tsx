@@ -150,4 +150,3 @@ export function TopPagesTable({ pages, isLoading }: TopPagesTableProps) {
     </div>
   );
 }
-

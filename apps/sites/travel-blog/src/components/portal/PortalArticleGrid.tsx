@@ -17,7 +17,9 @@ export function PortalArticleGrid({ articles }: PortalArticleGridProps) {
     return (
       <div className="rounded-2xl border border-dashed border-border p-12 text-center space-y-2">
         <p className="font-semibold text-foreground">No articles found in this category.</p>
-        <p className="text-xs text-muted-foreground">Select another filter or browse all categories.</p>
+        <p className="text-xs text-muted-foreground">
+          Select another filter or browse all categories.
+        </p>
       </div>
     );
   }

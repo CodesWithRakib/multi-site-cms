@@ -20,9 +20,13 @@ export function UserStatsCards({ users }: UserStatsCardsProps) {
 
     for (const u of users) {
       if (u.status === 'active') activeCount++;
-      const isSuper = u.roles.some((r) => r.roleKey === 'super_admin' || r.scopeType === 'platform');
+      const isSuper = u.roles.some(
+        (r) => r.roleKey === 'super_admin' || r.scopeType === 'platform',
+      );
       const isSiteAdmin = u.roles.some((r) => r.roleKey === 'admin' || r.roleKey === 'site_admin');
-      const isEditor = u.roles.some((r) => r.roleKey === 'site_editor' || r.roleKey === 'editor' || r.roleKey === 'author');
+      const isEditor = u.roles.some(
+        (r) => r.roleKey === 'site_editor' || r.roleKey === 'editor' || r.roleKey === 'author',
+      );
 
       if (isSuper) superAdmins++;
       else if (isSiteAdmin) siteAdmins++;
@@ -51,9 +55,7 @@ export function UserStatsCards({ users }: UserStatsCardsProps) {
           </div>
         </div>
         <div className="mt-3 flex items-baseline gap-2">
-          <span className="text-2xl font-black text-slate-900 dark:text-white">
-            {stats.total}
-          </span>
+          <span className="text-2xl font-black text-slate-900 dark:text-white">{stats.total}</span>
           <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-1.5 py-0.5 rounded">
             {stats.activeCount} Active
           </span>

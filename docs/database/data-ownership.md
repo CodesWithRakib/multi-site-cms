@@ -80,15 +80,42 @@ Never share implicitly through a join that ignores `site_id`.
 
 ## Retention and deletion
 
-| Data             | Policy                                                                           |
-| ---------------- | -------------------------------------------------------------------------------- |
-| Posts            | Archived, not hard-deleted from the UI; `deleted_at` is recoverable              |
-| Revisions        | Retained while the post exists; legal deletion is a Super Admin workflow         |
-| Publications     | Archived; slug stays reserved for URL stability                                  |
-| Media            | Deletion blocked while referenced (`RESTRICT`), or soft-delete + storage cleanup |
-| Taxonomy, events | Deleted with the site (`CASCADE`); a category in use is restricted               |
-| Audit events     | Append-only, never updateable by application roles                               |
-| Users            | Disabled/suspended; deletion restricted while content references them            |
+| Data             | Policy                                                                                                 |
+| ---------------- | ------------------------------------------------------------------------------------------------------ |
+| Posts            | Archived, not hard-deleted from the UI; `deleted_at` is recoverable                                    |
+| Revisions        | Retained while the post exists; legal deletion is a Super Admin workflow                               |
+| Publications     | Archived; slug stays reserved for URL stability                                                        |
+| Media            | Deletion blocked while referenced (`RESTRICT`), or soft-delete + storage cleanup                       |
+| Taxonomy, events | Deleted with the site (`CASCADE`); a category in use is restricted                                     |
+| Audit events     | Append-only, never updated; purged after `AUDIT_RETENTION_DAYS` (default 730, min 365)                 |
+| Users            | Disabled/suspended; deletion restricted while content references them                                  |
+| Page views       | Purged after `ANALYTICS_RETENTION_DAYS` (default 730: the 1-year view compares with the previous year) |
+| Sessions         | Purged `SESSION_RETENTION_DAYS` (default 30) after expiry or revocation                                |
+| Outbox events    | Completed and dead-lettered events purged after `OUTBOX_RETENTION_DAYS` (default 30)                   |
+
+The purge runs inside the API (`src/maintenance/retention.job.ts`) shortly after
+boot and then daily, in batches of 5,000 rows, under a PostgreSQL advisory lock
+so only one instance purges at a time. Each run that deletes rows writes a
+`retention.purge` audit event with the counts. Disable with
+`RETENTION_JOB_ENABLED=false`.
+
+### Generated analytics (one-time cleanup)
+
+Migration `AnalyticsAndTrafficEvents1793491207000` used to insert about 90 days
+of random page views for every site that existed when it ran. New installs no
+longer get them. A database that already ran it keeps them until an operator
+removes them:
+
+```bash
+pnpm --filter @multi-site-cms/api build
+pnpm --filter @multi-site-cms/api db:cleanup:generated-analytics          # dry run: counts only
+pnpm --filter @multi-site-cms/api db:cleanup:generated-analytics --apply  # after a backup
+```
+
+The rows are identified by the `xmin` of that migration's `typeorm_migrations`
+record, which they share. A logical dump/restore (`pg_dump` → `pg_restore`)
+rewrites every `xmin`, so run the cleanup on the original database before
+moving it that way.
 
 ## Deferred tables
 

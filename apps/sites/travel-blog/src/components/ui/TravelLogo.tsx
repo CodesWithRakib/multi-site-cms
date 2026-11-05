@@ -45,7 +45,12 @@ export function TravelLogo({
               : 'text-foreground group-hover:text-primary'
           }`}
         >
-          Travel<span className={inverted ? 'text-emerald-400' : 'text-emerald-600 dark:text-emerald-400'}>Blog</span>
+          Travel
+          <span
+            className={inverted ? 'text-emerald-400' : 'text-emerald-600 dark:text-emerald-400'}
+          >
+            Blog
+          </span>
         </span>
         {showSubtitle && (
           <span
@@ -60,4 +65,3 @@ export function TravelLogo({
     </Link>
   );
 }
-

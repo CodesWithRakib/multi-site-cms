@@ -38,7 +38,8 @@ export function RecentActivity({ items = [], isLoading = false }: RecentActivity
 
       if (diffSecs < 60) return t('dashboard.justNow');
       if (diffMins < 60) return `${diffMins} ${t('dashboard.minAgo')}`;
-      if (diffHours < 24) return `${diffHours} ${diffHours > 1 ? t('dashboard.hoursAgo') : t('dashboard.hourAgo')}`;
+      if (diffHours < 24)
+        return `${diffHours} ${diffHours > 1 ? t('dashboard.hoursAgo') : t('dashboard.hourAgo')}`;
       if (diffDays === 1) return t('dashboard.yesterday');
       if (diffDays < 7) return `${diffDays} ${t('dashboard.daysAgo')}`;
 

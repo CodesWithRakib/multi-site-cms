@@ -133,7 +133,9 @@ export function AirSportsHero() {
                   key={pill.title}
                   className="flex items-center gap-3.5 rounded-2xl border border-border/80 bg-card p-4 shadow-2xs transition hover:border-sky-500/40 hover:shadow-sm"
                 >
-                  <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${pill.iconBg}`}>
+                  <div
+                    className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${pill.iconBg}`}
+                  >
                     <Icon className="h-5 w-5" />
                   </div>
                   <div>

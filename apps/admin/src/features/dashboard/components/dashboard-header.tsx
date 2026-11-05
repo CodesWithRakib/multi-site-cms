@@ -3,13 +3,7 @@
 import React from 'react';
 import { Calendar } from 'lucide-react';
 import { useAdmin } from '@/lib/admin-context';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@multi-site-cms/ui';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@multi-site-cms/ui';
 
 export interface DashboardHeaderProps {
   days: number;
@@ -18,10 +12,7 @@ export interface DashboardHeaderProps {
   isRefreshing?: boolean;
 }
 
-export function DashboardHeader({
-  days,
-  onDaysChange,
-}: DashboardHeaderProps) {
+export function DashboardHeader({ days, onDaysChange }: DashboardHeaderProps) {
   const { t } = useAdmin();
 
   return (

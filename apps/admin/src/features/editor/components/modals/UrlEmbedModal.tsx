@@ -32,9 +32,7 @@ export function UrlEmbedModal({ type, onClose, onSubmit }: UrlEmbedModalProps) {
           value={urlInput}
           onChange={(e) => setUrlInput(e.target.value)}
           placeholder={
-            type === 'link'
-              ? 'https://example.com'
-              : 'https://www.youtube.com/watch?v=...'
+            type === 'link' ? 'https://example.com' : 'https://www.youtube.com/watch?v=...'
           }
           className="w-full px-3 py-2 border rounded-xl border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-medium"
         />

@@ -2,15 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import {
-  Clock,
-  CheckCircle2,
-  Calendar,
-  Send,
-  XCircle,
-  FileEdit,
-  RotateCcw,
-} from 'lucide-react';
+import { Clock, CheckCircle2, Calendar, Send, XCircle, FileEdit, RotateCcw } from 'lucide-react';
 import type { CalendarEvent } from '../types';
 import type { PublishingActionType } from '@/features/posts/components/PublishingModal';
 import { formatDateTime, type Locale } from '@/lib/i18n';
@@ -22,12 +14,7 @@ interface CalendarListViewProps {
   onAction: (event: CalendarEvent, action: PublishingActionType) => void;
 }
 
-export function CalendarListView({
-  events,
-  locale,
-  timezone,
-  onAction,
-}: CalendarListViewProps) {
+export function CalendarListView({ events, locale, timezone, onAction }: CalendarListViewProps) {
   if (events.length === 0) {
     return (
       <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-12 text-center shadow-2xs">
@@ -96,11 +83,11 @@ export function CalendarListView({
                   </div>
 
                   <div className="flex items-center gap-3 mt-1 text-xs text-slate-500 dark:text-slate-400">
-                    <span className="font-mono">
-                      {formatDateTime(ev.date, locale, timezone)}
-                    </span>
+                    <span className="font-mono">{formatDateTime(ev.date, locale, timezone)}</span>
                     <span>•</span>
-                    <span className="font-mono text-[11px] text-slate-500 dark:text-slate-400">/{ev.slug}</span>
+                    <span className="font-mono text-[11px] text-slate-500 dark:text-slate-400">
+                      /{ev.slug}
+                    </span>
                   </div>
                 </div>
               </div>

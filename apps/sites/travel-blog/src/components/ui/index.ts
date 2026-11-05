@@ -4,4 +4,3 @@ export * from './StarRating';
 export * from './BookmarkButton';
 export * from './PillButton';
 export * from './ThemeToggle';
-

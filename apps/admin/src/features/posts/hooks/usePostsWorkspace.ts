@@ -7,12 +7,11 @@ import type { PublishingActionType } from '@/features/posts/components/Publishin
 import { useAdmin } from '@/lib/admin-context';
 import {
   useDeletePostMutation,
+  useGetPostStatsQuery,
   useListPostsQuery,
   useListSitesQuery,
   useSubmitForReviewMutation,
 } from '@/lib/cms-api';
-
-import { displayedPublication, effectiveStatus } from '../utils/post-display';
 
 export const POSTS_PAGE_SIZE = 10;
 
@@ -60,12 +59,10 @@ export function usePostsWorkspace() {
     limit: POSTS_PAGE_SIZE,
   });
 
-  // Overview for the metric cards and tab counters, independent of the filters.
-  // Known limitation: counts only the first 100 posts (see TECHNICAL_DEBT TD-12).
-  const { data: statsOverviewData } = useListPostsQuery({
+  // Metric cards and tab counters: counted by the API over every visible post,
+  // with the same status rule as the list filter, independent of the filters.
+  const { data: statusCounts, isLoading: isStatsLoading } = useGetPostStatsQuery({
     siteId: activeSiteId || undefined,
-    page: 1,
-    limit: 100,
   });
 
   const [deletePost] = useDeletePostMutation();
@@ -75,27 +72,17 @@ export function usePostsWorkspace() {
   const totalPosts = postsData?.total || posts.length;
   const totalPages = postsData?.totalPages || 1;
 
-  // Match the effective publication status of the displayed site exactly.
-  const displayPosts = useMemo(() => {
-    if (!statusFilter) return posts;
-    return posts.filter(
-      (post) => effectiveStatus(post, displayedPublication(post, activeSiteId)) === statusFilter,
-    );
-  }, [posts, statusFilter, activeSiteId]);
-
   const stats = useMemo<PostsStats>(() => {
-    const items = statsOverviewData?.items || posts;
-    const counts = { published: 0, drafts: 0, scheduled: 0, inReview: 0, archived: 0 };
-    for (const post of items) {
-      const status = effectiveStatus(post, post.publications?.[0]);
-      if (status === 'published') counts.published++;
-      else if (status === 'draft') counts.drafts++;
-      else if (status === 'scheduled') counts.scheduled++;
-      else if (status === 'in_review') counts.inReview++;
-      else if (status === 'archived') counts.archived++;
-    }
-    return { total: statsOverviewData?.total || items.length, ...counts };
-  }, [statsOverviewData?.items, statsOverviewData?.total, posts]);
+    const byStatus = statusCounts?.byStatus;
+    return {
+      total: statusCounts?.total ?? 0,
+      published: byStatus?.published ?? 0,
+      drafts: byStatus?.draft ?? 0,
+      scheduled: byStatus?.scheduled ?? 0,
+      inReview: byStatus?.in_review ?? 0,
+      archived: byStatus?.archived ?? 0,
+    };
+  }, [statusCounts]);
 
   const openPublishing = (
     action: PublishingActionType,
@@ -144,8 +131,10 @@ export function usePostsWorkspace() {
 
   return {
     sites,
-    displayPosts,
+    // The API applies the status filter with the same rule as the counts.
+    displayPosts: posts,
     stats,
+    isStatsLoading,
     isLoading,
     isFetching,
     refetch,

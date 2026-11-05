@@ -16,7 +16,22 @@ jobs:
   verify:
     name: Lint, typecheck, test, build
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
+    # The API suites run against a real PostgreSQL. The harness only touches a
+    # database whose name ends in "_test" and recreates its schema per suite.
+    services:
+      postgres:
+        image: postgres:18.6-alpine
+        env:
+          POSTGRES_DB: multi_site_cms_test
+          POSTGRES_USER: multi_site_cms
+          POSTGRES_PASSWORD: multi_site_cms_ci
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U multi_site_cms -d multi_site_cms_test"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    env:
+      TEST_DATABASE_URL: postgresql://multi_site_cms:multi_site_cms_ci@localhost:5432/multi_site_cms_test
     steps:
       - uses: actions/checkout@v4
         with:
@@ -44,12 +59,106 @@ jobs:
       - name: Test
         run: pnpm test
 
+      - name: Database integration tests
+        run: pnpm --filter @multi-site-cms/api test:integration
+
       - name: Build
         run: pnpm build
 
-      # Discovery only: the full Playwright suite needs browsers and four live
-      # servers, so it runs locally (see docs/development/testing.md).
-      - name: E2E discovery
-        run: pnpm test:e2e:list
+  e2e:
+    name: E2E (production builds)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:18.6-alpine
         env:
-          CI: 'true'
+          POSTGRES_DB: multi_site_cms
+          POSTGRES_USER: multi_site_cms
+          POSTGRES_PASSWORD: multi_site_cms_ci
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U multi_site_cms -d multi_site_cms"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    env:
+      CI: 'true'
+      DATABASE_URL: postgresql://multi_site_cms:multi_site_cms_ci@localhost:5432/multi_site_cms
+      LOG_LEVEL: warn
+      NEXT_PUBLIC_API_URL: http://localhost:4000/api/v1
+      E2E_SERVER_MODE: production
+      E2E_REUSE_SERVERS: '1'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Build API
+        run: pnpm turbo run build --filter=@multi-site-cms/api...
+
+      - name: Migrate and seed
+        working-directory: apps/api
+        run: |
+          pnpm db:migration:run
+          pnpm db:seed:dev
+          pnpm db:seed:content
+
+      # Throwaway accounts for this run only: random passwords, masked in logs,
+      # gone with the job's database. No repository secret is needed.
+      - name: Create test accounts
+        run: |
+          admin_email="e2e-admin@example.com"
+          admin_password="$(openssl rand -base64 24)"
+          site_password="$(openssl rand -base64 24)"
+          echo "::add-mask::$admin_password"
+          echo "::add-mask::$site_password"
+          SUPER_ADMIN_EMAIL="$admin_email" SUPER_ADMIN_PASSWORD="$admin_password" \
+            pnpm --filter @multi-site-cms/api bootstrap:super-admin
+          DEV_SITE_ADMIN_PASSWORD="$site_password" pnpm --filter @multi-site-cms/api db:seed:admins
+          {
+            echo "E2E_ADMIN_EMAIL=$admin_email"
+            echo "E2E_ADMIN_PASSWORD=$admin_password"
+            echo "E2E_SITE_ADMIN_EMAIL=traveladmin@travelblog.internal"
+            echo "E2E_SITE_ADMIN_PASSWORD=$site_password"
+          } >> "$GITHUB_ENV"
+
+      # The sites prerender ISR pages from the API during `next build`, so the
+      # API must be serving seeded content before they are built.
+      - name: Start API
+        run: |
+          nohup pnpm --filter @multi-site-cms/api start > api.log 2>&1 &
+          for attempt in $(seq 1 60); do
+            curl -fsS http://localhost:4000/api/v1/health > /dev/null && exit 0
+            sleep 2
+          done
+          cat api.log
+          exit 1
+
+      # Excludes the API, which is already built and running from dist/.
+      - name: Build web apps
+        run: pnpm turbo run build --filter=!@multi-site-cms/api
+
+      - name: E2E
+        run: pnpm test:e2e
+
+      - name: API log
+        if: failure()
+        run: cat api.log
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report
+          retention-days: 7

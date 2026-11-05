@@ -88,9 +88,9 @@ describe('createApiClient', () => {
   });
 
   it('automatically attaches x-csrf-token from document.cookie on mutating requests', async () => {
-    const fetchMock = vi.fn<typeof fetch>().mockResolvedValue(
-      jsonResponse({ data: { success: true } }),
-    );
+    const fetchMock = vi
+      .fn<typeof fetch>()
+      .mockResolvedValue(jsonResponse({ data: { success: true } }));
     const client = createApiClient({
       baseUrl: 'https://api.example.com/api/v1',
       fetch: fetchMock,

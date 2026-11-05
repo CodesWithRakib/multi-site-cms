@@ -39,7 +39,11 @@ export default function PublishingCalendarPage() {
   const [quickScheduleOpen, setQuickScheduleOpen] = useState(false);
   const [selectedDateForSchedule, setSelectedDateForSchedule] = useState<Date | null>(null);
 
-  const { data: postsData, isLoading, refetch } = useListPostsQuery({
+  const {
+    data: postsData,
+    isLoading,
+    refetch,
+  } = useListPostsQuery({
     siteId: selectedSiteId || undefined,
     type: typeFilter || undefined,
     limit: 100,
@@ -147,7 +151,11 @@ export default function PublishingCalendarPage() {
     year: 'numeric',
   }).format(currentDate);
 
-  const handleOpenActionModal = (pub: PostPublicationItem, title: string, action: PublishingActionType) => {
+  const handleOpenActionModal = (
+    pub: PostPublicationItem,
+    title: string,
+    action: PublishingActionType,
+  ) => {
     setModalAction(action);
     setTargetPub(pub);
     setTargetTitle(title);
@@ -188,13 +196,21 @@ export default function PublishingCalendarPage() {
         {isLoading ? (
           <div className="flex flex-col items-center justify-center p-20 gap-3">
             <Loader2 className="w-6 h-6 animate-spin text-emerald-600 dark:text-emerald-400" />
-            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Loading scheduled calendar...</p>
+            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+              Loading scheduled calendar...
+            </p>
           </div>
         ) : viewMode === 'month' ? (
           <CalendarMonthGrid
             days={calendarDays}
             timezone={timezone}
-            onEventClick={(ev) => handleOpenActionModal(ev.publication, ev.title, ev.status === 'scheduled' ? 'reschedule' : 'unpublish')}
+            onEventClick={(ev) =>
+              handleOpenActionModal(
+                ev.publication,
+                ev.title,
+                ev.status === 'scheduled' ? 'reschedule' : 'unpublish',
+              )
+            }
             onDateClick={(d) => {
               setSelectedDateForSchedule(d);
               setQuickScheduleOpen(true);

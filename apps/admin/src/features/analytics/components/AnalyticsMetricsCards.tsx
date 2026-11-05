@@ -124,4 +124,3 @@ export function AnalyticsMetricsCards({ summary, isLoading }: AnalyticsMetricsCa
     </div>
   );
 }
-

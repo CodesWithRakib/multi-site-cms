@@ -74,9 +74,15 @@ export function DestinationSearchBar({ categories, className = '' }: Destination
             className="w-full bg-transparent text-xs sm:text-sm font-medium text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring cursor-pointer"
           >
             <option value="">Any Budget</option>
-            <option value="budget" className="dark:bg-neutral-900">$ Budget Friendly</option>
-            <option value="moderate" className="dark:bg-neutral-900">$$ Moderate Standard</option>
-            <option value="luxury" className="dark:bg-neutral-900">$$$ Luxury Escapes</option>
+            <option value="budget" className="dark:bg-neutral-900">
+              $ Budget Friendly
+            </option>
+            <option value="moderate" className="dark:bg-neutral-900">
+              $$ Moderate Standard
+            </option>
+            <option value="luxury" className="dark:bg-neutral-900">
+              $$$ Luxury Escapes
+            </option>
           </select>
         </div>
 
@@ -90,10 +96,18 @@ export function DestinationSearchBar({ categories, className = '' }: Destination
             className="w-full bg-transparent text-xs sm:text-sm font-medium text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring cursor-pointer"
           >
             <option value="">Any Time</option>
-            <option value="spring" className="dark:bg-neutral-900">🌸 Spring (Mar–May)</option>
-            <option value="summer" className="dark:bg-neutral-900">☀️ Summer (Jun–Aug)</option>
-            <option value="autumn" className="dark:bg-neutral-900">🍂 Autumn (Sep–Nov)</option>
-            <option value="winter" className="dark:bg-neutral-900">❄️ Winter (Dec–Feb)</option>
+            <option value="spring" className="dark:bg-neutral-900">
+              🌸 Spring (Mar–May)
+            </option>
+            <option value="summer" className="dark:bg-neutral-900">
+              ☀️ Summer (Jun–Aug)
+            </option>
+            <option value="autumn" className="dark:bg-neutral-900">
+              🍂 Autumn (Sep–Nov)
+            </option>
+            <option value="winter" className="dark:bg-neutral-900">
+              ❄️ Winter (Dec–Feb)
+            </option>
           </select>
         </div>
 
@@ -112,4 +126,3 @@ export function DestinationSearchBar({ categories, className = '' }: Destination
     </div>
   );
 }
-

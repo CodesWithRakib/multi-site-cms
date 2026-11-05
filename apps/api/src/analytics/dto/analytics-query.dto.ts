@@ -5,7 +5,8 @@ import type { AnalyticsTimeframe } from '@multi-site-cms/types';
 
 export class AnalyticsQueryDto {
   @ApiPropertyOptional({
-    description: 'Filter analytics by site ID (Super Admin can omit for platform-wide aggregated metrics)',
+    description:
+      'Filter analytics by site ID (Super Admin can omit for platform-wide aggregated metrics)',
   })
   @IsOptional()
   @IsUUID('4')
@@ -37,4 +38,3 @@ export class AnalyticsQueryDto {
   @IsIn(['7d', '14d', '30d', '90d', '1y'])
   timeframe?: AnalyticsTimeframe;
 }
-

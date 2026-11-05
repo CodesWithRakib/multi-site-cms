@@ -108,8 +108,18 @@ export function ContentActivityChart({
       const dayPart = parts[2];
       if (monthPart && dayPart) {
         const monthNames = [
-          'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-          'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+          'Jan',
+          'Feb',
+          'Mar',
+          'Apr',
+          'May',
+          'Jun',
+          'Jul',
+          'Aug',
+          'Sep',
+          'Oct',
+          'Nov',
+          'Dec',
         ];
         const m = monthNames[parseInt(monthPart, 10) - 1] || monthPart;
         return `${m} ${parseInt(dayPart, 10)}`;
@@ -204,7 +214,11 @@ export function ContentActivityChart({
                   </div>
                 )}
 
-                <svg viewBox="0 0 300 100" className="size-full overflow-visible" preserveAspectRatio="none">
+                <svg
+                  viewBox="0 0 300 100"
+                  className="size-full overflow-visible"
+                  preserveAspectRatio="none"
+                >
                   <defs>
                     <linearGradient id="analyticsGradient" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="0%" stopColor="#00e599" stopOpacity="0.35" />
@@ -214,15 +228,44 @@ export function ContentActivityChart({
                   </defs>
 
                   {/* Horizontal Guideline Grids */}
-                  <line x1="10" y1="18" x2="290" y2="18" stroke="currentColor" className="text-slate-100 dark:text-slate-800" strokeDasharray="3 3" />
-                  <line x1="10" y1="42" x2="290" y2="42" stroke="currentColor" className="text-slate-100 dark:text-slate-800" strokeDasharray="3 3" />
-                  <line x1="10" y1="66" x2="290" y2="66" stroke="currentColor" className="text-slate-100 dark:text-slate-800" strokeDasharray="3 3" />
-                  <line x1="10" y1="90" x2="290" y2="90" stroke="currentColor" className="text-slate-100 dark:text-slate-800" />
+                  <line
+                    x1="10"
+                    y1="18"
+                    x2="290"
+                    y2="18"
+                    stroke="currentColor"
+                    className="text-slate-100 dark:text-slate-800"
+                    strokeDasharray="3 3"
+                  />
+                  <line
+                    x1="10"
+                    y1="42"
+                    x2="290"
+                    y2="42"
+                    stroke="currentColor"
+                    className="text-slate-100 dark:text-slate-800"
+                    strokeDasharray="3 3"
+                  />
+                  <line
+                    x1="10"
+                    y1="66"
+                    x2="290"
+                    y2="66"
+                    stroke="currentColor"
+                    className="text-slate-100 dark:text-slate-800"
+                    strokeDasharray="3 3"
+                  />
+                  <line
+                    x1="10"
+                    y1="90"
+                    x2="290"
+                    y2="90"
+                    stroke="currentColor"
+                    className="text-slate-100 dark:text-slate-800"
+                  />
 
                   {/* Shaded Area Fill */}
-                  {svgAreaPath && (
-                    <path d={svgAreaPath} fill="url(#analyticsGradient)" />
-                  )}
+                  {svgAreaPath && <path d={svgAreaPath} fill="url(#analyticsGradient)" />}
 
                   {/* Smooth Line Curve */}
                   {svgPath && (

@@ -126,7 +126,9 @@ function QuickScheduleDialogContent({
       onClose();
     } catch (err: unknown) {
       const errorObj = err as { data?: { error?: { message?: string } }; message?: string };
-      setErrorMsg(errorObj?.data?.error?.message || errorObj?.message || 'Failed to schedule post.');
+      setErrorMsg(
+        errorObj?.data?.error?.message || errorObj?.message || 'Failed to schedule post.',
+      );
     }
   };
 

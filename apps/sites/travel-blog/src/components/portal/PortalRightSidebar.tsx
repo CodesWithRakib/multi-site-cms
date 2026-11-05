@@ -48,12 +48,15 @@ export function PortalRightSidebar({ categories, popularArticles }: PortalRightS
     }
   };
 
-  const displayCategories = categories.length > 0 ? categories.slice(0, 5) : [
-    { id: '1', name: 'Travel Tips', slug: 'travel-tips', postCount: 24 },
-    { id: '2', name: 'Destinations', slug: 'destinations', postCount: 32 },
-    { id: '3', name: 'Guides', slug: 'guides', postCount: 18 },
-    { id: '4', name: 'Stories', slug: 'stories', postCount: 20 },
-  ];
+  const displayCategories =
+    categories.length > 0
+      ? categories.slice(0, 5)
+      : [
+          { id: '1', name: 'Travel Tips', slug: 'travel-tips', postCount: 24 },
+          { id: '2', name: 'Destinations', slug: 'destinations', postCount: 32 },
+          { id: '3', name: 'Guides', slug: 'guides', postCount: 18 },
+          { id: '4', name: 'Stories', slug: 'stories', postCount: 20 },
+        ];
 
   return (
     <aside className="space-y-6">
@@ -207,7 +210,9 @@ export function PortalRightSidebar({ categories, popularArticles }: PortalRightS
           {subFeedback && (
             <p
               className={`text-xs ${
-                subStatus === 'success' ? 'text-emerald-600 dark:text-emerald-400 font-medium' : 'text-rose-500'
+                subStatus === 'success'
+                  ? 'text-emerald-600 dark:text-emerald-400 font-medium'
+                  : 'text-rose-500'
               }`}
               role="status"
             >

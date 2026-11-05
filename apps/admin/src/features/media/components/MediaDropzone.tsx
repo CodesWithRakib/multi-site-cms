@@ -108,9 +108,7 @@ export function MediaDropzone({ siteId, onUploaded, onFinishedAll }: MediaDropzo
 
       try {
         const result = await uploadMedia(formData).unwrap();
-        setQueue((prev) =>
-          prev.map((q) => (q.id === item.id ? { ...q, status: 'success' } : q)),
-        );
+        setQueue((prev) => prev.map((q) => (q.id === item.id ? { ...q, status: 'success' } : q)));
         successful++;
         if (onUploaded) onUploaded(result.media);
       } catch (err: unknown) {
@@ -204,7 +202,9 @@ export function MediaDropzone({ siteId, onUploaded, onFinishedAll }: MediaDropzo
           {/* Queue Actions */}
           <div className="flex items-center justify-between pt-3 border-t border-slate-200 dark:border-slate-800">
             <span className="text-xs text-slate-500 dark:text-slate-400">
-              {successCount > 0 ? `${successCount} uploaded successfully` : 'Review metadata before uploading'}
+              {successCount > 0
+                ? `${successCount} uploaded successfully`
+                : 'Review metadata before uploading'}
             </span>
 
             <div className="flex items-center gap-2">

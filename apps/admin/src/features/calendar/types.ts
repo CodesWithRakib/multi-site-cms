@@ -23,4 +23,3 @@ export interface CalendarDayCell {
   isToday: boolean;
   events: CalendarEvent[];
 }
-

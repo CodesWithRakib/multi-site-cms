@@ -2,11 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Bookmark } from 'lucide-react';
-import {
-  isArticleSaved,
-  removeArticle,
-  saveArticle,
-} from '@/lib/bookmarks';
+import { isArticleSaved, removeArticle, saveArticle } from '@/lib/bookmarks';
 
 export interface BookmarkButtonProps {
   articleId: string;
@@ -34,8 +30,7 @@ export function BookmarkButton({
   useEffect(() => {
     const checkSaved = () => {
       setIsSaved(
-        isArticleSaved(articleId) ||
-          (Boolean(articleSlug) && isArticleSaved(articleSlug ?? '')),
+        isArticleSaved(articleId) || (Boolean(articleSlug) && isArticleSaved(articleSlug ?? '')),
       );
     };
 
@@ -73,7 +68,11 @@ export function BookmarkButton({
     <button
       type="button"
       onClick={toggleBookmark}
-      aria-label={isSaved ? `Remove ${articleTitle || 'article'} from saved` : `Save ${articleTitle || 'article'}`}
+      aria-label={
+        isSaved
+          ? `Remove ${articleTitle || 'article'} from saved`
+          : `Save ${articleTitle || 'article'}`
+      }
       title={isSaved ? 'Saved to bookmarks' : 'Save article'}
       className={`inline-flex items-center justify-center rounded-full border border-border/80 bg-white/90 dark:bg-neutral-900/90 backdrop-blur-md shadow-2xs hover:scale-110 active:scale-95 transition-all cursor-pointer ${buttonSizes} ${
         isSaved

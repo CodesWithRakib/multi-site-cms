@@ -23,6 +23,7 @@ import type {
   PostPreviewData,
   PostPublicationItem,
   PostRevisionItem,
+  PostStatusCounts,
   PreviewTokenResponse,
 } from '@multi-site-cms/types';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
@@ -35,6 +36,7 @@ import {
   CreatePostDto,
   CreatePublicationDto,
   ListPostsQueryDto,
+  PostStatsQueryDto,
   RestoreRevisionDto,
   UpdatePostDto,
 } from './dto';
@@ -70,6 +72,18 @@ export class PostsController {
     @Query() query: ListPostsQueryDto,
   ): Promise<PaginatedResult<PostItem>> {
     return this.postsService.listPosts(actor, query);
+  }
+
+  // Declared before ':postId' so "stats" is not parsed as a post id.
+  @Get('stats')
+  @RequirePermissions('post:read')
+  @ApiOperation({ summary: 'Count visible posts per effective status' })
+  @ApiResponse({ status: 200, description: 'Post counts per status' })
+  async getPostStats(
+    @CurrentUser() actor: EffectiveAuthContext,
+    @Query() query: PostStatsQueryDto,
+  ): Promise<PostStatusCounts> {
+    return this.postsService.getPostStats(actor, query);
   }
 
   @Get(':postId')

@@ -393,7 +393,8 @@ export async function seedMediaData(dataSource: DataSource): Promise<void> {
       title: 'Dolomites Ridge Soaring',
       subtitle: 'Thermal lift mastery at 3,200m above jagged peaks',
       category: 'Paragliding',
-      altText: 'Cross-country paraglider catching thermal lift over dramatic jagged dolomite pinnacles',
+      altText:
+        'Cross-country paraglider catching thermal lift over dramatic jagged dolomite pinnacles',
       caption: 'Chasing ridge lift at 3,200m above the Italian Dolomites.',
       themeColor1: '#082625',
       themeColor2: '#134e4a',
@@ -541,7 +542,9 @@ export async function seedMediaData(dataSource: DataSource): Promise<void> {
     }
   }
 
-  console.log(`Successfully seeded ${mediaItems.length} realistic media assets and linked featured images.`);
+  console.log(
+    `Successfully seeded ${mediaItems.length} realistic media assets and linked featured images.`,
+  );
 }
 
 async function main(): Promise<void> {

@@ -67,7 +67,9 @@ export function MediaHeader({
           title="Refresh media library"
           className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-all cursor-pointer shadow-xs disabled:opacity-50"
         >
-          <RefreshCw className={`size-4 ${isFetching ? 'animate-spin text-emerald-600 dark:text-emerald-400' : ''}`} />
+          <RefreshCw
+            className={`size-4 ${isFetching ? 'animate-spin text-emerald-600 dark:text-emerald-400' : ''}`}
+          />
         </button>
 
         {/* View Mode Toggle (Grid / List) */}
@@ -129,4 +131,3 @@ export function MediaHeader({
     </div>
   );
 }
-

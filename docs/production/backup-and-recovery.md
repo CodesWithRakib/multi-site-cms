@@ -44,7 +44,18 @@ pg_dump -U multi_site_cms -d multi_site_cms -F c -f /tmp/pre_migration_backup.du
 
 ## 3. Verified Restore Drill Procedure
 
-The restore drill was verified against a live PostgreSQL 18 instance. Follow these exact steps to execute a disaster recovery restore drill:
+Follow these steps for a restore drill. Record every drill in the log below.
+
+### Drill log
+
+| Date       | Source                                     | Dump (custom, `-Z 9`) | Restore | Result                                                                                                                                                                            |
+| ---------- | ------------------------------------------ | --------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-11-05 | Local Docker PostgreSQL 18.6 (development) | 0.8 s, 380 KB         | 1.3 s   | `pg_restore --exit-on-error` exit 0. Source and copy identical: 25 tables, 12 migrations, 315 constraints, 87 indexes, 4 extensions, equal row counts, equal publication checksum |
+
+Not yet drilled: a restore from the production provider's own snapshots
+(point-in-time recovery). Do that once a production database exists; the RPO
+and RTO targets above remain unverified until then. Timings scale with data
+size, so repeat the drill when the database grows.
 
 ### Step 1: Create a Disposable Restore Target Database
 
@@ -66,14 +77,21 @@ pg_restore \
 
 ### Step 3: Verify Relational Integrity Checklist
 
-Verify that all 21 system tables, constraints, and migrations are intact:
+Run the same queries on the source and the restored copy; every number must
+match. Counts below are from the 2026-11-05 drill and change as the schema
+evolves.
 
 ```sql
 SELECT count(*) FROM information_schema.tables WHERE table_schema = 'public';
--- Expected result: 21 tables
+-- 25 tables (12 migrations applied)
 
 SELECT count(*) FROM typeorm_migrations;
--- Expected result: 7 migrations
+-- Equals the number of entries in apps/api/src/database/migrations/index.ts
+
+SELECT count(*) FROM pg_constraint c
+JOIN pg_namespace n ON n.oid = c.connamespace WHERE n.nspname = 'public';
+SELECT count(*) FROM pg_indexes WHERE schemaname = 'public';
+-- Constraints and indexes: identical on source and copy
 
 SELECT id, key, name, status FROM sites;
 -- Expected result: Active sites 'travel-blog' and 'air-sports' intact

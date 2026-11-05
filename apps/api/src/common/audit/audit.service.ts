@@ -1,9 +1,5 @@
 import { ForbiddenException, Inject, Injectable, Logger } from '@nestjs/common';
-import type {
-  AuditLogItem,
-  AuditLogSummary,
-  PaginatedAuditLogs,
-} from '@multi-site-cms/types';
+import type { AuditLogItem, AuditLogSummary, PaginatedAuditLogs } from '@multi-site-cms/types';
 import { type DataSource, type Repository } from 'typeorm';
 
 import type { EffectiveAuthContext } from '../../auth/services/authorization.service';
@@ -157,8 +153,7 @@ export class AuditService {
       params.push(query.startDate);
     }
     if (query.endDate) {
-      const endVal =
-        query.endDate.length === 10 ? `${query.endDate}T23:59:59.999Z` : query.endDate;
+      const endVal = query.endDate.length === 10 ? `${query.endDate}T23:59:59.999Z` : query.endDate;
       conditions.push(`ae.created_at <= $${pIdx++}`);
       params.push(endVal);
     }
@@ -257,10 +252,7 @@ export class AuditService {
   /**
    * Aggregates activity KPI metrics for the audit log dashboard.
    */
-  async getAuditSummary(
-    actor: EffectiveAuthContext,
-    siteId?: string,
-  ): Promise<AuditLogSummary> {
+  async getAuditSummary(actor: EffectiveAuthContext, siteId?: string): Promise<AuditLogSummary> {
     const conditions: string[] = [];
     const params: unknown[] = [];
     let pIdx = 1;

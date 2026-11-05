@@ -62,20 +62,17 @@ export function SearchClientContainer({
   const isFirstRender = useRef(true);
 
   // Sync URL query params with state
-  const syncUrl = useCallback(
-    (q: string, cat: string, tag: string, sort: PublicPostSort) => {
-      const params = new URLSearchParams();
-      if (q.trim()) params.set('q', q.trim());
-      if (cat) params.set('category', cat);
-      if (tag) params.set('tag', tag);
-      if (sort !== 'newest') params.set('sort', sort);
+  const syncUrl = useCallback((q: string, cat: string, tag: string, sort: PublicPostSort) => {
+    const params = new URLSearchParams();
+    if (q.trim()) params.set('q', q.trim());
+    if (cat) params.set('category', cat);
+    if (tag) params.set('tag', tag);
+    if (sort !== 'newest') params.set('sort', sort);
 
-      const qs = params.toString();
-      const newUrl = qs ? `/search?${qs}` : '/search';
-      window.history.replaceState(null, '', newUrl);
-    },
-    [],
-  );
+    const qs = params.toString();
+    const newUrl = qs ? `/search?${qs}` : '/search';
+    window.history.replaceState(null, '', newUrl);
+  }, []);
 
   // Fetch updated search results from proxy API
   const executeSearch = useCallback(
@@ -210,11 +207,7 @@ export function SearchClientContainer({
       {/* 2. Main 12-Column Faceted Explorer Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Left 4-Column Facet Sidebar (Desktop & Mobile Drawer) */}
-        <div
-          className={`lg:col-span-4 ${
-            mobileFilterOpen ? 'block' : 'hidden lg:block'
-          }`}
-        >
+        <div className={`lg:col-span-4 ${mobileFilterOpen ? 'block' : 'hidden lg:block'}`}>
           <div className="sticky top-28">
             <SearchFacetSidebar
               categories={categories}

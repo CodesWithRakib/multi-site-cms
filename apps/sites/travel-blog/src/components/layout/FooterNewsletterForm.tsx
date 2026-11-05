@@ -66,9 +66,7 @@ export function FooterNewsletterForm() {
 
       {feedback && (
         <p
-          className={`text-xs ${
-            status === 'success' ? 'text-emerald-300' : 'text-rose-300'
-          }`}
+          className={`text-xs ${status === 'success' ? 'text-emerald-300' : 'text-rose-300'}`}
           role="status"
         >
           {feedback}
@@ -77,4 +75,3 @@ export function FooterNewsletterForm() {
     </form>
   );
 }
-

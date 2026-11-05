@@ -1,12 +1,7 @@
 'use client';
 
 import React from 'react';
-import {
-  Calendar,
-  Globe,
-  RefreshCw,
-  Download,
-} from 'lucide-react';
+import { Calendar, Globe, RefreshCw, Download } from 'lucide-react';
 import type { AnalyticsTimeframe } from '@multi-site-cms/types';
 import { useAdmin } from '@/lib/admin-context';
 
@@ -108,10 +103,11 @@ export function AnalyticsFilterBar({
           className="p-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors disabled:opacity-50"
           title="Refresh metrics"
         >
-          <RefreshCw className={`size-3.5 ${isRefreshing ? 'animate-spin text-emerald-600 dark:text-emerald-400' : ''}`} />
+          <RefreshCw
+            className={`size-3.5 ${isRefreshing ? 'animate-spin text-emerald-600 dark:text-emerald-400' : ''}`}
+          />
         </button>
       </div>
     </div>
   );
 }
-

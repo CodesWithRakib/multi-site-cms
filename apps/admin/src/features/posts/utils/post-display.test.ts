@@ -19,10 +19,24 @@ const site = (domains: Array<{ hostname: string; isPrimary: boolean }>) =>
   ({ id: 's1', key: 'travel-blog', name: 'Travel', domains }) as unknown as SiteItem;
 
 describe('displayedPublication / effectiveStatus', () => {
-  it('uses the active site publication, else the first one', () => {
+  it('uses the active site publication when a site is selected', () => {
     const p = post([pub('a', 'draft'), pub('b', 'published')]);
+    expect(displayedPublication(p, 'a')?.siteId).toBe('a');
     expect(displayedPublication(p, 'b')?.siteId).toBe('b');
-    expect(displayedPublication(p, null)?.siteId).toBe('a');
+    expect(displayedPublication(p, 'missing')).toBeUndefined();
+  });
+
+  it('across all sites, shows the most advanced publication (same rule as the API)', () => {
+    expect(
+      displayedPublication(post([pub('a', 'draft'), pub('b', 'published')]), null)?.siteId,
+    ).toBe('b');
+    expect(
+      displayedPublication(post([pub('a', 'archived'), pub('b', 'draft')]), null)?.siteId,
+    ).toBe('b');
+    expect(
+      displayedPublication(post([pub('a', 'in_review'), pub('b', 'scheduled')]), null)?.siteId,
+    ).toBe('b');
+    expect(displayedPublication(post([]), null)).toBeUndefined();
   });
 
   it('falls back to the canonical status without a publication', () => {

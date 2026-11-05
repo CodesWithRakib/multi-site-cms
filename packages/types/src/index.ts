@@ -268,6 +268,16 @@ export interface PostPublicationItem {
   tagIds?: string[];
 }
 
+/** Status a post shows in the admin workspace (publication or canonical). */
+export type PostStatsStatus =
+  'draft' | 'in_review' | 'approved' | 'scheduled' | 'published' | 'archived';
+
+/** `GET /posts/stats`: post counts per effective status. */
+export interface PostStatusCounts {
+  total: number;
+  byStatus: Record<PostStatsStatus, number>;
+}
+
 /** Public-safe author summary (no email or credentials). */
 export interface PostAuthorSummary {
   id: string;

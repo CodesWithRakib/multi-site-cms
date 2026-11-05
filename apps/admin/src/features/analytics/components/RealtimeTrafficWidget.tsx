@@ -138,4 +138,3 @@ export function RealtimeTrafficWidget({ realtimeData, isLoading }: RealtimeTraff
     </div>
   );
 }
-

@@ -11,11 +11,7 @@ interface SecuritySettingsFormProps {
   isSaving: boolean;
 }
 
-export function SecuritySettingsForm({
-  initialData,
-  onSave,
-  isSaving,
-}: SecuritySettingsFormProps) {
+export function SecuritySettingsForm({ initialData, onSave, isSaving }: SecuritySettingsFormProps) {
   const { t } = useAdmin();
 
   const [formData, setFormData] = useState<PlatformSecuritySettings>({
@@ -94,7 +90,10 @@ export function SecuritySettingsForm({
             required
             value={formData.sessionTtlHours}
             onChange={(e) =>
-              setFormData({ ...formData, sessionTtlHours: Number.parseInt(e.target.value, 10) || 168 })
+              setFormData({
+                ...formData,
+                sessionTtlHours: Number.parseInt(e.target.value, 10) || 168,
+              })
             }
             className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50/70 dark:bg-neutral-800/80 text-neutral-900 dark:text-neutral-100 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all"
           />
@@ -112,7 +111,10 @@ export function SecuritySettingsForm({
             required
             value={formData.maxLoginAttempts}
             onChange={(e) =>
-              setFormData({ ...formData, maxLoginAttempts: Number.parseInt(e.target.value, 10) || 5 })
+              setFormData({
+                ...formData,
+                maxLoginAttempts: Number.parseInt(e.target.value, 10) || 5,
+              })
             }
             className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50/70 dark:bg-neutral-800/80 text-neutral-900 dark:text-neutral-100 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all"
           />
@@ -179,7 +181,9 @@ export function SecuritySettingsForm({
           <input
             type="checkbox"
             checked={formData.enforceMfaForSuperAdmin}
-            onChange={(e) => setFormData({ ...formData, enforceMfaForSuperAdmin: e.target.checked })}
+            onChange={(e) =>
+              setFormData({ ...formData, enforceMfaForSuperAdmin: e.target.checked })
+            }
             className="size-4 text-emerald-600 dark:text-emerald-400 rounded-md border-neutral-300 focus:ring-emerald-500"
           />
           <span className="text-xs font-medium text-neutral-800 dark:text-neutral-200">
@@ -191,7 +195,9 @@ export function SecuritySettingsForm({
           <input
             type="checkbox"
             checked={formData.allowPublicRegistration}
-            onChange={(e) => setFormData({ ...formData, allowPublicRegistration: e.target.checked })}
+            onChange={(e) =>
+              setFormData({ ...formData, allowPublicRegistration: e.target.checked })
+            }
             className="size-4 text-emerald-600 dark:text-emerald-400 rounded-md border-neutral-300 focus:ring-emerald-500"
           />
           <span className="text-xs font-medium text-neutral-800 dark:text-neutral-200">

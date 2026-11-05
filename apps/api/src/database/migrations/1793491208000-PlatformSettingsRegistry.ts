@@ -80,13 +80,7 @@ export class PlatformSettingsRegistry1793491208000 implements MigrationInterface
       ) VALUES ('default', $1, $2, $3, $4, $5)
       ON CONFLICT ("id") DO NOTHING;
     `,
-      [
-        defaultGeneral,
-        defaultSecurity,
-        defaultMedia,
-        defaultPublishing,
-        defaultMaintenance,
-      ],
+      [defaultGeneral, defaultSecurity, defaultMedia, defaultPublishing, defaultMaintenance],
     );
   }
 
@@ -94,4 +88,3 @@ export class PlatformSettingsRegistry1793491208000 implements MigrationInterface
     await queryRunner.query(`DROP TABLE IF EXISTS "platform_settings"`);
   }
 }
-

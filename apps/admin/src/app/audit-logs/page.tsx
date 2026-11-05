@@ -5,11 +5,7 @@ import { ShieldCheck, History } from 'lucide-react';
 import type { AuditLogCategory, AuditLogItem } from '@multi-site-cms/types';
 import { ShellLayout } from '@/components/shell';
 import { useAdmin } from '@/lib/admin-context';
-import {
-  useListAuditLogsQuery,
-  useGetAuditSummaryQuery,
-  useListSitesQuery,
-} from '@/lib/cms-api';
+import { useListAuditLogsQuery, useGetAuditSummaryQuery, useListSitesQuery } from '@/lib/cms-api';
 import {
   AuditLogStatsCards,
   AuditLogFilterBar,

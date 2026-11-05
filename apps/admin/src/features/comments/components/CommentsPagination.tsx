@@ -36,7 +36,9 @@ export function CommentsPagination({
 
         <span className="text-border">|</span>
 
-        <label htmlFor="comments-limit" className="text-xs">Per page:</label>
+        <label htmlFor="comments-limit" className="text-xs">
+          Per page:
+        </label>
         <select
           id="comments-limit"
           value={limit}
@@ -77,4 +79,3 @@ export function CommentsPagination({
     </div>
   );
 }
-

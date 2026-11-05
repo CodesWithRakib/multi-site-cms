@@ -65,7 +65,9 @@ export function EditorToolbar({
       {/* Table & Media */}
       <button
         type="button"
-        onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}
+        onClick={() =>
+          editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()
+        }
         className={btn(editor.isActive('table'))}
         title="Insert 3x3 Table"
       >

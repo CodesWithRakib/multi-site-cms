@@ -40,7 +40,17 @@ export function createPlatformApi(options: PlatformApiOptions) {
 
   return createApi({
     reducerPath: 'platformApi',
-    tagTypes: ['Post', 'Media', 'Site', 'User', 'Publication', 'Taxonomy', 'Health', 'Auth', 'Comment'],
+    tagTypes: [
+      'Post',
+      'Media',
+      'Site',
+      'User',
+      'Publication',
+      'Taxonomy',
+      'Health',
+      'Auth',
+      'Comment',
+    ],
     baseQuery: async (args: PlatformRequestArgs, { signal }) => {
       try {
         const data = await client.request<ApiSuccess<unknown>>(args.path, {

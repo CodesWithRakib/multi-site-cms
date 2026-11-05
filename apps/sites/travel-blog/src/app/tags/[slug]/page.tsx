@@ -95,7 +95,9 @@ export default async function TagDetailPage({ params }: TagPageProps) {
         </div>
       ) : (
         <div className="rounded-3xl border border-dashed border-border p-16 text-center space-y-2">
-          <h2 className="font-serif text-xl font-bold text-foreground">No Articles Tagged #{tag.name}</h2>
+          <h2 className="font-serif text-xl font-bold text-foreground">
+            No Articles Tagged #{tag.name}
+          </h2>
           <p className="text-sm text-muted-foreground">Check back soon for new dispatches.</p>
         </div>
       )}

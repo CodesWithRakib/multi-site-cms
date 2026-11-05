@@ -6,6 +6,7 @@ import { FileText, Loader2, Plus } from 'lucide-react';
 import { useAdmin } from '@/lib/admin-context';
 
 import type { PostsWorkspace } from '../hooks/usePostsWorkspace';
+import { PostCard } from './PostCard';
 import { PostsPagination } from './PostsPagination';
 import { PostTableRow } from './PostTableRow';
 
@@ -42,6 +43,14 @@ export function PostsTable({
 }: PostsTableProps) {
   const { t } = useAdmin();
 
+  const itemActions = (postId: string) => ({
+    isMenuOpen: openDropdownId === postId,
+    onToggleMenu: () => toggleDropdown(postId),
+    onPublishingAction: openPublishing,
+    onSubmitForReview: submitPublicationForReview,
+    onDelete: removePost,
+  });
+
   return (
     <div className="rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs overflow-hidden">
       {isLoading ? (
@@ -72,43 +81,46 @@ export function PostsTable({
           </Link>
         </div>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="border-b border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                <th scope="col" className="py-3.5 px-6">
-                  {t.content.tableTitle || 'Post & Summary'}
-                </th>
-                <th scope="col" className="py-3.5 px-4">
-                  {t.content.type || 'Content Type'}
-                </th>
-                <th scope="col" className="py-3.5 px-4">
-                  {t.content.publicationStatus || 'Site Publication'}
-                </th>
-                <th scope="col" className="py-3.5 px-4">
-                  {t.content.updated || 'Last Updated'}
-                </th>
-                <th scope="col" className="py-3.5 px-6 text-right">
-                  {t.content.actions || 'Actions'}
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-xs">
-              {displayPosts.map((post) => (
-                <PostTableRow
-                  key={post.id}
-                  post={post}
-                  sites={sites}
-                  isMenuOpen={openDropdownId === post.id}
-                  onToggleMenu={() => toggleDropdown(post.id)}
-                  onPublishingAction={openPublishing}
-                  onSubmitForReview={submitPublicationForReview}
-                  onDelete={removePost}
-                />
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <>
+          {/* Phones: a card list instead of a table that scrolls sideways. */}
+          <ul
+            className="md:hidden divide-y divide-slate-100 dark:divide-slate-800/60"
+            aria-label={t.content.tableTitle || 'Posts'}
+          >
+            {displayPosts.map((post) => (
+              <PostCard key={post.id} post={post} sites={sites} {...itemActions(post.id)} />
+            ))}
+          </ul>
+
+          <div className="hidden md:block overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  <th scope="col" className="py-3.5 px-6">
+                    {t.content.tableTitle || 'Post & Summary'}
+                  </th>
+                  <th scope="col" className="py-3.5 px-4">
+                    {t.content.type || 'Content Type'}
+                  </th>
+                  <th scope="col" className="py-3.5 px-4">
+                    {t.content.publicationStatus || 'Site Publication'}
+                  </th>
+                  <th scope="col" className="py-3.5 px-4">
+                    {t.content.updated || 'Last Updated'}
+                  </th>
+                  <th scope="col" className="py-3.5 px-6 text-right">
+                    {t.content.actions || 'Actions'}
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-xs">
+                {displayPosts.map((post) => (
+                  <PostTableRow key={post.id} post={post} sites={sites} {...itemActions(post.id)} />
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
 
       <PostsPagination

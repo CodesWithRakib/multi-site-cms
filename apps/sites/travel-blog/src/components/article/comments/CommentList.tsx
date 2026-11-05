@@ -20,7 +20,8 @@ export function CommentList({ comments }: CommentListProps) {
           No reflections yet
         </h4>
         <p className="mt-1.5 max-w-sm text-sm text-muted-foreground">
-          Be the pioneer wanderer to share your insights, recommendations, or questions on this dispatch.
+          Be the pioneer wanderer to share your insights, recommendations, or questions on this
+          dispatch.
         </p>
       </div>
     );
@@ -44,4 +45,3 @@ export function CommentList({ comments }: CommentListProps) {
     </div>
   );
 }
-

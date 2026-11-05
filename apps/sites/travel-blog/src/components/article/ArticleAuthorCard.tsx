@@ -49,4 +49,3 @@ export function ArticleAuthorCard({ author }: ArticleAuthorCardProps) {
     </section>
   );
 }
-

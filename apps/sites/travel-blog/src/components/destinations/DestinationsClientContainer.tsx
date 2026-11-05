@@ -24,10 +24,11 @@ export function DestinationsClientContainer({ initialGuides }: DestinationsClien
 
   const filteredGuides = useMemo(() => {
     if (activeRegion === 'all') return initialGuides;
-    return initialGuides.filter((guide) =>
-      guide.categories.some((cat) => cat.slug.toLowerCase().includes(activeRegion)) ||
-      guide.title.toLowerCase().includes(activeRegion) ||
-      guide.tags.some((t) => t.slug.toLowerCase().includes(activeRegion))
+    return initialGuides.filter(
+      (guide) =>
+        guide.categories.some((cat) => cat.slug.toLowerCase().includes(activeRegion)) ||
+        guide.title.toLowerCase().includes(activeRegion) ||
+        guide.tags.some((t) => t.slug.toLowerCase().includes(activeRegion)),
     );
   }, [initialGuides, activeRegion]);
 
@@ -68,7 +69,8 @@ export function DestinationsClientContainer({ initialGuides }: DestinationsClien
             No Destinations Found for &ldquo;{activeRegion}&rdquo;
           </h3>
           <p className="text-sm text-muted-foreground max-w-md mx-auto">
-            Try switching to &ldquo;All Destinations&rdquo; to explore all our field-tested itineraries.
+            Try switching to &ldquo;All Destinations&rdquo; to explore all our field-tested
+            itineraries.
           </p>
           <button
             type="button"
@@ -87,4 +89,3 @@ export function DestinationsClientContainer({ initialGuides }: DestinationsClien
     </div>
   );
 }
-

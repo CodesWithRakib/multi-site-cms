@@ -1,35 +1,36 @@
 # Next Session
 
-## State at handoff (2026-11-04)
+## State at handoff (2026-11-05)
 
-- Phases 1–3 done (3a–3d). Phase 3d changes are **uncommitted**; the user commits.
+- Phases 1–4 done in code. Phase 4 changes are **uncommitted**; the user commits.
 - Owner actions: rotate the Cloudinary secret (SEC-0) and any passwords set by
   the old admin seed (SEC-13); set `NEXT_PUBLIC_CONTACT_EMAIL`,
   `REVALIDATE_SECRET` (+ `SITE_REVALIDATE_URLS` locally); in production also
-  `PREVIEW_TOKEN_SECRET` and `API_BASE_URL`.
-- Dev database: start with `POSTGRES_PORT=5433 pnpm db:up` (matches `apps/api/.env`); all migrations applied.
+  `PREVIEW_TOKEN_SECRET` and `API_BASE_URL`. Deploy one API instance (ADR-0028).
+- **Decision pending (DB-6):** remove generated analytics from existing
+  databases with `pnpm --filter @multi-site-cms/api db:cleanup:generated-analytics`
+  (dry run), then `--apply` after a backup. Dev DB: 4,468 of 4,468 page views
+  are generated.
+- Dev database: `POSTGRES_PORT=5433 pnpm db:up`; all migrations applied.
 - Colors: edit `packages/ui/src/theme/site-themes.ts` only (ADR-0027).
 
 ## Resume steps
 
 1. Read `AGENTS.md`, `docs/roadmap/PHASE_STATUS.md`, this file.
 2. `git status`.
-3. `pnpm db:up`; `pnpm lint && pnpm typecheck && pnpm test`;
-   `pnpm --filter @multi-site-cms/api test:integration`; `npx playwright test`.
+3. `pnpm db:up`; `pnpm format:check && pnpm lint && pnpm typecheck && pnpm test`;
+   `pnpm --filter @multi-site-cms/api test:integration`;
+   `npx playwright test` (or `pnpm build` then `E2E_SERVER_MODE=production`).
+   Do not edit API files while E2E runs against the watch-mode API.
 
-## Exact next action — Phase 4 (production operations)
+## Exact next action
 
-1. CI: run Playwright against production builds (replace `test:e2e:list`), with
-   PostgreSQL service, seeded data, and the axe and keyboard specs. Admin specs
-   need CI secrets for test accounts.
-2. Formatting-only commit for the 145 pre-existing unformatted files (TD-10) so
-   `format:check` passes in CI.
-3. Scheduled-worker concurrency test (two workers, SKIP LOCKED).
-4. Server-side post counts for the posts workspace (TD-12); card list on phones (TD-14).
-5. Retention jobs (analytics, audit), restore drill, SSE scaling decision.
+1. After the owner pushes: check the first GitHub Actions run of `verify` and
+   `e2e`; fix anything environment-specific.
+2. API tests for newsletter, users/roles, settings (carried over from Phase 2).
+3. Decompose `sites/[siteId]`, `users/[userId]`, `sites` admin pages (TD-5).
+4. TD-15 (actions menu vs phone tab bar), TD-13 (native confirm/alert).
+5. Erasure procedure for personal data (DB-5) when legally required.
 
 Role, admin, accessibility and keyboard E2E need local accounts:
 `E2E_ADMIN_EMAIL/PASSWORD`, `E2E_SITE_ADMIN_EMAIL/PASSWORD` (never commit them).
-
-Then (CI E2E against production builds, formatting commit TD-10,
-worker concurrency test, SSE scaling, retention, restore drill).

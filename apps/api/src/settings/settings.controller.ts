@@ -36,7 +36,8 @@ export class SettingsController {
     @Body() dto: UpdatePlatformSettingsDto,
     @Req() req: Request,
   ): Promise<PlatformSettings> {
-    const ipAddress = (req.headers['x-forwarded-for'] as string) || req.socket.remoteAddress || null;
+    const ipAddress =
+      (req.headers['x-forwarded-for'] as string) || req.socket.remoteAddress || null;
     const requestId = (req.headers['x-request-id'] as string) || null;
     return this.settingsService.updatePlatformSettings(actor, dto, {
       ipAddress,
@@ -60,4 +61,3 @@ export class SettingsController {
     return this.settingsService.getPublicSettings();
   }
 }
-

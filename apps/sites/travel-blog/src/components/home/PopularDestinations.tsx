@@ -25,7 +25,8 @@ const DESTINATIONS: DestinationItem[] = [
     rating: 4.8,
     reviewsCount: '12k+ reviews',
     slug: '10-must-visit-places-europe',
-    imageUrl: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=800&q=80',
+    imageUrl:
+      'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=800&q=80',
     altText: 'Eiffel Tower standing tall in Paris',
   },
   {
@@ -36,7 +37,8 @@ const DESTINATIONS: DestinationItem[] = [
     rating: 4.8,
     reviewsCount: '10k+ reviews',
     slug: 'tokyo-tradition-meets-modernity',
-    imageUrl: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=800&q=80',
+    imageUrl:
+      'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=800&q=80',
     altText: 'Chureito Pagoda and Mount Fuji in Japan',
   },
   {
@@ -47,7 +49,8 @@ const DESTINATIONS: DestinationItem[] = [
     rating: 4.8,
     reviewsCount: '8k+ reviews',
     slug: 'santorini-dreamy-escape',
-    imageUrl: 'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?auto=format&fit=crop&w=800&q=80',
+    imageUrl:
+      'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?auto=format&fit=crop&w=800&q=80',
     altText: 'White and blue domed houses in Santorini Greece',
   },
   {
@@ -58,7 +61,8 @@ const DESTINATIONS: DestinationItem[] = [
     rating: 4.8,
     reviewsCount: '15k+ reviews',
     slug: 'sustainable-travel-europe',
-    imageUrl: 'https://images.unsplash.com/photo-1538688525198-9b88f6f53126?auto=format&fit=crop&w=800&q=80',
+    imageUrl:
+      'https://images.unsplash.com/photo-1538688525198-9b88f6f53126?auto=format&fit=crop&w=800&q=80',
     altText: 'Manhattan skyline at dusk with empire state building',
   },
 ];
@@ -127,7 +131,11 @@ export function PopularDestinations() {
 
               {/* Bookmark Button */}
               <div className="absolute top-3 right-3 z-10">
-                <BookmarkButton articleId={dest.id} articleTitle={`${dest.name}, ${dest.country}`} size="sm" />
+                <BookmarkButton
+                  articleId={dest.id}
+                  articleTitle={`${dest.name}, ${dest.country}`}
+                  size="sm"
+                />
               </div>
             </div>
 
@@ -158,4 +166,3 @@ export function PopularDestinations() {
     </section>
   );
 }
-

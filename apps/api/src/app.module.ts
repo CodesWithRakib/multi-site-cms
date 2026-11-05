@@ -14,6 +14,7 @@ import { ResponseEnvelopeInterceptor } from './common/interceptors/response-enve
 import { DatabaseModule } from './database/database.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { HealthModule } from './health/health.module';
+import { MaintenanceModule } from './maintenance/maintenance.module';
 import { MediaModule } from './media/media.module';
 import { PostsModule } from './posts/posts.module';
 import { CommentsModule } from './comments/comments.module';
@@ -42,6 +43,7 @@ import { UsersModule } from './users/users.module';
     TaxonomyModule,
     MediaModule,
     PublishingModule,
+    MaintenanceModule,
     HealthModule,
     DashboardModule,
     AnalyticsModule,

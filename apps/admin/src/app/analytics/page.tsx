@@ -135,40 +135,25 @@ export default function AnalyticsPage() {
         />
 
         {/* 4 Key Performance Metrics Cards */}
-        <AnalyticsMetricsCards
-          summary={summary}
-          isLoading={isOverviewLoading}
-        />
+        <AnalyticsMetricsCards summary={summary} isLoading={isOverviewLoading} />
 
         {/* Middle Section: Timeseries Area Chart (8 cols) & Real-time Live Pulse (4 cols) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           <div className="lg:col-span-8">
-            <AnalyticsTimeChart
-              data={timeseries}
-              isLoading={isOverviewLoading}
-            />
+            <AnalyticsTimeChart data={timeseries} isLoading={isOverviewLoading} />
           </div>
 
           <div className="lg:col-span-4">
-            <RealtimeTrafficWidget
-              realtimeData={realtimeData}
-              isLoading={isRealtimeLoading}
-            />
+            <RealtimeTrafficWidget realtimeData={realtimeData} isLoading={isRealtimeLoading} />
           </div>
         </div>
 
         {/* Top Performing Articles & Pages Table */}
-        <TopPagesTable
-          pages={topPages}
-          isLoading={isOverviewLoading}
-        />
+        <TopPagesTable pages={topPages} isLoading={isOverviewLoading} />
 
         {/* Bottom Section: Traffic Acquisition, Device/Browser Breakdown, and Geographic Distribution */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <TrafficSourcesCard
-            sources={sources}
-            isLoading={isOverviewLoading}
-          />
+          <TrafficSourcesCard sources={sources} isLoading={isOverviewLoading} />
 
           <DeviceAndBrowserCard
             devices={devices}
@@ -176,13 +161,9 @@ export default function AnalyticsPage() {
             isLoading={isOverviewLoading}
           />
 
-          <CountryDemographicsCard
-            countries={countries}
-            isLoading={isOverviewLoading}
-          />
+          <CountryDemographicsCard countries={countries} isLoading={isOverviewLoading} />
         </div>
       </div>
     </ShellLayout>
   );
 }
-

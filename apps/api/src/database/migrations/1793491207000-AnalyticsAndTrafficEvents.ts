@@ -7,7 +7,7 @@ import type { MigrationInterface, QueryRunner } from 'typeorm';
  * 1. `analytics_page_views` table with site isolation, post referencing,
  *    demographic/device tracking, and duration metrics.
  * 2. High-performance composite indexes for real-time and historical range queries.
- * 3. Seed data generation across the last 90 days for existing sites.
+ * 3. (Removed) Generated sample traffic; see the note in `up()`.
  */
 export class AnalyticsAndTrafficEvents1793491207000 implements MigrationInterface {
   name = 'AnalyticsAndTrafficEvents1793491207000';
@@ -64,129 +64,12 @@ export class AnalyticsAndTrafficEvents1793491207000 implements MigrationInterfac
         ON "analytics_page_views" ("site_id", "path");
     `);
 
-    // 3. Populate rich seed analytics across past 90 days for existing sites
-    await queryRunner.query(`
-      DO $$
-      DECLARE
-        site_rec RECORD;
-        post_rec RECORD;
-        day_offset INT;
-        views_today INT;
-        v_idx INT;
-        sample_devices TEXT[] := ARRAY['desktop', 'mobile', 'mobile', 'mobile', 'tablet'];
-        sample_browsers TEXT[] := ARRAY['chrome', 'chrome', 'safari', 'firefox', 'edge'];
-        sample_os TEXT[] := ARRAY['windows', 'ios', 'android', 'macos', 'linux'];
-        sample_sources TEXT[] := ARRAY['search', 'search', 'direct', 'social', 'newsletter', 'referral'];
-        sample_referrers TEXT[] := ARRAY[
-          'https://www.google.com/',
-          'https://www.google.com/',
-          'https://twitter.com/',
-          'https://www.instagram.com/',
-          'https://linkedin.com/',
-          'https://news.ycombinator.com/'
-        ];
-        sample_countries TEXT[][] := ARRAY[
-          ARRAY['US', 'United States'],
-          ARRAY['US', 'United States'],
-          ARRAY['BD', 'Bangladesh'],
-          ARRAY['GB', 'United Kingdom'],
-          ARRAY['DE', 'Germany'],
-          ARRAY['JP', 'Japan'],
-          ARRAY['CA', 'Canada'],
-          ARRAY['FR', 'France'],
-          ARRAY['AU', 'Australia']
-        ];
-        random_country INT;
-        chosen_device TEXT;
-        chosen_browser TEXT;
-        chosen_os TEXT;
-        chosen_source TEXT;
-        chosen_ref TEXT;
-        v_duration INT;
-        v_unique BOOLEAN;
-        v_time TIMESTAMPTZ;
-        v_path TEXT;
-        v_post_id UUID;
-      BEGIN
-        FOR site_rec IN SELECT id, key FROM sites LOOP
-          -- Iterate across past 90 days
-          FOR day_offset IN 0..89 LOOP
-            -- Base traffic of 12-35 views per day
-            views_today := 12 + floor(random() * 24)::INT;
-            
-            -- Slight growth curve towards recent days
-            IF day_offset < 14 THEN
-              views_today := views_today + 8;
-            END IF;
-
-            FOR v_idx IN 1..views_today LOOP
-              random_country := 1 + floor(random() * 9)::INT;
-              chosen_device := sample_devices[1 + floor(random() * array_length(sample_devices, 1))::INT];
-              chosen_browser := sample_browsers[1 + floor(random() * array_length(sample_browsers, 1))::INT];
-              chosen_os := sample_os[1 + floor(random() * array_length(sample_os, 1))::INT];
-              chosen_source := sample_sources[1 + floor(random() * array_length(sample_sources, 1))::INT];
-              
-              IF chosen_source = 'direct' THEN
-                chosen_ref := NULL;
-              ELSE
-                chosen_ref := sample_referrers[1 + floor(random() * array_length(sample_referrers, 1))::INT];
-              END IF;
-
-              v_duration := 20 + floor(random() * 260)::INT;
-              v_unique := (random() > 0.3);
-              v_time := (now() - (day_offset || ' days')::INTERVAL) + (floor(random() * 86400) || ' seconds')::INTERVAL;
-
-              -- Pick a post from this site or root page
-              v_post_id := NULL;
-              v_path := '/';
-
-              SELECT pp.post_id, '/' || pp.slug INTO post_rec
-              FROM post_publications pp
-              WHERE pp.site_id = site_rec.id AND pp.status = 'published'
-              ORDER BY random()
-              LIMIT 1;
-
-              IF post_rec.post_id IS NOT NULL AND random() > 0.25 THEN
-                v_post_id := post_rec.post_id;
-                v_path := post_rec.slug;
-              END IF;
-
-              INSERT INTO analytics_page_views (
-                site_id,
-                post_id,
-                path,
-                referrer,
-                referrer_source,
-                visitor_id,
-                device_type,
-                browser,
-                os,
-                country_code,
-                country_name,
-                duration_seconds,
-                is_unique,
-                created_at
-              ) VALUES (
-                site_rec.id,
-                v_post_id,
-                v_path,
-                chosen_ref,
-                chosen_source,
-                md5(random()::text || v_time::text),
-                chosen_device,
-                chosen_browser,
-                chosen_os,
-                sample_countries[random_country][1],
-                sample_countries[random_country][2],
-                v_duration,
-                v_unique,
-                v_time
-              );
-            END LOOP;
-          END LOOP;
-        END LOOP;
-      END $$;
-    `);
+    // 3. (Removed) This migration used to insert ~90 days of randomly generated
+    //    page views for every existing site. Fabricated analytics must never
+    //    reach a real database, so new installs start empty. Databases that
+    //    already ran it can identify and remove those rows with
+    //    `pnpm --filter @multi-site-cms/api db:cleanup:generated-analytics`
+    //    (dry run by default). The schema created above is unchanged.
   }
 
   async down(queryRunner: QueryRunner): Promise<void> {

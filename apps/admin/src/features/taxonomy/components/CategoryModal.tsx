@@ -112,7 +112,9 @@ function CategoryModalContent({
       onClose();
     } catch (err: unknown) {
       const errorObj = err as { data?: { error?: { message?: string } }; message?: string };
-      setErrorMsg(errorObj?.data?.error?.message || errorObj?.message || 'Failed to save category.');
+      setErrorMsg(
+        errorObj?.data?.error?.message || errorObj?.message || 'Failed to save category.',
+      );
     }
   };
 
@@ -274,4 +276,3 @@ function CategoryModalContent({
     </div>
   );
 }
-

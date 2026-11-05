@@ -1,13 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Post,
-  Query,
-  Req,
-} from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Query, Req } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import type { AnalyticsOverviewData, AnalyticsRealtimeData } from '@multi-site-cms/types';
@@ -63,4 +54,3 @@ export class AnalyticsController {
     return this.analyticsService.recordPageView(dto, ip, userAgent);
   }
 }
-

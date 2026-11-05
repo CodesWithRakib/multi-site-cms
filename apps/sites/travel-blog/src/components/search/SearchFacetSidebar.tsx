@@ -120,9 +120,7 @@ export function SearchFacetSidebar({
                 <span>{cat.name}</span>
                 <span
                   className={`text-[11px] px-2 py-0.5 rounded-full ${
-                    isSelected
-                      ? 'bg-emerald-700/80 text-white'
-                      : 'bg-muted text-muted-foreground'
+                    isSelected ? 'bg-emerald-700/80 text-white' : 'bg-muted text-muted-foreground'
                   }`}
                 >
                   {cat.postCount}
@@ -195,9 +193,7 @@ export function SearchFacetSidebar({
                   }`}
                 >
                   <span>#{t.name}</span>
-                  {t.postCount > 0 && (
-                    <span className="text-[10px]">({t.postCount})</span>
-                  )}
+                  {t.postCount > 0 && <span className="text-[10px]">({t.postCount})</span>}
                 </button>
               );
             })}
@@ -207,4 +203,3 @@ export function SearchFacetSidebar({
     </aside>
   );
 }
-

@@ -78,4 +78,3 @@ export function TagListCard({ tags, onEdit, onDelete }: TagListCardProps) {
     </div>
   );
 }
-

@@ -235,4 +235,4 @@ dashboard default a multi-site admin to their first site only (UX, not a leak).
   suite covers it; a manual review against polyglot files is pending.
 - `GET media/assets/*` path handling in the local storage provider.
 - Users module role assignment paths for privilege escalation.
-- Dependency vulnerability scan (`pnpm audit`) — not run in this session.
+- Dependency scan (`pnpm audit`, 2026-11-05): 0 high/critical. 1 moderate in production-dependency graph (`minimatch` ReDoS via `eslint-config-next`, lint-time only) and 1 moderate + 1 low in dev tooling (`glob`, `deepmerge` via Jest). None reach a runtime bundle; accepted until upstream updates. Re-run before each release.

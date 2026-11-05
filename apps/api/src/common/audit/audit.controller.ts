@@ -35,4 +35,3 @@ export class AuditController {
     return this.auditService.getAuditSummary(actor, siteId);
   }
 }
-

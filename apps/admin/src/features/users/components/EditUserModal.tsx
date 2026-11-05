@@ -1,22 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import {
-  X,
-  Edit2,
-  Shield,
-  Globe,
-  Loader2,
-  AlertCircle,
-  Plus,
-  Trash2,
-} from 'lucide-react';
+import { X, Edit2, Shield, Globe, Loader2, AlertCircle, Plus, Trash2 } from 'lucide-react';
 import type { UserItem, UserStatus } from '@multi-site-cms/types';
-import {
-  useUpdateUserMutation,
-  useAssignRoleMutation,
-  useRevokeRoleMutation,
-} from '@/lib/cms-api';
+import { useUpdateUserMutation, useAssignRoleMutation, useRevokeRoleMutation } from '@/lib/cms-api';
 import { useAdmin } from '@/lib/admin-context';
 
 export interface EditUserModalProps {
@@ -265,7 +252,9 @@ export function EditUserModal({
                           {r.roleName}
                         </span>
                         {siteName && (
-                          <span className="text-[11px] text-slate-500 dark:text-slate-400 ml-1.5">({siteName})</span>
+                          <span className="text-[11px] text-slate-500 dark:text-slate-400 ml-1.5">
+                            ({siteName})
+                          </span>
                         )}
                       </div>
                     </div>

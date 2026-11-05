@@ -1,4 +1,4 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiPropertyOptional, PickType } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { IsDateString, IsIn, IsInt, IsOptional, IsString, IsUUID, Max, Min } from 'class-validator';
 
@@ -84,3 +84,6 @@ export class ListPostsQueryDto {
   @IsIn(['ASC', 'DESC'])
   sortOrder?: 'ASC' | 'DESC' = 'DESC';
 }
+
+/** Query for `GET /posts/stats`: the scope of the counts (no status or paging). */
+export class PostStatsQueryDto extends PickType(ListPostsQueryDto, ['siteId', 'type'] as const) {}

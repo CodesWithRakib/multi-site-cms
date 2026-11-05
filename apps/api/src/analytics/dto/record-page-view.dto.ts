@@ -35,4 +35,3 @@ export class RecordPageViewDto {
   @Max(86400)
   durationSeconds?: number;
 }
-

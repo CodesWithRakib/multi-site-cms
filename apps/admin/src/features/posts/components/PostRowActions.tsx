@@ -1,5 +1,6 @@
 'use client';
 
+import { useId } from 'react';
 import Link from 'next/link';
 import {
   AlertCircle,
@@ -49,7 +50,8 @@ export function PostRowActions({
   onDelete,
 }: PostRowActionsProps) {
   const { t } = useAdmin();
-  const menuId = `post-actions-${postId}`;
+  // useId: the same post renders as a table row and as a phone card.
+  const menuId = useId();
 
   return (
     <div className="relative inline-block text-left">

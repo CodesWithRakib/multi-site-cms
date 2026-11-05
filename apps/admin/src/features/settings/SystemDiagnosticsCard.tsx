@@ -155,10 +155,20 @@ export function SystemDiagnosticsCard({
       <div className="p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-800/30 flex items-center justify-between text-xs text-neutral-600 dark:text-neutral-400 flex-wrap gap-2">
         <div className="flex items-center gap-2">
           <HardDrive className="size-4 text-emerald-600 dark:text-emerald-400" />
-          <span>Storage Engine: <strong className="text-neutral-900 dark:text-neutral-100 uppercase">{diagnostics?.storageProvider ?? 'CLOUDINARY'}</strong></span>
+          <span>
+            Storage Engine:{' '}
+            <strong className="text-neutral-900 dark:text-neutral-100 uppercase">
+              {diagnostics?.storageProvider ?? 'CLOUDINARY'}
+            </strong>
+          </span>
         </div>
         <div>
-          <span>Environment: <strong className="text-neutral-900 dark:text-neutral-100 uppercase">{diagnostics?.environment ?? 'DEVELOPMENT'}</strong></span>
+          <span>
+            Environment:{' '}
+            <strong className="text-neutral-900 dark:text-neutral-100 uppercase">
+              {diagnostics?.environment ?? 'DEVELOPMENT'}
+            </strong>
+          </span>
         </div>
       </div>
     </div>

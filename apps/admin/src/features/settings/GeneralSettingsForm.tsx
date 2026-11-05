@@ -11,11 +11,7 @@ interface GeneralSettingsFormProps {
   isSaving: boolean;
 }
 
-export function GeneralSettingsForm({
-  initialData,
-  onSave,
-  isSaving,
-}: GeneralSettingsFormProps) {
+export function GeneralSettingsForm({ initialData, onSave, isSaving }: GeneralSettingsFormProps) {
   const { t } = useAdmin();
 
   const [formData, setFormData] = useState<PlatformGeneralSettings>({

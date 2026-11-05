@@ -11,11 +11,7 @@ import {
 } from 'lucide-react';
 import { ShellLayout } from '@/components/shell';
 import { useAdmin } from '@/lib/admin-context';
-import {
-  useListUsersQuery,
-  useListSitesQuery,
-  useUpdateUserMutation,
-} from '@/lib/cms-api';
+import { useListUsersQuery, useListSitesQuery, useUpdateUserMutation } from '@/lib/cms-api';
 import type { UserItem } from '@multi-site-cms/types';
 import {
   UserStatsCards,
@@ -105,7 +101,9 @@ export default function UsersPage() {
       (r) => r.roleKey === 'super_admin' || r.scopeType === 'platform',
     );
     if (isSuper && user.status === 'active' && superAdminCount <= 1) {
-      alert(t.users.protectSuperAdmin || 'The last active Super Admin account cannot be deactivated.');
+      alert(
+        t.users.protectSuperAdmin || 'The last active Super Admin account cannot be deactivated.',
+      );
       return;
     }
 
@@ -162,7 +160,9 @@ export default function UsersPage() {
               className="p-2.5 rounded-xl border border-slate-200/80 dark:border-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors disabled:opacity-50 cursor-pointer"
               title="Refresh"
             >
-              <RefreshCw className={`size-4 ${isFetching ? 'animate-spin text-emerald-600 dark:text-emerald-400' : ''}`} />
+              <RefreshCw
+                className={`size-4 ${isFetching ? 'animate-spin text-emerald-600 dark:text-emerald-400' : ''}`}
+              />
             </button>
 
             {isSuperAdmin && (
@@ -185,7 +185,8 @@ export default function UsersPage() {
             <div>
               <p className="font-bold">{t.users.protectSuperAdmin}</p>
               <p className="text-amber-700 dark:text-amber-400 mt-0.5">
-                Only {superAdminCount} active Platform Super Admin currently exists. Account deactivation is locked.
+                Only {superAdminCount} active Platform Super Admin currently exists. Account
+                deactivation is locked.
               </p>
             </div>
           </div>

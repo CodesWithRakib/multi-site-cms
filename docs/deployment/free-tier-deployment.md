@@ -26,7 +26,9 @@ persistent NestJS process or host PostgreSQL. Expect a split:
 
 - **Web (three apps):** a Next.js-optimized host with git previews.
 - **API:** a container/Node host with an always-on free instance, or a very cheap
-  tier.
+  tier. Run **exactly one** API instance: live updates (SSE) are delivered
+  in-process ([ADR-0028](../adr/0028-single-api-instance-for-realtime.md)).
+  Disable autoscaling to more than one replica.
 - **Database:** a managed PostgreSQL free tier with a hard storage and connection
   cap.
 

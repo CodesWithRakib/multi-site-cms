@@ -1,13 +1,7 @@
 'use client';
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import {
-  Loader2,
-  Radio,
-  Search as SearchIcon,
-  SlidersHorizontal,
-  X,
-} from 'lucide-react';
+import { Loader2, Radio, Search as SearchIcon, SlidersHorizontal, X } from 'lucide-react';
 import type {
   PublicArticleSummary,
   PublicCategoryItem,
@@ -54,20 +48,17 @@ export function AirSportsSearchContainer({
   const isFirstRender = useRef(true);
 
   // Sync browser URL search params
-  const syncUrl = useCallback(
-    (q: string, cat: string, tag: string, sort: PublicPostSort) => {
-      const params = new URLSearchParams();
-      if (q.trim()) params.set('q', q.trim());
-      if (cat) params.set('category', cat);
-      if (tag) params.set('tag', tag);
-      if (sort !== 'newest') params.set('sort', sort);
+  const syncUrl = useCallback((q: string, cat: string, tag: string, sort: PublicPostSort) => {
+    const params = new URLSearchParams();
+    if (q.trim()) params.set('q', q.trim());
+    if (cat) params.set('category', cat);
+    if (tag) params.set('tag', tag);
+    if (sort !== 'newest') params.set('sort', sort);
 
-      const qs = params.toString();
-      const newUrl = qs ? `/search?${qs}` : '/search';
-      window.history.replaceState(null, '', newUrl);
-    },
-    [],
-  );
+    const qs = params.toString();
+    const newUrl = qs ? `/search?${qs}` : '/search';
+    window.history.replaceState(null, '', newUrl);
+  }, []);
 
   // Live search execution via internal proxy endpoint
   const executeSearch = useCallback(

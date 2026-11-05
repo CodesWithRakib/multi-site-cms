@@ -17,10 +17,7 @@ const CHIP_CATEGORIES = [
   { label: 'Stories', slug: 'stories' },
 ];
 
-export function PortalCategoryChips({
-  activeSlug,
-  onSelectCategory,
-}: PortalCategoryChipsProps) {
+export function PortalCategoryChips({ activeSlug, onSelectCategory }: PortalCategoryChipsProps) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
       <div className="flex flex-wrap items-center gap-2">
@@ -53,4 +50,3 @@ export function PortalCategoryChips({
     </div>
   );
 }
-

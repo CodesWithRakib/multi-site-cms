@@ -1,13 +1,27 @@
 import type { PostItem, PostPublicationItem, SiteItem } from '@multi-site-cms/types';
 
-/** The publication shown for a post: the active site's, else the first one. */
+/** Most advanced first; mirrors `effectiveStatusSql` in the API. */
+const STATUS_PRECEDENCE = ['published', 'scheduled', 'in_review', 'draft'];
+
+function precedence(status: string): number {
+  const index = STATUS_PRECEDENCE.indexOf(status);
+  return index === -1 ? STATUS_PRECEDENCE.length : index;
+}
+
+/**
+ * The publication shown for a post: the active site's, else the most advanced
+ * one across sites. Uses the same rule as the API's status filter and counts,
+ * so a row always matches the tab it is listed under.
+ */
 export function displayedPublication(
   post: PostItem,
   activeSiteId: string | null,
 ): PostPublicationItem | undefined {
-  return activeSiteId
-    ? post.publications?.find((pub) => pub.siteId === activeSiteId)
-    : post.publications?.[0];
+  if (activeSiteId) return post.publications?.find((pub) => pub.siteId === activeSiteId);
+  return post.publications?.reduce<PostPublicationItem | undefined>(
+    (best, pub) => (!best || precedence(pub.status) < precedence(best.status) ? pub : best),
+    undefined,
+  );
 }
 
 /** Publication status when a publication exists, else the canonical post status. */

@@ -24,9 +24,9 @@ records what the audit verified on disk and where reality differs.
 
 - `e2e/platform.spec.ts` — 16 Playwright tests (scenarios A–F).
 - `infrastructure/docker` — PostgreSQL 18 compose file (host port 5433 in the
-  running container). `infrastructure/database/init` and
-  `infrastructure/deployment` are empty directories.
-- `docs/api`, `docs/decisions`, `docs/screenshots`, `docs/testing` — empty.
+  running container). The empty `infrastructure/database/init` and
+  `infrastructure/deployment` directories were removed in Phase 4 (TD-8).
+- `docs/api`, `docs/decisions`, `docs/screenshots`, `docs/testing` — were empty; removed in Phase 4 (TD-8).
 - `.agent/skills/*` — 16 project skills indexed in AGENTS.md.
 - `.github/workflows/ci.yml` — single CI workflow.
 

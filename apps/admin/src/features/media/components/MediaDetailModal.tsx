@@ -118,7 +118,11 @@ function MediaDetailModalView({
             <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center justify-center">
               {isImage ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={assetUrl} alt={asset.altText || 'Media preview'} className="size-full object-contain" />
+                <img
+                  src={assetUrl}
+                  alt={asset.altText || 'Media preview'}
+                  className="size-full object-contain"
+                />
               ) : isVideo ? (
                 <Video className="size-16 text-slate-500 dark:text-slate-400" />
               ) : isPdf ? (
@@ -141,25 +145,47 @@ function MediaDetailModalView({
                   onClick={() => copyToClipboard(assetUrl, 'url')}
                   className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 font-semibold text-slate-700 dark:text-slate-200 hover:text-emerald-500 transition-colors cursor-pointer"
                 >
-                  {copiedKind === 'url' ? <Check className="size-3 text-emerald-600 dark:text-emerald-400" /> : <Copy className="size-3" />}
+                  {copiedKind === 'url' ? (
+                    <Check className="size-3 text-emerald-600 dark:text-emerald-400" />
+                  ) : (
+                    <Copy className="size-3" />
+                  )}
                   <span>{copiedKind === 'url' ? 'URL Copied!' : 'Copy URL'}</span>
                 </button>
 
                 <button
                   type="button"
-                  onClick={() => copyToClipboard(`![${altText || asset.originalFilename || 'image'}](${assetUrl})`, 'md')}
+                  onClick={() =>
+                    copyToClipboard(
+                      `![${altText || asset.originalFilename || 'image'}](${assetUrl})`,
+                      'md',
+                    )
+                  }
                   className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 font-semibold text-slate-700 dark:text-slate-200 hover:text-emerald-500 transition-colors cursor-pointer"
                 >
-                  {copiedKind === 'md' ? <Check className="size-3 text-emerald-600 dark:text-emerald-400" /> : <Copy className="size-3" />}
+                  {copiedKind === 'md' ? (
+                    <Check className="size-3 text-emerald-600 dark:text-emerald-400" />
+                  ) : (
+                    <Copy className="size-3" />
+                  )}
                   <span>{copiedKind === 'md' ? 'Markdown Copied!' : 'Copy Markdown'}</span>
                 </button>
 
                 <button
                   type="button"
-                  onClick={() => copyToClipboard(`<img src="${assetUrl}" alt="${altText.replace(/"/g, '&quot;')}" />`, 'html')}
+                  onClick={() =>
+                    copyToClipboard(
+                      `<img src="${assetUrl}" alt="${altText.replace(/"/g, '&quot;')}" />`,
+                      'html',
+                    )
+                  }
                   className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 font-semibold text-slate-700 dark:text-slate-200 hover:text-emerald-500 transition-colors cursor-pointer"
                 >
-                  {copiedKind === 'html' ? <Check className="size-3 text-emerald-600 dark:text-emerald-400" /> : <Copy className="size-3" />}
+                  {copiedKind === 'html' ? (
+                    <Check className="size-3 text-emerald-600 dark:text-emerald-400" />
+                  ) : (
+                    <Copy className="size-3" />
+                  )}
                   <span>{copiedKind === 'html' ? 'HTML Copied!' : 'Copy HTML'}</span>
                 </button>
 
@@ -187,9 +213,24 @@ function MediaDetailModalView({
 
               {/* Specs */}
               <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/40 p-3 rounded-xl border border-slate-100 dark:border-slate-800">
-                <div>Dimensions: <span className="font-mono font-bold text-slate-700 dark:text-slate-200">{asset.width && asset.height ? `${asset.width} × ${asset.height}` : '—'}</span></div>
-                <div>Size: <span className="font-mono font-bold text-slate-700 dark:text-slate-200">{formatBytes(asset.byteSize)}</span></div>
-                <div className="col-span-2 truncate">Storage Key: <span className="font-mono font-bold text-slate-700 dark:text-slate-200">{asset.storageKey}</span></div>
+                <div>
+                  Dimensions:{' '}
+                  <span className="font-mono font-bold text-slate-700 dark:text-slate-200">
+                    {asset.width && asset.height ? `${asset.width} × ${asset.height}` : '—'}
+                  </span>
+                </div>
+                <div>
+                  Size:{' '}
+                  <span className="font-mono font-bold text-slate-700 dark:text-slate-200">
+                    {formatBytes(asset.byteSize)}
+                  </span>
+                </div>
+                <div className="col-span-2 truncate">
+                  Storage Key:{' '}
+                  <span className="font-mono font-bold text-slate-700 dark:text-slate-200">
+                    {asset.storageKey}
+                  </span>
+                </div>
               </div>
 
               <div>
@@ -223,7 +264,8 @@ function MediaDetailModalView({
               <button
                 type="button"
                 onClick={() => {
-                  if (confirm('Are you sure you want to delete this media asset?')) onDelete(asset.id);
+                  if (confirm('Are you sure you want to delete this media asset?'))
+                    onDelete(asset.id);
                 }}
                 className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
               >

@@ -37,4 +37,3 @@ export class PostComments1793491210000 implements MigrationInterface {
     await queryRunner.query(`DROP TABLE IF EXISTS "post_comments";`);
   }
 }
-

@@ -37,7 +37,15 @@ const XTwitterIcon: FC<SVGProps<SVGSVGElement>> = (props) => (
 );
 
 const InstagramIcon: FC<SVGProps<SVGSVGElement>> = (props) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
     <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
     <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
     <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
@@ -57,10 +65,26 @@ export function Footer() {
   return (
     <footer className="relative mt-24 overflow-hidden bg-[#071E28] text-sky-100/80">
       {/* Mountain Silhouette Graphic */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-44 opacity-15" aria-hidden="true">
-        <svg viewBox="0 0 1440 220" fill="none" className="h-full w-full object-cover" preserveAspectRatio="none">
-          <path d="M0 220L180 140L360 180L540 100L720 160L900 80L1080 140L1260 90L1440 150V220H0Z" fill="currentColor" className="text-sky-300" />
-          <path d="M0 220L220 170L440 200L660 130L880 180L1100 120L1320 170L1440 140V220H0Z" fill="currentColor" className="text-teal-400 opacity-60" />
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-44 opacity-15"
+        aria-hidden="true"
+      >
+        <svg
+          viewBox="0 0 1440 220"
+          fill="none"
+          className="h-full w-full object-cover"
+          preserveAspectRatio="none"
+        >
+          <path
+            d="M0 220L180 140L360 180L540 100L720 160L900 80L1080 140L1260 90L1440 150V220H0Z"
+            fill="currentColor"
+            className="text-sky-300"
+          />
+          <path
+            d="M0 220L220 170L440 200L660 130L880 180L1100 120L1320 170L1440 140V220H0Z"
+            fill="currentColor"
+            className="text-teal-400 opacity-60"
+          />
         </svg>
       </div>
 
@@ -70,7 +94,8 @@ export function Footer() {
           <div className="space-y-4 lg:col-span-5">
             <AirSportsLogo inverted showSubtitle />
             <p className="max-w-sm text-sm leading-relaxed text-sky-100/70">
-              Breaking updates, field notes, and live human flight coverage across global drop zones and championships.
+              Breaking updates, field notes, and live human flight coverage across global drop zones
+              and championships.
             </p>
 
             {/* Social Icons */}

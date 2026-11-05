@@ -5,7 +5,17 @@ const travelUrl = process.env.E2E_TRAVEL_URL ?? 'http://localhost:5001';
 const airSportsUrl = process.env.E2E_AIR_SPORTS_URL ?? 'http://localhost:5002';
 const apiUrl = process.env.E2E_API_URL ?? 'http://localhost:4000/api/v1';
 
-const reuseExistingServer = !process.env.CI;
+// CI starts the API itself before building the sites (their ISR pages are
+// prerendered from it at build time) and sets E2E_REUSE_SERVERS=1.
+const reuseExistingServer = !process.env.CI || process.env.E2E_REUSE_SERVERS === '1';
+
+/**
+ * `production` serves the apps from `pnpm build` output (`next start`,
+ * `node dist/main.js`): what CI runs, and fast on first load. The default `dev`
+ * uses watch-mode servers, which compile each route on first visit.
+ */
+const isProductionBuild = process.env.E2E_SERVER_MODE === 'production';
+const serverScript = isProductionBuild ? 'start' : 'dev';
 
 export default defineConfig({
   testDir: './e2e',
@@ -20,12 +30,11 @@ export default defineConfig({
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: process.env.CI ? 'retain-on-failure' : 'off',
-    // Local runs use `next dev`, which compiles each route on first visit and can
-    // exceed 30 s; CI should run against production builds (fast first load).
-    navigationTimeout: process.env.CI ? 30_000 : 60_000,
+    // `next dev` compiles each route on first visit, which can exceed 30 s.
+    navigationTimeout: isProductionBuild ? 30_000 : 60_000,
   },
   // Same reason: the first test of a spec may wait on a cold compile.
-  timeout: process.env.CI ? 30_000 : 90_000,
+  timeout: isProductionBuild ? 30_000 : 90_000,
   projects: [
     {
       name: 'chromium',
@@ -34,7 +43,7 @@ export default defineConfig({
   ],
   webServer: [
     {
-      command: 'pnpm --filter @multi-site-cms/api dev',
+      command: `pnpm --filter @multi-site-cms/api ${serverScript}`,
       url: `${apiUrl}/health`,
       reuseExistingServer,
       timeout: 180_000,
@@ -45,19 +54,19 @@ export default defineConfig({
       },
     },
     {
-      command: 'pnpm --filter @multi-site-cms/admin dev',
+      command: `pnpm --filter @multi-site-cms/admin ${serverScript}`,
       url: adminUrl,
       reuseExistingServer,
       timeout: 180_000,
     },
     {
-      command: 'pnpm --filter @multi-site-cms/travel-blog dev',
+      command: `pnpm --filter @multi-site-cms/travel-blog ${serverScript}`,
       url: travelUrl,
       reuseExistingServer,
       timeout: 180_000,
     },
     {
-      command: 'pnpm --filter @multi-site-cms/air-sports dev',
+      command: `pnpm --filter @multi-site-cms/air-sports ${serverScript}`,
       url: airSportsUrl,
       reuseExistingServer,
       timeout: 180_000,

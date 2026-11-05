@@ -92,7 +92,10 @@ function TagModalContent({ onClose, editingTag, onSave, isSaving }: ContentProps
               <Tag className="size-5" />
             </div>
             <div>
-              <h3 id="tag-modal-title" className="text-base font-bold text-slate-900 dark:text-slate-100">
+              <h3
+                id="tag-modal-title"
+                className="text-base font-bold text-slate-900 dark:text-slate-100"
+              >
                 {editingTag ? 'Edit Tag' : 'Create New Tag'}
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -193,4 +196,3 @@ function TagModalContent({ onClose, editingTag, onSave, isSaving }: ContentProps
     </div>
   );
 }
-

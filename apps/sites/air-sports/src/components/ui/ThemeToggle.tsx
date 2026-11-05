@@ -10,7 +10,11 @@ function subscribe() {
 
 export function ThemeToggle() {
   const { resolvedTheme, toggleTheme } = useTheme();
-  const isMounted = useSyncExternalStore(subscribe, () => true, () => false);
+  const isMounted = useSyncExternalStore(
+    subscribe,
+    () => true,
+    () => false,
+  );
 
   if (!isMounted) {
     return (
@@ -35,4 +39,3 @@ export function ThemeToggle() {
     </button>
   );
 }
-

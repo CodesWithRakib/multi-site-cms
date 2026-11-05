@@ -43,7 +43,10 @@ export function AirSportsLogo({
               : 'text-foreground group-hover:text-sky-600 dark:group-hover:text-sky-400'
           }`}
         >
-          Air<span className={inverted ? 'text-sky-400' : 'text-sky-600 dark:text-sky-400'}>Sports</span>
+          Air
+          <span className={inverted ? 'text-sky-400' : 'text-sky-600 dark:text-sky-400'}>
+            Sports
+          </span>
         </span>
         {showSubtitle && (
           <span
@@ -58,4 +61,3 @@ export function AirSportsLogo({
     </Link>
   );
 }
-

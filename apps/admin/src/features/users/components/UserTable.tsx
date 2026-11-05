@@ -65,15 +65,17 @@ export function UserTable({
               const isSuper = user.roles.some(
                 (r) => r.roleKey === 'super_admin' || r.scopeType === 'platform',
               );
-              const isDeactivationLocked = isSuper && user.status === 'active' && superAdminCount <= 1;
+              const isDeactivationLocked =
+                isSuper && user.status === 'active' && superAdminCount <= 1;
 
               // Compute avatar color gradient based on email string
-              const initials = user.displayName
-                .split(' ')
-                .map((n) => n[0])
-                .join('')
-                .slice(0, 2)
-                .toUpperCase() || 'AD';
+              const initials =
+                user.displayName
+                  .split(' ')
+                  .map((n) => n[0])
+                  .join('')
+                  .slice(0, 2)
+                  .toUpperCase() || 'AD';
 
               return (
                 <tr
@@ -183,7 +185,9 @@ export function UserTable({
                         </span>
                       </div>
                     ) : (
-                      <span className="text-slate-500 dark:text-slate-400 italic text-[11px]">Never</span>
+                      <span className="text-slate-500 dark:text-slate-400 italic text-[11px]">
+                        Never
+                      </span>
                     )}
                   </td>
 
@@ -250,4 +254,3 @@ export function UserTable({
     </div>
   );
 }
-

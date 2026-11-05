@@ -75,7 +75,9 @@ export function CreateUserModal({ isOpen, onClose, onCreated, sites }: CreateUse
     } catch (err: unknown) {
       const apiErr = err as { data?: { error?: { message?: string } }; message?: string };
       setErrorMsg(
-        apiErr?.data?.error?.message || apiErr?.message || 'Failed to create user. Ensure email is unique.',
+        apiErr?.data?.error?.message ||
+          apiErr?.message ||
+          'Failed to create user. Ensure email is unique.',
       );
     }
   };

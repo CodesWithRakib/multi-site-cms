@@ -171,10 +171,7 @@ export function PostSitePublicationCard({
 
           {/* Live Publication Status & Quick Actions */}
           {existingPub && (
-            <PublicationStatusActions
-              pub={existingPub}
-              onOpenPublishModal={onOpenPublishModal}
-            />
+            <PublicationStatusActions pub={existingPub} onOpenPublishModal={onOpenPublishModal} />
           )}
         </div>
       )}

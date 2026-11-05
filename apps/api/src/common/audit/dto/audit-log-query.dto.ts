@@ -68,4 +68,3 @@ export class AuditLogQueryDto {
   @Max(100)
   limit?: number = 20;
 }
-

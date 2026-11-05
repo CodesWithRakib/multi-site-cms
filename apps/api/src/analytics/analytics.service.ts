@@ -116,10 +116,7 @@ export class AnalyticsService {
     };
   }
 
-  async getRealtime(
-    actor: EffectiveAuthContext,
-    siteId?: string,
-  ): Promise<AnalyticsRealtimeData> {
+  async getRealtime(actor: EffectiveAuthContext, siteId?: string): Promise<AnalyticsRealtimeData> {
     let targetSiteId = siteId;
 
     if (targetSiteId) {
@@ -215,23 +212,25 @@ export class AnalyticsService {
       LIMIT 8;
     `;
     const eventRows = await this.dataSource.query(eventsQuery, params);
-    const recentEvents = eventRows.map((r: {
-      id: string;
-      siteName: string;
-      path: string;
-      title: string | null;
-      countryName: string;
-      deviceType: string;
-      timestamp: string;
-    }) => ({
-      id: r.id,
-      siteName: r.siteName,
-      path: r.path,
-      title: r.title ?? undefined,
-      countryName: r.countryName,
-      deviceType: r.deviceType,
-      timestamp: r.timestamp,
-    }));
+    const recentEvents = eventRows.map(
+      (r: {
+        id: string;
+        siteName: string;
+        path: string;
+        title: string | null;
+        countryName: string;
+        deviceType: string;
+        timestamp: string;
+      }) => ({
+        id: r.id,
+        siteName: r.siteName,
+        path: r.path,
+        title: r.title ?? undefined,
+        countryName: r.countryName,
+        deviceType: r.deviceType,
+        timestamp: r.timestamp,
+      }),
+    );
 
     return {
       activeVisitors30m,
@@ -250,7 +249,10 @@ export class AnalyticsService {
     const rawUa = userAgent || 'Mozilla/5.0';
     const visitorId =
       dto.visitorId ||
-      createHash('sha256').update(`${rawIp}:${rawUa}:${new Date().toISOString().slice(0, 10)}`).digest('hex').slice(0, 32);
+      createHash('sha256')
+        .update(`${rawIp}:${rawUa}:${new Date().toISOString().slice(0, 10)}`)
+        .digest('hex')
+        .slice(0, 32);
 
     const device = this.detectDevice(rawUa);
     const browser = this.detectBrowser(rawUa);
@@ -470,7 +472,8 @@ export class AnalyticsService {
       return {
         postId: r.post_id,
         slug: r.path,
-        title: r.title || (r.path === '/' ? 'Home Page' : r.path.replace('/', '').replace(/-/g, ' ')),
+        title:
+          r.title || (r.path === '/' ? 'Home Page' : r.path.replace('/', '').replace(/-/g, ' ')),
         siteId: r.site_id,
         siteName: r.site_name,
         pageViews: views,
@@ -574,7 +577,8 @@ export class AnalyticsService {
       siteKey: r.site_key,
       pageViews: Number(r.page_views) || 0,
       uniqueVisitors: Number(r.unique_visitors) || 0,
-      percentage: totalViews > 0 ? Number((((Number(r.page_views) || 0) / totalViews) * 100).toFixed(1)) : 0,
+      percentage:
+        totalViews > 0 ? Number((((Number(r.page_views) || 0) / totalViews) * 100).toFixed(1)) : 0,
     }));
   }
 
@@ -649,7 +653,8 @@ export class AnalyticsService {
     if (!referrer) return 'direct';
     const lower = referrer.toLowerCase();
     if (/google|bing|duckduckgo|yahoo|yandex|baidu/i.test(lower)) return 'search';
-    if (/twitter|t\.co|x\.com|facebook|instagram|linkedin|reddit|pinterest/i.test(lower)) return 'social';
+    if (/twitter|t\.co|x\.com|facebook|instagram|linkedin|reddit|pinterest/i.test(lower))
+      return 'social';
     if (/mail|newsletter|campaign|substack/i.test(lower)) return 'newsletter';
     return 'referral';
   }
@@ -676,4 +681,3 @@ export class AnalyticsService {
     };
   }
 }
-

@@ -30,4 +30,3 @@ export class UpdatePlatformSettingsDto implements UpdatePlatformSettingsPayload 
   @IsOptional()
   maintenance?: Partial<PlatformMaintenanceSettings>;
 }
-

@@ -128,4 +128,3 @@ export function TravelGuidesSection({ articles }: TravelGuidesSectionProps) {
     </section>
   );
 }
-

@@ -5,7 +5,11 @@ import { Activity, CheckCircle, AlertTriangle, ChevronDown } from 'lucide-react'
 import { useGetPublishingHealthQuery } from '@/lib/cms-api';
 
 export function PublishingHealthBadge() {
-  const { data: health, isLoading, isError } = useGetPublishingHealthQuery(undefined, {
+  const {
+    data: health,
+    isLoading,
+    isError,
+  } = useGetPublishingHealthQuery(undefined, {
     pollingInterval: 30000,
   });
   const [open, setOpen] = useState(false);
@@ -119,4 +123,3 @@ export function PublishingHealthBadge() {
     </div>
   );
 }
-

@@ -93,4 +93,3 @@ export function AirSportsArticleNavigation({ post }: AirSportsArticleNavigationP
     </>
   );
 }
-

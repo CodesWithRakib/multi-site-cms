@@ -11,11 +11,7 @@ export interface DeviceAndBrowserCardProps {
   isLoading?: boolean;
 }
 
-export function DeviceAndBrowserCard({
-  devices,
-  browsers,
-  isLoading,
-}: DeviceAndBrowserCardProps) {
+export function DeviceAndBrowserCard({ devices, browsers, isLoading }: DeviceAndBrowserCardProps) {
   const { t } = useAdmin();
 
   const getDeviceIcon = (key: string) => {
@@ -65,9 +61,7 @@ export function DeviceAndBrowserCard({
 
       {/* Browsers List */}
       <div>
-        <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-3">
-          Top Browsers
-        </h4>
+        <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-3">Top Browsers</h4>
 
         {isLoading ? (
           <div className="py-4 text-center text-xs text-slate-500 dark:text-slate-400">
@@ -100,4 +94,3 @@ export function DeviceAndBrowserCard({
     </div>
   );
 }
-

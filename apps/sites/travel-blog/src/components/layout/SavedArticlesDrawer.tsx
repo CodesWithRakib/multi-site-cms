@@ -95,7 +95,10 @@ export function SavedArticlesDrawer({ isOpen, onClose }: SavedArticlesDrawerProp
               <Bookmark className="h-5 w-5 fill-emerald-600 dark:fill-emerald-400" />
             </div>
             <div>
-              <h2 id="saved-articles-title" className="font-serif text-lg font-bold text-foreground">
+              <h2
+                id="saved-articles-title"
+                className="font-serif text-lg font-bold text-foreground"
+              >
                 Saved Dispatches
               </h2>
               <p className="text-xs text-muted-foreground">
@@ -215,4 +218,3 @@ export function SavedArticlesDrawer({ isOpen, onClose }: SavedArticlesDrawerProp
     </div>
   );
 }
-

@@ -11,11 +11,7 @@ interface MediaSettingsFormProps {
   isSaving: boolean;
 }
 
-export function MediaSettingsForm({
-  initialData,
-  onSave,
-  isSaving,
-}: MediaSettingsFormProps) {
+export function MediaSettingsForm({ initialData, onSave, isSaving }: MediaSettingsFormProps) {
   const { t } = useAdmin();
 
   const [formData, setFormData] = useState<PlatformMediaSettings>({

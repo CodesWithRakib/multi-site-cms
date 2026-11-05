@@ -1,23 +1,11 @@
 'use client';
 
 import React from 'react';
-import {
-  Globe,
-  ShieldAlert,
-  HardDrive,
-  FileCheck2,
-  Wrench,
-  Activity,
-} from 'lucide-react';
+import { Globe, ShieldAlert, HardDrive, FileCheck2, Wrench, Activity } from 'lucide-react';
 import { useAdmin } from '@/lib/admin-context';
 
 export type SettingsTabId =
-  | 'general'
-  | 'security'
-  | 'media'
-  | 'publishing'
-  | 'maintenance'
-  | 'diagnostics';
+  'general' | 'security' | 'media' | 'publishing' | 'maintenance' | 'diagnostics';
 
 interface SettingsTabsProps {
   activeTab: SettingsTabId;

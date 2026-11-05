@@ -32,6 +32,7 @@ earlier one with a new ADR and a `Status` line change, never by rewriting histor
 | [0025](0025-ui-ux-engineering-foundation-and-admin-refactoring.md)        | UI/UX engineering foundation and admin refactoring        | Accepted |
 | [0026](0026-site-revalidation-targets.md)                                 | Site revalidation targets (override, verified domain)     | Accepted |
 | [0027](0027-centralized-theme-and-mobile-app-shell.md)                    | Centralized theme and mobile app shell                    | Accepted |
+| [0028](0028-single-api-instance-for-realtime.md)                          | Single API instance for realtime updates (SSE)            | Accepted |
 
 ## Template
 

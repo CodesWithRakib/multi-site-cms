@@ -46,9 +46,7 @@ export function ArticleDetailHeader({
           </>
         )}
         <ChevronRight className="h-3 w-3" />
-        <span className="truncate max-w-[200px] text-foreground font-medium">
-          {article.title}
-        </span>
+        <span className="truncate max-w-[200px] text-foreground font-medium">{article.title}</span>
       </nav>
 
       {/* Category Badges */}
@@ -122,4 +120,3 @@ export function ArticleDetailHeader({
     </header>
   );
 }
-

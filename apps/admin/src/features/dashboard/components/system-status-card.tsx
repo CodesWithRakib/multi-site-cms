@@ -8,7 +8,11 @@ import { useAdmin } from '@/lib/admin-context';
 
 export function SystemStatusCard() {
   const { t } = useAdmin();
-  const { data: health, isLoading, isError } = useGetPublishingHealthQuery(undefined, {
+  const {
+    data: health,
+    isLoading,
+    isError,
+  } = useGetPublishingHealthQuery(undefined, {
     pollingInterval: 30000,
   });
 
@@ -82,7 +86,9 @@ export function SystemStatusCard() {
               : 'text-amber-600 dark:text-amber-400'
           }`}
         >
-          <span>{isHealthy ? t('dashboard.allSystemsOperational') : t('dashboard.telemetryWarning')}</span>
+          <span>
+            {isHealthy ? t('dashboard.allSystemsOperational') : t('dashboard.telemetryWarning')}
+          </span>
           {isHealthy ? (
             <CheckCircle2 className="size-3.5" />
           ) : (

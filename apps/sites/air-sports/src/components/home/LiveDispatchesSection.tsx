@@ -9,10 +9,7 @@ interface LiveDispatchesSectionProps {
   events: PublicEventSummary[];
 }
 
-export function LiveDispatchesSection({
-  articles,
-  events,
-}: LiveDispatchesSectionProps) {
+export function LiveDispatchesSection({ articles, events }: LiveDispatchesSectionProps) {
   const displayArticles = articles.slice(0, 4);
   const activeEvents = events.slice(0, 2);
 
@@ -139,7 +136,12 @@ export function LiveDispatchesSection({
                         {evt.status}
                       </span>
                       <span className="text-[11px] text-muted-foreground">
-                        {evt.startsAt ? new Date(evt.startsAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'Upcoming'}
+                        {evt.startsAt
+                          ? new Date(evt.startsAt).toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric',
+                            })
+                          : 'Upcoming'}
                       </span>
                     </div>
                     <h4 className="mt-2 text-xs font-bold text-foreground group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
