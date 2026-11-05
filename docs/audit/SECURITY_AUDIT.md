@@ -36,6 +36,7 @@ did not cover; treat this file as the current source of truth.
 | SEC-19 | High     | `POST /media/upload` had no multer size limit: any file was buffered fully in memory before the size check (memory exhaustion).                                                  | Fixed (Phase 7): 100 MB multer hard limit + settings limit                                                                                           |
 | SEC-20 | Low      | Settings audit events took the IP from the raw `X-Forwarded-For` header (client-controlled).                                                                                     | Fixed (Phase 7): `req.ip` (honors `TRUST_PROXY`)                                                                                                     |
 | SEC-21 | Medium   | Failed-login counter was read-modify-write; parallel wrong guesses could undercount and delay lockout.                                                                           | Fixed (Phase 7): atomic `UPDATE … + 1` (concurrency test)                                                                                            |
+| SEC-22 | Medium   | Admin and API on different sites (e.g. `*.vercel.app` and `*.onrender.com`) cannot share the session and CSRF cookies; production sign-in would fail.                            | Phase 9: proxy `/api/v1` through the admin origin (same-site cookies)                                                                                |
 
 ### SEC-0 — Real Cloudinary API key and secret committed to source
 

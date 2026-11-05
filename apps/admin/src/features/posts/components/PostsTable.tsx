@@ -15,6 +15,8 @@ type PostsTableProps = Pick<
   | 'displayPosts'
   | 'sites'
   | 'isLoading'
+  | 'isError'
+  | 'refetch'
   | 'page'
   | 'setPage'
   | 'totalPages'
@@ -29,6 +31,8 @@ export function PostsTable({
   displayPosts,
   sites,
   isLoading,
+  isError,
+  refetch,
   page,
   setPage,
   totalPages,
@@ -47,7 +51,23 @@ export function PostsTable({
 
   return (
     <div className="rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs overflow-hidden">
-      {isLoading ? (
+      {isError ? (
+        <div
+          className="flex flex-col items-center justify-center p-16 gap-3 text-center"
+          role="alert"
+        >
+          <p className="text-sm font-bold text-rose-700 dark:text-rose-300">
+            The posts could not be loaded.
+          </p>
+          <button
+            type="button"
+            onClick={() => void refetch()}
+            className="text-xs font-semibold text-emerald-700 dark:text-emerald-300 hover:underline cursor-pointer"
+          >
+            Try again
+          </button>
+        </div>
+      ) : isLoading ? (
         <div className="flex flex-col items-center justify-center p-20 gap-3" role="status">
           <Loader2
             className="size-7 animate-spin text-emerald-600 dark:text-emerald-400"

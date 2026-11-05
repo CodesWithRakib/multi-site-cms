@@ -1,19 +1,21 @@
 # Phase Status
 
-Last updated: 2026-11-05 (Phase 6)
+Last updated: 2026-11-05 (Phase 8)
 
-| Phase                              | Status                                  | Evidence / blocker                                                                                                                                                             |
-| ---------------------------------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 0 — Audit                          | Done                                    | `docs/audit/*`                                                                                                                                                                 |
-| 1 — Secrets and security hardening | **Done in code; one owner action open** | Open: rotate Cloudinary secret (SEC-0)                                                                                                                                         |
-| 2 — Core workflow correctness      | **Done** (one coverage item deferred)   | API 263/263, integration 56/56. Deferred to Phase 4: API tests for newsletter, users/roles, settings                                                                           |
-| 3 — UX resilience                  | **Done (3a–3d)**                        | WCAG 2.2 AA: 0 serious/critical (axe, light+dark, public+admin); keyboard flows tested; `/posts` decomposed. E2E 51/51. Remaining page decompositions moved to Phase 4 backlog |
-| 4 — Production operations          | **Done in code; owner/CI checks open**  | API 267/267, integration 67/67, E2E full suite green on production builds locally. Open: first GitHub CI run, DB-6 cleanup decision, provider PITR drill                       |
-| 5 — Commerce                       | **Out of scope**                        | Business decision 2026-11-04                                                                                                                                                   |
-| 6 — Coverage and hardening backlog | **In progress**                         | API 294/294, integration 67/67, E2E posts/keyboard/axe 12/12. Open: SEC-18 decision, TD-5 decompositions, TD-13 other screens                                                  |
-| 7 — Enforced platform settings     | **Done**                                | Owner approved (SEC-18). API 306/306, integration 67/67, E2E 54/54 (dev servers), maintenance banner verified in browser                                                       |
+| Phase                                           | Status                                  | Evidence / blocker                                                                                                                                                             |
+| ----------------------------------------------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 0 — Audit                                       | Done                                    | `docs/audit/*`                                                                                                                                                                 |
+| 1 — Secrets and security hardening              | **Done in code; one owner action open** | Open: rotate Cloudinary secret (SEC-0)                                                                                                                                         |
+| 2 — Core workflow correctness                   | **Done** (one coverage item deferred)   | API 263/263, integration 56/56. Deferred to Phase 4: API tests for newsletter, users/roles, settings                                                                           |
+| 3 — UX resilience                               | **Done (3a–3d)**                        | WCAG 2.2 AA: 0 serious/critical (axe, light+dark, public+admin); keyboard flows tested; `/posts` decomposed. E2E 51/51. Remaining page decompositions moved to Phase 4 backlog |
+| 4 — Production operations                       | **Done in code; owner/CI checks open**  | API 267/267, integration 67/67, E2E full suite green on production builds locally. Open: first GitHub CI run, DB-6 cleanup decision, provider PITR drill                       |
+| 5 — Commerce                                    | **Out of scope**                        | Business decision 2026-11-04                                                                                                                                                   |
+| 6 — Coverage and hardening backlog              | **In progress**                         | API 294/294, integration 67/67, E2E posts/keyboard/axe 12/12. Open: SEC-18 decision, TD-5 decompositions, TD-13 other screens                                                  |
+| 7 — Enforced platform settings                  | **Done**                                | Owner approved (SEC-18). API 306/306, integration 67/67, E2E 54/54 (dev servers), maintenance banner verified in browser                                                       |
+| 8 — Admin decomposition and UX correctness      | **Done**                                | API 308/308, integration 67/67, admin 31, E2E 54/54 on production builds (twice)                                                                                               |
+| 9 — Deployment readiness (Neon, Render, Vercel) | Planned                                 | See MASTER_IMPLEMENTATION_PLAN Phase 9 and NEXT_SESSION                                                                                                                        |
 
-Phases 1–3 are committed by the owner; Phases 6–7 changes are uncommitted.
+Phases 1–3 are committed by the owner; Phase 8 changes are uncommitted.
 
 ## Phase 1 checklist
 
@@ -103,3 +105,14 @@ Phases 1–3 are committed by the owner; Phases 6–7 changes are uncommitted.
 - [x] Audit retention from settings (min 365); `AUDIT_RETENTION_DAYS` env removed
 - [x] MFA, public registration, S3, WebP removed from settings (never implemented)
 - [x] Settings audit IP from `req.ip` (SEC-20)
+
+## Phase 8 checklist
+
+- [x] Shared admin feedback: `ConfirmDialog`, `ActionNotice`, `apiErrorMessage`, generic `Pagination`
+- [x] `/sites/[siteId]` 710 → 105 lines; accessible DNS dialog; live link only for verified primary domain
+- [x] `/sites` 668 → 118 lines; real per-site counts (UX-28)
+- [x] `/users`, `/users/[userId]` split; server-side search/filters; `GET /users/stats` (UX-26); real roles (UX-27)
+- [x] Native dialogs replaced on media, taxonomy, comments, users, sites (TD-13); media double confirm fixed (UX-29)
+- [x] Tag/category in use → 409 (DB-8); site timezone validated as IANA
+- [x] Posts table uses `currentData` (UX-30)
+- [ ] Phase 9: deployment readiness

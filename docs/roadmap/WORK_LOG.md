@@ -310,3 +310,29 @@ in the Postgres container), dry run 4,468, `--apply` deleted 4,468; table now em
 travel 21, air 13, config 21, validation 12, api-client 5, redux 3; integration
 67/67; Playwright 54/54 (dev servers). Maintenance banner verified in a
 browser (appeared after 24 s; maintenance switched off again afterwards).
+
+## 2026-11-05 — Phase 8 (admin decomposition and UX correctness)
+
+**Baseline:** Phase 7 committed; tree clean.
+
+**Code changes (uncommitted):**
+
+- Admin shared: `components/feedback` (`ConfirmDialog`, `ActionNotice`,
+  `useActionNotice`), `components/navigation/Pagination`, `lib/api-error.ts`.
+- Sites: `features/sites` (hooks `useSiteDetail`, `useSitesRegistry`; utils
+  `site-url`, `sites-registry`; components header, general form, domains panel,
+  add-domain form, DNS dialog, card, card art, stats, filters). Pages rewritten.
+- Users: `features/users/roles.ts`; hooks `useUsersDirectory`, `useUserDetail`;
+  components profile card, roles card, assign-role dialog; stats cards from the
+  API; filter bar and edit modal use real roles/statuses; `/users/new` fixed.
+- Media, taxonomy, comments: confirmations and notices instead of native dialogs.
+- Posts: shared feedback components; `currentData` with loading/error states.
+- API: `GET /users/stats`; users list `search` (LIKE-escaped), `roleKey`,
+  `siteId`; category/tag in-use 409; IANA timezone validation on sites.
+- Tests: site-url, sites-registry, roles, api-error unit tests; users e2e
+  (search/filters/stats), cms-core (409), OpenAPI path list.
+
+**Verification:** format, lint, typecheck, tests (API 308, admin 31, ui 59,
+travel 21, air 13, config 21, validation 12, api-client 5, redux 3),
+integration 67/67, web build, Playwright on production builds 54/54 twice (a
+first run had one failure traced to stale RTK data; fixed).

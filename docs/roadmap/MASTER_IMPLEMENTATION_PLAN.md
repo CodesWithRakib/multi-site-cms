@@ -103,3 +103,40 @@ is out of scope).
 Wire every admin platform setting into the API path it governs (auth, sessions,
 passwords, uploads, publishing, retention, maintenance banner), with safe
 clamping and fallbacks; remove settings for features that do not exist.
+
+## Phase 9 — Deployment readiness (free tier: Neon, Render, Vercel)
+
+**Objective:** a first production deploy that works end to end, then stays up.
+
+Blockers found while planning:
+
+- SEC-22: admin (Vercel) and API (Render) are different sites, so session and
+  CSRF cookies cannot work. Proxy `/api/v1/*` through each frontend origin with
+  Next.js rewrites, so the browser only talks to its own origin.
+- No production path to create roles and permissions: the development seed
+  refuses production. Add an idempotent, production-safe platform bootstrap
+  (permissions + roles only; no users, no demo content).
+- TD-16: rate limits per IP must see the real client IP through the proxies.
+
+Work:
+
+1. Deployment config: `render.yaml` (API, Node 24, pnpm via corepack, migrations
+   before start, health check), Vercel project settings per app (root directory,
+   build command, env), documented in `docs/deployment/production-runbook.md`.
+2. Neon: pooled connection string with `sslmode=require`; verify TLS and pool
+   size against Neon free limits; migrations run on each deploy (idempotent).
+3. Same-origin API proxy for admin and both sites; CORS narrowed to the real
+   frontend origins; cookie flags verified over HTTPS.
+4. Production bootstrap CLI (roles/permissions), then `bootstrap:super-admin`
+   and site creation through the admin.
+5. Media on Cloudinary (Render's free disk is ephemeral; local storage loses
+   files on every deploy).
+6. Keep-alive and monitoring: an external monitor (UptimeRobot, free) calling
+   `/api/v1/health` every 5 minutes keeps the Render free instance awake and
+   alerts on downtime; a GitHub Actions schedule as a backup.
+7. Post-deploy smoke test script (health, login, publish, public page, ISR
+   revalidation) and a rollback note.
+8. UX and production polish: SEO metadata and Open Graph images per site,
+   sitemap and robots on real domains, 404/500 pages verified, Lighthouse pass
+   (performance, accessibility, SEO) on both sites, cookie/privacy notice for
+   analytics, email for password reset (later, needs an email provider).

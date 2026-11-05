@@ -1,8 +1,8 @@
 # Next Session
 
-## State at handoff (2026-11-05, Phase 7)
+## State at handoff (2026-11-05, Phase 8)
 
-- Phases 1–4 committed. Phases 6 and 7 done; their changes are **uncommitted**; the user commits.
+- Phases 1–7 committed. Phase 8 (admin decomposition, UX correctness) done and **uncommitted**; the user commits and pushes to GitHub.
 - Owner actions: rotate the Cloudinary secret (SEC-0) and any passwords set by
   the old admin seed (SEC-13); set `NEXT_PUBLIC_CONTACT_EMAIL`,
   `REVALIDATE_SECRET` (+ `SITE_REVALIDATE_URLS` locally); in production also
@@ -21,14 +21,20 @@
    `npx playwright test` (or `pnpm build` then `E2E_SERVER_MODE=production`).
    Do not edit API files while E2E runs against the watch-mode API.
 
-## Exact next action
+## Exact next action — Phase 9 (deployment readiness)
 
-1. Decompose `sites/[siteId]`, `users/[userId]`, `sites` admin pages (TD-5), replacing
-   their native dialogs on the way (TD-13; 24 calls remain).
-2. Check the first GitHub Actions run of `verify` and `e2e` after a push.
-3. Optional: revalidate the `platform-settings` tag on save so the maintenance
-   banner appears immediately instead of within ~30–60 s.
-4. DB-5 personal-data erasure procedure when legally required.
+Targets: Neon PostgreSQL, Render (API, free), Vercel (admin + two sites, free).
+Plan: `docs/roadmap/MASTER_IMPLEMENTATION_PLAN.md` Phase 9. In order:
+
+1. Same-origin API proxy (Next.js rewrites) for admin and sites (SEC-22).
+2. Production-safe platform bootstrap CLI (roles, permissions).
+3. `render.yaml`, Vercel settings, `docs/deployment/production-runbook.md`.
+4. Keep-alive + uptime monitor; post-deploy smoke script.
+5. After the first deploy: verify forwarded client IP and set TRUST_PROXY (TD-16),
+   cookies over HTTPS, Neon TLS, ISR revalidation webhook.
+
+Owner provides URLs (not secrets) after creating the services; secrets go
+straight into the Render/Vercel dashboards.
 
 Role, admin, accessibility and keyboard E2E need local accounts:
 `E2E_ADMIN_EMAIL/PASSWORD`, `E2E_SITE_ADMIN_EMAIL/PASSWORD` (never commit them).

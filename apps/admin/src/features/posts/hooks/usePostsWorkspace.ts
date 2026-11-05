@@ -55,9 +55,11 @@ export function usePostsWorkspace() {
 
   const { data: sites = [] } = useListSitesQuery();
   const {
-    data: postsData,
-    isLoading,
+    // currentData belongs to the current filters only. `data` would keep the
+    // previous filter's rows on screen while loading or after an error.
+    currentData: postsData,
     isFetching,
+    isError,
     refetch,
   } = useListPostsQuery({
     siteId: activeSiteId || undefined,
@@ -152,7 +154,9 @@ export function usePostsWorkspace() {
     displayPosts: posts,
     stats,
     isStatsLoading,
-    isLoading,
+    /** No rows for the current filters yet (first load or a filter change). */
+    isLoading: isFetching && !postsData,
+    isError: isError && !postsData,
     isFetching,
     refetch,
     page,
