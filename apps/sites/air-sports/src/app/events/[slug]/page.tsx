@@ -80,7 +80,7 @@ export default async function EventDetailPage({ params }: EventPageProps) {
     },
     scheduled: {
       label: 'Upcoming',
-      color: 'bg-blue-500/15 text-blue-600 border-blue-500/30',
+      color: 'bg-blue-500/15 text-blue-700 dark:text-blue-300 border-blue-500/30',
       ping: false,
     },
     completed: {

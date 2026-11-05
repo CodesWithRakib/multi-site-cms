@@ -57,7 +57,7 @@ export function PublishingHealthBadge() {
           <div className="absolute right-0 mt-2 w-72 rounded-xl bg-white dark:bg-slate-900 p-4 shadow-xl border border-slate-200 dark:border-slate-800 z-30 text-xs text-slate-700 dark:text-slate-300 space-y-2.5">
             <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
               <span className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
-                <Activity className="w-4 h-4 text-emerald-600" />
+                <Activity className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 Publishing Engine Status
               </span>
               <span
@@ -73,35 +73,35 @@ export function PublishingHealthBadge() {
 
             <div className="space-y-1.5">
               <div className="flex justify-between items-center py-1">
-                <span className="text-slate-500">Scheduled Worker:</span>
+                <span className="text-slate-500 dark:text-slate-400">Scheduled Worker:</span>
                 <span className="font-semibold flex items-center gap-1">
                   {health.isScheduledWorkerActive ? (
-                    <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
+                    <CheckCircle className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                   ) : (
-                    <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
+                    <AlertTriangle className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400" />
                   )}
                   {health.isScheduledWorkerActive ? 'Active' : 'Inactive'}
                 </span>
               </div>
               <div className="flex justify-between items-center py-1">
-                <span className="text-slate-500">Outbox Dispatcher:</span>
+                <span className="text-slate-500 dark:text-slate-400">Outbox Dispatcher:</span>
                 <span className="font-semibold flex items-center gap-1">
                   {health.isOutboxDispatcherActive ? (
-                    <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
+                    <CheckCircle className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                   ) : (
-                    <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
+                    <AlertTriangle className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400" />
                   )}
                   {health.isOutboxDispatcherActive ? 'Active' : 'Inactive'}
                 </span>
               </div>
               <div className="flex justify-between items-center py-1">
-                <span className="text-slate-500">Scheduled in Queue:</span>
+                <span className="text-slate-500 dark:text-slate-400">Scheduled in Queue:</span>
                 <span className="font-mono font-bold text-slate-900 dark:text-slate-100">
                   {health.scheduledPublicationsPending}
                 </span>
               </div>
               <div className="flex justify-between items-center py-1">
-                <span className="text-slate-500">Outbox Backlog:</span>
+                <span className="text-slate-500 dark:text-slate-400">Outbox Backlog:</span>
                 <span className="font-mono font-bold text-slate-900 dark:text-slate-100">
                   {health.outboxBacklogPending}
                 </span>

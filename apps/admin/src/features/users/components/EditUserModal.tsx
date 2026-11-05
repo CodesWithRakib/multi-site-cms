@@ -157,7 +157,7 @@ export function EditUserModal({
           <button
             type="button"
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+            className="p-2 text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           >
             <X className="size-4" />
           </button>
@@ -256,16 +256,16 @@ export function EditUserModal({
                   >
                     <div className="flex items-center gap-2">
                       {isPlatform ? (
-                        <Shield className="size-4 text-purple-500" />
+                        <Shield className="size-4 text-purple-600 dark:text-purple-400" />
                       ) : (
-                        <Globe className="size-4 text-emerald-500" />
+                        <Globe className="size-4 text-emerald-600 dark:text-emerald-400" />
                       )}
                       <div>
                         <span className="font-bold text-slate-800 dark:text-slate-200">
                           {r.roleName}
                         </span>
                         {siteName && (
-                          <span className="text-[11px] text-slate-500 ml-1.5">({siteName})</span>
+                          <span className="text-[11px] text-slate-500 dark:text-slate-400 ml-1.5">({siteName})</span>
                         )}
                       </div>
                     </div>
@@ -274,7 +274,7 @@ export function EditUserModal({
                         type="button"
                         onClick={() => handleRevokeRole(r.assignmentId)}
                         disabled={isRevoking}
-                        className="p-1 text-slate-400 hover:text-rose-600 rounded transition-colors cursor-pointer"
+                        className="p-1 text-slate-500 dark:text-slate-400 hover:text-rose-600 rounded transition-colors cursor-pointer"
                         title="Revoke Role"
                       >
                         <Trash2 className="size-3.5" />
@@ -319,7 +319,7 @@ export function EditUserModal({
                   <button
                     type="button"
                     onClick={() => setShowAddRole(false)}
-                    className="px-2.5 py-1 text-xs text-slate-500 hover:text-slate-700"
+                    className="px-2.5 py-1 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-700"
                   >
                     Cancel
                   </button>

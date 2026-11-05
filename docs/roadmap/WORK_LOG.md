@@ -177,3 +177,31 @@ accounts via env). Old-code check: site-admin sidebar test fails without the fix
 **Note:** E2E logins share the API's 5-per-minute login limit; role specs log
 in once per role. `Sidebar.tsx` was already unformatted at HEAD and was
 formatted as part of this change.
+
+## 2026-11-05 — Phase 3d (accessibility, keyboard, posts decomposition)
+
+**Decision (user):** add any needed dependency without asking; the user commits.
+
+**Changes (uncommitted):**
+
+- Dev dependency `@axe-core/playwright@4.14.0` (root).
+- Theme: brand ramp 500–900 and neutral 500 darkened for WCAG AA; contrast
+  guard tests in `site-themes.test.ts` (UI tests 57).
+- Admin contrast codemods (light-only text steps, dark variants for class strings
+  without one), 10 `aria-label`s on selects, editor textbox name, language button
+  name, logo accessible names (sites), Travel/Air badge and chip fixes.
+- `SkipLink` (UI package) in all apps with `#main-content`; `aria-expanded`/
+  `aria-controls` on menu toggles; visible focus rings where outlines were hidden;
+  Escape closes the admin drawer.
+- `/posts` decomposed: `usePostsWorkspace` + `PostsWorkspaceHeader`,
+  `PostsStatsCards`, `PostsStatusTabs`, `PostsFilterBar`, `PostsTable`,
+  `PostTableRow`, `PostRowActions`, `PostStatusCell`, `PostThumbnail`,
+  `PostsPagination`, `utils/post-display.ts` (+ tests).
+- API: post list returns `author { id, displayName }` (join selects only those
+  columns) and fetches latest revisions in one `DISTINCT ON` query instead of
+  one query per post. Type `PostAuthorSummary`. Test in `cms-core.e2e-spec.ts`.
+- E2E: `accessibility.spec.ts`, `keyboard.spec.ts`, `support/admin-session.ts`
+  (one login per account per run, shared via test-results/.auth).
+
+**Verification:** see the final gate in this session's summary (lint,
+typecheck, unit, API, integration, E2E with local accounts).

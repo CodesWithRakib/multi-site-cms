@@ -10,7 +10,7 @@ export default function UnauthorizedPage() {
 
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center bg-slate-50 dark:bg-slate-950 px-4 text-center">
-      <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-rose-100 dark:bg-rose-950/40 text-rose-600 mb-4 shadow-xs">
+      <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-rose-100 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 mb-4 shadow-xs">
         <ShieldAlert className="h-8 w-8" />
       </div>
 
@@ -18,7 +18,7 @@ export default function UnauthorizedPage() {
         {t.auth.unauthorizedTitle}
       </h1>
 
-      <p className="mt-2 max-w-md text-xs sm:text-sm text-slate-500 leading-relaxed">
+      <p className="mt-2 max-w-md text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
         {t.auth.unauthorizedDesc}
       </p>
 

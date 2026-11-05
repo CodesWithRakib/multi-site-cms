@@ -43,7 +43,7 @@ export function CategoryHierarchyTree({
         <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">
           No categories found
         </h3>
-        <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm mx-auto">
           Create hierarchical categories to organize and group content publications across this site.
         </p>
       </div>
@@ -68,11 +68,11 @@ export function CategoryHierarchyTree({
                     <span className="text-sm font-bold text-slate-900 dark:text-white">
                       {rootCat.name}
                     </span>
-                    <span className="font-mono text-[10px] px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-500 font-semibold">
+                    <span className="font-mono text-[10px] px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 font-semibold">
                       /{rootCat.slug}
                     </span>
                     {typeof rootCat.displayOrder === 'number' && rootCat.displayOrder > 0 && (
-                      <span className="text-[9px] px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-800 text-slate-400 font-mono font-bold">
+                      <span className="text-[9px] px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 font-mono font-bold">
                         Order: {rootCat.displayOrder}
                       </span>
                     )}
@@ -99,7 +99,7 @@ export function CategoryHierarchyTree({
                 <button
                   type="button"
                   onClick={() => onEdit(rootCat)}
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                  className="p-1.5 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                   title="Edit category"
                 >
                   <Edit2 className="size-3.5" />
@@ -124,18 +124,18 @@ export function CategoryHierarchyTree({
                     className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-2 rounded-xl bg-slate-50/80 dark:bg-slate-800/40 hover:bg-slate-100/80 dark:hover:bg-slate-800/70 transition-colors"
                   >
                     <div className="flex items-center gap-2.5">
-                      <ChevronRight className="size-3.5 text-emerald-500 shrink-0" />
+                      <ChevronRight className="size-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                       <div>
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
                             {subCat.name}
                           </span>
-                          <span className="font-mono text-[9px] px-1.5 py-0.2 rounded bg-slate-200/60 dark:bg-slate-700 text-slate-500 font-semibold">
+                          <span className="font-mono text-[9px] px-1.5 py-0.2 rounded bg-slate-200/60 dark:bg-slate-700 text-slate-500 dark:text-slate-400 font-semibold">
                             /{subCat.slug}
                           </span>
                         </div>
                         {subCat.description && (
-                          <p className="text-[11px] text-slate-400 line-clamp-1">
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1">
                             {subCat.description}
                           </p>
                         )}
@@ -146,7 +146,7 @@ export function CategoryHierarchyTree({
                       <button
                         type="button"
                         onClick={() => onEdit(subCat)}
-                        className="p-1 rounded-md text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                        className="p-1 rounded-md text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
                         title="Edit subcategory"
                       >
                         <Edit2 className="size-3" />

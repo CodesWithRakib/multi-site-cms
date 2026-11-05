@@ -56,6 +56,7 @@ export function CommentsFilterBar({
             <Globe className="h-3.5 w-3.5" />
           </div>
           <select
+            aria-label="Filter by website"
             value={selectedSiteId}
             onChange={(e) => onSiteChange(e.target.value)}
             className="w-full rounded-xl border border-input bg-card pl-8.5 pr-8 py-2 text-xs sm:text-sm font-medium text-foreground transition-colors focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 cursor-pointer"
@@ -77,7 +78,9 @@ export function CommentsFilterBar({
           title="Refresh"
           className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-card text-muted-foreground hover:bg-muted hover:text-foreground transition-colors disabled:opacity-50 cursor-pointer"
         >
-          <RotateCw className={`h-4 w-4 ${isFetching ? 'animate-spin text-emerald-600' : ''}`} />
+          <RotateCw
+            className={`h-4 w-4 ${isFetching ? 'animate-spin text-emerald-600 dark:text-emerald-400' : ''}`}
+          />
         </button>
       </div>
     </div>

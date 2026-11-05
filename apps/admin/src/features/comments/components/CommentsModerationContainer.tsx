@@ -108,7 +108,7 @@ export function CommentsModerationContainer() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2">
         <div>
           <div className="flex items-center gap-2.5">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-700 dark:text-emerald-400">
               <MessageSquare className="h-5 w-5" />
             </div>
             <div>
@@ -180,7 +180,7 @@ export function CommentsModerationContainer() {
       {/* Loading state */}
       {isLoading ? (
         <div className="flex h-64 flex-col items-center justify-center gap-3 text-muted-foreground">
-          <Loader2 className="h-7 w-7 animate-spin text-emerald-600" />
+          <Loader2 className="h-7 w-7 animate-spin text-emerald-600 dark:text-emerald-400" />
           <p className="text-sm">Loading dispatches and discussions...</p>
         </div>
       ) : comments.length === 0 ? (
@@ -208,7 +208,7 @@ export function CommentsModerationContainer() {
                 type="checkbox"
                 checked={comments.length > 0 && selectedIds.length === comments.length}
                 onChange={() => handleSelectAll(comments)}
-                className="h-4 w-4 rounded border-border text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                className="h-4 w-4 rounded border-border text-emerald-600 dark:text-emerald-400 focus:ring-emerald-500 cursor-pointer"
               />
               <span>Select all on page ({comments.length})</span>
             </label>

@@ -19,7 +19,7 @@ const colorMap: Record<string, string> = {
   destinations: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/20',
   'travel-tips': 'bg-cyan-500/15 text-cyan-700 dark:text-cyan-300 border-cyan-500/20',
   'budget-travel': 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/20',
-  'food-travel': 'bg-orange-500/15 text-orange-700 dark:text-orange-300 border-orange-500/20',
+  'food-travel': 'bg-orange-500/15 text-orange-800 dark:text-orange-300 border-orange-500/20',
   guides: 'bg-teal-500/15 text-teal-700 dark:text-teal-300 border-teal-500/20',
   stories: 'bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border-indigo-500/20',
 };

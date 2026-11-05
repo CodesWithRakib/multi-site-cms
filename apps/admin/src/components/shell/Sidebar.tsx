@@ -124,6 +124,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
       {/* Sidebar container */}
       <aside
+        id="admin-sidebar"
         className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col bg-gradient-to-b from-brand-900 via-brand-950 to-brand-950 text-white border-r border-brand-900 transition-transform duration-200 lg:static lg:translate-x-0 h-full shrink-0 ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}

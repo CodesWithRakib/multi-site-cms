@@ -38,8 +38,8 @@ export function AuditLogTable({
     if (action.startsWith('media.'))
       return 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/20';
     if (action.startsWith('post.') || action.startsWith('publication.'))
-      return 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20';
-    return 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20';
+      return 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20';
+    return 'bg-purple-500/10 text-purple-700 dark:text-purple-400 border-purple-500/20';
   };
 
   const fromCount = total === 0 ? 0 : (page - 1) * limit + 1;
@@ -125,7 +125,7 @@ export function AuditLogTable({
                   {/* Site Scope */}
                   <td className="py-3 px-4">
                     {log.siteName ? (
-                      <span className="text-xs font-medium px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                      <span className="text-xs font-medium px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
                         {log.siteName}
                       </span>
                     ) : (

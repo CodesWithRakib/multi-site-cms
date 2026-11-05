@@ -268,9 +268,17 @@ export interface PostPublicationItem {
   tagIds?: string[];
 }
 
+/** Public-safe author summary (no email or credentials). */
+export interface PostAuthorSummary {
+  id: string;
+  displayName: string;
+}
+
 export interface PostItem {
   id: string;
   authorId: string;
+  /** Present on list responses. */
+  author?: PostAuthorSummary | null;
   type: PostType;
   status: PostStatus;
   sourceLocale: string;

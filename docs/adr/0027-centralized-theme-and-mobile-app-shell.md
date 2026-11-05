@@ -58,8 +58,10 @@ that overflowed at 375 px.
 - `bg-emerald-*` in a site no longer means emerald; it means "brand". New code
   should use semantic tokens (`bg-primary`) or `brand-*` utilities.
 - A raw `<script>` is avoided; the theme script runs through `next/script`.
-- Contrast of aliased classes is preserved because the lightness ramps match
-  Tailwind's. Extreme brand chroma can still be gamut-clipped by the browser.
+- Extreme brand chroma can still be gamut-clipped by the browser.
+- The brand and neutral ramps are darker than Tailwind's at 500–900 so that
+  `--primary` and secondary text meet WCAG AA (4.5:1) for **any** hue; unit
+  tests in `site-themes.test.ts` enforce this for every configured site.
 
 ## Future migration considerations
 

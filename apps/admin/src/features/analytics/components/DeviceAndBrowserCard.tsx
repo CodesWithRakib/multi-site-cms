@@ -21,7 +21,7 @@ export function DeviceAndBrowserCard({
   const getDeviceIcon = (key: string) => {
     switch (key.toLowerCase()) {
       case 'mobile':
-        return <Smartphone className="size-4 text-emerald-500" />;
+        return <Smartphone className="size-4 text-emerald-600 dark:text-emerald-400" />;
       case 'tablet':
         return <Tablet className="size-4 text-sky-500" />;
       default:
@@ -56,7 +56,7 @@ export function DeviceAndBrowserCard({
             <span className="text-sm font-black text-slate-900 dark:text-slate-100 mt-0.5">
               {dev.percentage}%
             </span>
-            <span className="text-[10px] text-slate-400">
+            <span className="text-[10px] text-slate-500 dark:text-slate-400">
               {dev.count.toLocaleString()}
             </span>
           </div>
@@ -70,7 +70,7 @@ export function DeviceAndBrowserCard({
         </h4>
 
         {isLoading ? (
-          <div className="py-4 text-center text-xs text-slate-400">
+          <div className="py-4 text-center text-xs text-slate-500 dark:text-slate-400">
             Loading browsers...
           </div>
         ) : (
@@ -79,7 +79,7 @@ export function DeviceAndBrowserCard({
               <div key={b.key} className="space-y-1">
                 <div className="flex items-center justify-between text-xs">
                   <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300 font-medium">
-                    <Globe className="size-3.5 text-slate-400" />
+                    <Globe className="size-3.5 text-slate-500 dark:text-slate-400" />
                     <span>{b.label}</span>
                   </div>
                   <span className="font-bold text-slate-900 dark:text-slate-100">

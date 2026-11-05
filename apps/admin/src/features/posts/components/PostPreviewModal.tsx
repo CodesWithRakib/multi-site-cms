@@ -60,7 +60,7 @@ export function PostPreviewModal({
             <span className="text-sm font-bold text-slate-200">Post Draft Preview</span>
 
             {/* Device Switcher */}
-            <div className="flex p-0.5 rounded-lg bg-slate-800 text-slate-400">
+            <div className="flex p-0.5 rounded-lg bg-slate-800 text-slate-500 dark:text-slate-400">
               <button
                 type="button"
                 onClick={() => setDevice('desktop')}
@@ -98,7 +98,7 @@ export function PostPreviewModal({
             <button
               type="button"
               onClick={onClose}
-              className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800"
+              className="p-1 rounded-lg text-slate-500 dark:text-slate-400 hover:text-white hover:bg-slate-800"
             >
               <X className="w-5 h-5" />
             </button>
@@ -128,7 +128,7 @@ export function PostPreviewModal({
 
             {/* Content Body */}
             {isLoading ? (
-              <div className="flex-1 flex flex-col items-center justify-center p-12 text-slate-400 gap-3">
+              <div className="flex-1 flex flex-col items-center justify-center p-12 text-slate-500 dark:text-slate-400 gap-3">
                 <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
                 <p className="text-xs">Authenticating and compiling preview snapshot...</p>
               </div>
@@ -139,14 +139,16 @@ export function PostPreviewModal({
                   <span className="px-2.5 py-0.5 rounded-full font-semibold uppercase bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
                     {previewData?.post.type || 'article'}
                   </span>
-                  <span className="text-slate-400">•</span>
-                  <span className="text-slate-500">
+                  <span className="text-slate-500 dark:text-slate-400">•</span>
+                  <span className="text-slate-500 dark:text-slate-400">
                     Draft Revision #{previewData?.revision.revisionNumber || 1}
                   </span>
                   {previewData?.publication && (
                     <>
-                      <span className="text-slate-400">•</span>
-                      <span className="text-slate-500">Slug: /{previewData.publication.slug}</span>
+                      <span className="text-slate-500 dark:text-slate-400">•</span>
+                      <span className="text-slate-500 dark:text-slate-400">
+                        Slug: /{previewData.publication.slug}
+                      </span>
                     </>
                   )}
                 </div>
@@ -175,7 +177,9 @@ export function PostPreviewModal({
                     </p>
                   </div>
                 ) : (
-                  <p className="text-slate-400 text-sm">No body content written yet.</p>
+                  <p className="text-slate-500 dark:text-slate-400 text-sm">
+                    No body content written yet.
+                  </p>
                 )}
               </div>
             )}

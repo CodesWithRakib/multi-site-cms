@@ -1,6 +1,8 @@
 'use client';
 
-import React, { useState, type ReactNode } from 'react';
+import React, { useEffect, useState, type ReactNode } from 'react';
+import { SkipLink } from '@multi-site-cms/ui';
+
 import { AuthGuard } from './AuthGuard';
 import { AdminTabBar } from './AdminTabBar';
 import { Sidebar } from './Sidebar';
@@ -19,8 +21,19 @@ export function ShellLayout({
 }: ShellLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  // Escape closes the mobile drawer, as keyboard users expect from an overlay.
+  useEffect(() => {
+    if (!sidebarOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setSidebarOpen(false);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [sidebarOpen]);
+
   return (
     <AuthGuard requiredPermission={requiredPermission} superAdminOnly={superAdminOnly}>
+      <SkipLink />
       <div className="flex h-screen h-dvh w-full overflow-hidden bg-neutral-100 dark:bg-brand-950 font-sans antialiased text-slate-900 dark:text-slate-100 relative selection:bg-emerald-400 selection:text-emerald-950">
         {/* Soft abstract cyan/emerald ambient gradient glow in top-right corner */}
         <div
@@ -33,9 +46,11 @@ export function ShellLayout({
 
         {/* Main Content Column */}
         <div className="flex flex-1 flex-col h-full min-w-0 overflow-hidden relative">
-          <Header onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
+          <Header onMenuToggle={() => setSidebarOpen(!sidebarOpen)} isMenuOpen={sidebarOpen} />
 
           <main
+            id="main-content"
+            tabIndex={-1}
             className="flex-1 overflow-y-auto overflow-x-hidden px-4 sm:px-8 pb-[calc(4.5rem+env(safe-area-inset-bottom))] md:pb-10"
             role="main"
           >

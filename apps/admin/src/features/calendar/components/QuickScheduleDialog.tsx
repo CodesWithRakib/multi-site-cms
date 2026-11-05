@@ -151,7 +151,7 @@ function QuickScheduleDialogContent({
               >
                 Schedule Article Release
               </h3>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 Plan an automated publication across your sites
               </p>
             </div>
@@ -159,7 +159,7 @@ function QuickScheduleDialogContent({
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+            className="p-1.5 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
           >
             <X className="w-4 h-4" />
           </button>
@@ -180,6 +180,7 @@ function QuickScheduleDialogContent({
               Target Publication Site
             </label>
             <select
+              aria-label="Website"
               value={selectedSiteId}
               onChange={(e) => {
                 setSelectedSiteId(e.target.value);
@@ -201,7 +202,7 @@ function QuickScheduleDialogContent({
               Select Article / Post
             </label>
             {isLoadingPosts ? (
-              <div className="p-2 text-xs text-slate-400 flex items-center gap-2">
+              <div className="p-2 text-xs text-slate-500 dark:text-slate-400 flex items-center gap-2">
                 <Loader2 className="w-4 h-4 animate-spin text-indigo-600" />
                 <span>Loading available articles...</span>
               </div>
@@ -211,6 +212,7 @@ function QuickScheduleDialogContent({
               </p>
             ) : (
               <select
+                aria-label="Post to schedule"
                 value={selectedPostId}
                 onChange={(e) => setSelectedPostId(e.target.value)}
                 className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 font-medium"

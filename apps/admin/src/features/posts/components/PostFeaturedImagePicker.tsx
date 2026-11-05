@@ -26,7 +26,7 @@ export function PostFeaturedImagePicker({
   return (
     <div className="flex flex-col gap-2 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-xs">
       <div className="flex items-center justify-between">
-        <label className="text-xs font-bold uppercase tracking-wider text-slate-500">
+        <label className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
           Featured Image (Hero & Social Cards)
         </label>
         {featuredImage && (
@@ -74,14 +74,14 @@ export function PostFeaturedImagePicker({
           onClick={onSelectClick}
           className="w-full flex flex-col items-center justify-center gap-2.5 p-6 border-2 border-dashed rounded-xl border-slate-200 dark:border-slate-700 hover:border-emerald-500 hover:bg-slate-50/50 dark:hover:bg-slate-800/40 text-slate-500 dark:text-slate-400 text-xs font-semibold transition-all cursor-pointer group"
         >
-          <div className="p-3 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform">
+          <div className="p-3 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 group-hover:scale-110 transition-transform">
             <ImageIcon className="w-5 h-5" />
           </div>
           <div className="text-center">
             <span className="font-bold text-slate-800 dark:text-slate-200 block mb-0.5">
               Select or Upload Featured Image
             </span>
-            <span className="text-[11px] text-slate-400">
+            <span className="text-[11px] text-slate-500 dark:text-slate-400">
               Cloudinary CDN supported (JPG, PNG, WebP)
             </span>
           </div>

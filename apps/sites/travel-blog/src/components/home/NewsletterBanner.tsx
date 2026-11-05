@@ -69,7 +69,7 @@ export function NewsletterBanner() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email address"
-                className="w-full pl-4 pr-2 bg-transparent text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-muted-foreground focus:outline-hidden"
+                className="w-full pl-4 pr-2 bg-transparent text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-muted-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
               />
               <button
                 type="submit"

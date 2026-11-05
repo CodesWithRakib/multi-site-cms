@@ -118,7 +118,7 @@ export default function SitesRegistryPage() {
               className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-2xs cursor-pointer disabled:opacity-50"
             >
               <RefreshCw
-                className={`size-4 ${isFetching ? 'animate-spin text-emerald-500' : ''}`}
+                className={`size-4 ${isFetching ? 'animate-spin text-emerald-600 dark:text-emerald-400' : ''}`}
               />
             </button>
 
@@ -336,7 +336,7 @@ export default function SitesRegistryPage() {
         {/* 5. Modern Website Cards Grid */}
         {isLoading ? (
           <div className="flex flex-col items-center justify-center p-20 gap-3">
-            <Loader2 className="size-7 animate-spin text-emerald-500" />
+            <Loader2 className="size-7 animate-spin text-emerald-600 dark:text-emerald-400" />
             <p className="text-xs font-semibold text-slate-400">Loading website registry...</p>
           </div>
         ) : filteredSites.length === 0 ? (

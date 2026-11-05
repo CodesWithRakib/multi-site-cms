@@ -40,7 +40,7 @@ export function TopPagesTable({ pages, isLoading }: TopPagesTableProps) {
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="border-b border-slate-100 dark:border-slate-800 text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+            <tr className="border-b border-slate-100 dark:border-slate-800 text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
               <th className="py-3 px-3">{t('analytics.article')}</th>
               <th className="py-3 px-3">{t('analytics.website')}</th>
               <th className="py-3 px-3 text-right">{t('analytics.views')}</th>
@@ -52,7 +52,7 @@ export function TopPagesTable({ pages, isLoading }: TopPagesTableProps) {
           <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-xs">
             {isLoading ? (
               <tr>
-                <td colSpan={6} className="py-8 text-center text-slate-400">
+                <td colSpan={6} className="py-8 text-center text-slate-500 dark:text-slate-400">
                   <div className="inline-flex items-center gap-2">
                     <div className="size-4 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin" />
                     <span>Loading top articles...</span>
@@ -61,7 +61,7 @@ export function TopPagesTable({ pages, isLoading }: TopPagesTableProps) {
               </tr>
             ) : pages.length === 0 ? (
               <tr>
-                <td colSpan={6} className="py-8 text-center text-slate-400">
+                <td colSpan={6} className="py-8 text-center text-slate-500 dark:text-slate-400">
                   {t('analytics.noData')}
                 </td>
               </tr>
@@ -85,14 +85,14 @@ export function TopPagesTable({ pages, isLoading }: TopPagesTableProps) {
                             {page.postId && (
                               <Link
                                 href={`/posts/${page.postId}`}
-                                className="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-emerald-500 transition-opacity"
+                                className="opacity-0 group-hover:opacity-100 text-slate-500 dark:text-slate-400 hover:text-emerald-500 transition-opacity"
                                 title="Edit post"
                               >
                                 <ExternalLink className="size-3" />
                               </Link>
                             )}
                           </div>
-                          <span className="text-[11px] text-slate-400 font-mono">
+                          <span className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
                             {page.slug}
                           </span>
                         </div>
@@ -102,7 +102,7 @@ export function TopPagesTable({ pages, isLoading }: TopPagesTableProps) {
                     {/* Site Badge */}
                     <td className="py-3.5 px-3">
                       <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
-                        <Globe className="size-3 text-slate-400" />
+                        <Globe className="size-3 text-slate-500 dark:text-slate-400" />
                         <span>{page.siteName}</span>
                       </span>
                     </td>

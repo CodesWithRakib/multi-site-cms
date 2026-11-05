@@ -105,7 +105,7 @@ export function AnalyticsMetricsCards({ summary, isLoading }: AnalyticsMetricsCa
 
             {/* Sparkline curve */}
             <div className="mt-4 pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
-              <span className="text-[10px] text-slate-400 font-medium">
+              <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
                 {t('analytics.vsPreviousPeriod')}
               </span>
               <svg className="w-20 h-6 overflow-visible" viewBox="0 0 160 30" fill="none">

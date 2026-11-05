@@ -65,7 +65,7 @@ export function MediaBatchActionBar({
         <button
           type="button"
           onClick={onClearSelection}
-          className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+          className="p-1 rounded-lg text-slate-500 dark:text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
           title="Clear selection"
         >
           <X className="size-4" />

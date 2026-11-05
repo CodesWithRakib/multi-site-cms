@@ -115,7 +115,7 @@ export default function AnalyticsPage() {
 
           <div className="flex items-center gap-2">
             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-slate-700 dark:text-slate-200 shadow-2xs">
-              <Sparkles className="size-3.5 text-emerald-500" />
+              <Sparkles className="size-3.5 text-emerald-600 dark:text-emerald-400" />
               <span>Multi-Site Telemetry</span>
             </span>
           </div>

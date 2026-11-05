@@ -74,7 +74,7 @@ export function MaintenanceSettingsForm({
         <div
           className={`flex items-center gap-2 p-3 text-xs font-medium rounded-xl border ${
             statusMessage.type === 'success'
-              ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400'
+              ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-700 dark:text-emerald-400'
               : 'bg-rose-500/10 border-rose-500/20 text-rose-600 dark:text-rose-400'
           }`}
         >
@@ -94,7 +94,7 @@ export function MaintenanceSettingsForm({
             type="checkbox"
             checked={formData.maintenanceMode}
             onChange={(e) => setFormData({ ...formData, maintenanceMode: e.target.checked })}
-            className="size-5 mt-0.5 text-rose-600 rounded-md border-neutral-300 focus:ring-rose-500"
+            className="size-5 mt-0.5 text-rose-600 dark:text-rose-400 rounded-md border-neutral-300 focus:ring-rose-500"
           />
           <div>
             <span className="text-sm font-bold text-neutral-900 dark:text-neutral-100">

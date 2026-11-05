@@ -133,6 +133,7 @@ export function CalendarHeader({
         <div className="flex flex-wrap items-center gap-2.5">
           {/* Site Filter */}
           <select
+            aria-label="Filter by website"
             value={selectedSiteId}
             onChange={(e) => onSiteChange(e.target.value)}
             className="px-2.5 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-hidden focus:ring-2 focus:ring-emerald-500 font-medium"
@@ -147,6 +148,7 @@ export function CalendarHeader({
 
           {/* Type Filter */}
           <select
+            aria-label="Filter by content type"
             value={typeFilter}
             onChange={(e) => onTypeFilterChange(e.target.value)}
             className="px-2.5 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-hidden focus:ring-2 focus:ring-emerald-500 font-medium"
@@ -159,6 +161,7 @@ export function CalendarHeader({
 
           {/* Status Filter */}
           <select
+            aria-label="Filter by status"
             value={statusFilter}
             onChange={(e) => onStatusFilterChange(e.target.value)}
             className="px-2.5 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-hidden focus:ring-2 focus:ring-emerald-500 font-medium"

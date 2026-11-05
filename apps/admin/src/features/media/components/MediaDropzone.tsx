@@ -153,7 +153,7 @@ export function MediaDropzone({ siteId, onUploaded, onFinishedAll }: MediaDropzo
         />
 
         <div className="flex flex-col items-center gap-2 text-center pointer-events-none">
-          <UploadCloud className="w-10 h-10 text-slate-400 group-hover:text-emerald-500 transition-colors" />
+          <UploadCloud className="w-10 h-10 text-slate-500 dark:text-slate-400 group-hover:text-emerald-500 transition-colors" />
           <p className="font-semibold text-slate-700 dark:text-slate-300 text-sm">
             Drag & drop media files here, or click to browse
           </p>
@@ -203,7 +203,7 @@ export function MediaDropzone({ siteId, onUploaded, onFinishedAll }: MediaDropzo
 
           {/* Queue Actions */}
           <div className="flex items-center justify-between pt-3 border-t border-slate-200 dark:border-slate-800">
-            <span className="text-xs text-slate-500">
+            <span className="text-xs text-slate-500 dark:text-slate-400">
               {successCount > 0 ? `${successCount} uploaded successfully` : 'Review metadata before uploading'}
             </span>
 

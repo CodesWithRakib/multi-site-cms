@@ -37,12 +37,12 @@ export function CalendarEventBadge({ event, onClick, timezone = 'UTC' }: Calenda
       case 'scheduled':
         return <Clock className="w-3 h-3 shrink-0 text-indigo-500" />;
       case 'published':
-        return <CheckCircle2 className="w-3 h-3 shrink-0 text-emerald-500" />;
+        return <CheckCircle2 className="w-3 h-3 shrink-0 text-emerald-600 dark:text-emerald-400" />;
       case 'draft':
       case 'in_review':
-        return <FileText className="w-3 h-3 shrink-0 text-amber-500" />;
+        return <FileText className="w-3 h-3 shrink-0 text-amber-700 dark:text-amber-400" />;
       default:
-        return <Archive className="w-3 h-3 shrink-0 text-slate-400" />;
+        return <Archive className="w-3 h-3 shrink-0 text-slate-500 dark:text-slate-400" />;
     }
   };
 
@@ -64,7 +64,7 @@ export function CalendarEventBadge({ event, onClick, timezone = 'UTC' }: Calenda
       title={`${event.title} • ${event.status.toUpperCase()} • ${timeFormatted} (${event.siteName})`}
     >
       {getStatusIcon()}
-      <span className="font-mono text-[9px] font-bold opacity-80 shrink-0">
+      <span className="font-mono text-[9px] font-bold shrink-0">
         {timeFormatted}
       </span>
       <span className="truncate flex-1 font-semibold">{event.title}</span>

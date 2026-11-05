@@ -17,7 +17,7 @@ export default function EditPostPage() {
   if (isLoading) {
     return (
       <ShellLayout>
-        <div className="flex flex-col items-center justify-center min-h-[50vh] text-slate-400 gap-3">
+        <div className="flex flex-col items-center justify-center min-h-[50vh] text-slate-500 dark:text-slate-400 gap-3">
           <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
           <span className="text-xs">Loading post content...</span>
         </div>

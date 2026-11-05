@@ -189,7 +189,7 @@ export function PostForm({ initialPost, isCreateMode = false }: PostFormProps) {
       />
 
       <div className="flex flex-col gap-2">
-        <label className="text-xs font-bold uppercase tracking-wider text-slate-500 px-1">
+        <label className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 px-1">
           Editorial Content Body
         </label>
         <RichTextEditor

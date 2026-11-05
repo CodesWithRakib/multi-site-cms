@@ -109,6 +109,7 @@ export {
   type MobileTabItem,
   type MobileTabLinkProps,
 } from './components/mobile-tab-bar';
+export { SkipLink, type SkipLinkProps } from './components/skip-link';
 export { Skeleton, type SkeletonProps } from './components/skeleton';
 export { StatusPage, type StatusPageProps } from './components/status-page';
 export { Slider } from './components/slider';

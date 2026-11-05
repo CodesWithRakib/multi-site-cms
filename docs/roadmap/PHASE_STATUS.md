@@ -2,14 +2,14 @@
 
 Last updated: 2026-11-04
 
-| Phase                              | Status                                  | Evidence / blocker                                                                                                                                                                                  |
-| ---------------------------------- | --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 0 — Audit                          | Done                                    | `docs/audit/*`                                                                                                                                                                                      |
-| 1 — Secrets and security hardening | **Done in code; one owner action open** | Open: rotate Cloudinary secret (SEC-0)                                                                                                                                                              |
-| 2 — Core workflow correctness      | **Done** (one coverage item deferred)   | API 263/263, integration 56/56. Deferred to Phase 4: API tests for newsletter, users/roles, settings                                                                                                |
-| 3 — UX resilience                  | **In progress (3a–3c done)**            | Admin reviewed as Super Admin and site admin; fabricated dashboard metrics removed; role-aware sidebar; admin mobile tab bar. E2E 42/42. Remaining: keyboard QA, axe scan, admin page decomposition |
-| 4 — Production operations          | Not started                             |                                                                                                                                                                                                     |
-| 5 — Commerce                       | **Out of scope**                        | Business decision 2026-11-04                                                                                                                                                                        |
+| Phase                              | Status                                  | Evidence / blocker                                                                                                                                                             |
+| ---------------------------------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 0 — Audit                          | Done                                    | `docs/audit/*`                                                                                                                                                                 |
+| 1 — Secrets and security hardening | **Done in code; one owner action open** | Open: rotate Cloudinary secret (SEC-0)                                                                                                                                         |
+| 2 — Core workflow correctness      | **Done** (one coverage item deferred)   | API 263/263, integration 56/56. Deferred to Phase 4: API tests for newsletter, users/roles, settings                                                                           |
+| 3 — UX resilience                  | **Done (3a–3d)**                        | WCAG 2.2 AA: 0 serious/critical (axe, light+dark, public+admin); keyboard flows tested; `/posts` decomposed. E2E 51/51. Remaining page decompositions moved to Phase 4 backlog |
+| 4 — Production operations          | Not started                             |                                                                                                                                                                                |
+| 5 — Commerce                       | **Out of scope**                        | Business decision 2026-11-04                                                                                                                                                   |
 
 All changes are uncommitted.
 
@@ -50,6 +50,7 @@ All changes are uncommitted.
 - [x] 3c Authenticated admin review (Super Admin + site admin, 1440/390, light/dark)
 - [x] 3c UX-17 fabricated dashboard metrics → real data; UX-18 fake upsell removed
 - [x] 3c UX-19 permission-aware sidebar, `/settings` guarded; UX-20 admin phone layout
-- [ ] Keyboard-only QA of critical flows
-- [ ] `@axe-core/playwright` on critical routes (needs a new dev dependency)
-- [ ] Admin page decomposition, starting with `posts/page.tsx` (901 lines)
+- [x] 3d Keyboard-only QA: skip links, focus rings, aria-expanded, Escape closes drawer (E2E)
+- [x] 3d `@axe-core/playwright` scan: ~80 → 0 serious/critical findings; central AA-safe ramps with guard tests (needs a new dev dependency)
+- [x] 3d `/posts` decomposed (952 → 65 lines; hook + 9 components); real author, honest stats, correct live links
+- [ ] Decompose `sites/[siteId]`, `users/[userId]`, `sites` pages (moved to Phase 4 backlog)

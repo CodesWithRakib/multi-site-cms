@@ -68,7 +68,7 @@ export function SecuritySettingsForm({
         <div
           className={`flex items-center gap-2 p-3 text-xs font-medium rounded-xl border ${
             statusMessage.type === 'success'
-              ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400'
+              ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-700 dark:text-emerald-400'
               : 'bg-rose-500/10 border-rose-500/20 text-rose-600 dark:text-rose-400'
           }`}
         >
@@ -168,7 +168,7 @@ export function SecuritySettingsForm({
             type="checkbox"
             checked={formData.requireStrongPasswords}
             onChange={(e) => setFormData({ ...formData, requireStrongPasswords: e.target.checked })}
-            className="size-4 text-emerald-600 rounded-md border-neutral-300 focus:ring-emerald-500"
+            className="size-4 text-emerald-600 dark:text-emerald-400 rounded-md border-neutral-300 focus:ring-emerald-500"
           />
           <span className="text-xs font-medium text-neutral-800 dark:text-neutral-200">
             {t('settings.requireStrongPasswords')}
@@ -180,7 +180,7 @@ export function SecuritySettingsForm({
             type="checkbox"
             checked={formData.enforceMfaForSuperAdmin}
             onChange={(e) => setFormData({ ...formData, enforceMfaForSuperAdmin: e.target.checked })}
-            className="size-4 text-emerald-600 rounded-md border-neutral-300 focus:ring-emerald-500"
+            className="size-4 text-emerald-600 dark:text-emerald-400 rounded-md border-neutral-300 focus:ring-emerald-500"
           />
           <span className="text-xs font-medium text-neutral-800 dark:text-neutral-200">
             {t('settings.enforceMfaForSuperAdmin')}
@@ -192,7 +192,7 @@ export function SecuritySettingsForm({
             type="checkbox"
             checked={formData.allowPublicRegistration}
             onChange={(e) => setFormData({ ...formData, allowPublicRegistration: e.target.checked })}
-            className="size-4 text-emerald-600 rounded-md border-neutral-300 focus:ring-emerald-500"
+            className="size-4 text-emerald-600 dark:text-emerald-400 rounded-md border-neutral-300 focus:ring-emerald-500"
           />
           <span className="text-xs font-medium text-neutral-800 dark:text-neutral-200">
             {t('settings.allowPublicRegistration')}

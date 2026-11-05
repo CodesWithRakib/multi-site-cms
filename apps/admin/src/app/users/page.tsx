@@ -162,7 +162,7 @@ export default function UsersPage() {
               className="p-2.5 rounded-xl border border-slate-200/80 dark:border-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors disabled:opacity-50 cursor-pointer"
               title="Refresh"
             >
-              <RefreshCw className={`size-4 ${isFetching ? 'animate-spin text-emerald-500' : ''}`} />
+              <RefreshCw className={`size-4 ${isFetching ? 'animate-spin text-emerald-600 dark:text-emerald-400' : ''}`} />
             </button>
 
             {isSuperAdmin && (
@@ -212,7 +212,7 @@ export default function UsersPage() {
         {/* Main Users Table */}
         {isLoading ? (
           <div className="flex flex-col items-center justify-center p-24 text-slate-400 gap-3 bg-white dark:bg-slate-900/60 rounded-3xl border border-slate-200/80 dark:border-slate-800/80">
-            <Loader2 className="size-8 animate-spin text-emerald-500" />
+            <Loader2 className="size-8 animate-spin text-emerald-600 dark:text-emerald-400" />
             <span className="text-xs font-bold text-slate-600 dark:text-slate-300">
               Loading administrators...
             </span>

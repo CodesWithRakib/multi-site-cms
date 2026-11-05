@@ -54,7 +54,9 @@ export function DashboardMetricItem({
           {trend && !isLoading && (
             <span
               className={`flex items-center text-xs font-semibold gap-0.5 ${
-                isDown ? 'text-rose-500' : 'text-emerald-500'
+                isDown
+                  ? 'text-rose-600 dark:text-rose-400'
+                  : 'text-emerald-600 dark:text-emerald-400'
               }`}
             >
               <TrendIcon className="size-3 stroke-[2.5]" aria-hidden="true" />

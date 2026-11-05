@@ -2,7 +2,7 @@
 
 ## Verdict: **Not production-ready**
 
-Score: **7.5 / 10** for the publishing CMS (up from 5 at the initial audit).
+Score: **8 / 10** for the publishing CMS (up from 5 at the initial audit).
 Booking, payments, and customer accounts are out of scope by business
 decision (2026-11-04) and are not scored.
 
@@ -10,8 +10,8 @@ decision (2026-11-04) and are not scored.
 | -------------- | ----- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Security       | 6     | Secret, preview, CSRF, and webhook issues fixed and regression-tested; comment pre-moderation and rate limit in place; Cloudinary rotation still pending |
 | Correctness    | 7     | API 242/242, integration 56/56; revalidation wired (ADR-0026); contact page honest (`mailto:`). Not verified against a deployed site                     |
-| Test evidence  | 6     | API 263, integration 56, E2E 27/27 locally (first real run); E2E still not run in CI; thin frontend unit tests                                           |
-| UX resilience  | 7.5   | Central theme, dark mode, app shells on sites and admin; dashboards show only real data; role-aware admin navigation. Keyboard and axe pending           |
+| Test evidence  | 7     | API 264 + integration 56 + E2E 51 locally (incl. accessibility, keyboard, roles); E2E still not run in CI                                                |
+| UX resilience  | 8.5   | WCAG 2.2 AA: 0 serious/critical axe findings (light + dark, public + admin); keyboard flows tested; real data only                                       |
 | Operations     | 5     | Health / readiness exist; backup restore drill, monitoring, and alerting not verified                                                                    |
 | Data / privacy | 5     | Migrations reviewed; latest one round-trip tested; no retention or erasure policy (DB-4, DB-5)                                                           |
 

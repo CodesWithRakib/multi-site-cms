@@ -15,7 +15,6 @@ export function AirSportsLogo({
   return (
     <Link
       href="/"
-      aria-label="Air Sports - Adventure in the Sky"
       className={`inline-flex items-center gap-2.5 group transition-transform hover:opacity-95 ${className}`}
     >
       {/* Glider / Aerodynamic Wing Vector Icon */}
@@ -44,7 +43,7 @@ export function AirSportsLogo({
               : 'text-foreground group-hover:text-sky-600 dark:group-hover:text-sky-400'
           }`}
         >
-          Air<span className="text-sky-500 dark:text-sky-400">Sports</span>
+          Air<span className={inverted ? 'text-sky-400' : 'text-sky-600 dark:text-sky-400'}>Sports</span>
         </span>
         {showSubtitle && (
           <span

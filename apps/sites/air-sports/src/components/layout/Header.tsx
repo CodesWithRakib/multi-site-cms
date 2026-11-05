@@ -125,6 +125,8 @@ export function Header() {
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle navigation menu"
+            aria-expanded={mobileMenuOpen}
+            aria-controls="mobile-menu"
             className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card md:hidden text-foreground"
           >
             {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -134,7 +136,7 @@ export function Header() {
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="border-b border-border bg-card p-4 md:hidden space-y-3">
+        <div id="mobile-menu" className="border-b border-border bg-card p-4 md:hidden space-y-3">
           <div className="space-y-1">
             {NAV_ITEMS.map((item) => (
               <Link

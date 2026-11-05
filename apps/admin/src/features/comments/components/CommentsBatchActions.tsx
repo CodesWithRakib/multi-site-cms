@@ -71,7 +71,7 @@ export function CommentsBatchActions({
           type="button"
           disabled={isUpdating}
           onClick={onBatchDelete}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-red-500/30 bg-card hover:bg-red-50 dark:hover:bg-red-950/40 px-3 py-1.5 text-xs font-semibold text-red-600 transition-colors disabled:opacity-50 cursor-pointer"
+          className="inline-flex items-center gap-1.5 rounded-lg border border-red-500/30 bg-card hover:bg-red-50 dark:hover:bg-red-950/40 px-3 py-1.5 text-xs font-semibold text-red-600 dark:text-red-400 transition-colors disabled:opacity-50 cursor-pointer"
         >
           <Trash2 className="h-3.5 w-3.5" />
           <span>Delete</span>

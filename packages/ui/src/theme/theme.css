@@ -24,11 +24,11 @@
   --brand-200: oklch(0.905 calc(var(--brand-c) * 0.53) var(--brand-h));
   --brand-300: oklch(0.845 calc(var(--brand-c) * 0.81) var(--brand-h));
   --brand-400: oklch(0.765 calc(var(--brand-c) * 1) var(--brand-h));
-  --brand-500: oklch(0.696 calc(var(--brand-c) * 0.96) var(--brand-h));
-  --brand-600: oklch(0.596 calc(var(--brand-c) * 0.82) var(--brand-h));
-  --brand-700: oklch(0.508 calc(var(--brand-c) * 0.67) var(--brand-h));
-  --brand-800: oklch(0.432 calc(var(--brand-c) * 0.54) var(--brand-h));
-  --brand-900: oklch(0.378 calc(var(--brand-c) * 0.44) var(--brand-h));
+  --brand-500: oklch(0.62 calc(var(--brand-c) * 0.96) var(--brand-h));
+  --brand-600: oklch(0.52 calc(var(--brand-c) * 0.82) var(--brand-h));
+  --brand-700: oklch(0.45 calc(var(--brand-c) * 0.67) var(--brand-h));
+  --brand-800: oklch(0.4 calc(var(--brand-c) * 0.54) var(--brand-h));
+  --brand-900: oklch(0.35 calc(var(--brand-c) * 0.44) var(--brand-h));
   --brand-950: oklch(0.262 calc(var(--brand-c) * 0.29) var(--brand-h));
 
   --neutral-50: oklch(0.984 calc(var(--neutral-c) * 0.07) var(--neutral-h));
@@ -36,7 +36,7 @@
   --neutral-200: oklch(0.929 calc(var(--neutral-c) * 0.3) var(--neutral-h));
   --neutral-300: oklch(0.869 calc(var(--neutral-c) * 0.5) var(--neutral-h));
   --neutral-400: oklch(0.704 calc(var(--neutral-c) * 0.9) var(--neutral-h));
-  --neutral-500: oklch(0.554 calc(var(--neutral-c) * 1) var(--neutral-h));
+  --neutral-500: oklch(0.5 calc(var(--neutral-c) * 1) var(--neutral-h));
   --neutral-600: oklch(0.446 calc(var(--neutral-c) * 0.95) var(--neutral-h));
   --neutral-700: oklch(0.372 calc(var(--neutral-c) * 1) var(--neutral-h));
   --neutral-800: oklch(0.279 calc(var(--neutral-c) * 0.93) var(--neutral-h));

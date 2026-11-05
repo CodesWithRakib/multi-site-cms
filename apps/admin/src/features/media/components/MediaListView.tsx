@@ -30,14 +30,14 @@ export function MediaListView({
     <div className="overflow-hidden rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-2xs">
       <table className="w-full text-left border-collapse text-xs">
         <thead>
-          <tr className="border-b border-slate-200 dark:border-slate-800 text-[11px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50/70 dark:bg-slate-950/50">
+          <tr className="border-b border-slate-200 dark:border-slate-800 text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider bg-slate-50/70 dark:bg-slate-950/50">
             {onToggleBatchSelect && (
               <th className="py-3 pl-4 pr-1 w-10">
                 <input
                   type="checkbox"
                   checked={isAllSelected}
                   onChange={(e) => onSelectAll?.(e.target.checked)}
-                  className="size-4 rounded border-slate-300 dark:border-slate-700 text-emerald-500 focus:ring-emerald-500 cursor-pointer"
+                  className="size-4 rounded border-slate-300 dark:border-slate-700 text-emerald-600 dark:text-emerald-400 focus:ring-emerald-500 cursor-pointer"
                   title="Select all on this page"
                 />
               </th>
@@ -75,7 +75,7 @@ export function MediaListView({
                       type="checkbox"
                       checked={isSelected}
                       onChange={(e) => onToggleBatchSelect(asset.id, e.target.checked)}
-                      className="size-4 rounded border-slate-300 dark:border-slate-700 text-emerald-500 focus:ring-emerald-500 cursor-pointer"
+                      className="size-4 rounded border-slate-300 dark:border-slate-700 text-emerald-600 dark:text-emerald-400 focus:ring-emerald-500 cursor-pointer"
                     />
                   </td>
                 )}
@@ -91,11 +91,11 @@ export function MediaListView({
                         loading="lazy"
                       />
                     ) : isVideo ? (
-                      <Video className="size-5 text-slate-400" />
+                      <Video className="size-5 text-slate-500 dark:text-slate-400" />
                     ) : isPdf ? (
                       <FileText className="size-5 text-red-400" />
                     ) : (
-                      <ImageIcon className="size-5 text-slate-400" />
+                      <ImageIcon className="size-5 text-slate-500 dark:text-slate-400" />
                     )}
                   </div>
                 </td>
@@ -138,7 +138,7 @@ export function MediaListView({
                       type="button"
                       onClick={() => onCopyUrl(assetUrl)}
                       title="Copy URL"
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-emerald-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                      className="p-1.5 rounded-lg text-slate-500 dark:text-slate-400 hover:text-emerald-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                     >
                       <Copy className="size-3.5" />
                     </button>
@@ -146,7 +146,7 @@ export function MediaListView({
                       type="button"
                       onClick={() => onDelete(asset.id)}
                       title="Delete Media"
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors cursor-pointer"
+                      className="p-1.5 rounded-lg text-slate-500 dark:text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors cursor-pointer"
                     >
                       <Trash2 className="size-3.5" />
                     </button>

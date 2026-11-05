@@ -23,11 +23,11 @@ export function RealtimeTrafficWidget({ realtimeData, isLoading }: RealtimeTraff
   const renderDeviceIcon = (type: string) => {
     switch (type.toLowerCase()) {
       case 'mobile':
-        return <Smartphone className="size-3.5 text-slate-400" />;
+        return <Smartphone className="size-3.5 text-slate-500 dark:text-slate-400" />;
       case 'tablet':
-        return <Tablet className="size-3.5 text-slate-400" />;
+        return <Tablet className="size-3.5 text-slate-500 dark:text-slate-400" />;
       default:
-        return <Monitor className="size-3.5 text-slate-400" />;
+        return <Monitor className="size-3.5 text-slate-500 dark:text-slate-400" />;
     }
   };
 
@@ -78,7 +78,7 @@ export function RealtimeTrafficWidget({ realtimeData, isLoading }: RealtimeTraff
 
       {/* Minute by minute bar graph */}
       <div className="mb-5">
-        <div className="flex items-center justify-between text-[11px] text-slate-400 font-semibold mb-2">
+        <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 font-semibold mb-2">
           <span>-30 min</span>
           <span>Views / Min</span>
           <span>Now</span>
@@ -105,7 +105,7 @@ export function RealtimeTrafficWidget({ realtimeData, isLoading }: RealtimeTraff
         </h4>
 
         {events.length === 0 ? (
-          <div className="text-xs text-slate-400 py-3 text-center">
+          <div className="text-xs text-slate-500 dark:text-slate-400 py-3 text-center">
             {t('analytics.noData')}
           </div>
         ) : (
@@ -121,7 +121,7 @@ export function RealtimeTrafficWidget({ realtimeData, isLoading }: RealtimeTraff
                     <span className="font-semibold text-slate-800 dark:text-slate-200 truncate block">
                       {event.title || event.path}
                     </span>
-                    <span className="text-[10px] text-slate-400 font-medium">
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
                       {event.siteName} • {event.countryName}
                     </span>
                   </div>

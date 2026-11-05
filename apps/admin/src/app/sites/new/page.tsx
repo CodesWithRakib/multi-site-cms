@@ -64,7 +64,7 @@ export default function NewSitePage() {
           <div className="flex items-center gap-3">
             <Link
               href="/sites"
-              className="p-2 rounded-xl text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shadow-2xs"
+              className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shadow-2xs"
               title={t.sites.backToSites || 'Back to Websites'}
             >
               <ArrowLeft className="size-4" />
@@ -91,7 +91,7 @@ export default function NewSitePage() {
         {/* Form Card */}
         <div className="rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-xs">
           <div className="flex items-center gap-2.5 mb-5 pb-4 border-b border-slate-100 dark:border-slate-800">
-            <Globe className="size-5 text-emerald-500" />
+            <Globe className="size-5 text-emerald-600 dark:text-emerald-400" />
             <div>
               <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
                 Tenant Parameters

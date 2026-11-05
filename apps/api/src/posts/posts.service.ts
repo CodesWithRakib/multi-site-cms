@@ -207,7 +207,12 @@ export class PostsService {
     const postRepo = await this.getPostRepo();
     const revisionRepo = await this.getRevisionRepo();
 
-    const qb = postRepo.createQueryBuilder('p').where('p.deleted_at IS NULL');
+    // Author name only: never load password hashes or other user fields here.
+    const qb = postRepo
+      .createQueryBuilder('p')
+      .leftJoin('p.author', 'author')
+      .addSelect(['author.id', 'author.displayName'])
+      .where('p.deleted_at IS NULL');
 
     if (!actor.isSuperAdmin) {
       if (actor.authorizedSiteIds.length > 0) {
@@ -271,16 +276,27 @@ export class PostsService {
     const publications =
       postIds.length > 0 ? await publicationRepo.find({ where: { postId: In(postIds) } }) : [];
 
+    // Latest revision of every post on the page in one query (was one query per post).
+    const latestRevisions =
+      postIds.length > 0
+        ? await revisionRepo
+            .createQueryBuilder('r')
+            .distinctOn(['r.post_id'])
+            .where('r.post_id IN (:...postIds)', { postIds })
+            .orderBy('r.post_id')
+            .addOrderBy('r.revision_number', 'DESC')
+            .getMany()
+        : [];
+    const latestByPost = new Map(latestRevisions.map((rev) => [rev.postId, rev]));
+
     const items: PostItem[] = [];
     for (const post of posts) {
-      const latestRev = await revisionRepo.findOne({
-        where: { postId: post.id },
-        order: { revisionNumber: 'DESC' },
-      });
+      const latestRev = latestByPost.get(post.id) ?? null;
       const postPubs = publications.filter((pub) => pub.postId === post.id);
       items.push({
         id: post.id,
         authorId: post.authorId,
+        author: post.author ? { id: post.author.id, displayName: post.author.displayName } : null,
         type: post.type,
         status: post.status,
         sourceLocale: post.sourceLocale,

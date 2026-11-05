@@ -39,7 +39,7 @@ export function AirSportsCard({
                 sizes="(max-width: 1024px) 100vw, 60vw"
               />
             ) : (
-              <div className="size-full flex items-center justify-center bg-stone-900 text-stone-500 font-mono text-sm">
+              <div className="size-full flex items-center justify-center bg-stone-900 text-stone-400 font-mono text-sm">
                 Air Sports Dispatch
               </div>
             )}
@@ -146,7 +146,7 @@ export function AirSportsCard({
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
           ) : (
-            <div className="size-full flex items-center justify-center bg-stone-900 text-stone-500 font-mono text-xs uppercase">
+            <div className="size-full flex items-center justify-center bg-stone-900 text-stone-400 font-mono text-xs uppercase">
               Aviation Report
             </div>
           )}

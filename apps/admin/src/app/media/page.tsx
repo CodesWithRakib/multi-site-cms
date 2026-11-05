@@ -208,7 +208,7 @@ export default function MediaPage() {
           <div className="space-y-4">
             {isLoading ? (
               <div className="flex flex-col items-center justify-center p-24 text-slate-400 gap-3 bg-white dark:bg-slate-900/60 rounded-3xl border border-slate-200/80 dark:border-slate-800/80">
-                <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
+                <Loader2 className="w-8 h-8 animate-spin text-emerald-600 dark:text-emerald-400" />
                 <span className="text-xs font-bold text-slate-600 dark:text-slate-300">
                   Loading media assets...
                 </span>
@@ -269,7 +269,7 @@ export default function MediaPage() {
               </>
             ) : (
               <div className="flex flex-col items-center justify-center p-20 text-center bg-white dark:bg-slate-900/60 rounded-3xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs">
-                <div className="size-16 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center mb-4">
+                <div className="size-16 rounded-2xl bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 flex items-center justify-center mb-4">
                   <ImageIcon className="size-8" />
                 </div>
                 <h3 className="font-bold text-base text-slate-900 dark:text-white">

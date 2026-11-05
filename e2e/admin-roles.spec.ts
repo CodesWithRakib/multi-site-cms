@@ -1,4 +1,6 @@
-import { expect, test, type Browser, type BrowserContext, type Page } from '@playwright/test';
+import { expect, test, type Browser, type Page } from '@playwright/test';
+
+import { adminSession, type StorageState } from './support/admin-session';
 
 /**
  * Role-aware admin UI. Needs local development accounts, passed through env
@@ -13,21 +15,6 @@ import { expect, test, type Browser, type BrowserContext, type Page } from '@pla
 
 const adminUrl = process.env.E2E_ADMIN_URL ?? 'http://localhost:5000';
 const PLATFORM_LINKS = ['/sites', '/users', '/settings'];
-
-type StorageState = Awaited<ReturnType<BrowserContext['storageState']>>;
-
-async function loginOnce(browser: Browser, email: string, password: string): Promise<StorageState> {
-  const context = await browser.newContext();
-  const page = await context.newPage();
-  await page.goto(`${adminUrl}/login`);
-  await page.locator('#email').fill(email);
-  await page.locator('#password').fill(password);
-  await page.locator('button[type="submit"]').click();
-  await expect(page).not.toHaveURL(/\/login/, { timeout: 30_000 });
-  const state = await context.storageState();
-  await context.close();
-  return state;
-}
 
 async function openAs(
   browser: Browser,
@@ -49,7 +36,7 @@ test.describe('site admin', () => {
 
   let state: StorageState;
   test.beforeAll(async ({ browser }) => {
-    state = await loginOnce(browser, email, password);
+    state = await adminSession(browser, email, password);
   });
 
   test('sidebar hides platform-only sections', async ({ browser }) => {
@@ -78,7 +65,7 @@ test.describe('super admin', () => {
 
   let state: StorageState;
   test.beforeAll(async ({ browser }) => {
-    state = await loginOnce(browser, email, password);
+    state = await adminSession(browser, email, password);
   });
 
   test('sidebar shows platform sections; dashboard shows no invented numbers', async ({

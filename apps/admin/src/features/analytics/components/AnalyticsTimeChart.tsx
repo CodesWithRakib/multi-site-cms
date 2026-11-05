@@ -239,7 +239,7 @@ export function AnalyticsTimeChart({ data, isLoading }: AnalyticsTimeChartProps)
             className="absolute -top-2 pointer-events-none z-20 px-3 py-2 rounded-xl bg-slate-900/95 text-white text-[11px] font-medium shadow-xl border border-slate-700/80 -translate-x-1/2 transition-all backdrop-blur-xs"
             style={{ left: `${(activePoint.x / 800) * 100}%` }}
           >
-            <div className="text-slate-400 font-bold mb-1">{activePoint.date}</div>
+            <div className="text-slate-500 dark:text-slate-400 font-bold mb-1">{activePoint.date}</div>
             <div className="flex items-center gap-2 text-emerald-400">
               <span>{t('analytics.views')}:</span>
               <strong className="font-bold text-white">{activePoint.pageViews}</strong>

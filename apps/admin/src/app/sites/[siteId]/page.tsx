@@ -194,7 +194,7 @@ export default function SiteDetailPage() {
     return (
       <ShellLayout superAdminOnly>
         <div className="flex h-96 flex-col items-center justify-center gap-3">
-          <Loader2 className="size-8 animate-spin text-emerald-500" />
+          <Loader2 className="size-8 animate-spin text-emerald-600 dark:text-emerald-400" />
           <p className="text-xs font-semibold text-slate-400">Loading website configuration...</p>
         </div>
       </ShellLayout>
@@ -224,7 +224,7 @@ export default function SiteDetailPage() {
           <div className="flex items-center gap-3">
             <Link
               href="/sites"
-              className="p-2 rounded-xl text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shadow-2xs"
+              className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shadow-2xs"
               title={t.sites.backToSites || 'Back to Websites'}
             >
               <ArrowLeft className="size-4" />
@@ -315,7 +315,7 @@ export default function SiteDetailPage() {
         {activeTab === 'general' && (
           <div className="rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-xs">
             <div className="flex items-center gap-2.5 mb-5 pb-4 border-b border-slate-100 dark:border-slate-800">
-              <Settings className="size-5 text-emerald-500" />
+              <Settings className="size-5 text-emerald-600 dark:text-emerald-400" />
               <div>
                 <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
                   {t.sites.generalSettings || 'General Tenant Configuration'}
@@ -444,7 +444,7 @@ export default function SiteDetailPage() {
             <div className="rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-xs">
               <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800 mb-4">
                 <div className="flex items-center gap-2.5">
-                  <Radio className="size-5 text-emerald-500" />
+                  <Radio className="size-5 text-emerald-600 dark:text-emerald-400" />
                   <div>
                     <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
                       Bound Hostnames & Domains
@@ -492,12 +492,12 @@ export default function SiteDetailPage() {
                           >
                             {isVerified ? (
                               <>
-                                <CheckCircle2 className="size-3 text-emerald-500" />
+                                <CheckCircle2 className="size-3 text-emerald-600 dark:text-emerald-400" />
                                 <span>Verified</span>
                               </>
                             ) : (
                               <>
-                                <AlertCircle className="size-3 text-amber-500" />
+                                <AlertCircle className="size-3 text-amber-700 dark:text-amber-400" />
                                 <span>Pending DNS</span>
                               </>
                             )}
@@ -570,7 +570,7 @@ export default function SiteDetailPage() {
                     type="checkbox"
                     checked={isPrimaryDomain}
                     onChange={(e) => setIsPrimaryDomain(e.target.checked)}
-                    className="size-4 rounded-md border-slate-300 dark:border-slate-700 text-emerald-500 focus:ring-emerald-400/20"
+                    className="size-4 rounded-md border-slate-300 dark:border-slate-700 text-emerald-600 dark:text-emerald-400 focus:ring-emerald-400/20"
                   />
                   <label
                     htmlFor="isPrimary"
@@ -605,7 +605,7 @@ export default function SiteDetailPage() {
             <div className="w-full max-w-lg rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-2xl animate-in zoom-in-95">
               <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 mb-4">
                 <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                  <Shield className="size-4 text-emerald-500" />
+                  <Shield className="size-4 text-emerald-600 dark:text-emerald-400" />
                   <span>{t.sites.dnsChallenge || 'Domain DNS Verification Challenge'}</span>
                 </h3>
                 <button
@@ -619,7 +619,7 @@ export default function SiteDetailPage() {
 
               {!challengeData ? (
                 <div className="py-10 flex flex-col items-center justify-center gap-2.5">
-                  <Loader2 className="size-6 animate-spin text-emerald-500" />
+                  <Loader2 className="size-6 animate-spin text-emerald-600 dark:text-emerald-400" />
                   <p className="text-xs text-slate-400">Loading DNS challenge records...</p>
                 </div>
               ) : (
@@ -650,7 +650,7 @@ export default function SiteDetailPage() {
                           title="Copy host name"
                         >
                           {copiedHost ? (
-                            <Check className="size-4 text-emerald-500" />
+                            <Check className="size-4 text-emerald-600 dark:text-emerald-400" />
                           ) : (
                             <Copy className="size-4" />
                           )}
@@ -672,7 +672,7 @@ export default function SiteDetailPage() {
                           title="Copy challenge value"
                         >
                           {copiedValue ? (
-                            <Check className="size-4 text-emerald-500" />
+                            <Check className="size-4 text-emerald-600 dark:text-emerald-400" />
                           ) : (
                             <Copy className="size-4" />
                           )}

@@ -17,7 +17,7 @@ export function MediaMetricsCards({ stats }: MediaMetricsCardsProps) {
           <div className="size-11 rounded-xl bg-blue-500/10 text-blue-500 dark:text-blue-400 flex items-center justify-center">
             <ImageIcon className="size-5" />
           </div>
-          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
             Active
           </span>
         </div>
@@ -37,10 +37,10 @@ export function MediaMetricsCards({ stats }: MediaMetricsCardsProps) {
       {/* Card 2: Storage Used */}
       <div className="relative overflow-hidden p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-2xs">
         <div className="flex items-center justify-between">
-          <div className="size-11 rounded-xl bg-emerald-500/10 text-emerald-500 dark:text-emerald-400 flex items-center justify-center">
+          <div className="size-11 rounded-xl bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 flex items-center justify-center">
             <HardDrive className="size-5" />
           </div>
-          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
             Storage
           </span>
         </div>
@@ -60,10 +60,10 @@ export function MediaMetricsCards({ stats }: MediaMetricsCardsProps) {
       {/* Card 3: Images & Photos */}
       <div className="relative overflow-hidden p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-2xs">
         <div className="flex items-center justify-between">
-          <div className="size-11 rounded-xl bg-amber-500/10 text-amber-500 dark:text-amber-400 flex items-center justify-center">
+          <div className="size-11 rounded-xl bg-amber-500/10 text-amber-700 dark:text-amber-400 flex items-center justify-center">
             <ImageIcon className="size-5" />
           </div>
-          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded-full">
+          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-700 dark:text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full">
             WebP/JPG
           </span>
         </div>
@@ -83,10 +83,10 @@ export function MediaMetricsCards({ stats }: MediaMetricsCardsProps) {
       {/* Card 4: Documents & Other */}
       <div className="relative overflow-hidden p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-2xs">
         <div className="flex items-center justify-between">
-          <div className="size-11 rounded-xl bg-purple-500/10 text-purple-500 dark:text-purple-400 flex items-center justify-center">
+          <div className="size-11 rounded-xl bg-purple-500/10 text-purple-700 dark:text-purple-400 flex items-center justify-center">
             <FileText className="size-5" />
           </div>
-          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-purple-500 bg-purple-500/10 px-2 py-0.5 rounded-full">
+          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-purple-700 dark:text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded-full">
             PDF/Media
           </span>
         </div>

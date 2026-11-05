@@ -24,7 +24,7 @@ export function CalendarMonthGrid({
     <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-x-auto shadow-2xs">
       <div className="min-w-[720px]">
         {/* Weekday headers */}
-        <div className="grid grid-cols-7 border-b border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 text-[11px] font-bold uppercase tracking-wider text-slate-500 text-center py-2.5">
+        <div className="grid grid-cols-7 border-b border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 text-center py-2.5">
           {WEEKDAYS.map((day) => (
             <span key={day}>{day}</span>
           ))}
@@ -64,7 +64,7 @@ export function CalendarMonthGrid({
                       e.stopPropagation();
                       onDateClick(cell.date);
                     }}
-                    className="opacity-0 group-hover:opacity-100 p-1 rounded-md text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 transition-all"
+                    className="opacity-0 group-hover:opacity-100 p-1 rounded-md text-slate-500 dark:text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 transition-all"
                     title="Schedule post on this date"
                   >
                     <Plus className="w-3.5 h-3.5" />
@@ -83,7 +83,7 @@ export function CalendarMonthGrid({
                   ))}
 
                   {hiddenCount > 0 && (
-                    <div className="text-[10px] font-semibold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 pt-0.5">
+                    <div className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 pt-0.5">
                       +{hiddenCount} more
                     </div>
                   )}

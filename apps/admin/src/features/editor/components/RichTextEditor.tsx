@@ -37,8 +37,12 @@ export function RichTextEditor({
     content: initialContent || '',
     editorProps: {
       attributes: {
+        // Named multi-line text box for screen readers (WCAG 4.1.2).
+        role: 'textbox',
+        'aria-multiline': 'true',
+        'aria-label': 'Post body',
         class:
-          'prose dark:prose-invert max-w-none min-h-[360px] p-6 focus:outline-hidden text-slate-800 dark:text-slate-100',
+          'prose dark:prose-invert max-w-none min-h-[360px] p-6 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring text-slate-800 dark:text-slate-100',
       },
     },
     onUpdate: ({ editor: currentEditor }) => {

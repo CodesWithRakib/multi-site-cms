@@ -36,13 +36,13 @@ export function MediaDropzoneQueueItem({
       {/* File type icon & thumbnail indicator */}
       <div className="size-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
         {isImage ? (
-          <ImageIcon className="size-5 text-emerald-500" />
+          <ImageIcon className="size-5 text-emerald-600 dark:text-emerald-400" />
         ) : isVideo ? (
           <Video className="size-5 text-sky-500" />
         ) : isPdf ? (
           <FileText className="size-5 text-rose-500" />
         ) : (
-          <FileText className="size-5 text-slate-400" />
+          <FileText className="size-5 text-slate-500 dark:text-slate-400" />
         )}
       </div>
 
@@ -52,7 +52,7 @@ export function MediaDropzoneQueueItem({
           <p className="text-xs font-semibold text-slate-900 dark:text-white truncate">
             {item.file.name}
           </p>
-          <span className="text-[10px] text-slate-400 font-mono shrink-0">
+          <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono shrink-0">
             {(item.file.size / 1024).toFixed(1)} KB
           </span>
         </div>
@@ -87,10 +87,10 @@ export function MediaDropzoneQueueItem({
       {/* Status & Delete Action */}
       <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
         {item.status === 'uploading' && (
-          <Loader2 className="size-4 animate-spin text-emerald-500" />
+          <Loader2 className="size-4 animate-spin text-emerald-600 dark:text-emerald-400" />
         )}
         {item.status === 'success' && (
-          <CheckCircle2 className="size-4 text-emerald-500" />
+          <CheckCircle2 className="size-4 text-emerald-600 dark:text-emerald-400" />
         )}
         {item.status === 'error' && (
           <AlertCircle className="size-4 text-rose-500" />
@@ -101,7 +101,7 @@ export function MediaDropzoneQueueItem({
             type="button"
             onClick={() => onRemove(item.id)}
             disabled={disabled}
-            className="p-1 rounded-md text-slate-400 hover:text-rose-500 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-40 transition-colors"
+            className="p-1 rounded-md text-slate-500 dark:text-slate-400 hover:text-rose-500 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-40 transition-colors"
             title="Remove from queue"
           >
             <X className="size-4" />

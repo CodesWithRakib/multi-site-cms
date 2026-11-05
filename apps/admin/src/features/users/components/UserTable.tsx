@@ -40,7 +40,7 @@ export function UserTable({
         <h3 className="text-sm font-bold text-slate-700 dark:text-slate-300">
           {t.users.noUsersFound || 'No administrators found'}
         </h3>
-        <p className="text-xs text-slate-400 mt-1">
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
           Try adjusting your search keywords or filter selections.
         </p>
       </div>
@@ -52,7 +52,7 @@ export function UserTable({
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse text-xs">
           <thead>
-            <tr className="border-b border-slate-200 dark:border-slate-800 text-[11px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50/50 dark:bg-slate-950/50">
+            <tr className="border-b border-slate-200 dark:border-slate-800 text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider bg-slate-50/50 dark:bg-slate-950/50">
               <th className="py-3.5 px-4">Administrator</th>
               <th className="py-3.5 px-4">{t.users.roles}</th>
               <th className="py-3.5 px-4">{t.users.status}</th>
@@ -110,7 +110,7 @@ export function UserTable({
                   <td className="py-3.5 px-4">
                     <div className="flex flex-wrap items-center gap-1.5 max-w-sm">
                       {user.roles.length === 0 ? (
-                        <span className="text-slate-400 italic text-[11px]">
+                        <span className="text-slate-500 dark:text-slate-400 italic text-[11px]">
                           No assigned roles
                         </span>
                       ) : (
@@ -128,9 +128,9 @@ export function UserTable({
                               }`}
                             >
                               {isPlatform ? (
-                                <Shield className="size-3 text-purple-500 shrink-0" />
+                                <Shield className="size-3 text-purple-600 dark:text-purple-400 shrink-0" />
                               ) : (
-                                <Globe className="size-3 text-emerald-500 shrink-0" />
+                                <Globe className="size-3 text-emerald-600 dark:text-emerald-400 shrink-0" />
                               )}
                               <span>{r.roleName}</span>
                               {siteName && (
@@ -173,9 +173,9 @@ export function UserTable({
                   <td className="py-3.5 px-4 text-slate-500 dark:text-slate-400">
                     {user.lastLoginAt ? (
                       <div className="flex items-center gap-1.5 text-[11px]">
-                        <Calendar className="size-3.5 text-slate-400" />
+                        <Calendar className="size-3.5 text-slate-500 dark:text-slate-400" />
                         <span>{new Date(user.lastLoginAt).toLocaleDateString()}</span>
-                        <span className="text-slate-400 text-[10px]">
+                        <span className="text-slate-500 dark:text-slate-400 text-[10px]">
                           {new Date(user.lastLoginAt).toLocaleTimeString([], {
                             hour: '2-digit',
                             minute: '2-digit',
@@ -183,7 +183,7 @@ export function UserTable({
                         </span>
                       </div>
                     ) : (
-                      <span className="text-slate-400 italic text-[11px]">Never</span>
+                      <span className="text-slate-500 dark:text-slate-400 italic text-[11px]">Never</span>
                     )}
                   </td>
 
@@ -195,7 +195,7 @@ export function UserTable({
                         <button
                           type="button"
                           onClick={() => onEditUser(user)}
-                          className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 hover:border-emerald-300 dark:hover:border-emerald-800 hover:bg-emerald-50/50 dark:hover:bg-emerald-950/30 transition-colors cursor-pointer"
+                          className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:border-emerald-300 dark:hover:border-emerald-800 hover:bg-emerald-50/50 dark:hover:bg-emerald-950/30 transition-colors cursor-pointer"
                           title="Quick Edit Profile"
                         >
                           <Edit2 className="size-3.5" />
@@ -210,10 +210,10 @@ export function UserTable({
                           disabled={isDeactivationLocked}
                           className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${
                             isDeactivationLocked
-                              ? 'opacity-30 cursor-not-allowed border-slate-200 dark:border-slate-700 text-slate-400'
+                              ? 'opacity-30 cursor-not-allowed border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400'
                               : user.status === 'active'
-                                ? 'border-slate-200 dark:border-slate-700 text-slate-500 hover:text-rose-600 hover:border-rose-300 dark:hover:border-rose-800 hover:bg-rose-50/50 dark:hover:bg-rose-950/30'
-                                : 'border-slate-200 dark:border-slate-700 text-slate-500 hover:text-emerald-600 hover:border-emerald-300 dark:hover:border-emerald-800 hover:bg-emerald-50/50 dark:hover:bg-emerald-950/30'
+                                ? 'border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:text-rose-600 hover:border-rose-300 dark:hover:border-rose-800 hover:bg-rose-50/50 dark:hover:bg-rose-950/30'
+                                : 'border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:text-emerald-600 hover:border-emerald-300 dark:hover:border-emerald-800 hover:bg-emerald-50/50 dark:hover:bg-emerald-950/30'
                           }`}
                           title={
                             isDeactivationLocked
@@ -237,7 +237,7 @@ export function UserTable({
                         className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs transition-colors"
                       >
                         <span>{t.users.manageUser || 'Manage'}</span>
-                        <ChevronRight className="size-3 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
+                        <ChevronRight className="size-3 text-slate-500 dark:text-slate-400 group-hover:translate-x-0.5 transition-transform" />
                       </Link>
                     </div>
                   </td>

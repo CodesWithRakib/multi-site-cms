@@ -89,7 +89,7 @@ export function MediaFilterBar({
 
       {/* Search Bar */}
       <div className="relative w-full">
-        <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+        <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 pointer-events-none" />
         <input
           type="text"
           value={searchTerm}
@@ -101,7 +101,7 @@ export function MediaFilterBar({
           <button
             type="button"
             onClick={() => onSearchChange('')}
-            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-0.5"
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-0.5"
           >
             <X className="w-3.5 h-3.5" />
           </button>

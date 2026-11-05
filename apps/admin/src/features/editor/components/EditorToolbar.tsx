@@ -50,7 +50,7 @@ export function EditorToolbar({
   const btn = (active: boolean) =>
     `p-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
       active
-        ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-bold'
+        ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 font-bold'
         : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100'
     }`;
 
@@ -139,7 +139,7 @@ export function EditorToolbar({
           type="button"
           onClick={() => editor.chain().focus().undo().run()}
           disabled={!editor.can().undo()}
-          className="p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-30 cursor-pointer"
+          className="p-1.5 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-30 cursor-pointer"
           title="Undo (Ctrl+Z)"
         >
           <Undo className="size-3.5" />
@@ -148,7 +148,7 @@ export function EditorToolbar({
           type="button"
           onClick={() => editor.chain().focus().redo().run()}
           disabled={!editor.can().redo()}
-          className="p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-30 cursor-pointer"
+          className="p-1.5 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-30 cursor-pointer"
           title="Redo (Ctrl+Y)"
         >
           <Redo className="size-3.5" />

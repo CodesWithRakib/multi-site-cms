@@ -77,11 +77,11 @@ export function MediaCard({
             loading="lazy"
           />
         ) : isVideo ? (
-          <Video className="w-10 h-10 text-slate-400" />
+          <Video className="w-10 h-10 text-slate-500 dark:text-slate-400" />
         ) : isPdf ? (
           <FileText className="w-10 h-10 text-red-400" />
         ) : (
-          <ImageIcon className="w-10 h-10 text-slate-400" />
+          <ImageIcon className="w-10 h-10 text-slate-500 dark:text-slate-400" />
         )}
 
         {asset.width && asset.height && (

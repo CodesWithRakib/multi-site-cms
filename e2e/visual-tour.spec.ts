@@ -1,6 +1,8 @@
 import path from 'node:path';
 
-import { expect, test, type Page } from '@playwright/test';
+import { test, type Page } from '@playwright/test';
+
+import { adminSession } from './support/admin-session';
 
 /**
  * Visual tour for manual design review — not an assertion suite.
@@ -93,15 +95,14 @@ test.describe('visual tour', () => {
           });
         }
 
-        test('admin pages', async ({ page }) => {
+        test('admin pages', async ({ page, browser }) => {
           await page.goto(`${adminUrl}/login`);
           await capture(page, `admin-login-${viewport.name}-${scheme}`);
           test.skip(!adminEmail || !adminPassword, 'No admin credentials provided.');
 
-          await page.locator('#email').fill(adminEmail);
-          await page.locator('#password').fill(adminPassword);
-          await page.locator('button[type="submit"]').click();
-          await expect(page).not.toHaveURL(/\/login/, { timeout: 30_000 });
+          // Shared session: one login per account per run (API login rate limit).
+          const state = await adminSession(browser, adminEmail, adminPassword);
+          await page.context().addCookies(state.cookies);
 
           for (const route of ADMIN_ROUTES) {
             await page.goto(`${adminUrl}${route}`);

@@ -142,7 +142,7 @@ function CategoryModalContent({
               >
                 {editingCategory ? 'Edit Category' : 'Create New Category'}
               </h3>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 Organize site publications in hierarchical taxonomy
               </p>
             </div>
@@ -150,7 +150,7 @@ function CategoryModalContent({
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+            className="p-1.5 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
           >
             <X className="size-4" />
           </button>
@@ -203,6 +203,7 @@ function CategoryModalContent({
                 Parent Category (Optional)
               </label>
               <select
+                aria-label="Parent category"
                 value={parentId}
                 onChange={(e) => setParentId(e.target.value)}
                 className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-emerald-500 font-medium"

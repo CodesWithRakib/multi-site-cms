@@ -47,7 +47,7 @@ export function PortalContentContainer({
                 Read our latest travel stories, tips and guides.
               </p>
             </div>
-            <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+            <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400">
               {filteredArticles.length} {filteredArticles.length === 1 ? 'Article' : 'Articles'}
             </span>
           </div>

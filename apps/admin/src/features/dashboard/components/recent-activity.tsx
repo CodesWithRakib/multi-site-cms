@@ -142,7 +142,7 @@ export function RecentActivity({ items = [], isLoading = false }: RecentActivity
             ))}
           </div>
         ) : mappedActivities.length === 0 ? (
-          <div className="flex flex-col items-center justify-center p-6 text-center text-slate-400">
+          <div className="flex flex-col items-center justify-center p-6 text-center text-slate-500 dark:text-slate-400">
             <Activity className="size-6 mb-1 text-slate-300 dark:text-slate-700" />
             <p className="text-xs font-medium">No recent activity recorded.</p>
           </div>
@@ -165,7 +165,7 @@ export function RecentActivity({ items = [], isLoading = false }: RecentActivity
                       <span className="text-xs font-bold text-slate-900 dark:text-white truncate">
                         {item.title}
                       </span>
-                      <span className="text-[11px] text-slate-400 shrink-0 font-medium">
+                      <span className="text-[11px] text-slate-500 dark:text-slate-400 shrink-0 font-medium">
                         {item.time}
                       </span>
                     </div>

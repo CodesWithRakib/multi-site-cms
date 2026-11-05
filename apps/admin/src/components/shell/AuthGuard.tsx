@@ -55,7 +55,9 @@ export function AuthGuard({
       <div className="flex h-screen w-full items-center justify-center bg-slate-50 dark:bg-slate-900">
         <div className="flex flex-col items-center gap-3">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-xs font-semibold text-slate-500">Verifying session...</p>
+          <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+            Verifying session...
+          </p>
         </div>
       </div>
     );

@@ -229,7 +229,7 @@ export function PublishingModal({
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+          className="absolute top-4 right-4 p-1.5 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
         >
           <X className="w-4 h-4" />
         </button>
@@ -243,7 +243,9 @@ export function PublishingModal({
             <h3 id="modal-title" className="text-base font-bold text-slate-900 dark:text-slate-100">
               {config.title}
             </h3>
-            <p className="text-xs text-slate-500 mt-0.5">{config.description}</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              {config.description}
+            </p>
           </div>
         </div>
 
@@ -252,7 +254,7 @@ export function PublishingModal({
           <p className="font-bold text-slate-800 dark:text-slate-200 truncate">
             {postTitle || publication.slug}
           </p>
-          <div className="flex items-center gap-3 mt-1 text-[11px] text-slate-400">
+          <div className="flex items-center gap-3 mt-1 text-[11px] text-slate-500 dark:text-slate-400">
             <span>Slug: /{publication.slug}</span>
             <span>•</span>
             <span className="capitalize">Status: {publication.status}</span>
@@ -281,7 +283,7 @@ export function PublishingModal({
                 onChange={(e) => setScheduledTime(e.target.value)}
                 className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-xs text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-blue-500"
               />
-              <p className="text-[10px] text-slate-400 mt-1">
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">
                 Configured site timezone: <span className="font-semibold">{timezone}</span>
               </p>
             </div>
@@ -310,7 +312,7 @@ export function PublishingModal({
           {/* Destructive Warning */}
           {config.isDestructive && (
             <div className="flex items-start gap-2 p-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/60 text-xs text-amber-800 dark:text-amber-300">
-              <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+              <AlertTriangle className="w-4 h-4 text-amber-700 dark:text-amber-400 shrink-0 mt-0.5" />
               <span>
                 This state change will be recorded in the immutable audit log and trigger immediate
                 cache invalidation.

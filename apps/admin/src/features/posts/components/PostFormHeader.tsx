@@ -31,7 +31,7 @@ export function PostFormHeader({
       <div className="flex items-center gap-3">
         <Link
           href="/posts"
-          className="p-2 rounded-xl text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+          className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
           title="Back to Posts"
         >
           <ArrowLeft className="w-5 h-5" />
@@ -40,7 +40,7 @@ export function PostFormHeader({
           <h1 className="text-lg font-bold text-slate-900 dark:text-slate-100">
             {isCreateMode ? 'Create New Post' : 'Edit Post'}
           </h1>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-slate-500 dark:text-slate-400">
             {isCreateMode
               ? 'Draft will be auto-saved and backed up locally'
               : `Revision #${currentRevisionNumber} • Last saved: ${
@@ -56,7 +56,7 @@ export function PostFormHeader({
           <div className="flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800">
             {autosaveStatus === 'saving' && (
               <>
-                <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-500" />
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-600 dark:text-emerald-400" />
                 <span className="text-slate-600 dark:text-slate-400">Saving...</span>
               </>
             )}
@@ -68,7 +68,7 @@ export function PostFormHeader({
             )}
             {autosaveStatus === 'saved' && (
               <>
-                <Check className="w-3.5 h-3.5 text-emerald-500" />
+                <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                 <span className="text-slate-600 dark:text-slate-400">All changes saved</span>
               </>
             )}
@@ -80,8 +80,8 @@ export function PostFormHeader({
             )}
             {autosaveStatus === 'offline' && (
               <>
-                <WifiOff className="w-3.5 h-3.5 text-slate-400" />
-                <span className="text-slate-500">Offline</span>
+                <WifiOff className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
+                <span className="text-slate-500 dark:text-slate-400">Offline</span>
               </>
             )}
           </div>

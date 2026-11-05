@@ -522,6 +522,26 @@ describe('CMS Core (Posts, Publications, Taxonomy, Media, OCC & Tenant Isolation
       expect(postBody.data.currentRevisionNumber).toBe(3);
       expect(postBody.data.currentRevision?.title).toBe('Versioned Article Title V1');
     });
+
+    it('lists posts with the latest revision and a safe author summary', async () => {
+      const res = await request(app.getHttpServer())
+        .get('/api/v1/posts?limit=100')
+        .set('Cookie', superAdminCookie)
+        .expect(200);
+
+      const items = (res.body as ApiSuccess<{ items: PostItem[] }>).data.items;
+      const occPost = items.find((item) => item.id === occPostId);
+      // Batched latest-revision lookup must still pick the newest revision.
+      expect(occPost?.currentRevisionNumber).toBe(3);
+      expect(occPost?.author?.id).toBe(occPost?.authorId);
+      expect(occPost?.author?.displayName).toEqual(expect.any(String));
+
+      // Only id and displayName: no email, hash, or status of the author.
+      const serialized = JSON.stringify(res.body);
+      expect(serialized).not.toContain('passwordHash');
+      expect(serialized).not.toContain('password_hash');
+      expect(Object.keys(occPost?.author ?? {}).sort()).toEqual(['displayName', 'id']);
+    });
   });
 
   describe('4. Hierarchical Taxonomy (Categories & Tags) & Circular Reference Protection', () => {

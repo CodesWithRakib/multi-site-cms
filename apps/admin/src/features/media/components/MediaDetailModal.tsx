@@ -106,7 +106,7 @@ function MediaDetailModalView({
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+            className="p-1.5 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           >
             <X className="size-4" />
           </button>
@@ -120,11 +120,11 @@ function MediaDetailModalView({
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={assetUrl} alt={asset.altText || 'Media preview'} className="size-full object-contain" />
               ) : isVideo ? (
-                <Video className="size-16 text-slate-400" />
+                <Video className="size-16 text-slate-500 dark:text-slate-400" />
               ) : isPdf ? (
                 <FileText className="size-16 text-rose-400" />
               ) : (
-                <ImageIcon className="size-16 text-slate-400" />
+                <ImageIcon className="size-16 text-slate-500 dark:text-slate-400" />
               )}
             </div>
 
@@ -141,7 +141,7 @@ function MediaDetailModalView({
                   onClick={() => copyToClipboard(assetUrl, 'url')}
                   className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 font-semibold text-slate-700 dark:text-slate-200 hover:text-emerald-500 transition-colors cursor-pointer"
                 >
-                  {copiedKind === 'url' ? <Check className="size-3 text-emerald-500" /> : <Copy className="size-3" />}
+                  {copiedKind === 'url' ? <Check className="size-3 text-emerald-600 dark:text-emerald-400" /> : <Copy className="size-3" />}
                   <span>{copiedKind === 'url' ? 'URL Copied!' : 'Copy URL'}</span>
                 </button>
 
@@ -150,7 +150,7 @@ function MediaDetailModalView({
                   onClick={() => copyToClipboard(`![${altText || asset.originalFilename || 'image'}](${assetUrl})`, 'md')}
                   className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 font-semibold text-slate-700 dark:text-slate-200 hover:text-emerald-500 transition-colors cursor-pointer"
                 >
-                  {copiedKind === 'md' ? <Check className="size-3 text-emerald-500" /> : <Copy className="size-3" />}
+                  {copiedKind === 'md' ? <Check className="size-3 text-emerald-600 dark:text-emerald-400" /> : <Copy className="size-3" />}
                   <span>{copiedKind === 'md' ? 'Markdown Copied!' : 'Copy Markdown'}</span>
                 </button>
 
@@ -159,7 +159,7 @@ function MediaDetailModalView({
                   onClick={() => copyToClipboard(`<img src="${assetUrl}" alt="${altText.replace(/"/g, '&quot;')}" />`, 'html')}
                   className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 font-semibold text-slate-700 dark:text-slate-200 hover:text-emerald-500 transition-colors cursor-pointer"
                 >
-                  {copiedKind === 'html' ? <Check className="size-3 text-emerald-500" /> : <Copy className="size-3" />}
+                  {copiedKind === 'html' ? <Check className="size-3 text-emerald-600 dark:text-emerald-400" /> : <Copy className="size-3" />}
                   <span>{copiedKind === 'html' ? 'HTML Copied!' : 'Copy HTML'}</span>
                 </button>
 
@@ -167,7 +167,7 @@ function MediaDetailModalView({
                   href={assetUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="p-1 rounded-md text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 ml-auto"
+                  className="p-1 rounded-md text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 ml-auto"
                   title="Open original asset in new tab"
                 >
                   <ExternalLink className="size-4" />
@@ -225,7 +225,7 @@ function MediaDetailModalView({
                 onClick={() => {
                   if (confirm('Are you sure you want to delete this media asset?')) onDelete(asset.id);
                 }}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
               >
                 <Trash2 className="size-3.5" />
                 <span>Delete Asset</span>

@@ -58,10 +58,10 @@ export function PostSitePublicationCard({
             type="checkbox"
             checked={config.enabled}
             onChange={(e) => onChange({ ...config, enabled: e.target.checked })}
-            className="size-4 rounded text-emerald-600 focus:ring-emerald-500"
+            className="size-4 rounded text-emerald-600 dark:text-emerald-400 focus:ring-emerald-500"
           />
           <span className="flex items-center gap-1.5">
-            <Globe className="size-4 text-emerald-500" />
+            <Globe className="size-4 text-emerald-600 dark:text-emerald-400" />
             {site.name}
           </span>
         </label>
@@ -91,7 +91,7 @@ export function PostSitePublicationCard({
               URL Slug *
             </label>
             <div className="flex items-center gap-1 font-mono text-xs">
-              <span className="text-slate-400">/articles/</span>
+              <span className="text-slate-500 dark:text-slate-400">/articles/</span>
               <input
                 type="text"
                 required

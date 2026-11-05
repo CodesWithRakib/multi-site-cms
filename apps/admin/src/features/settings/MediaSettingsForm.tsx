@@ -81,7 +81,7 @@ export function MediaSettingsForm({
         <div
           className={`flex items-center gap-2 p-3 text-xs font-medium rounded-xl border ${
             statusMessage.type === 'success'
-              ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400'
+              ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-700 dark:text-emerald-400'
               : 'bg-rose-500/10 border-rose-500/20 text-rose-600 dark:text-rose-400'
           }`}
         >
@@ -156,7 +156,7 @@ export function MediaSettingsForm({
             type="checkbox"
             checked={formData.autoWebpConversion}
             onChange={(e) => setFormData({ ...formData, autoWebpConversion: e.target.checked })}
-            className="size-4 text-emerald-600 rounded-md border-neutral-300 focus:ring-emerald-500"
+            className="size-4 text-emerald-600 dark:text-emerald-400 rounded-md border-neutral-300 focus:ring-emerald-500"
           />
           <span className="text-xs font-medium text-neutral-800 dark:text-neutral-200">
             {t('settings.autoWebpConversion')}

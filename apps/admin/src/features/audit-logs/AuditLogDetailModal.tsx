@@ -37,13 +37,13 @@ export function AuditLogDetailModal({ log, onClose }: AuditLogDetailModalProps) 
     if (action.includes('delete') || action.includes('failed'))
       return 'bg-rose-500/10 text-rose-500 border-rose-500/20';
     if (action.startsWith('auth.') || action.startsWith('role.'))
-      return 'bg-amber-500/10 text-amber-500 border-amber-500/20';
+      return 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20';
     if (action.includes('status') || action.includes('schedule'))
       return 'bg-indigo-500/10 text-indigo-500 border-indigo-500/20';
     if (action.startsWith('media.')) return 'bg-cyan-500/10 text-cyan-500 border-cyan-500/20';
     if (action.startsWith('post.') || action.startsWith('publication.'))
-      return 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20';
-    return 'bg-purple-500/10 text-purple-500 border-purple-500/20';
+      return 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20';
+    return 'bg-purple-500/10 text-purple-700 dark:text-purple-400 border-purple-500/20';
   };
 
   const resourceLink = getResourceRoute(log.entityType);

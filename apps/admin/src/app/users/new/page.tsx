@@ -89,7 +89,7 @@ export default function NewUserPage() {
         <div className="flex items-center gap-3 pb-4 border-b border-slate-200 dark:border-slate-800">
           <Link
             href="/users"
-            className="p-2 rounded-xl text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
           </Link>
@@ -106,7 +106,7 @@ export default function NewUserPage() {
         {/* Error Alert */}
         {errorMsg && (
           <div className="flex items-center gap-3 p-4 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-900 dark:text-rose-200 text-xs">
-            <AlertCircle className="w-5 h-5 text-rose-600 shrink-0" />
+            <AlertCircle className="w-5 h-5 text-rose-600 dark:text-rose-400 shrink-0" />
             <p className="font-semibold">{errorMsg}</p>
           </div>
         )}
@@ -194,7 +194,7 @@ export default function NewUserPage() {
                   value="super_admin"
                   checked={initialRole === 'super_admin'}
                   onChange={() => setInitialRole('super_admin')}
-                  className="mt-1 text-purple-600 focus:ring-purple-500"
+                  className="mt-1 text-purple-600 dark:text-purple-400 focus:ring-purple-500"
                 />
                 <div>
                   <div className="flex items-center gap-1.5 font-bold text-xs text-purple-700 dark:text-purple-300">

@@ -35,7 +35,7 @@ export function CalendarListView({
         <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">
           No scheduled or published articles
         </h3>
-        <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm mx-auto">
           No publications match the current filters. Select another month or use the button above to
           schedule content.
         </p>
@@ -95,12 +95,12 @@ export function CalendarListView({
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-3 mt-1 text-xs text-slate-500">
+                  <div className="flex items-center gap-3 mt-1 text-xs text-slate-500 dark:text-slate-400">
                     <span className="font-mono">
                       {formatDateTime(ev.date, locale, timezone)}
                     </span>
                     <span>•</span>
-                    <span className="font-mono text-[11px] text-slate-400">/{ev.slug}</span>
+                    <span className="font-mono text-[11px] text-slate-500 dark:text-slate-400">/{ev.slug}</span>
                   </div>
                 </div>
               </div>
@@ -150,7 +150,7 @@ export function CalendarListView({
 
                 <Link
                   href={`/posts/${ev.postId}/edit`}
-                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                 >
                   <FileEdit className="w-3.5 h-3.5" />
                   <span>Edit</span>

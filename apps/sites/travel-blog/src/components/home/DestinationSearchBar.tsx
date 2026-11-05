@@ -42,7 +42,7 @@ export function DestinationSearchBar({ categories, className = '' }: Destination
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search destinations, travel tips..."
-            className="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-hidden"
+            className="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
           />
         </div>
 
@@ -53,7 +53,7 @@ export function DestinationSearchBar({ categories, className = '' }: Destination
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
             aria-label="Category Filter"
-            className="w-full bg-transparent text-xs sm:text-sm font-medium text-foreground focus:outline-hidden cursor-pointer"
+            className="w-full bg-transparent text-xs sm:text-sm font-medium text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring cursor-pointer"
           >
             <option value="">All Categories</option>
             {categories.map((cat) => (
@@ -71,7 +71,7 @@ export function DestinationSearchBar({ categories, className = '' }: Destination
             value={selectedBudget}
             onChange={(e) => setSelectedBudget(e.target.value)}
             aria-label="Budget Filter"
-            className="w-full bg-transparent text-xs sm:text-sm font-medium text-foreground focus:outline-hidden cursor-pointer"
+            className="w-full bg-transparent text-xs sm:text-sm font-medium text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring cursor-pointer"
           >
             <option value="">Any Budget</option>
             <option value="budget" className="dark:bg-neutral-900">$ Budget Friendly</option>
@@ -87,7 +87,7 @@ export function DestinationSearchBar({ categories, className = '' }: Destination
             value={selectedTime}
             onChange={(e) => setSelectedTime(e.target.value)}
             aria-label="Season and Time Filter"
-            className="w-full bg-transparent text-xs sm:text-sm font-medium text-foreground focus:outline-hidden cursor-pointer"
+            className="w-full bg-transparent text-xs sm:text-sm font-medium text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring cursor-pointer"
           >
             <option value="">Any Time</option>
             <option value="spring" className="dark:bg-neutral-900">🌸 Spring (Mar–May)</option>

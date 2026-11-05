@@ -23,7 +23,7 @@ export function ThemeToggle() {
       {resolvedTheme === 'dark' ? (
         <Sun className="size-4 text-amber-400 transition-transform duration-200 hover:rotate-45" />
       ) : (
-        <Moon className="size-4 text-slate-600 transition-transform duration-200 hover:-rotate-12" />
+        <Moon className="size-4 text-slate-600 dark:text-slate-300 transition-transform duration-200 hover:-rotate-12" />
       )}
       <span className="sr-only">Toggle theme</span>
     </button>

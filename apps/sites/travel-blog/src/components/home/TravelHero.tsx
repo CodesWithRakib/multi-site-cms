@@ -66,18 +66,18 @@ export function TravelHero({ articleCount, topicCount }: TravelHeroProps) {
 
           {/* Real publication stats from the CMS (no invented social proof). */}
           {(articleCount > 0 || topicCount > 0) && (
-            <dl className="pt-6 border-t border-border/80 grid grid-cols-2 gap-4 max-w-xs mx-auto lg:mx-0">
+            <div className="pt-6 border-t border-border/80 grid grid-cols-2 gap-4 max-w-xs mx-auto lg:mx-0">
               <div className="flex items-center gap-2.5">
                 <div className="p-2 rounded-xl bg-primary/10 text-primary">
                   <BookOpen className="h-4 w-4" aria-hidden="true" />
                 </div>
                 <div className="text-left">
-                  <dd className="text-sm font-extrabold text-foreground leading-tight">
+                  <p className="text-sm font-extrabold text-foreground leading-tight">
                     {articleCount}
-                  </dd>
-                  <dt className="text-[11px] text-muted-foreground font-medium">
+                  </p>
+                  <p className="text-[11px] text-muted-foreground font-medium">
                     {articleCount === 1 ? 'Published story' : 'Published stories'}
-                  </dt>
+                  </p>
                 </div>
               </div>
               <div className="flex items-center gap-2.5">
@@ -85,15 +85,15 @@ export function TravelHero({ articleCount, topicCount }: TravelHeroProps) {
                   <Compass className="h-4 w-4" aria-hidden="true" />
                 </div>
                 <div className="text-left">
-                  <dd className="text-sm font-extrabold text-foreground leading-tight">
+                  <p className="text-sm font-extrabold text-foreground leading-tight">
                     {topicCount}
-                  </dd>
-                  <dt className="text-[11px] text-muted-foreground font-medium">
+                  </p>
+                  <p className="text-[11px] text-muted-foreground font-medium">
                     {topicCount === 1 ? 'Topic' : 'Topics'}
-                  </dt>
+                  </p>
                 </div>
               </div>
-            </dl>
+            </div>
           )}
         </div>
 
@@ -124,7 +124,7 @@ export function TravelHero({ articleCount, topicCount }: TravelHeroProps) {
                   <p className="text-[11px] text-muted-foreground">Most Visited Destination 2026</p>
                 </div>
               </div>
-              <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-500 text-white shadow-2xs">
+              <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-600 text-white shadow-2xs">
                 Featured
               </span>
             </div>

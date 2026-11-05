@@ -271,8 +271,10 @@ function TaxonomyWorkspace() {
         {/* 4. Tab Content */}
         {isLoading ? (
           <div className="flex flex-col items-center justify-center p-20 gap-3">
-            <Loader2 className="size-6 animate-spin text-emerald-600" />
-            <p className="text-xs font-semibold text-slate-400">Loading taxonomy...</p>
+            <Loader2 className="size-6 animate-spin text-emerald-600 dark:text-emerald-400" />
+            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+              Loading taxonomy...
+            </p>
           </div>
         ) : activeTab === 'categories' ? (
           <CategoryHierarchyTree

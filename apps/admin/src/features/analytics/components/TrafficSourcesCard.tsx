@@ -16,7 +16,7 @@ export function TrafficSourcesCard({ sources, isLoading }: TrafficSourcesCardPro
   const getSourceIcon = (key: string) => {
     switch (key.toLowerCase()) {
       case 'search':
-        return <Search className="size-4 text-emerald-500" />;
+        return <Search className="size-4 text-emerald-600 dark:text-emerald-400" />;
       case 'direct':
         return <Compass className="size-4 text-sky-500" />;
       case 'social':
@@ -24,7 +24,7 @@ export function TrafficSourcesCard({ sources, isLoading }: TrafficSourcesCardPro
       case 'newsletter':
         return <Mail className="size-4 text-violet-500" />;
       default:
-        return <Link2 className="size-4 text-amber-500" />;
+        return <Link2 className="size-4 text-amber-700 dark:text-amber-400" />;
     }
   };
 
@@ -56,12 +56,14 @@ export function TrafficSourcesCard({ sources, isLoading }: TrafficSourcesCardPro
 
       <div className="space-y-4 my-auto">
         {isLoading ? (
-          <div className="py-8 text-center text-xs text-slate-400">
+          <div className="py-8 text-center text-xs text-slate-500 dark:text-slate-400">
             <div className="size-4 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin inline-block mr-2" />
             Loading sources...
           </div>
         ) : sources.length === 0 ? (
-          <div className="py-8 text-center text-xs text-slate-400">{t('analytics.noData')}</div>
+          <div className="py-8 text-center text-xs text-slate-500 dark:text-slate-400">
+            {t('analytics.noData')}
+          </div>
         ) : (
           sources.map((src) => (
             <div key={src.key} className="space-y-1.5">
@@ -74,7 +76,9 @@ export function TrafficSourcesCard({ sources, isLoading }: TrafficSourcesCardPro
                   <span className="text-slate-900 dark:text-slate-100">
                     {src.count.toLocaleString()}
                   </span>
-                  <span className="text-slate-400 font-normal">({src.percentage}%)</span>
+                  <span className="text-slate-500 dark:text-slate-400 font-normal">
+                    ({src.percentage}%)
+                  </span>
                 </div>
               </div>
 

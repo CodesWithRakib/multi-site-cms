@@ -91,7 +91,7 @@ export function CommentModerationCard({
             checked={isSelected}
             onChange={() => onSelectToggle(comment.id)}
             aria-label={`Select comment by ${comment.authorName}`}
-            className="h-4 w-4 rounded border-border text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+            className="h-4 w-4 rounded border-border text-emerald-600 dark:text-emerald-400 focus:ring-emerald-500 cursor-pointer"
           />
         </div>
 
@@ -145,7 +145,7 @@ export function CommentModerationCard({
                 href={publicArticleUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-0.5 text-emerald-600 hover:underline text-[11px]"
+                className="inline-flex items-center gap-0.5 text-emerald-600 dark:text-emerald-400 hover:underline text-[11px]"
               >
                 <span>View</span>
                 <ExternalLink className="h-2.5 w-2.5" />
@@ -154,7 +154,7 @@ export function CommentModerationCard({
             {typeof comment.rating === 'number' && comment.rating > 0 && (
               <>
                 <span>•</span>
-                <span className="inline-flex items-center gap-1 text-amber-500 font-bold">
+                <span className="inline-flex items-center gap-1 text-amber-700 dark:text-amber-400 font-bold">
                   <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
                   {comment.rating} / 5
                 </span>
@@ -189,7 +189,7 @@ export function CommentModerationCard({
                 <button
                   type="button"
                   onClick={() => onUpdateStatus(comment.id, 'spam')}
-                  className="inline-flex items-center gap-1 rounded-lg border border-red-500/20 bg-card px-2.5 py-1 text-xs font-semibold text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1 rounded-lg border border-red-500/20 bg-card px-2.5 py-1 text-xs font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors cursor-pointer"
                 >
                   <ShieldAlert className="h-3.5 w-3.5" />
                   <span>Spam</span>

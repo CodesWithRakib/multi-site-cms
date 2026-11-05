@@ -45,7 +45,7 @@ export function SystemDiagnosticsCard({
       value: diagnostics?.databaseStatus === 'up' ? 'Online (PostgreSQL 18)' : 'Degraded',
       badge: `${diagnostics?.databaseLatencyMs ?? 0}ms`,
       icon: Database,
-      color: 'text-emerald-500',
+      color: 'text-emerald-600 dark:text-emerald-400',
     },
     {
       label: t('settings.uptime'),
@@ -59,14 +59,14 @@ export function SystemDiagnosticsCard({
       value: `${diagnostics?.memoryUsageMb ?? 0} MB`,
       badge: 'V8 Heap',
       icon: Cpu,
-      color: 'text-purple-500',
+      color: 'text-purple-600 dark:text-purple-400',
     },
     {
       label: t('settings.nodeVersion'),
       value: diagnostics?.nodeVersion ?? 'Node 24',
       badge: diagnostics?.platform ?? 'Windows',
       icon: Activity,
-      color: 'text-amber-500',
+      color: 'text-amber-700 dark:text-amber-400',
     },
   ];
 
@@ -137,7 +137,7 @@ export function SystemDiagnosticsCard({
               key={c.label}
               className="p-4 rounded-xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-900 flex items-center gap-3.5"
             >
-              <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+              <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-700 dark:text-emerald-400">
                 <Icon className="size-4" />
               </div>
               <div>
@@ -154,7 +154,7 @@ export function SystemDiagnosticsCard({
       {/* Environmental & Storage Banner */}
       <div className="p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-800/30 flex items-center justify-between text-xs text-neutral-600 dark:text-neutral-400 flex-wrap gap-2">
         <div className="flex items-center gap-2">
-          <HardDrive className="size-4 text-emerald-500" />
+          <HardDrive className="size-4 text-emerald-600 dark:text-emerald-400" />
           <span>Storage Engine: <strong className="text-neutral-900 dark:text-neutral-100 uppercase">{diagnostics?.storageProvider ?? 'CLOUDINARY'}</strong></span>
         </div>
         <div>

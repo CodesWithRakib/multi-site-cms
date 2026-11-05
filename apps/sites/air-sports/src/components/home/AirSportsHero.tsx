@@ -116,7 +116,7 @@ export function AirSportsHero() {
                       <p className="text-[10px] text-sky-200">Terminal Velocity 12,000 FT</p>
                     </div>
                   </div>
-                  <span className="rounded-full bg-emerald-500 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+                  <span className="rounded-full bg-emerald-600 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
                     Live Dispatch
                   </span>
                 </div>

@@ -196,7 +196,7 @@ export function SearchFacetSidebar({
                 >
                   <span>#{t.name}</span>
                   {t.postCount > 0 && (
-                    <span className="text-[10px] opacity-75">({t.postCount})</span>
+                    <span className="text-[10px]">({t.postCount})</span>
                   )}
                 </button>
               );

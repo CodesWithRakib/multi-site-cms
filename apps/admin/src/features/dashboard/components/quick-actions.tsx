@@ -40,7 +40,7 @@ export function QuickActions() {
           href="/sites"
           className="w-full py-3 px-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 font-semibold text-xs flex items-center justify-center gap-2.5 shadow-2xs transition-all"
         >
-          <Globe className="size-4 text-slate-500" />
+          <Globe className="size-4 text-slate-500 dark:text-slate-400" />
           <span>{t('dashboard.manageWebsites')}</span>
         </Link>
 
@@ -49,7 +49,7 @@ export function QuickActions() {
           href="/analytics"
           className="w-full py-3 px-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 font-semibold text-xs flex items-center justify-center gap-2.5 shadow-2xs transition-all"
         >
-          <BarChart2 className="size-4 text-slate-500" />
+          <BarChart2 className="size-4 text-slate-500 dark:text-slate-400" />
           <span>{t('dashboard.viewAnalytics')}</span>
         </Link>
 
@@ -60,7 +60,7 @@ export function QuickActions() {
           rel="noopener noreferrer"
           className="w-full py-3 px-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 font-semibold text-xs flex items-center justify-center gap-2.5 shadow-2xs transition-all"
         >
-          <ExternalLink className="size-4 text-slate-500" />
+          <ExternalLink className="size-4 text-slate-500 dark:text-slate-400" />
           <span>{t('dashboard.openLiveSites')}</span>
         </a>
       </CardContent>

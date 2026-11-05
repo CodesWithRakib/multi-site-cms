@@ -22,7 +22,7 @@ export function PublicationStatusActions({ pub, onOpenPublishModal }: Publicatio
   return (
     <div className="flex items-center justify-between pt-2 border-t border-slate-200/60 dark:border-slate-800">
       <div className="flex items-center gap-2">
-        <span className="text-[11px] text-slate-500">Live Status:</span>
+        <span className="text-[11px] text-slate-500 dark:text-slate-400">Live Status:</span>
         <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${badgeColor}`}>
           {pub.status.toUpperCase()}
         </span>

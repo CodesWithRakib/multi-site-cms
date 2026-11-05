@@ -28,7 +28,7 @@ export function PostPublicationsSection({
         <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 font-sans">
           Site Publications
         </h3>
-        <p className="text-xs text-slate-500 mt-0.5">
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
           Publish this canonical post across independent websites with site-specific slugs,
           categories, and SEO configuration.
         </p>

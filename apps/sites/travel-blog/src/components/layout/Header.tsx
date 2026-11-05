@@ -153,6 +153,8 @@ export function Header() {
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle Navigation Menu"
+            aria-expanded={mobileMenuOpen}
+            aria-controls="mobile-menu"
             className="md:hidden inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card text-foreground cursor-pointer"
           >
             {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
@@ -162,7 +164,10 @@ export function Header() {
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-b border-border bg-card/95 px-6 pt-3 pb-6 space-y-3 backdrop-blur-lg animate-in slide-in-from-top-2 duration-200">
+        <div
+          id="mobile-menu"
+          className="md:hidden border-b border-border bg-card/95 px-6 pt-3 pb-6 space-y-3 backdrop-blur-lg animate-in slide-in-from-top-2 duration-200"
+        >
           <Link
             href="/"
             onClick={() => setMobileMenuOpen(false)}

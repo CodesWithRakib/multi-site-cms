@@ -28,14 +28,20 @@ export type SiteThemeKey = keyof typeof SITE_THEMES;
 
 /** Scale steps and the ramps theme.css uses; kept here so tests can verify them. */
 export const SCALE_STEPS = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950] as const;
+/**
+ * Brand lightness ramp. 500–900 are darker than Tailwind's emerald ramp so that
+ * brand-600 (= --primary in light mode) reaches WCAG AA 4.5:1 against white for
+ * text and for white-on-brand buttons, for any hue (verified in tests).
+ */
 export const BRAND_LIGHTNESS = [
-  0.979, 0.95, 0.905, 0.845, 0.765, 0.696, 0.596, 0.508, 0.432, 0.378, 0.262,
+  0.979, 0.95, 0.905, 0.845, 0.765, 0.62, 0.52, 0.45, 0.4, 0.35, 0.262,
 ] as const;
 export const BRAND_CHROMA_FACTOR = [
   0.12, 0.29, 0.53, 0.81, 1, 0.96, 0.82, 0.67, 0.54, 0.44, 0.29,
 ] as const;
+/** Neutral ramp; 500 is darker than Tailwind slate so secondary text passes AA on tinted surfaces. */
 export const NEUTRAL_LIGHTNESS = [
-  0.984, 0.968, 0.929, 0.869, 0.704, 0.554, 0.446, 0.372, 0.279, 0.208, 0.129,
+  0.984, 0.968, 0.929, 0.869, 0.704, 0.5, 0.446, 0.372, 0.279, 0.208, 0.129,
 ] as const;
 export const NEUTRAL_CHROMA_FACTOR = [
   0.07, 0.16, 0.3, 0.5, 0.9, 1, 0.95, 1, 0.93, 0.95, 0.95,

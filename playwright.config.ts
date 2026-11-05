@@ -20,7 +20,12 @@ export default defineConfig({
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: process.env.CI ? 'retain-on-failure' : 'off',
+    // Local runs use `next dev`, which compiles each route on first visit and can
+    // exceed 30 s; CI should run against production builds (fast first load).
+    navigationTimeout: process.env.CI ? 30_000 : 60_000,
   },
+  // Same reason: the first test of a spec may wait on a cold compile.
+  timeout: process.env.CI ? 30_000 : 90_000,
   projects: [
     {
       name: 'chromium',

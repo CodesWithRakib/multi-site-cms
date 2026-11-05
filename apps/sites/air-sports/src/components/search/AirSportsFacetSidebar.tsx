@@ -195,9 +195,7 @@ export function AirSportsFacetSidebar({
                   }`}
                 >
                   <span>#{t.name}</span>
-                  {t.postCount > 0 && (
-                    <span className="text-[10px] opacity-75">({t.postCount})</span>
-                  )}
+                  {t.postCount > 0 && <span className="text-[10px]">({t.postCount})</span>}
                 </button>
               );
             })}

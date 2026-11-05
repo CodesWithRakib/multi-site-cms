@@ -7,9 +7,11 @@ import { ThemeToggle } from '../theme-toggle';
 
 interface HeaderProps {
   onMenuToggle: () => void;
+  /** Whether the sidebar drawer is open (announced via aria-expanded). */
+  isMenuOpen?: boolean;
 }
 
-export function Header({ onMenuToggle }: HeaderProps) {
+export function Header({ onMenuToggle, isMenuOpen = false }: HeaderProps) {
   const { locale, setLocale, t } = useAdmin();
 
   const toggleLanguage = () => {
@@ -22,8 +24,10 @@ export function Header({ onMenuToggle }: HeaderProps) {
       <button
         type="button"
         onClick={onMenuToggle}
-        className="p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-200/50 dark:text-slate-300 dark:hover:bg-slate-800 transition-colors lg:hidden focus:outline-hidden"
+        className="p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-200/50 dark:text-slate-300 dark:hover:bg-slate-800 transition-colors lg:hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
         aria-label="Open sidebar menu"
+        aria-expanded={isMenuOpen}
+        aria-controls="admin-sidebar"
       >
         <Menu className="h-5 w-5" />
       </button>
@@ -37,7 +41,7 @@ export function Header({ onMenuToggle }: HeaderProps) {
             placeholder={t('dashboard.searchPlaceholder')}
             className="w-full h-11 pl-11 pr-20 rounded-full bg-white dark:bg-slate-900/90 border border-slate-200/90 dark:border-slate-800 text-xs text-slate-700 dark:text-slate-200 placeholder:text-slate-400 shadow-2xs focus:outline-hidden focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 transition-all"
           />
-          <div className="absolute right-3.5 hidden sm:flex items-center gap-1 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-[10px] font-mono font-semibold text-slate-400">
+          <div className="absolute right-3.5 hidden sm:flex items-center gap-1 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-[10px] font-mono font-semibold text-slate-500 dark:text-slate-400">
             <span>Ctrl</span>
             <span>+</span>
             <span>K</span>
@@ -69,9 +73,9 @@ export function Header({ onMenuToggle }: HeaderProps) {
           onClick={toggleLanguage}
           className="h-10 px-3.5 rounded-full bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 shadow-2xs transition-colors cursor-pointer"
           title="Toggle Language (English / বাংলা)"
-          aria-label={`Switch language. Current: ${locale === 'en' ? 'English' : 'Bangla'}`}
+          aria-label={`${locale === 'en' ? 'EN' : 'বাং'}: switch language (current ${locale === 'en' ? 'English' : 'Bangla'})`}
         >
-          <Globe className="size-3.5 text-slate-500" />
+          <Globe className="size-3.5 text-slate-500 dark:text-slate-400" />
           <span className="font-bold">{locale === 'en' ? 'EN' : 'বাং'}</span>
           <ChevronDown className="size-3 text-slate-400" />
         </button>

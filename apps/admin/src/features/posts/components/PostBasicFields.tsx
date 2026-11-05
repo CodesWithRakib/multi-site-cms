@@ -30,11 +30,11 @@ export function PostBasicFields({
         <div className="flex items-center justify-between mb-2">
           <label
             htmlFor="post-title-input"
-            className="text-xs font-bold uppercase tracking-wider text-slate-500"
+            className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400"
           >
             Post Title *
           </label>
-          <span className="text-[11px] text-slate-400 font-mono">{title.length} / 255</span>
+          <span className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">{title.length} / 255</span>
         </div>
         <input
           id="post-title-input"
@@ -53,11 +53,11 @@ export function PostBasicFields({
         <div className="flex items-center justify-between mb-2">
           <label
             htmlFor="post-excerpt-input"
-            className="text-xs font-bold uppercase tracking-wider text-slate-500"
+            className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400"
           >
             Summary / Excerpt
           </label>
-          <span className="text-[11px] text-slate-400 font-mono">{excerpt.length} / 1000</span>
+          <span className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">{excerpt.length} / 1000</span>
         </div>
         <textarea
           id="post-excerpt-input"
@@ -75,7 +75,7 @@ export function PostBasicFields({
         <div>
           <label
             htmlFor="post-type-select"
-            className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2"
+            className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2"
           >
             Content Type
           </label>
@@ -97,7 +97,7 @@ export function PostBasicFields({
         <div>
           <label
             htmlFor="post-locale-select"
-            className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2"
+            className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2"
           >
             Primary Language
           </label>

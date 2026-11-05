@@ -95,7 +95,7 @@ function TagModalContent({ onClose, editingTag, onSave, isSaving }: ContentProps
               <h3 id="tag-modal-title" className="text-base font-bold text-slate-900 dark:text-slate-100">
                 {editingTag ? 'Edit Tag' : 'Create New Tag'}
               </h3>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 Classification tag for SEO keywords and topics
               </p>
             </div>
@@ -103,7 +103,7 @@ function TagModalContent({ onClose, editingTag, onSave, isSaving }: ContentProps
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+            className="p-1.5 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
           >
             <X className="size-4" />
           </button>

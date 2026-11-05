@@ -32,7 +32,7 @@ export function YourWebsites({ recentContent = [] }: YourWebsitesProps) {
           <CardTitle className="text-base font-bold text-slate-900 dark:text-white font-sans">
             {t('dashboard.yourWebsites')}
           </CardTitle>
-          <CardDescription className="text-xs text-slate-400 mt-0.5">
+          <CardDescription className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
             {t('dashboard.manageWebsitesSub')} ({availableSites.length} {t('dashboard.registered')})
           </CardDescription>
         </div>
@@ -48,9 +48,9 @@ export function YourWebsites({ recentContent = [] }: YourWebsitesProps) {
       <CardContent className="p-6 pt-0 space-y-4">
         {availableSites.length === 0 ? (
           <div className="flex flex-col items-center justify-center p-8 text-center border border-dashed border-slate-200 dark:border-slate-800 rounded-xl">
-            <Globe className="size-8 text-slate-400 mb-2" />
+            <Globe className="size-8 text-slate-500 dark:text-slate-400 mb-2" />
             <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">No websites found</p>
-            <p className="text-[11px] text-slate-400 mt-0.5">Create your first website property to begin publishing.</p>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Create your first website property to begin publishing.</p>
             <Link
               href="/sites"
               className="mt-3 px-3.5 py-1.5 rounded-lg bg-emerald-500 text-white text-xs font-semibold hover:bg-emerald-600 transition-colors"
@@ -140,7 +140,7 @@ export function YourWebsites({ recentContent = [] }: YourWebsitesProps) {
                         className={`flex items-center gap-1 text-[11px] font-semibold ${
                           isActive
                             ? 'text-emerald-600 dark:text-emerald-400'
-                            : 'text-slate-400'
+                            : 'text-slate-500 dark:text-slate-400'
                         }`}
                       >
                         <span
@@ -152,7 +152,7 @@ export function YourWebsites({ recentContent = [] }: YourWebsitesProps) {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-1 text-[11px] text-slate-400 mt-0.5 truncate">
+                    <div className="flex items-center gap-1 text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">
                       <Link2 className="size-3 shrink-0" />
                       <span className="truncate">{domainUrl}</span>
                     </div>
@@ -163,11 +163,11 @@ export function YourWebsites({ recentContent = [] }: YourWebsitesProps) {
                 <div className="flex items-center gap-3 sm:gap-4 shrink-0 justify-between sm:justify-end">
                   <div className="flex flex-col text-left sm:text-right text-[11px] text-slate-500 dark:text-slate-400 font-medium">
                     <div className="flex items-center gap-1 sm:justify-end">
-                      <FileText className="size-3 text-slate-400" />
+                      <FileText className="size-3 text-slate-500 dark:text-slate-400" />
                       <span>{postsCount} {t('dashboard.posts')}</span>
                     </div>
                     <div className="flex items-center gap-1 sm:justify-end mt-0.5">
-                      <Eye className="size-3 text-slate-400" />
+                      <Eye className="size-3 text-slate-500 dark:text-slate-400" />
                       <span>{viewsEstimate}</span>
                     </div>
                   </div>
@@ -187,7 +187,7 @@ export function YourWebsites({ recentContent = [] }: YourWebsitesProps) {
 
                     <Link
                       href={`/sites`}
-                      className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                      className="p-1 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
                       aria-label={`Options for ${site.name}`}
                     >
                       <MoreVertical className="size-4" />

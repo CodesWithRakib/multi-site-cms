@@ -88,3 +88,55 @@ describe('oklchToHex', () => {
     }
   });
 });
+
+/** WCAG relative-luminance contrast between two sRGB hex colors. */
+function contrastRatio(hexA: string, hexB: string): number {
+  const luminance = (hex: string) => {
+    const channels = [1, 3, 5].map((i) => Number.parseInt(hex.slice(i, i + 2), 16) / 255);
+    const [r, g, b] = channels.map((c) =>
+      c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4,
+    );
+    return 0.2126 * (r ?? 0) + 0.7152 * (g ?? 0) + 0.0722 * (b ?? 0);
+  };
+  const [light, dark] = [luminance(hexA), luminance(hexB)].sort((x, y) => y - x);
+  return ((light ?? 0) + 0.05) / ((dark ?? 0) + 0.05);
+}
+
+describe('theme accessibility (WCAG AA, any site theme)', () => {
+  const sites = Object.keys(SITE_THEMES) as Array<keyof typeof SITE_THEMES>;
+
+  it.each(sites)(
+    '%s: primary (brand-600) text and white-on-primary buttons reach 4.5:1',
+    (site) => {
+      const primary = siteThemeHex(site, 'brand', 600);
+      expect(contrastRatio(primary, '#ffffff')).toBeGreaterThanOrEqual(4.5);
+      expect(contrastRatio(primary, siteThemeHex(site, 'neutral', 50))).toBeGreaterThanOrEqual(4.5);
+    },
+  );
+
+  it.each(sites)('%s: muted text (neutral-600) on the page background reaches 4.5:1', (site) => {
+    expect(
+      contrastRatio(siteThemeHex(site, 'neutral', 600), siteThemeHex(site, 'neutral', 50)),
+    ).toBeGreaterThanOrEqual(4.5);
+  });
+
+  it.each(sites)(
+    '%s: dark-mode primary (brand-400) on the dark background reaches 4.5:1',
+    (site) => {
+      expect(
+        contrastRatio(siteThemeHex(site, 'brand', 400), siteThemeHex(site, 'neutral', 950)),
+      ).toBeGreaterThanOrEqual(4.5);
+    },
+  );
+});
+
+describe('secondary text (neutral-500) on tinted surfaces', () => {
+  it.each(Object.keys(SITE_THEMES) as Array<keyof typeof SITE_THEMES>)(
+    '%s: neutral-500 on neutral-100 reaches 4.5:1',
+    (site) => {
+      expect(
+        contrastRatio(siteThemeHex(site, 'neutral', 500), siteThemeHex(site, 'neutral', 100)),
+      ).toBeGreaterThanOrEqual(4.5);
+    },
+  );
+});

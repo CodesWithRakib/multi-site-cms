@@ -9,6 +9,7 @@ import { Header } from '@/components/layout/Header';
 import { siteConfig } from '@/config/site';
 
 import {
+  SkipLink,
   siteThemeColors,
   siteThemeStyle,
   ThemeProvider,
@@ -90,8 +91,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         className={`${sansFont.variable} ${serifFont.variable} ${handwritingFont.variable} ${monoFont.variable} min-h-dvh flex flex-col bg-background pb-tabbar md:pb-0 font-sans antialiased text-foreground`}
       >
         <ThemeProvider storageKey="travel_blog_theme">
+          <SkipLink />
           <Header />
-          <main className="flex-1">{children}</main>
+          <main id="main-content" tabIndex={-1} className="flex-1 focus:outline-none">
+            {children}
+          </main>
           <Footer />
           <AppTabBar />
         </ThemeProvider>

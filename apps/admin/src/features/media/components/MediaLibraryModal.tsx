@@ -91,7 +91,7 @@ export function MediaLibraryModal({
           <button
             type="button"
             onClick={onClose}
-            className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+            className="p-1 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
           >
             <X className="w-5 h-5" />
           </button>
@@ -113,7 +113,7 @@ export function MediaLibraryModal({
               {/* Search & Filters */}
               <div className="flex flex-wrap items-center justify-between gap-3 pb-2">
                 <div className="relative flex-1 min-w-[200px] max-w-md">
-                  <Search className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
+                  <Search className="absolute left-3 top-2.5 w-4 h-4 text-slate-500 dark:text-slate-400" />
                   <input
                     type="text"
                     value={searchTerm}
@@ -127,7 +127,7 @@ export function MediaLibraryModal({
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <Filter className="w-4 h-4 text-slate-400" />
+                  <Filter className="w-4 h-4 text-slate-500 dark:text-slate-400" />
                   <select
                     value={mimeFilter}
                     onChange={(e) => {
@@ -146,7 +146,7 @@ export function MediaLibraryModal({
 
               {/* Grid */}
               {isLoading ? (
-                <div className="flex-1 flex items-center justify-center py-20 text-slate-400">
+                <div className="flex-1 flex items-center justify-center py-20 text-slate-500 dark:text-slate-400">
                   <Loader2 className="w-8 h-8 animate-spin" />
                 </div>
               ) : mediaData?.items && mediaData.items.length > 0 ? (
@@ -161,9 +161,9 @@ export function MediaLibraryModal({
                   ))}
                 </div>
               ) : (
-                <div className="flex-1 flex flex-col items-center justify-center py-16 text-center text-slate-500">
+                <div className="flex-1 flex flex-col items-center justify-center py-16 text-center text-slate-500 dark:text-slate-400">
                   <p className="font-semibold text-sm">No media assets found</p>
-                  <p className="text-xs text-slate-400 mt-1">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                     Upload files or adjust your search filter
                   </p>
                   <button
@@ -178,7 +178,7 @@ export function MediaLibraryModal({
 
               {/* Pagination */}
               {mediaData && mediaData.totalPages > 1 && (
-                <div className="flex items-center justify-between border-t border-slate-200 dark:border-slate-800 pt-3 mt-auto text-xs text-slate-500">
+                <div className="flex items-center justify-between border-t border-slate-200 dark:border-slate-800 pt-3 mt-auto text-xs text-slate-500 dark:text-slate-400">
                   <span>
                     Page {mediaData.page} of {mediaData.totalPages} ({mediaData.total} total)
                   </span>

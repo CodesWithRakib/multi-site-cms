@@ -25,8 +25,8 @@ export function TaxonomyTabs({
         onClick={() => onTabChange('categories')}
         className={`pb-3.5 text-xs font-bold flex items-center gap-2 border-b-2 transition-all cursor-pointer ${
           activeTab === 'categories'
-            ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400'
-            : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+            ? 'border-emerald-500 text-emerald-700 dark:text-emerald-400'
+            : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
         }`}
       >
         <Layers className="size-4" />
@@ -48,8 +48,8 @@ export function TaxonomyTabs({
         onClick={() => onTabChange('tags')}
         className={`pb-3.5 text-xs font-bold flex items-center gap-2 border-b-2 transition-all cursor-pointer ${
           activeTab === 'tags'
-            ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400'
-            : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+            ? 'border-emerald-500 text-emerald-700 dark:text-emerald-400'
+            : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
         }`}
       >
         <Tag className="size-4" />

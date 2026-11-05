@@ -38,12 +38,12 @@ export function CountryDemographicsCard({
 
       <div className="space-y-3.5 my-auto">
         {isLoading ? (
-          <div className="py-8 text-center text-xs text-slate-400">
+          <div className="py-8 text-center text-xs text-slate-500 dark:text-slate-400">
             <div className="size-4 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin inline-block mr-2" />
             Loading countries...
           </div>
         ) : countries.length === 0 ? (
-          <div className="py-8 text-center text-xs text-slate-400">
+          <div className="py-8 text-center text-xs text-slate-500 dark:text-slate-400">
             {t('analytics.noData')}
           </div>
         ) : (
@@ -62,7 +62,7 @@ export function CountryDemographicsCard({
                   <span className="text-slate-900 dark:text-slate-100">
                     {c.count.toLocaleString()}
                   </span>
-                  <span className="text-slate-400 font-normal">
+                  <span className="text-slate-500 dark:text-slate-400 font-normal">
                     ({c.percentage}%)
                   </span>
                 </div>

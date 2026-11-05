@@ -15,7 +15,6 @@ export function TravelLogo({
   return (
     <Link
       href="/"
-      aria-label="Travel Blog - Explore the World"
       className={`inline-flex items-center gap-2.5 group transition-transform hover:opacity-95 ${className}`}
     >
       {/* Mountain Peak Vector Icon */}
@@ -46,7 +45,7 @@ export function TravelLogo({
               : 'text-foreground group-hover:text-primary'
           }`}
         >
-          Travel<span className="text-emerald-500">Blog</span>
+          Travel<span className={inverted ? 'text-emerald-400' : 'text-emerald-600 dark:text-emerald-400'}>Blog</span>
         </span>
         {showSubtitle && (
           <span

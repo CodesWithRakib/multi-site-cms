@@ -22,7 +22,7 @@ export function WordCountBar({ editor, modeLabel, targetWordCount = 600 }: WordC
   // Editorial depth status
   const depthBadge =
     words === 0
-      ? { label: 'Empty Draft', color: 'text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800' }
+      ? { label: 'Empty Draft', color: 'text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800' }
       : words < 300
         ? { label: 'Quick Read (<300 words)', color: 'text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border border-amber-200/60 dark:border-amber-800/60' }
         : words < 900
@@ -34,7 +34,7 @@ export function WordCountBar({ editor, modeLabel, targetWordCount = 600 }: WordC
       {/* Metrics Row */}
       <div className="flex items-center gap-3.5 flex-wrap">
         <span className="flex items-center gap-1.5 font-medium">
-          <FileText className="size-3.5 text-slate-400" />
+          <FileText className="size-3.5 text-slate-500 dark:text-slate-400" />
           <strong className="text-slate-800 dark:text-slate-200 font-mono">{words}</strong>
           <span>words</span>
         </span>
@@ -48,7 +48,7 @@ export function WordCountBar({ editor, modeLabel, targetWordCount = 600 }: WordC
         <span className="text-slate-300 dark:text-slate-700">•</span>
 
         <span className="flex items-center gap-1.5 font-medium">
-          <Clock className="size-3.5 text-slate-400" />
+          <Clock className="size-3.5 text-slate-500 dark:text-slate-400" />
           <span>~</span>
           <strong className="text-slate-800 dark:text-slate-200 font-mono">{readingTimeMinutes}</strong>
           <span>min read</span>
@@ -63,7 +63,7 @@ export function WordCountBar({ editor, modeLabel, targetWordCount = 600 }: WordC
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
-            <span className="text-[11px] font-mono text-slate-400">
+            <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400">
               {progressPercent}% target
             </span>
           </div>

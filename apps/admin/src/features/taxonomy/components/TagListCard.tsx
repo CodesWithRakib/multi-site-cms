@@ -16,7 +16,7 @@ export function TagListCard({ tags, onEdit, onDelete }: TagListCardProps) {
       <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-12 text-center shadow-2xs">
         <Tag className="size-10 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
         <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">No tags found</h3>
-        <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm mx-auto">
           Create classification tags for indexing, SEO keywords, and topic cross-referencing.
         </p>
       </div>
@@ -43,7 +43,7 @@ export function TagListCard({ tags, onEdit, onDelete }: TagListCardProps) {
             </div>
 
             <div className="mt-2 flex items-center gap-1.5">
-              <span className="font-mono text-[10px] px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-500 font-semibold truncate">
+              <span className="font-mono text-[10px] px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 font-semibold truncate">
                 #{tag.slug}
               </span>
             </div>
@@ -59,7 +59,7 @@ export function TagListCard({ tags, onEdit, onDelete }: TagListCardProps) {
             <button
               type="button"
               onClick={() => onEdit(tag)}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              className="p-1.5 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
               title="Edit tag"
             >
               <Edit2 className="size-3.5" />

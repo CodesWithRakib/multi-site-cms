@@ -128,7 +128,7 @@ export function ContentActivityChart({
     <Card className="rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs h-full">
       <CardHeader className="p-6 pb-4 border-b-0 flex flex-row items-center justify-between space-y-0">
         <div className="flex items-center gap-2">
-          <BarChart2 className="size-4 text-emerald-500" />
+          <BarChart2 className="size-4 text-emerald-600 dark:text-emerald-400" />
           <CardTitle className="text-base font-bold text-slate-900 dark:text-white font-sans flex items-center gap-2">
             <span>{t('dashboard.analyticsOverview')}</span>
             <span className="sr-only">Content Activity Over Time</span>
@@ -178,7 +178,7 @@ export function ContentActivityChart({
           {/* Main Area / Dynamic Line Chart */}
           <div className="md:col-span-8 flex gap-3">
             {/* Dynamic Y-Axis Labels */}
-            <div className="flex flex-col justify-between py-1 text-[11px] font-medium text-slate-400 select-none text-right w-8 shrink-0">
+            <div className="flex flex-col justify-between py-1 text-[11px] font-medium text-slate-500 dark:text-slate-400 select-none text-right w-8 shrink-0">
               {yLabels.map((yl, i) => (
                 <span key={i}>{yl}</span>
               ))}
@@ -258,7 +258,7 @@ export function ContentActivityChart({
               </div>
 
               {/* Dynamic X-Axis Dates */}
-              <div className="flex justify-between text-[11px] font-medium text-slate-400 pt-2 px-2">
+              <div className="flex justify-between text-[11px] font-medium text-slate-500 dark:text-slate-400 pt-2 px-2">
                 {displayDateLabels.map((lbl, i) => (
                   <span key={i}>{lbl}</span>
                 ))}
@@ -276,7 +276,7 @@ export function ContentActivityChart({
               <span>+{Math.max(1, totalVolume)} items</span>
             </div>
 
-            <span className="text-xs font-medium text-slate-400 mt-2.5">
+            <span className="text-xs font-medium text-slate-500 dark:text-slate-400 mt-2.5">
               Activity In Period
             </span>
 
@@ -284,7 +284,7 @@ export function ContentActivityChart({
               {totalVolume}
             </span>
 
-            <p className="text-[11px] text-slate-400 mt-0.5">
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
               {totalPublished} published, {totalDrafts} drafts, {totalScheduled} scheduled
             </p>
 

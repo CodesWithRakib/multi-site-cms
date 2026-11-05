@@ -23,7 +23,7 @@ export function EventCard({ event }: EventCardProps) {
     },
     scheduled: {
       label: 'Upcoming',
-      color: 'bg-blue-500/15 text-blue-600 border-blue-500/30',
+      color: 'bg-blue-500/15 text-blue-700 dark:text-blue-300 border-blue-500/30',
       ping: false,
     },
     completed: {
@@ -65,7 +65,10 @@ export function EventCard({ event }: EventCardProps) {
         </div>
 
         <h3 className="text-xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">
-          <Link href={`/events/${event.slug}`} className="focus:outline-hidden">
+          <Link
+            href={`/events/${event.slug}`}
+            className="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+          >
             {event.name}
           </Link>
         </h3>
