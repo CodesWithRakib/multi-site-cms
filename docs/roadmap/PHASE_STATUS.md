@@ -1,6 +1,6 @@
 # Phase Status
 
-Last updated: 2026-11-05 (Phase 8)
+Last updated: 2026-11-05 (Phase 9)
 
 | Phase                                           | Status                                  | Evidence / blocker                                                                                                                                                             |
 | ----------------------------------------------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -13,7 +13,7 @@ Last updated: 2026-11-05 (Phase 8)
 | 6 — Coverage and hardening backlog              | **In progress**                         | API 294/294, integration 67/67, E2E posts/keyboard/axe 12/12. Open: SEC-18 decision, TD-5 decompositions, TD-13 other screens                                                  |
 | 7 — Enforced platform settings                  | **Done**                                | Owner approved (SEC-18). API 306/306, integration 67/67, E2E 54/54 (dev servers), maintenance banner verified in browser                                                       |
 | 8 — Admin decomposition and UX correctness      | **Done**                                | API 308/308, integration 67/67, admin 31, E2E 54/54 on production builds (twice)                                                                                               |
-| 9 — Deployment readiness (Neon, Render, Vercel) | Planned                                 | See MASTER_IMPLEMENTATION_PLAN Phase 9 and NEXT_SESSION                                                                                                                        |
+| 9 — Deployment readiness (Neon, Render, Vercel) | **In progress**                         | Code ready: proxy, bootstrap, timeouts, password change, phone, runbook. API 311, integration 71. Waiting: admin URL, Render env/start command, first Super Admin              |
 
 Phases 1–3 are committed by the owner; Phase 8 changes are uncommitted.
 
@@ -116,3 +116,19 @@ Phases 1–3 are committed by the owner; Phase 8 changes are uncommitted.
 - [x] Tag/category in use → 409 (DB-8); site timezone validated as IANA
 - [x] Posts table uses `currentData` (UX-30)
 - [ ] Phase 9: deployment readiness
+
+## Phase 9 checklist
+
+- [x] Production env files (git-ignored): API (Neon verify-full, Cloudinary, generated secrets), admin, both sites
+- [x] Neon and Cloudinary reachable (read-only checks); API production env validates
+- [x] Same-origin admin API proxy (SEC-22), verified locally on a production build
+- [x] `bootstrap:platform` (roles + permissions, idempotent; integration test)
+- [x] Site API fetches time out at 10 s (Vercel build no longer hangs; verified with an unreachable API)
+- [x] Self-service password change (API + UI; other sessions revoked; tests)
+- [x] User phone (migration `1793491212000`, E.164 check; API + profile UI; tests)
+- [x] Contact phone on /contact; invented "Field Desks" text removed
+- [x] Keep-alive workflow (backup) and `docs/deployment/production-runbook.md`
+- [ ] Owner: Render env (`API_BASE_URL`, `CORS_ORIGINS`, `SITE_REVALIDATE_URLS`) and new start command
+- [ ] Owner: admin Vercel URL → admin env + CORS
+- [ ] Owner: first Super Admin via bootstrap CLI (password ≥ 12, upper/lower/digit)
+- [ ] After deploy: cookies over HTTPS, client IP (TD-16), revalidation webhook, Cloudinary upload, UptimeRobot

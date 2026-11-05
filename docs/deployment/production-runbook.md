@@ -81,3 +81,17 @@ values are compiled into the bundle: changing them needs a redeploy.
   `node --env-file=.env.prod` semantics, after a Neon branch/backup.
 - Neon keeps point-in-time history on the free plan for a limited window;
   create a branch before risky changes.
+
+## Turborepo environment (strict mode)
+
+Turborepo 2 passes only declared environment variables to tasks. Vercel and CI
+both build and test through turbo, so a variable missing from `turbo.json` is
+silently empty there (locally it may still "work" through defaults). Declare:
+
+- build-time variables (`NEXT_PUBLIC_*`, anything read in `next.config.ts`) in
+  `tasks.build.env` or `globalEnv`;
+- test connection strings in `tasks.test.passThroughEnv` (not hashed into the
+  cache key).
+
+Runtime-only server variables (e.g. `REVALIDATE_SECRET` in a route handler)
+come from the hosting platform at request time and need no declaration.

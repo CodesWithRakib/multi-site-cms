@@ -336,3 +336,29 @@ browser (appeared after 24 s; maintenance switched off again afterwards).
 travel 21, air 13, config 21, validation 12, api-client 5, redux 3),
 integration 67/67, web build, Playwright on production builds 54/54 twice (a
 first run had one failure traced to stale RTK data; fixed).
+
+## 2026-11-05 — Phase 9 (deployment readiness, part 1)
+
+**Owner inputs:** Neon and Cloudinary production credentials (stored only in
+git-ignored `.env.prod` files), Vercel URLs for both sites, contact email and
+phone, intended accounts.
+
+**Code changes (uncommitted):**
+
+- Sites: `lib/api-timeout.ts`, 10 s `AbortSignal` on all 16 server-side API
+  fetches; travel `/contact` phone (`parseContactPhone`, tests); invented
+  location text removed.
+- Admin: `API_PROXY_TARGET` rewrite in `next.config.ts`; "Change password"
+  dialog in the user menu; phone on the user profile card.
+- API: `database/platform-vocabulary.ts` (shared by dev seed),
+  `cli/bootstrap-platform.ts` + `bootstrap:platform`; `POST /auth/password`
+  (`AuthService.changePassword`, `SessionService.revokeOtherUserSessions`);
+  migration `1793491212000-UserPhone`, `users.phone` in entity/DTOs/types.
+- Ops: `.github/workflows/keep-alive.yml`, `docs/deployment/production-runbook.md`.
+- Tests: platform vocabulary, auth password, user phone (API + schema +
+  migration round trip), OpenAPI path list (credential check made precise).
+
+**Verification:** format, lint, typecheck; tests API 311, admin 31, ui 59,
+travel 23, air 13, config 21, validation 12, api-client 5, redux 3;
+integration 71/71. Travel blog builds in 51 s with an unreachable API. Admin
+production build proxies login correctly (cookies host-only).
