@@ -6,6 +6,7 @@ import type { Request, Response } from 'express';
 import { env } from '../config/env';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { Public } from './decorators/public.decorator';
+import { ChangePasswordDto } from './dto/change-password.dto';
 import { LoginDto } from './dto/login.dto';
 import { AuthService } from './services/auth.service';
 import { AuthorizationService } from './services/authorization.service';
@@ -107,6 +108,27 @@ export class AuthController {
       path: '/',
     });
 
+    return { success: true };
+  }
+
+  /** The signed-in user changes their own password (any role). */
+  @Post('password')
+  @HttpCode(HttpStatus.OK)
+  @Throttle({ default: { limit: 5, ttl: 60_000 } })
+  async changePassword(
+    @CurrentUser() authContext: EffectiveAuthContext,
+    @Body() dto: ChangePasswordDto,
+    @Req() req: Request & { cookies?: Record<string, string>; id?: string },
+  ): Promise<{ success: boolean }> {
+    const rawToken = req.cookies?.[SESSION_COOKIE_NAME] ?? this.extractBearer(req) ?? '';
+    await this.authService.changePassword({
+      userId: authContext.user.id,
+      currentPassword: dto.currentPassword,
+      newPassword: dto.newPassword,
+      currentRawToken: rawToken,
+      ipAddress: req.ip ?? req.socket.remoteAddress,
+      requestId: req.id,
+    });
     return { success: true };
   }
 

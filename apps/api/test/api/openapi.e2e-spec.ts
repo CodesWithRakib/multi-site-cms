@@ -51,6 +51,7 @@ describe('OpenAPI document', () => {
       `/${env.API_PREFIX}/auth/login`,
       `/${env.API_PREFIX}/auth/logout`,
       `/${env.API_PREFIX}/auth/me`,
+      `/${env.API_PREFIX}/auth/password`,
       `/${env.API_PREFIX}/comments`,
       `/${env.API_PREFIX}/comments/batch`,
       `/${env.API_PREFIX}/comments/{id}`,
@@ -152,7 +153,15 @@ describe('OpenAPI document', () => {
 
     expect(serialized).not.toContain('DATABASE_URL');
     expect(serialized).not.toContain('postgresql://');
-    expect(serialized).not.toMatch(/password/i);
+    // The self-service endpoint (path, operation id, DTO name) is the only
+    // allowed mentions; no schema, field, or description may name a password.
+    const withoutKnownEndpoint = serialized
+      .split(`/${env.API_PREFIX}/auth/password`)
+      .join('')
+      .replace(/"operationId":"AuthController_changePassword"/g, '')
+      .split('ChangePasswordDto')
+      .join('');
+    expect(withoutKnownEndpoint).not.toMatch(/password/i);
     expect(serialized).not.toContain('localhost:5432');
   });
 });

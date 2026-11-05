@@ -4,6 +4,7 @@ import { DataSource } from 'typeorm';
 
 import { env } from '../../config/env';
 import { buildDataSourceOptions } from '../database-options';
+import { ensurePlatformVocabulary } from '../platform-vocabulary';
 
 /**
  * Development-only seed.
@@ -18,46 +19,6 @@ import { buildDataSourceOptions } from '../database-options';
  * `docs/database/README.md`. Seeds are idempotent and safe to re-run, and they
  * must never run against production data.
  */
-
-interface PermissionSeed {
-  readonly key: string;
-  readonly description: string;
-  readonly admin: boolean;
-}
-
-const PERMISSIONS: readonly PermissionSeed[] = [
-  { key: 'site:read', description: 'Read site configuration', admin: true },
-  { key: 'site:update_settings', description: 'Update allowlisted site settings', admin: true },
-  { key: 'site:create', description: 'Create a site', admin: false },
-  { key: 'site:delete', description: 'Delete a site', admin: false },
-  { key: 'domain:manage', description: 'Add, verify, or remove site domains', admin: false },
-  { key: 'user:read', description: 'Read platform users', admin: false },
-  { key: 'user:manage', description: 'Create, suspend, or disable users', admin: false },
-  { key: 'role:assign', description: 'Assign roles and site access', admin: false },
-  { key: 'post:read', description: 'Read canonical content', admin: true },
-  { key: 'post:create', description: 'Create canonical content and revisions', admin: true },
-  { key: 'post:update', description: 'Edit canonical content', admin: true },
-  { key: 'post:delete', description: 'Delete or restore canonical content', admin: false },
-  { key: 'publication:publish', description: 'Publish content to a site', admin: true },
-  { key: 'publication:schedule', description: 'Schedule or cancel a publication', admin: true },
-  { key: 'publication:archive', description: 'Unpublish content from a site', admin: true },
-  { key: 'taxonomy:manage', description: 'Manage site categories and tags', admin: true },
-  { key: 'media:upload', description: 'Upload media to a site library', admin: true },
-  { key: 'media:delete', description: 'Delete media from a site library', admin: true },
-  { key: 'audit:read', description: 'Read the audit log', admin: false },
-  { key: 'platform:configure', description: 'Change platform-wide settings', admin: false },
-];
-
-interface RoleSeed {
-  readonly key: string;
-  readonly name: string;
-  readonly scopeType: 'platform' | 'site';
-}
-
-const ROLES: readonly RoleSeed[] = [
-  { key: 'super_admin', name: 'Super Admin', scopeType: 'platform' },
-  { key: 'admin', name: 'Admin', scopeType: 'site' },
-];
 
 interface SiteSeed {
   readonly key: string;
@@ -103,85 +64,6 @@ const SITES: readonly SiteSeed[] = [
     tags: ['paragliding', 'skydiving', 'competition'],
   },
 ];
-
-async function seedPermissions(dataSource: DataSource): Promise<Map<string, string>> {
-  const ids = new Map<string, string>();
-
-  for (const permission of PERMISSIONS) {
-    const rows: unknown[] = await dataSource.query(
-      `INSERT INTO "permissions" ("key", "description")
-       VALUES ($1, $2)
-       ON CONFLICT ("key") DO UPDATE SET "description" = EXCLUDED."description"
-       RETURNING "id"`,
-      [permission.key, permission.description],
-    );
-    const row = rows[0] as { id: string } | undefined;
-    if (!row) {
-      throw new Error(`Failed to upsert permission ${permission.key}.`);
-    }
-    ids.set(permission.key, row.id);
-  }
-
-  return ids;
-}
-
-async function seedRoles(dataSource: DataSource): Promise<Map<string, string>> {
-  const ids = new Map<string, string>();
-
-  for (const role of ROLES) {
-    const rows: unknown[] = await dataSource.query(
-      `INSERT INTO "roles" ("key", "name", "scope_type", "is_system")
-       VALUES ($1, $2, $3, true)
-       ON CONFLICT ("key") DO UPDATE
-         SET "name" = EXCLUDED."name", "scope_type" = EXCLUDED."scope_type", "is_system" = true
-       RETURNING "id"`,
-      [role.key, role.name, role.scopeType],
-    );
-    const row = rows[0] as { id: string } | undefined;
-    if (!row) {
-      throw new Error(`Failed to upsert role ${role.key}.`);
-    }
-    ids.set(role.key, row.id);
-  }
-
-  return ids;
-}
-
-async function seedRolePermissions(
-  dataSource: DataSource,
-  roleIds: Map<string, string>,
-  permissionIds: Map<string, string>,
-): Promise<void> {
-  const superAdminId = roleIds.get('super_admin');
-  const adminId = roleIds.get('admin');
-
-  if (!superAdminId || !adminId) {
-    throw new Error('Built-in roles are missing after seeding.');
-  }
-
-  for (const permission of PERMISSIONS) {
-    const permissionId = permissionIds.get(permission.key);
-    if (!permissionId) {
-      throw new Error(`Permission ${permission.key} is missing after seeding.`);
-    }
-
-    const assignments: { roleId: string; permissionId: string }[] = [
-      { roleId: superAdminId, permissionId },
-    ];
-    if (permission.admin) {
-      assignments.push({ roleId: adminId, permissionId });
-    }
-
-    for (const assignment of assignments) {
-      await dataSource.query(
-        `INSERT INTO "role_permissions" ("role_id", "permission_id")
-         VALUES ($1, $2)
-         ON CONFLICT ("role_id", "permission_id") DO NOTHING`,
-        [assignment.roleId, assignment.permissionId],
-      );
-    }
-  }
-}
 
 async function seedSites(dataSource: DataSource): Promise<void> {
   for (const site of SITES) {
@@ -240,9 +122,7 @@ export async function seedDevelopmentData(dataSource: DataSource): Promise<void>
     throw new Error('Refusing to run the development seed with NODE_ENV=production.');
   }
 
-  const permissionIds = await seedPermissions(dataSource);
-  const roleIds = await seedRoles(dataSource);
-  await seedRolePermissions(dataSource, roleIds, permissionIds);
+  await ensurePlatformVocabulary(dataSource);
   await seedSites(dataSource);
 }
 

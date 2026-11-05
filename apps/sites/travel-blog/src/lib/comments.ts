@@ -4,6 +4,7 @@ import type {
   SubmittedPublicComment,
 } from '@multi-site-cms/types';
 import { siteConfig } from '@/config/site';
+import { apiTimeoutSignal } from './api-timeout';
 
 const API_BASE_URL = (
   process.env.INTERNAL_API_URL ||
@@ -21,6 +22,7 @@ export async function fetchArticleComments(slug: string): Promise<PublicComments
 
   try {
     const res = await fetch(url, {
+      signal: apiTimeoutSignal(),
       method: 'GET',
       headers: { Accept: 'application/json' },
       next: { revalidate: 30, tags: [`comments-${slug}`] },
@@ -48,6 +50,7 @@ export async function submitArticleComment(
 
   try {
     const res = await fetch(url, {
+      signal: apiTimeoutSignal(),
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       body: JSON.stringify(payload),

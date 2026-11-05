@@ -165,6 +165,11 @@ export const cmsApi = platformApi.injectEndpoints({
       ],
     }),
 
+    // Self-service: requires the current password; other sessions are signed out.
+    changeOwnPassword: build.mutation<void, { currentPassword: string; newPassword: string }>({
+      query: (body) => ({ path: '/auth/password', method: 'POST', body }),
+    }),
+
     logout: build.mutation<void, void>({
       query: () => ({
         path: '/auth/logout',
@@ -1026,6 +1031,7 @@ export const {
   useGetMeQuery,
   useLoginMutation,
   useLogoutMutation,
+  useChangeOwnPasswordMutation,
 
   // Sites & Domains
   useListSitesQuery,

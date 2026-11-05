@@ -5,6 +5,7 @@ import type { UserRoleSummary, UserStatus } from '@multi-site-cms/types';
 
 import { useActionNotice } from '@/components/feedback';
 import { apiErrorMessage } from '@/lib/api-error';
+import type { ProfileValues } from '../components/UserProfileCard';
 import {
   useAssignRoleMutation,
   useGetUserQuery,
@@ -45,9 +46,12 @@ export function useUserDetail(userId: string) {
     : false;
 
   /** Resolves true when saved (so the form can leave edit mode). */
-  const saveProfile = async (displayName: string, status: UserStatus): Promise<boolean> => {
+  const saveProfile = async ({ displayName, status, phone }: ProfileValues): Promise<boolean> => {
     try {
-      await updateUser({ userId, data: { displayName: displayName.trim(), status } }).unwrap();
+      await updateUser({
+        userId,
+        data: { displayName: displayName.trim(), status, phone: phone.trim() || null },
+      }).unwrap();
       notices.success('Profile updated.');
       return true;
     } catch (err: unknown) {

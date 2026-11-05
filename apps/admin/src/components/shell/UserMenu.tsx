@@ -2,13 +2,15 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { LogOut, Shield, ChevronDown } from 'lucide-react';
+import { ChevronDown, KeyRound, LogOut, Shield } from 'lucide-react';
+import { ChangePasswordDialog } from '@/features/account/ChangePasswordDialog';
 import { useAdmin } from '@/lib/admin-context';
 import { useLogoutMutation } from '@/lib/cms-api';
 
 export function UserMenu() {
   const { user, isSuperAdmin, t } = useAdmin();
   const [isOpen, setIsOpen] = useState(false);
+  const [isPasswordOpen, setIsPasswordOpen] = useState(false);
   const [logout, { isLoading: isLoggingOut }] = useLogoutMutation();
   const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -97,6 +99,18 @@ export function UserMenu() {
             <button
               type="button"
               role="menuitem"
+              onClick={() => {
+                setIsOpen(false);
+                setIsPasswordOpen(true);
+              }}
+              className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-xs font-semibold text-foreground hover:bg-accent transition-colors"
+            >
+              <KeyRound className="w-4 h-4" aria-hidden="true" />
+              <span>Change password</span>
+            </button>
+            <button
+              type="button"
+              role="menuitem"
               onClick={handleLogout}
               disabled={isLoggingOut}
               className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors disabled:opacity-50"
@@ -107,6 +121,8 @@ export function UserMenu() {
           </div>
         </div>
       )}
+
+      <ChangePasswordDialog open={isPasswordOpen} onClose={() => setIsPasswordOpen(false)} />
     </div>
   );
 }

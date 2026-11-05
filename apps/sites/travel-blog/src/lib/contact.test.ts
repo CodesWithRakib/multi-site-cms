@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { buildContactMailto, parseContactEmail } from './contact';
+import { buildContactMailto, parseContactEmail, parseContactPhone } from './contact';
 
 describe('parseContactEmail', () => {
   it('accepts a plain address and trims it', () => {
@@ -27,5 +27,27 @@ describe('buildContactMailto', () => {
     expect(href).not.toContain('&cc=');
     expect(href).toContain('Hi%26cc%3Dattacker%40example.com');
     expect(href).toContain('body=Line%20one%0ALine%20two%0A%0A%E2%80%94%20Alex');
+  });
+});
+
+describe('parseContactPhone', () => {
+  it('accepts international numbers and formats Bangladeshi mobiles', () => {
+    expect(parseContactPhone('+8801767476724')).toEqual({
+      href: '+8801767476724',
+      label: '+880 1767-476724',
+    });
+    expect(parseContactPhone(' +880 1767-476724 ')?.href).toBe('+8801767476724');
+    expect(parseContactPhone('+14155552671')).toEqual({
+      href: '+14155552671',
+      label: '+14155552671',
+    });
+  });
+
+  it('never shows a malformed or missing number', () => {
+    expect(parseContactPhone(undefined)).toBeNull();
+    expect(parseContactPhone('')).toBeNull();
+    expect(parseContactPhone('8801767476724')).toBeNull(); // no "+"
+    expect(parseContactPhone('+12')).toBeNull();
+    expect(parseContactPhone('+880abc')).toBeNull();
   });
 });

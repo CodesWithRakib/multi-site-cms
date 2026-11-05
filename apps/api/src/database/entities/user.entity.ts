@@ -37,6 +37,10 @@ export class User {
   @Column({ type: 'text', default: 'active' })
   status!: UserStatus;
 
+  /** Optional contact phone, E.164 (CHK_users_phone_e164). */
+  @Column({ type: 'varchar', length: 16, nullable: true })
+  phone!: string | null;
+
   @Column({ name: 'last_login_at', type: 'timestamptz', nullable: true })
   lastLoginAt!: Date | null;
 

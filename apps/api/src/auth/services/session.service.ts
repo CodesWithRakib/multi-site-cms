@@ -152,6 +152,20 @@ export class SessionService {
   /**
    * Revokes all active sessions for a given user (e.g. account suspension or password reset).
    */
+  /** Revokes every active session of a user except the one making the request. */
+  async revokeOtherUserSessions(userId: string, keepRawToken: string): Promise<void> {
+    const sessionRepo = await this.getSessionRepo();
+    await sessionRepo
+      .createQueryBuilder()
+      .update()
+      .set({ revokedAt: new Date() })
+      .where('user_id = :userId AND revoked_at IS NULL AND token_hash <> :keep', {
+        userId,
+        keep: this.hashToken(keepRawToken),
+      })
+      .execute();
+  }
+
   async revokeAllUserSessions(userId: string): Promise<void> {
     const sessionRepo = await this.getSessionRepo();
     await sessionRepo.update({ userId, revokedAt: IsNull() }, { revokedAt: new Date() });

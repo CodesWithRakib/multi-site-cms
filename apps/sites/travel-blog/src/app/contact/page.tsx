@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
-import { Mail, MapPin } from 'lucide-react';
+import { Mail, Phone } from 'lucide-react';
 
 import { ContactForm } from '@/components/contact/ContactForm';
 import { NewsletterBanner } from '@/components/home/NewsletterBanner';
 import { siteConfig } from '@/config/site';
-import { parseContactEmail } from '@/lib/contact';
+import { parseContactEmail, parseContactPhone } from '@/lib/contact';
 
 export const metadata: Metadata = {
   title: 'Contact the Editors',
@@ -13,6 +13,7 @@ export const metadata: Metadata = {
 };
 
 const contactEmail = parseContactEmail(process.env.NEXT_PUBLIC_CONTACT_EMAIL);
+const contactPhone = parseContactPhone(process.env.NEXT_PUBLIC_CONTACT_PHONE);
 
 export default function ContactPage() {
   return (
@@ -56,13 +57,17 @@ export default function ContactPage() {
                   </a>
                 </p>
               )}
-              <p className="flex items-center gap-2.5">
-                <MapPin
-                  className="h-4 w-4 text-emerald-600 dark:text-emerald-400"
-                  aria-hidden="true"
-                />
-                <span>Field Desks in Zurich, Tokyo & New York</span>
-              </p>
+              {contactPhone && (
+                <p className="flex items-center gap-2.5">
+                  <Phone
+                    className="h-4 w-4 text-emerald-600 dark:text-emerald-400"
+                    aria-hidden="true"
+                  />
+                  <a href={`tel:${contactPhone.href}`} className="hover:text-foreground underline">
+                    {contactPhone.label}
+                  </a>
+                </p>
+              )}
             </div>
           </div>
         </aside>

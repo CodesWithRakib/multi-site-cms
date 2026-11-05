@@ -9,6 +9,7 @@ import type {
   PublicSitemapItem,
   PublicTagItem,
 } from '@multi-site-cms/types';
+import { apiTimeoutSignal } from './api-timeout';
 
 export const SITE_KEY = 'air-sports';
 
@@ -47,6 +48,7 @@ export async function fetchArticles(
   try {
     const url = buildUrl('/posts', params as Record<string, unknown>);
     const res = await fetch(url, {
+      signal: apiTimeoutSignal(),
       next: {
         revalidate: 30,
         tags: ['air-sports-content'],
@@ -85,6 +87,7 @@ export async function fetchArticleBySlug(slug: string): Promise<PublicArticleDet
   try {
     const url = buildUrl(`/posts/${encodeURIComponent(slug)}`);
     const res = await fetch(url, {
+      signal: apiTimeoutSignal(),
       next: {
         revalidate: 30,
         tags: ['air-sports-content', `post-${slug}`],
@@ -109,6 +112,7 @@ export async function fetchEvents(): Promise<PublicEventSummary[]> {
   try {
     const url = buildUrl('/events');
     const res = await fetch(url, {
+      signal: apiTimeoutSignal(),
       next: {
         revalidate: 30,
         tags: ['air-sports-events'],
@@ -133,6 +137,7 @@ export async function fetchEventBySlug(slug: string): Promise<PublicEventDetail 
   try {
     const url = buildUrl(`/events/${encodeURIComponent(slug)}`);
     const res = await fetch(url, {
+      signal: apiTimeoutSignal(),
       next: {
         revalidate: 15,
         tags: ['air-sports-events', `event-${slug}`],
@@ -157,6 +162,7 @@ export async function fetchCategories(): Promise<PublicCategoryItem[]> {
   try {
     const url = buildUrl('/categories');
     const res = await fetch(url, {
+      signal: apiTimeoutSignal(),
       next: {
         revalidate: 60,
         tags: ['air-sports-categories'],
@@ -181,6 +187,7 @@ export async function fetchTags(): Promise<PublicTagItem[]> {
   try {
     const url = buildUrl('/tags');
     const res = await fetch(url, {
+      signal: apiTimeoutSignal(),
       next: {
         revalidate: 60,
         tags: ['air-sports-tags'],
@@ -205,6 +212,7 @@ export async function fetchSitemapEntries(): Promise<PublicSitemapItem[]> {
   try {
     const url = buildUrl('/sitemap');
     const res = await fetch(url, {
+      signal: apiTimeoutSignal(),
       next: {
         revalidate: 600,
         tags: ['air-sports-content'],
@@ -232,6 +240,7 @@ export async function fetchDraftPreview(
   try {
     const url = buildUrl(`/preview/${encodeURIComponent(postId)}`, { token });
     const res = await fetch(url, {
+      signal: apiTimeoutSignal(),
       cache: 'no-store',
       headers: { Accept: 'application/json' },
     });
@@ -254,6 +263,7 @@ export async function subscribeNewsletter(
 ): Promise<{ success: boolean; message: string }> {
   try {
     const res = await fetch(`${API_BASE_URL}/public/sites/${SITE_KEY}/newsletter`, {
+      signal: apiTimeoutSignal(),
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email }),

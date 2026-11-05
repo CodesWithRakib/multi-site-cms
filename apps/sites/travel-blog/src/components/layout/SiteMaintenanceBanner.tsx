@@ -1,5 +1,6 @@
 import type { ApiSuccess, PublicPlatformSettings } from '@multi-site-cms/types';
 import { MaintenanceBanner } from '@multi-site-cms/ui';
+import { apiTimeoutSignal } from '@/lib/api-timeout';
 
 const API_BASE_URL = (
   process.env.INTERNAL_API_URL ||
@@ -11,6 +12,7 @@ const API_BASE_URL = (
 async function fetchPublicPlatformSettings(): Promise<PublicPlatformSettings | null> {
   try {
     const res = await fetch(`${API_BASE_URL}/settings/public`, {
+      signal: apiTimeoutSignal(),
       headers: { Accept: 'application/json' },
       next: { revalidate: 30, tags: ['platform-settings'] },
     });

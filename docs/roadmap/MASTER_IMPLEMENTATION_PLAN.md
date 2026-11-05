@@ -140,3 +140,18 @@ Work:
    sitemap and robots on real domains, 404/500 pages verified, Lighthouse pass
    (performance, accessibility, SEO) on both sites, cookie/privacy notice for
    analytics, email for password reset (later, needs an email provider).
+
+### Phase 9 additions (owner requests, 2026-11-05)
+
+- User profile phone: nullable `users.phone` (E.164, validated), editable by
+  Super Admins; shown on the user detail page. Migration + API + admin UI.
+- Self-service password change: `POST /auth/password` with the current
+  password, platform password policy, other sessions revoked; "Change password"
+  in the user menu for every role. Super Admins keep resetting other users'
+  passwords from the users screen.
+- Production accounts: Super Admin "Md. Rakib Islam" (owner email) via
+  `bootstrap:super-admin`, run locally against Neon with the password typed at
+  the prompt/env (never stored); site Admin "Ashiqur Rahaman" created from the
+  admin UI. Passwords must meet the bootstrap rule (≥ 12 characters) and the
+  platform policy (upper + lower + digit).
+- Public contact phone `NEXT_PUBLIC_CONTACT_PHONE` (done on /contact).

@@ -19,13 +19,20 @@ const STATUS_BADGE: Record<UserStatus, string> = {
 const FIELD =
   'w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100';
 
+export interface ProfileValues {
+  displayName: string;
+  status: UserStatus;
+  /** E.164 or empty (clears it). */
+  phone: string;
+}
+
 interface UserProfileCardProps {
   readonly user: UserItem;
   readonly canEdit: boolean;
   /** The last active Super Admin cannot change away from "active". */
   readonly statusLocked: boolean;
   readonly isSaving: boolean;
-  readonly onSave: (displayName: string, status: UserStatus) => Promise<boolean>;
+  readonly onSave: (values: ProfileValues) => Promise<boolean>;
 }
 
 function Row({ label, children }: { readonly label: string; readonly children: React.ReactNode }) {
@@ -49,16 +56,18 @@ export function UserProfileCard({
   const [isEditing, setIsEditing] = useState(false);
   const [displayName, setDisplayName] = useState(user.displayName);
   const [status, setStatus] = useState<UserStatus>(user.status);
+  const [phone, setPhone] = useState(user.phone ?? '');
 
   const startEditing = () => {
     setDisplayName(user.displayName);
     setStatus(user.status);
+    setPhone(user.phone ?? '');
     setIsEditing(true);
   };
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
-    if (await onSave(displayName, status)) setIsEditing(false);
+    if (await onSave({ displayName, status, phone })) setIsEditing(false);
   };
 
   return (
@@ -104,6 +113,31 @@ export function UserProfileCard({
               onChange={(e) => setDisplayName(e.target.value)}
               className={FIELD}
             />
+          </div>
+          <div>
+            <label
+              htmlFor="profile-phone"
+              className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1"
+            >
+              Phone (optional)
+            </label>
+            <input
+              id="profile-phone"
+              type="tel"
+              inputMode="tel"
+              autoComplete="tel"
+              placeholder="+8801767476724"
+              aria-describedby="profile-phone-help"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className={FIELD}
+            />
+            <p
+              id="profile-phone-help"
+              className="text-[11px] text-slate-600 dark:text-slate-400 mt-1"
+            >
+              International format with country code.
+            </p>
           </div>
           <div>
             <label
@@ -163,6 +197,19 @@ export function UserProfileCard({
             <span className="font-mono text-slate-800 dark:text-slate-200 break-all">
               {user.email}
             </span>
+          </div>
+          <div>
+            <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Phone</span>
+            {user.phone ? (
+              <a
+                href={`tel:${user.phone}`}
+                className="font-mono text-slate-800 dark:text-slate-200 hover:underline"
+              >
+                {user.phone}
+              </a>
+            ) : (
+              <span className="text-slate-500 dark:text-slate-400">Not set</span>
+            )}
           </div>
           <div>
             <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Status</span>

@@ -7,6 +7,7 @@ import { ApiException } from '../../common/exceptions/api.exception';
 import { getInitializedRepository } from '../../database/ensure-connected';
 import { DATA_SOURCE } from '../../database/database.tokens';
 import { User } from '../../database/entities/user.entity';
+import { passwordPolicyViolation } from '../../settings/platform-policy';
 import { SettingsService } from '../../settings/settings.service';
 import { AuthorizationService } from './authorization.service';
 import { PasswordService } from './password.service';
@@ -183,6 +184,72 @@ export class AuthService {
       expiresAt,
       user: authUser,
     };
+  }
+
+  /**
+   * Self-service password change. Requires the current password, applies the
+   * platform password policy, and signs the user out everywhere else.
+   */
+  async changePassword(options: {
+    userId: string;
+    currentPassword: string;
+    newPassword: string;
+    currentRawToken: string;
+    ipAddress?: string | null;
+    requestId?: string | null;
+  }): Promise<void> {
+    const userRepo = await this.getUserRepo();
+    const user = await userRepo
+      .createQueryBuilder('user')
+      .addSelect('user.passwordHash')
+      .where('user.id = :id', { id: options.userId })
+      .getOne();
+    if (!user?.passwordHash) {
+      throw new ApiException(HttpStatus.UNAUTHORIZED, 'UNAUTHENTICATED', 'auth.sessionExpired');
+    }
+
+    const currentOk = await this.passwordService.verify(user.passwordHash, options.currentPassword);
+    if (!currentOk) {
+      await this.auditService.record({
+        actorId: user.id,
+        actorType: 'user',
+        action: 'auth.password_change_failed',
+        entityType: 'user',
+        entityId: user.id,
+        ipAddress: options.ipAddress,
+        requestId: options.requestId,
+        metadata: { reason: 'wrong_current_password' },
+      });
+      throw new ApiException(
+        HttpStatus.BAD_REQUEST,
+        'VALIDATION_ERROR',
+        'auth.currentPasswordInvalid',
+      );
+    }
+    if (options.newPassword === options.currentPassword) {
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'VALIDATION_ERROR', 'auth.passwordUnchanged');
+    }
+
+    const { password: policy } = await this.settingsService.getPolicy();
+    const violation = passwordPolicyViolation(options.newPassword, policy);
+    if (violation) {
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'VALIDATION_ERROR', violation);
+    }
+
+    user.passwordHash = await this.passwordService.hash(options.newPassword);
+    await userRepo.save(user);
+    await this.sessionService.revokeOtherUserSessions(user.id, options.currentRawToken);
+
+    await this.auditService.record({
+      actorId: user.id,
+      actorType: 'user',
+      action: 'auth.password_changed',
+      entityType: 'user',
+      entityId: user.id,
+      ipAddress: options.ipAddress,
+      requestId: options.requestId,
+      metadata: { otherSessionsRevoked: true },
+    });
   }
 
   /**

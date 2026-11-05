@@ -116,6 +116,8 @@ export interface UserItem {
   id: string;
   email: string;
   displayName: string;
+  /** Contact phone in E.164, or null. */
+  phone: string | null;
   status: UserStatus;
   lastLoginAt: string | null;
   failedLoginCount: number;
@@ -465,6 +467,8 @@ export interface CreateDomainPayload {
 export interface CreateUserPayload {
   email: string;
   displayName: string;
+  /** E.164, e.g. +8801767476724. */
+  phone?: string | null;
   password?: string;
   roleKey?: string;
   siteId?: string | null;
@@ -472,6 +476,8 @@ export interface CreateUserPayload {
 
 export interface UpdateUserPayload {
   displayName?: string;
+  /** E.164; null clears it. */
+  phone?: string | null;
   status?: UserStatus;
 }
 

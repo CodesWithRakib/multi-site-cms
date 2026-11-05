@@ -146,7 +146,7 @@ describe('migration chain', () => {
       `SELECT "name" FROM "typeorm_migrations" ORDER BY "id"`,
     );
 
-    expect(applied).toHaveLength(12);
+    expect(applied).toHaveLength(13);
   });
 
   it('creates every expected table', async () => {
@@ -957,6 +957,8 @@ describe('pre-moderated comments migration', () => {
   });
 
   it('reverts cleanly and re-applies', async () => {
+    // UserPhone1793491212000 runs after this migration: undo it first.
+    await dataSource.undoLastMigration({ transaction: 'all' });
     await dataSource.undoLastMigration({ transaction: 'all' });
     expect(await statusDefault()).toContain("'approved'");
     expect(await hasCompositeFk()).toBe(false);
@@ -964,5 +966,33 @@ describe('pre-moderated comments migration', () => {
     await dataSource.runMigrations({ transaction: 'all' });
     expect(await statusDefault()).toContain("'pending'");
     expect(await hasCompositeFk()).toBe(true);
+  });
+});
+
+describe('user phone migration', () => {
+  async function hasPhoneColumn(): Promise<boolean> {
+    const rows: unknown[] = await dataSource.query(
+      `SELECT 1 FROM "information_schema"."columns"
+       WHERE "table_name" = 'users' AND "column_name" = 'phone'`,
+    );
+    return rows.length === 1;
+  }
+
+  it('accepts E.164 or null and rejects anything else', async () => {
+    const userId = await insertUser('phone.check@example.test');
+    const setPhone = (phone: string | null) =>
+      dataSource.query(`UPDATE "users" SET "phone" = $1 WHERE "id" = $2`, [phone, userId]);
+
+    await expect(setPhone('+8801767476724')).resolves.toBeDefined();
+    await expect(setPhone(null)).resolves.toBeDefined();
+    await expect(setPhone('01767476724')).rejects.toThrow(/CHK_users_phone_e164/);
+    await expect(setPhone('+0123456789')).rejects.toThrow(/CHK_users_phone_e164/);
+  });
+
+  it('reverts cleanly and re-applies', async () => {
+    await dataSource.undoLastMigration({ transaction: 'all' });
+    expect(await hasPhoneColumn()).toBe(false);
+    await dataSource.runMigrations({ transaction: 'all' });
+    expect(await hasPhoneColumn()).toBe(true);
   });
 });

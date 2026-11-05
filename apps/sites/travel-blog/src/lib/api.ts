@@ -10,6 +10,7 @@ import type {
   PublicTagItem,
 } from '@multi-site-cms/types';
 import { siteConfig } from '@/config/site';
+import { apiTimeoutSignal } from './api-timeout';
 
 const API_BASE_URL = (
   process.env.INTERNAL_API_URL ||
@@ -34,6 +35,7 @@ async function fetchFromApi<T>(
 
   try {
     const res = await fetch(url, {
+      signal: apiTimeoutSignal(),
       method: 'GET',
       headers: {
         Accept: 'application/json',
@@ -84,6 +86,7 @@ export async function fetchArticles(
 
   try {
     const res = await fetch(`${API_BASE_URL}${endpoint}`, {
+      signal: apiTimeoutSignal(),
       method: 'GET',
       headers: { Accept: 'application/json' },
       next: {
@@ -206,6 +209,7 @@ export async function subscribeNewsletter(
 ): Promise<{ success: boolean; message: string }> {
   try {
     const res = await fetch(`${API_BASE_URL}/public/sites/${SITE_KEY}/newsletter`, {
+      signal: apiTimeoutSignal(),
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email }),

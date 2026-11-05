@@ -1,0 +1,32 @@
+name: Keep API awake
+
+# Backup for the primary uptime monitor (UptimeRobot, 5-minute checks): the
+# free Render instance sleeps after 15 minutes without traffic. GitHub runs
+# schedules on a best-effort basis (they can be delayed, and are disabled after
+# 60 days without repository activity), so this is not the only safeguard.
+# Set the repository variable API_HEALTH_URL, e.g.
+# https://multi-site-cms.onrender.com/api/v1/health
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Ping health endpoint
+        env:
+          API_HEALTH_URL: ${{ vars.API_HEALTH_URL }}
+        run: |
+          if [ -z "$API_HEALTH_URL" ]; then
+            echo "API_HEALTH_URL is not set; skipping."
+            exit 0
+          fi
+          # A cold start can take up to a minute; retry once before failing.
+          curl -fsS --max-time 90 "$API_HEALTH_URL" > /dev/null \
+            || { sleep 20; curl -fsS --max-time 90 "$API_HEALTH_URL" > /dev/null; }

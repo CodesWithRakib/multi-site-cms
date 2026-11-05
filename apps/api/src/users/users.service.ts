@@ -189,6 +189,7 @@ export class UsersService {
     const user = userRepo.create({
       email: normalizedEmail,
       displayName: dto.displayName.trim(),
+      phone: dto.phone ?? null,
       passwordHash,
       status,
       failedLoginCount: 0,
@@ -239,6 +240,9 @@ export class UsersService {
       }
       if (dto.status !== undefined) {
         target.status = dto.status;
+      }
+      if (dto.phone !== undefined) {
+        target.phone = dto.phone;
       }
       if (newPasswordHash) {
         target.passwordHash = newPasswordHash;
@@ -466,6 +470,7 @@ export class UsersService {
       id: user.id,
       email: user.email,
       displayName: user.displayName,
+      phone: user.phone ?? null,
       status: user.status,
       lastLoginAt: user.lastLoginAt ? user.lastLoginAt.toISOString() : null,
       failedLoginCount: user.failedLoginCount,

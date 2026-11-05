@@ -211,6 +211,24 @@ describe('Users and roles (/api/v1/users)', () => {
     expect(total).toBe(countRow?.n);
   });
 
+  it('stores an optional E.164 phone, normalizes it, and clears it with null', async () => {
+    const member = await createUser('phone.owner@example.test');
+
+    const set = await patchUser(member.id, { phone: '+880 1767-476724' }).expect(200);
+    expect((set.body as ApiSuccess<UserItem>).data.phone).toBe('+8801767476724');
+
+    await patchUser(member.id, { phone: '01767476724' }).expect(400); // no country code
+    await patchUser(member.id, { phone: '+12' }).expect(400);
+
+    const cleared = await patchUser(member.id, { phone: null }).expect(200);
+    expect((cleared.body as ApiSuccess<UserItem>).data.phone).toBeNull();
+
+    // The database refuses a malformed value even if the API were bypassed.
+    await expect(
+      dataSource.query(`UPDATE "users" SET "phone" = 'not-a-phone' WHERE "id" = $1`, [member.id]),
+    ).rejects.toThrow(/CHK_users_phone_e164/);
+  });
+
   it('creates a user with a normalized email and rejects duplicates and bad input', async () => {
     const create = (body: object) =>
       request(app.getHttpServer())
