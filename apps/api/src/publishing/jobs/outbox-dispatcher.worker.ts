@@ -140,6 +140,7 @@ export class OutboxDispatcherWorker implements OnModuleDestroy {
 
     switch (event.eventType) {
       case OUTBOX_EVENT_TYPES.PUBLICATION_PUBLISHED:
+      case OUTBOX_EVENT_TYPES.PUBLICATION_UPDATED:
       case OUTBOX_EVENT_TYPES.PUBLICATION_UNPUBLISHED:
       case OUTBOX_EVENT_TYPES.PUBLICATION_ARCHIVED: {
         const typedPayload = payload as unknown as

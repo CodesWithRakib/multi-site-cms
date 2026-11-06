@@ -42,7 +42,7 @@ export function RichTextEditor({
         'aria-multiline': 'true',
         'aria-label': 'Post body',
         class:
-          'prose dark:prose-invert max-w-none min-h-[360px] p-6 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring text-slate-800 dark:text-slate-100',
+          'cms-editor-content min-h-[360px] p-6 sm:px-10 sm:py-8 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
       },
     },
     onUpdate: ({ editor: currentEditor }) => {

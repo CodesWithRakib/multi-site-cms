@@ -145,4 +145,62 @@ describe('DocRenderer (Air Sports)', () => {
     const { container } = render(<DocRenderer document={null} />);
     expect(container.firstChild).toBeNull();
   });
+  it('embeds YouTube links via the nocookie player and never iframes other hosts', () => {
+    const doc = {
+      type: 'doc',
+      content: [
+        { type: 'youtube', attrs: { src: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' } },
+        { type: 'youtube', attrs: { src: 'https://evil.example/embed/dQw4w9WgXcQ' } },
+      ],
+    };
+    const { container } = render(<DocRenderer document={doc} />);
+    const frames = container.querySelectorAll('iframe');
+    expect(frames).toHaveLength(1);
+    expect(frames[0]?.getAttribute('src')).toBe(
+      'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ',
+    );
+  });
+
+  it('keeps Shift+Enter line breaks, underline and text alignment from the editor', () => {
+    const doc = {
+      type: 'doc',
+      content: [
+        {
+          type: 'paragraph',
+          attrs: { textAlign: 'center' },
+          content: [
+            { type: 'text', text: 'First line' },
+            { type: 'hardBreak' },
+            { type: 'text', marks: [{ type: 'underline' }], text: 'Second line' },
+          ],
+        },
+      ],
+    };
+    const { container } = render(<DocRenderer document={doc} />);
+    const paragraph = container.querySelector('p');
+    expect(paragraph?.querySelector('br')).not.toBeNull();
+    expect(paragraph?.querySelector('u')?.textContent).toBe('Second line');
+    expect(paragraph?.style.textAlign).toBe('center');
+  });
+  it('wraps table rows in a tbody so server and client HTML match', () => {
+    const cell = (type: string, text: string) => ({
+      type,
+      content: [{ type: 'paragraph', content: [{ type: 'text', text }] }],
+    });
+    const doc = {
+      type: 'doc',
+      content: [
+        {
+          type: 'table',
+          content: [
+            { type: 'tableRow', content: [cell('tableHeader', 'Stop')] },
+            { type: 'tableRow', content: [cell('tableCell', 'Vik')] },
+          ],
+        },
+      ],
+    };
+    const { container } = render(<DocRenderer document={doc} />);
+    expect(container.querySelectorAll('table > tbody > tr')).toHaveLength(2);
+    expect(container.querySelector('table > tr')).toBeNull();
+  });
 });

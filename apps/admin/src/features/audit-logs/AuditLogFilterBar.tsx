@@ -12,7 +12,11 @@ import {
   GitCommitHorizontal,
 } from 'lucide-react';
 import type { AuditLogCategory, SiteItem } from '@multi-site-cms/types';
+import { NativeSelect } from '@multi-site-cms/ui';
 import { useAdmin } from '@/lib/admin-context';
+
+const FILTER_SELECT_CLASS =
+  'px-3 py-2 text-sm bg-neutral-50 dark:bg-neutral-800/80 border-neutral-200 dark:border-neutral-700 rounded-lg text-neutral-800 dark:text-neutral-200 focus:ring-emerald-500/30 focus:border-emerald-500';
 
 export interface AuditLogFilterBarProps {
   searchTerm: string;
@@ -115,50 +119,32 @@ export function AuditLogFilterBar({
         </div>
 
         {/* Site Selector */}
-        <div>
-          <select
-            value={selectedSiteId ?? ''}
-            onChange={(e) => onSiteChange(e.target.value || undefined)}
-            className="w-full px-3 py-2 text-sm bg-neutral-50 dark:bg-neutral-800/80 border border-neutral-200 dark:border-neutral-700 rounded-lg text-neutral-800 dark:text-neutral-200 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 cursor-pointer"
-          >
-            <option value="">{t('auditLogs.allWebsites')}</option>
-            {sites.map((site) => (
-              <option key={site.id} value={site.id}>
-                {site.name}
-              </option>
-            ))}
-          </select>
-        </div>
+        <NativeSelect
+          aria-label="Filter by website"
+          value={selectedSiteId ?? ''}
+          onValueChange={(value) => onSiteChange(value || undefined)}
+          options={[
+            { value: '', label: t('auditLogs.allWebsites') },
+            ...sites.map((site) => ({ value: site.id, label: site.name })),
+          ]}
+          className={FILTER_SELECT_CLASS}
+        />
 
-        {/* Target Entity Filter */}
-        <div>
-          <select
-            value={selectedEntityType ?? ''}
-            onChange={(e) => onEntityTypeChange(e.target.value || undefined)}
-            className="w-full px-3 py-2 text-sm bg-neutral-50 dark:bg-neutral-800/80 border border-neutral-200 dark:border-neutral-700 rounded-lg text-neutral-800 dark:text-neutral-200 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 cursor-pointer"
-          >
-            {entityTypes.map((et) => (
-              <option key={et.value} value={et.value}>
-                {et.label}
-              </option>
-            ))}
-          </select>
-        </div>
+        <NativeSelect
+          aria-label="Filter by target entity"
+          value={selectedEntityType ?? ''}
+          onValueChange={(value) => onEntityTypeChange(value || undefined)}
+          options={entityTypes}
+          className={FILTER_SELECT_CLASS}
+        />
 
-        {/* Date Preset Filter */}
-        <div>
-          <select
-            value={selectedDatePreset}
-            onChange={(e) => onDatePresetChange(e.target.value)}
-            className="w-full px-3 py-2 text-sm bg-neutral-50 dark:bg-neutral-800/80 border border-neutral-200 dark:border-neutral-700 rounded-lg text-neutral-800 dark:text-neutral-200 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 cursor-pointer"
-          >
-            {datePresets.map((dp) => (
-              <option key={dp.value} value={dp.value}>
-                {dp.label}
-              </option>
-            ))}
-          </select>
-        </div>
+        <NativeSelect
+          aria-label="Filter by date"
+          value={selectedDatePreset}
+          onValueChange={onDatePresetChange}
+          options={datePresets}
+          className={FILTER_SELECT_CLASS}
+        />
       </div>
 
       {/* Middle/Bottom Row: Category Tabs + View Toggle + Live Stream + Export */}

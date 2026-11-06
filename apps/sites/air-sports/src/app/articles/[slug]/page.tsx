@@ -171,7 +171,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
                 src={post.featuredImage.url}
                 alt={post.featuredImage.altText || post.title}
                 fill
-                priority
+                preload
                 className="object-cover"
                 sizes="(max-width: 1024px) 100vw, 896px"
               />

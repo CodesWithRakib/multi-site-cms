@@ -453,6 +453,22 @@ describe('Public Content Discovery API (/api/v1/public/sites/:siteKey/*)', () =>
       expect(body.data.seoTitle).toBe('Hidden Fjords of Norway Travel Guide');
     });
 
+    it('returns related articles with their own type, taxonomy, and author (not blanks)', async () => {
+      const res = await request(app.getHttpServer())
+        .get('/api/v1/public/sites/travel-blog/posts/hidden-fjords-norway')
+        .expect(200);
+
+      const body = res.body as ApiSuccess<PublicArticleDetail>;
+      const kyoto = body.data.relatedArticles.find((a) => a.slug === 'kyoto-temples-guide');
+      expect(kyoto).toBeDefined();
+      // Regression: related items used to copy the current post's type and
+      // ship empty categories/author, so cards rendered placeholder data.
+      expect(kyoto?.type).toBe('travel_guide');
+      expect(kyoto?.categories.some((c) => c.slug === 'cultural-heritage')).toBe(true);
+      expect(kyoto?.author?.displayName).toBe('Elena Rostova');
+      expect(body.data.relatedArticles.some((a) => a.slug === 'hidden-fjords-norway')).toBe(false);
+    });
+
     it('returns opaque 404 for unpublished draft post slug', async () => {
       await request(app.getHttpServer())
         .get('/api/v1/public/sites/travel-blog/posts/secret-draft-expedition')

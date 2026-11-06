@@ -3,6 +3,7 @@
 import React from 'react';
 import type { SiteItem, PostPublicationItem } from '@multi-site-cms/types';
 import { PostSitePublicationCard, type SitePubConfig } from './PostSitePublicationCard';
+import { slugifyTitle } from '../utils/slugify';
 import type { PublishingActionType } from './PublishingModal';
 
 export interface PostPublicationsSectionProps {
@@ -10,6 +11,7 @@ export interface PostPublicationsSectionProps {
   title: string;
   siteConfigs: Record<string, SitePubConfig>;
   existingPublications?: PostPublicationItem[];
+  latestRevisionId?: string;
   onConfigChange: (siteId: string, updated: SitePubConfig) => void;
   onOpenPublishModal: (pub: PostPublicationItem, action: PublishingActionType) => void;
 }
@@ -19,6 +21,7 @@ export function PostPublicationsSection({
   title,
   siteConfigs,
   existingPublications,
+  latestRevisionId,
   onConfigChange,
   onOpenPublishModal,
 }: PostPublicationsSectionProps) {
@@ -32,20 +35,23 @@ export function PostPublicationsSection({
           Publish this canonical post across independent websites with site-specific slugs,
           categories, and SEO configuration.
         </p>
+        {existingPublications !== undefined && (
+          <p className="mt-2 inline-flex rounded-lg bg-amber-50 px-2.5 py-1 text-[11px] font-medium text-amber-800 dark:bg-amber-950/40 dark:text-amber-300">
+            Autosave keeps your text safe, but a live site only changes when you publish or click
+            Update live. Site settings and the featured image are saved with Save Changes.
+          </p>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {sites.map((site) => {
-          const defaultSlug = (title || 'post-slug')
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/^-|-$/g, '');
+          const defaultSlug = slugifyTitle(title);
           const existingPub = existingPublications?.find((p) => p.siteId === site.id);
           const currentConfig = siteConfigs[site.id] || {
             enabled: Boolean(existingPub),
             slug: existingPub?.slug || defaultSlug,
             status: existingPub?.status || 'draft',
-            categoryIds: [],
+            categoryIds: existingPub?.categoryIds ?? [],
             seoTitle: existingPub?.seoTitle || '',
             seoDescription: existingPub?.seoDescription || '',
           };
@@ -56,6 +62,7 @@ export function PostPublicationsSection({
               site={site}
               config={currentConfig}
               existingPub={existingPub}
+              latestRevisionId={latestRevisionId}
               onChange={(updated) => onConfigChange(site.id, updated)}
               onOpenPublishModal={onOpenPublishModal}
             />

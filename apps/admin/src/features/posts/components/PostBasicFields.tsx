@@ -1,6 +1,24 @@
 'use client';
 
 import React from 'react';
+import { NativeSelect, type NativeSelectOption } from '@multi-site-cms/ui';
+
+const FIELD_SELECT_CLASS =
+  'px-3 py-2 text-sm rounded-xl border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 font-medium focus:border-emerald-400 focus:ring-emerald-400/20';
+
+const POST_TYPE_OPTIONS: NativeSelectOption[] = [
+  { value: 'article', label: 'Standard Article' },
+  { value: 'guide', label: 'Travel Destination Guide' },
+  { value: 'air_sports_update', label: 'Air Sports Update' },
+  { value: 'event_update', label: 'Event Update' },
+  { value: 'news', label: 'News Flash' },
+  { value: 'live_update', label: 'Live Stream Update' },
+];
+
+const LOCALE_OPTIONS: NativeSelectOption[] = [
+  { value: 'en', label: 'English (en)' },
+  { value: 'bn', label: 'Bengali (bn)' },
+];
 
 interface PostBasicFieldsProps {
   title: string;
@@ -83,19 +101,13 @@ export function PostBasicFields({
           >
             Content Type
           </label>
-          <select
+          <NativeSelect
             id="post-type-select"
             value={type}
-            onChange={(e) => onTypeChange(e.target.value)}
-            className="w-full px-3 py-2 text-sm border rounded-xl border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 font-medium focus:outline-hidden focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 transition-all cursor-pointer"
-          >
-            <option value="article">Standard Article</option>
-            <option value="guide">Travel Destination Guide</option>
-            <option value="air_sports_update">Air Sports Update</option>
-            <option value="event_update">Event Update</option>
-            <option value="news">News Flash</option>
-            <option value="live_update">Live Stream Update</option>
-          </select>
+            onValueChange={onTypeChange}
+            options={POST_TYPE_OPTIONS}
+            className={FIELD_SELECT_CLASS}
+          />
         </div>
 
         <div>
@@ -105,15 +117,13 @@ export function PostBasicFields({
           >
             Primary Language
           </label>
-          <select
+          <NativeSelect
             id="post-locale-select"
             value={sourceLocale}
-            onChange={(e) => onLocaleChange(e.target.value)}
-            className="w-full px-3 py-2 text-sm border rounded-xl border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 font-medium focus:outline-hidden focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 transition-all cursor-pointer"
-          >
-            <option value="en">English (en)</option>
-            <option value="bn">Bengali (bn)</option>
-          </select>
+            onValueChange={onLocaleChange}
+            options={LOCALE_OPTIONS}
+            className={FIELD_SELECT_CLASS}
+          />
         </div>
       </div>
     </div>

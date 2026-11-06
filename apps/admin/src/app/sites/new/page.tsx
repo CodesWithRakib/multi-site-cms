@@ -8,6 +8,27 @@ import { ShellLayout } from '@/components/shell';
 import { useAdmin } from '@/lib/admin-context';
 import { useCreateSiteMutation } from '@/lib/cms-api';
 
+import { NativeSelect, type NativeSelectOption } from '@multi-site-cms/ui';
+
+const FIELD_SELECT_CLASS =
+  'px-3.5 py-2.5 text-xs rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 text-slate-900 dark:text-slate-100 focus:border-emerald-400 focus:ring-emerald-400/20 shadow-2xs';
+
+const LOCALE_OPTIONS: NativeSelectOption[] = [
+  { value: 'en', label: 'English (en)' },
+  { value: 'bn', label: 'Bangla (bn)' },
+  { value: 'es', label: 'Spanish (es)' },
+  { value: 'fr', label: 'French (fr)' },
+];
+
+const TIMEZONE_OPTIONS: NativeSelectOption[] = [
+  { value: 'UTC', label: 'UTC (Universal Coordinated Time)' },
+  { value: 'Asia/Dhaka', label: 'Asia/Dhaka (GMT+6)' },
+  { value: 'America/New_York', label: 'America/New_York (EST/EDT)' },
+  { value: 'Europe/London', label: 'Europe/London (GMT/BST)' },
+  { value: 'Europe/Paris', label: 'Europe/Paris (CET)' },
+  { value: 'Asia/Tokyo', label: 'Asia/Tokyo (JST)' },
+];
+
 export default function NewSitePage() {
   const router = useRouter();
   const { t } = useAdmin();
@@ -144,37 +165,35 @@ export default function NewSitePage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                <label
+                  htmlFor="site-default-locale"
+                  className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5"
+                >
                   {t.sites.defaultLocale || 'Default Locale'}
                 </label>
-                <select
+                <NativeSelect
+                  id="site-default-locale"
                   value={defaultLocale}
-                  onChange={(e) => setDefaultLocale(e.target.value)}
-                  className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 text-slate-900 dark:text-slate-100 focus:outline-hidden focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 shadow-2xs"
-                >
-                  <option value="en">English (en)</option>
-                  <option value="bn">Bangla (bn)</option>
-                  <option value="es">Spanish (es)</option>
-                  <option value="fr">French (fr)</option>
-                </select>
+                  onValueChange={setDefaultLocale}
+                  options={LOCALE_OPTIONS}
+                  className={FIELD_SELECT_CLASS}
+                />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                <label
+                  htmlFor="site-timezone"
+                  className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5"
+                >
                   {t.sites.timezone || 'Timezone'}
                 </label>
-                <select
+                <NativeSelect
+                  id="site-timezone"
                   value={timezone}
-                  onChange={(e) => setTimezone(e.target.value)}
-                  className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 text-slate-900 dark:text-slate-100 focus:outline-hidden focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 shadow-2xs"
-                >
-                  <option value="UTC">UTC (Universal Coordinated Time)</option>
-                  <option value="Asia/Dhaka">Asia/Dhaka (GMT+6)</option>
-                  <option value="America/New_York">America/New_York (EST/EDT)</option>
-                  <option value="Europe/London">Europe/London (GMT/BST)</option>
-                  <option value="Europe/Paris">Europe/Paris (CET)</option>
-                  <option value="Asia/Tokyo">Asia/Tokyo (JST)</option>
-                </select>
+                  onValueChange={setTimezone}
+                  options={TIMEZONE_OPTIONS}
+                  className={FIELD_SELECT_CLASS}
+                />
               </div>
             </div>
 

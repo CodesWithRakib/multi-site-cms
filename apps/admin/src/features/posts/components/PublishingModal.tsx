@@ -11,6 +11,7 @@ import {
   Loader2,
   RotateCcw,
   Archive,
+  RefreshCw,
 } from 'lucide-react';
 import type { PostPublicationItem } from '@multi-site-cms/types';
 import { useAdmin } from '@/lib/admin-context';
@@ -19,13 +20,21 @@ import {
   useCancelScheduleMutation,
   usePublishImmediatelyMutation,
   useReschedulePublicationMutation,
+  useUpdateLiveContentMutation,
   useRestorePublicationMutation,
   useSchedulePublicationMutation,
   useUnpublishPublicationMutation,
 } from '@/lib/cms-api';
 
 export type PublishingActionType =
-  'publish' | 'schedule' | 'reschedule' | 'cancelSchedule' | 'unpublish' | 'archive' | 'restore';
+  | 'publish'
+  | 'updateLive'
+  | 'schedule'
+  | 'reschedule'
+  | 'cancelSchedule'
+  | 'unpublish'
+  | 'archive'
+  | 'restore';
 
 interface PublishingModalProps {
   isOpen: boolean;
@@ -54,6 +63,7 @@ export function PublishingModal({
 
   // Mutations
   const [publishImmediately, { isLoading: isPublishing }] = usePublishImmediatelyMutation();
+  const [updateLiveContent, { isLoading: isUpdatingLive }] = useUpdateLiveContentMutation();
   const [schedulePublication, { isLoading: isScheduling }] = useSchedulePublicationMutation();
   const [reschedulePublication, { isLoading: isRescheduling }] = useReschedulePublicationMutation();
   const [cancelSchedule, { isLoading: isCancelling }] = useCancelScheduleMutation();
@@ -63,6 +73,7 @@ export function PublishingModal({
 
   const isPending =
     isPublishing ||
+    isUpdatingLive ||
     isScheduling ||
     isRescheduling ||
     isCancelling ||
@@ -82,6 +93,8 @@ export function PublishingModal({
     try {
       if (action === 'publish') {
         await publishImmediately({ siteId, publicationId }).unwrap();
+      } else if (action === 'updateLive') {
+        await updateLiveContent({ siteId, publicationId }).unwrap();
       } else if (action === 'schedule') {
         if (!scheduledTime) {
           setErrorMsg('Please select a scheduled date and time.');
@@ -157,6 +170,16 @@ export function PublishingModal({
       color: 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30',
       btnText: t.actions.publishNow,
       btnClass: 'bg-blue-600 hover:bg-blue-700 text-white',
+      isDestructive: false,
+    },
+    updateLive: {
+      title: 'Update the live site',
+      description:
+        'Replace the published version on this site with your latest saved edits. The URL and publish date stay the same.',
+      icon: RefreshCw,
+      color: 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30',
+      btnText: 'Update live',
+      btnClass: 'bg-emerald-600 hover:bg-emerald-700 text-white',
       isDestructive: false,
     },
     schedule: {

@@ -51,6 +51,19 @@ export class PublishingController {
     return this.publishingService.publishImmediately(actor, siteId, publicationId);
   }
 
+  @Post('sites/:siteId/publications/:publicationId/update-live')
+  @HttpCode(HttpStatus.OK)
+  @RequirePermissions('publication:publish')
+  @ApiOperation({ summary: 'Push the latest edits of a published post to the live site' })
+  @ApiResponse({ status: 200, description: 'Live publication now shows the latest revision' })
+  async updateLiveContent(
+    @CurrentUser() actor: EffectiveAuthContext,
+    @Param('siteId', new ParseUUIDPipe({ version: '4' })) siteId: string,
+    @Param('publicationId', new ParseUUIDPipe({ version: '4' })) publicationId: string,
+  ): Promise<PostPublicationItem> {
+    return this.publishingService.updateLiveContent(actor, siteId, publicationId);
+  }
+
   @Post('sites/:siteId/publications/:publicationId/schedule')
   @HttpCode(HttpStatus.OK)
   @RequirePermissions('publication:schedule')

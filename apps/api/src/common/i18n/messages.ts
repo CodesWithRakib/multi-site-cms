@@ -93,6 +93,7 @@ export const en = {
   'post.previewTokenExpired': 'The preview token has expired.',
   'post.previewTokenInvalid': 'Invalid or tampered preview token.',
   'publication.invalidTransition': 'Invalid publication state transition.',
+  'publication.notPublished': 'Only a published publication can be updated live.',
   'publication.scheduledTimeInPast': 'Scheduled publication time must be in the future.',
   'publication.scheduledTimeInvalid': 'Invalid scheduled timestamp format.',
   'publication.contentNotEligible':
@@ -204,6 +205,7 @@ export const bn: Record<MessageKey, string> = {
   'post.previewTokenExpired': 'প্রিভিউ টোকেনের মেয়াদ শেষ হয়ে গেছে।',
   'post.previewTokenInvalid': 'অবৈধ বা বিকৃত প্রিভিউ টোকেন।',
   'publication.invalidTransition': 'প্রকাশনার অবস্থার এই পরিবর্তনটি অনুমোদিত নয়।',
+  'publication.notPublished': 'শুধুমাত্র প্রকাশিত কনটেন্ট লাইভ আপডেট করা যায়।',
   'publication.scheduledTimeInPast': 'নির্ধারিত সময় ভবিষ্যতের হতে হবে।',
   'publication.scheduledTimeInvalid': 'নির্ধারিত সময়ের ফরম্যাটটি সঠিক নয়।',
   'publication.contentNotEligible': 'মূল পোস্ট বা সংস্করণটি অসম্পূর্ণ এবং প্রকাশযোগ্য নয়।',

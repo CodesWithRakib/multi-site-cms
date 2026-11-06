@@ -35,6 +35,26 @@ export const USER_STATUS_OPTIONS: ReadonlyArray<readonly [UserStatus, string]> =
   ['disabled', 'Disabled'],
 ];
 
+/** Dropdown options derived from the lists above. */
+export const ROLE_SELECT_OPTIONS = ASSIGNABLE_ROLES.map((role) => ({
+  value: role.key,
+  label: role.label,
+}));
+export const STATUS_SELECT_OPTIONS = USER_STATUS_OPTIONS.map(([value, label]) => ({
+  value,
+  label,
+}));
+
+/** Narrows a dropdown value to a role key; undefined for anything else. */
+export function toAssignableRoleKey(value: string): AssignableRoleKey | undefined {
+  return ASSIGNABLE_ROLES.find((role) => role.key === value)?.key;
+}
+
+/** Narrows a dropdown value to a user status; undefined for anything else. */
+export function toUserStatus(value: string): UserStatus | undefined {
+  return USER_STATUS_OPTIONS.find(([status]) => status === value)?.[0];
+}
+
 export function isSuperAdminUser(user: Pick<UserItem, 'roles'>): boolean {
   return user.roles.some((role) => role.roleKey === 'super_admin');
 }

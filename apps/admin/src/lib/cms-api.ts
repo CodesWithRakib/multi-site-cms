@@ -84,6 +84,15 @@ export interface CreatePublicationPayload {
   tagIds?: string[];
 }
 
+/** PATCH body for a publication; `null` clears an optional field. */
+export type UpdatePublicationPayload = Partial<
+  Omit<CreatePublicationPayload, 'siteId' | 'featuredImageId' | 'seoTitle' | 'seoDescription'>
+> & {
+  featuredImageId?: string | null;
+  seoTitle?: string | null;
+  seoDescription?: string | null;
+};
+
 export interface ListPostsParams {
   siteId?: string;
   type?: string;
@@ -532,7 +541,14 @@ export const cmsApi = platformApi.injectEndpoints({
     getPost: build.query<PostItem, string>({
       query: (postId) => ({ path: `/posts/${postId}` }),
       transformResponse: (response: ApiSuccess<unknown>) => response.data as PostItem,
-      providesTags: (_result, _error, id) => [{ type: 'Post' as const, id }],
+      // Publication tags too, so publish/unpublish/update-live refresh the editor.
+      providesTags: (result, _error, id) => [
+        { type: 'Post' as const, id },
+        ...(result?.publications ?? []).map((pub) => ({
+          type: 'Publication' as const,
+          id: pub.id,
+        })),
+      ],
     }),
 
     createPost: build.mutation<PostItem, CreatePostPayload>({
@@ -615,7 +631,7 @@ export const cmsApi = platformApi.injectEndpoints({
 
     updatePublication: build.mutation<
       PostPublicationItem,
-      { siteId: string; publicationId: string; data: Partial<CreatePublicationPayload> }
+      { siteId: string; publicationId: string; data: UpdatePublicationPayload }
     >({
       query: ({ siteId, publicationId, data }) => ({
         path: `/sites/${siteId}/publications/${publicationId}`,
@@ -644,6 +660,22 @@ export const cmsApi = platformApi.injectEndpoints({
     >({
       query: ({ siteId, publicationId }) => ({
         path: `/sites/${siteId}/publications/${publicationId}/publish`,
+        method: 'POST',
+      }),
+      transformResponse: (response: ApiSuccess<unknown>) => response.data as PostPublicationItem,
+      invalidatesTags: (_res, _err, { publicationId }) => [
+        { type: 'Publication' as const, id: publicationId },
+        { type: 'Publication' as const, id: 'LIST' },
+        { type: 'Post' as const, id: 'LIST' },
+      ],
+    }),
+
+    updateLiveContent: build.mutation<
+      PostPublicationItem,
+      { siteId: string; publicationId: string }
+    >({
+      query: ({ siteId, publicationId }) => ({
+        path: `/sites/${siteId}/publications/${publicationId}/update-live`,
         method: 'POST',
       }),
       transformResponse: (response: ApiSuccess<unknown>) => response.data as PostPublicationItem,
@@ -816,6 +848,12 @@ export const cmsApi = platformApi.injectEndpoints({
               { type: 'Media' as const, id: 'LIST' },
             ]
           : [{ type: 'Media' as const, id: 'LIST' }],
+    }),
+
+    getMediaAsset: build.query<MediaAssetItem, string>({
+      query: (mediaId) => ({ path: `/media/${mediaId}` }),
+      transformResponse: (response: ApiSuccess<unknown>) => response.data as MediaAssetItem,
+      providesTags: (_result, _error, mediaId) => [{ type: 'Media' as const, id: mediaId }],
     }),
 
     uploadMedia: build.mutation<MediaUploadResponse, FormData>({
@@ -1089,6 +1127,7 @@ export const {
   useUpdatePublicationMutation,
   useDeletePublicationMutation,
   usePublishImmediatelyMutation,
+  useUpdateLiveContentMutation,
   useSchedulePublicationMutation,
   useReschedulePublicationMutation,
   useCancelScheduleMutation,
@@ -1104,6 +1143,7 @@ export const {
 
   // Media
   useListMediaQuery,
+  useGetMediaAssetQuery,
   useUploadMediaMutation,
   useUpdateMediaMutation,
   useDeleteMediaMutation,

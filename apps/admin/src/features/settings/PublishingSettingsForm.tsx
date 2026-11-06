@@ -3,7 +3,17 @@
 import React, { useState } from 'react';
 import { Save, CheckCircle2, AlertCircle, RotateCw } from 'lucide-react';
 import type { PlatformPublishingSettings } from '@multi-site-cms/types';
+import { NativeSelect } from '@multi-site-cms/ui';
 import { useAdmin } from '@/lib/admin-context';
+import { SETTINGS_SELECT_CLASS } from './form-styles';
+
+const POST_STATUS_OPTIONS: ReadonlyArray<{
+  value: PlatformPublishingSettings['defaultPostStatus'];
+  label: string;
+}> = [
+  { value: 'draft', label: 'Draft (Private author workspace)' },
+  { value: 'in_review', label: 'In Review (Direct editorial review queue)' },
+];
 
 interface PublishingSettingsFormProps {
   initialData?: PlatformPublishingSettings;
@@ -76,22 +86,22 @@ export function PublishingSettingsForm({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 text-sm">
         {/* Default Post Status */}
         <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+          <label
+            htmlFor="settings-default-post-status"
+            className="text-xs font-semibold text-neutral-700 dark:text-neutral-300"
+          >
             {t('settings.defaultPostStatus')}
           </label>
-          <select
+          <NativeSelect
+            id="settings-default-post-status"
             value={formData.defaultPostStatus}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                defaultPostStatus: e.target.value as 'draft' | 'in_review',
-              })
-            }
-            className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50/70 dark:bg-neutral-800/80 text-neutral-900 dark:text-neutral-100 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 cursor-pointer"
-          >
-            <option value="draft">Draft (Private author workspace)</option>
-            <option value="in_review">In Review (Direct editorial review queue)</option>
-          </select>
+            onValueChange={(value) => {
+              const match = POST_STATUS_OPTIONS.find((option) => option.value === value);
+              if (match) setFormData({ ...formData, defaultPostStatus: match.value });
+            }}
+            options={POST_STATUS_OPTIONS}
+            className={SETTINGS_SELECT_CLASS}
+          />
         </div>
 
         {/* Auto Save Interval */}

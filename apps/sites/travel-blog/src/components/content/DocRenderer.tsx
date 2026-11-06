@@ -2,6 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import { CalloutBox } from './CalloutBox';
 import { DestinationInfoCard } from './DestinationInfoCard';
+import { toYouTubeEmbedUrl } from '@multi-site-cms/config/embeds';
 import { EventTimelineCard } from './EventTimelineCard';
 
 interface TiptapMark {
@@ -71,6 +72,13 @@ function renderTextWithMarks(text: string, marks?: TiptapMark[], key = 0): React
           <em key={markKey} className="italic">
             {element}
           </em>
+        );
+        break;
+      case 'underline':
+        element = (
+          <u key={markKey} className="underline underline-offset-4">
+            {element}
+          </u>
         );
         break;
       case 'strike':
@@ -152,6 +160,14 @@ function renderHeading(level: number, headingId: string, children: React.ReactNo
   );
 }
 
+/** Editor text alignment (TextAlign extension); left is the default. */
+function alignStyle(node: TiptapNode): React.CSSProperties | undefined {
+  const align = node.attrs?.textAlign;
+  return align === 'center' || align === 'right' || align === 'justify'
+    ? { textAlign: align }
+    : undefined;
+}
+
 function renderNode(node: TiptapNode, index: number): React.ReactNode {
   const key = `node-${index}-${node.type}`;
 
@@ -170,7 +186,11 @@ function renderNode(node: TiptapNode, index: number): React.ReactNode {
       );
     case 'paragraph':
       return (
-        <p key={key} className="text-foreground/90 font-serif text-lg leading-relaxed">
+        <p
+          key={key}
+          className="text-foreground/90 font-serif text-lg leading-relaxed"
+          style={alignStyle(node)}
+        >
           {children && children.length > 0 ? children : <br />}
         </p>
       );
@@ -220,6 +240,8 @@ function renderNode(node: TiptapNode, index: number): React.ReactNode {
           <code>{getNodeText(node)}</code>
         </pre>
       );
+    case 'hardBreak':
+      return <br key={key} />;
     case 'horizontalRule':
       return <hr key={key} className="my-10 border-border" />;
     case 'image': {
@@ -257,7 +279,10 @@ function renderNode(node: TiptapNode, index: number): React.ReactNode {
     case 'table':
       return (
         <div key={key} className="overflow-x-auto my-8 rounded-xl border border-border">
-          <table className="w-full text-left border-collapse font-sans text-sm">{children}</table>
+          {/* Rows need a <tbody>: <tr> directly in <table> breaks hydration. */}
+          <table className="w-full text-left border-collapse font-sans text-sm">
+            <tbody>{children}</tbody>
+          </table>
         </div>
       );
     case 'tableRow':
@@ -324,16 +349,19 @@ function renderNode(node: TiptapNode, index: number): React.ReactNode {
       );
     case 'youtubeEmbed':
     case 'youtube': {
-      const src = node.attrs?.src;
-      if (!isSafeUrl(src)) return null;
+      // Only YouTube is embeddable; anything else is dropped, never iframed.
+      const src = toYouTubeEmbedUrl(node.attrs?.src);
+      if (!src) return null;
       return (
         <div
           key={key}
           className="my-8 aspect-video w-full overflow-hidden rounded-2xl border border-border shadow-md"
         >
           <iframe
-            src={String(src)}
+            src={src}
             title="Video player"
+            loading="lazy"
+            referrerPolicy="strict-origin-when-cross-origin"
             className="h-full w-full"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen

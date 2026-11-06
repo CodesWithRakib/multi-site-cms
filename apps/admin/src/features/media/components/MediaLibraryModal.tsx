@@ -6,8 +6,16 @@ import { ConfirmDialog } from '@/components/feedback';
 import { apiErrorMessage } from '@/lib/api-error';
 import { useDeleteMediaMutation, useListMediaQuery } from '@/lib/cms-api';
 import type { MediaAssetItem } from '@multi-site-cms/types';
+import { NativeSelect, type NativeSelectOption } from '@multi-site-cms/ui';
 import { MediaCard } from './MediaCard';
 import { MediaDropzone } from './MediaDropzone';
+
+const MIME_FILTER_OPTIONS: NativeSelectOption[] = [
+  { value: '', label: 'All Formats' },
+  { value: 'image/', label: 'Images Only' },
+  { value: 'application/pdf', label: 'PDF Documents' },
+  { value: 'video/', label: 'Videos' },
+];
 
 export interface MediaLibraryModalProps {
   isOpen: boolean;
@@ -151,20 +159,20 @@ export function MediaLibraryModal({
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <Filter className="w-4 h-4 text-slate-500 dark:text-slate-400" />
-                  <select
+                  <Filter
+                    aria-hidden="true"
+                    className="w-4 h-4 text-slate-500 dark:text-slate-400"
+                  />
+                  <NativeSelect
+                    aria-label="Filter by file format"
                     value={mimeFilter}
-                    onChange={(e) => {
-                      setMimeFilter(e.target.value);
+                    onValueChange={(value) => {
+                      setMimeFilter(value);
                       setPage(1);
                     }}
-                    className="text-xs px-3 py-2 border rounded-lg border-slate-300 dark:border-slate-700 dark:bg-slate-800 text-slate-900 dark:text-slate-100"
-                  >
-                    <option value="">All Formats</option>
-                    <option value="image/">Images Only</option>
-                    <option value="application/pdf">PDF Documents</option>
-                    <option value="video/">Videos</option>
-                  </select>
+                    options={MIME_FILTER_OPTIONS}
+                    className="w-auto text-xs px-3 py-2 rounded-lg border-slate-300 dark:border-slate-700 dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+                  />
                 </div>
               </div>
 

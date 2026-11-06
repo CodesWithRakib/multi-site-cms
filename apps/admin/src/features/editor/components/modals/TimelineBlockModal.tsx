@@ -1,7 +1,31 @@
 'use client';
 
 import React, { useState } from 'react';
+import { NativeSelect } from '@multi-site-cms/ui';
 import type { EventTimelineBlockAttributes } from '../../extensions/event-timeline-block';
+
+const MODAL_SELECT_CLASS =
+  'px-3 py-2 rounded-xl border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-medium';
+
+const STATUS_OPTIONS: ReadonlyArray<{
+  value: EventTimelineBlockAttributes['status'];
+  label: string;
+}> = [
+  { value: 'scheduled', label: 'Scheduled' },
+  { value: 'live', label: 'Live / In Progress' },
+  { value: 'completed', label: 'Completed' },
+  { value: 'delayed', label: 'Delayed' },
+  { value: 'cancelled', label: 'Cancelled' },
+];
+
+const ALERT_LEVEL_OPTIONS: ReadonlyArray<{
+  value: NonNullable<EventTimelineBlockAttributes['alertLevel']>;
+  label: string;
+}> = [
+  { value: 'normal', label: 'Normal' },
+  { value: 'advisory', label: 'Advisory' },
+  { value: 'warning', label: 'Warning / Severe' },
+];
 
 export interface TimelineBlockModalProps {
   onClose: () => void;
@@ -69,38 +93,40 @@ export function TimelineBlockModal({ onClose, onInsert }: TimelineBlockModalProp
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block font-semibold mb-1 text-slate-700 dark:text-slate-300">
+          <label
+            htmlFor="timeline-status"
+            className="block font-semibold mb-1 text-slate-700 dark:text-slate-300"
+          >
             Status
           </label>
-          <select
+          <NativeSelect
+            id="timeline-status"
             value={timelineStatus}
-            onChange={(e) =>
-              setTimelineStatus(e.target.value as EventTimelineBlockAttributes['status'])
-            }
-            className="w-full px-3 py-2 border rounded-xl border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-medium"
-          >
-            <option value="scheduled">Scheduled</option>
-            <option value="live">Live / In Progress</option>
-            <option value="completed">Completed</option>
-            <option value="delayed">Delayed</option>
-            <option value="cancelled">Cancelled</option>
-          </select>
+            onValueChange={(value) => {
+              const match = STATUS_OPTIONS.find((option) => option.value === value);
+              if (match) setTimelineStatus(match.value);
+            }}
+            options={STATUS_OPTIONS}
+            className={MODAL_SELECT_CLASS}
+          />
         </div>
         <div>
-          <label className="block font-semibold mb-1 text-slate-700 dark:text-slate-300">
+          <label
+            htmlFor="timeline-alert-level"
+            className="block font-semibold mb-1 text-slate-700 dark:text-slate-300"
+          >
             Alert Level
           </label>
-          <select
-            value={alertLevel}
-            onChange={(e) =>
-              setAlertLevel(e.target.value as EventTimelineBlockAttributes['alertLevel'])
-            }
-            className="w-full px-3 py-2 border rounded-xl border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-medium"
-          >
-            <option value="normal">Normal</option>
-            <option value="advisory">Advisory</option>
-            <option value="warning">Warning / Severe</option>
-          </select>
+          <NativeSelect
+            id="timeline-alert-level"
+            value={alertLevel ?? 'normal'}
+            onValueChange={(value) => {
+              const match = ALERT_LEVEL_OPTIONS.find((option) => option.value === value);
+              if (match) setAlertLevel(match.value);
+            }}
+            options={ALERT_LEVEL_OPTIONS}
+            className={MODAL_SELECT_CLASS}
+          />
         </div>
       </div>
 

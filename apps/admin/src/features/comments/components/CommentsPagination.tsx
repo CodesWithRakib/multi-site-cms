@@ -2,6 +2,12 @@
 
 import React from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { NativeSelect } from '@multi-site-cms/ui';
+
+const PAGE_SIZE_OPTIONS = [10, 20, 50].map((size) => ({
+  value: String(size),
+  label: String(size),
+}));
 
 interface CommentsPaginationProps {
   page: number;
@@ -39,16 +45,13 @@ export function CommentsPagination({
         <label htmlFor="comments-limit" className="text-xs">
           Per page:
         </label>
-        <select
+        <NativeSelect
           id="comments-limit"
-          value={limit}
-          onChange={(e) => onLimitChange(Number.parseInt(e.target.value, 10))}
-          className="rounded-lg border border-border bg-card px-2 py-1 text-xs text-foreground cursor-pointer"
-        >
-          <option value={10}>10</option>
-          <option value={20}>20</option>
-          <option value={50}>50</option>
-        </select>
+          value={String(limit)}
+          onValueChange={(value) => onLimitChange(Number.parseInt(value, 10))}
+          options={PAGE_SIZE_OPTIONS}
+          className="min-h-0 w-auto gap-1.5 rounded-lg border-border bg-card px-2 py-1 text-xs"
+        />
       </div>
 
       <div className="flex items-center gap-1.5">

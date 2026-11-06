@@ -3,7 +3,22 @@
 import React, { useState } from 'react';
 import { Save, CheckCircle2, AlertCircle, RotateCw } from 'lucide-react';
 import type { PlatformGeneralSettings } from '@multi-site-cms/types';
+import { NativeSelect, type NativeSelectOption } from '@multi-site-cms/ui';
 import { useAdmin } from '@/lib/admin-context';
+import { SETTINGS_SELECT_CLASS } from './form-styles';
+
+const LOCALE_OPTIONS: NativeSelectOption[] = [
+  { value: 'en', label: 'English (en)' },
+  { value: 'bn', label: 'বাংলা (bn)' },
+];
+
+const TIMEZONE_OPTIONS: NativeSelectOption[] = [
+  { value: 'UTC', label: 'UTC (Coordinated Universal Time)' },
+  { value: 'Asia/Dhaka', label: 'Asia/Dhaka (GMT+6)' },
+  { value: 'America/New_York', label: 'America/New_York (EST/EDT)' },
+  { value: 'Europe/London', label: 'Europe/London (GMT/BST)' },
+  { value: 'Asia/Tokyo', label: 'Asia/Tokyo (JST)' },
+];
 
 interface GeneralSettingsFormProps {
   initialData?: PlatformGeneralSettings;
@@ -118,35 +133,36 @@ export function GeneralSettingsForm({ initialData, onSave, isSaving }: GeneralSe
 
         {/* Default Locale */}
         <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+          <label
+            htmlFor="settings-default-locale"
+            className="text-xs font-semibold text-neutral-700 dark:text-neutral-300"
+          >
             {t('settings.defaultLocale')}
           </label>
-          <select
+          <NativeSelect
+            id="settings-default-locale"
             value={formData.defaultLocale}
-            onChange={(e) => setFormData({ ...formData, defaultLocale: e.target.value })}
-            className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50/70 dark:bg-neutral-800/80 text-neutral-900 dark:text-neutral-100 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 cursor-pointer"
-          >
-            <option value="en">English (en)</option>
-            <option value="bn">বাংলা (bn)</option>
-          </select>
+            onValueChange={(value) => setFormData({ ...formData, defaultLocale: value })}
+            options={LOCALE_OPTIONS}
+            className={SETTINGS_SELECT_CLASS}
+          />
         </div>
 
         {/* Default Timezone */}
         <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+          <label
+            htmlFor="settings-default-timezone"
+            className="text-xs font-semibold text-neutral-700 dark:text-neutral-300"
+          >
             {t('settings.defaultTimezone')}
           </label>
-          <select
+          <NativeSelect
+            id="settings-default-timezone"
             value={formData.defaultTimezone}
-            onChange={(e) => setFormData({ ...formData, defaultTimezone: e.target.value })}
-            className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50/70 dark:bg-neutral-800/80 text-neutral-900 dark:text-neutral-100 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 cursor-pointer"
-          >
-            <option value="UTC">UTC (Coordinated Universal Time)</option>
-            <option value="Asia/Dhaka">Asia/Dhaka (GMT+6)</option>
-            <option value="America/New_York">America/New_York (EST/EDT)</option>
-            <option value="Europe/London">Europe/London (GMT/BST)</option>
-            <option value="Asia/Tokyo">Asia/Tokyo (JST)</option>
-          </select>
+            onValueChange={(value) => setFormData({ ...formData, defaultTimezone: value })}
+            options={TIMEZONE_OPTIONS}
+            className={SETTINGS_SELECT_CLASS}
+          />
         </div>
       </div>
 

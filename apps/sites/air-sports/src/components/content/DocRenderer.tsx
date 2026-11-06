@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { AirSportsCallout } from './AirSportsCallout';
 import { AirSportsDestinationCard } from './AirSportsDestinationCard';
 import { AirSportsTimelineCard } from './AirSportsTimelineCard';
+import { toYouTubeEmbedUrl } from '@multi-site-cms/config/embeds';
 
 export interface DocMark {
   type: string;
@@ -44,6 +45,8 @@ function renderTextNode(node: DocNode, index: number): React.ReactNode {
         element = <strong className="font-bold text-foreground">{element}</strong>;
       } else if (mark.type === 'italic') {
         element = <em className="italic">{element}</em>;
+      } else if (mark.type === 'underline') {
+        element = <u className="underline underline-offset-4">{element}</u>;
       } else if (mark.type === 'strike') {
         element = <s className="line-through">{element}</s>;
       } else if (mark.type === 'code') {
@@ -72,13 +75,23 @@ function renderTextNode(node: DocNode, index: number): React.ReactNode {
   return <React.Fragment key={index}>{element}</React.Fragment>;
 }
 
+/** Editor text alignment (TextAlign extension); left is the default. */
+function alignStyle(node: DocNode): React.CSSProperties | undefined {
+  const align = node.attrs?.textAlign;
+  return align === 'center' || align === 'right' || align === 'justify'
+    ? { textAlign: align }
+    : undefined;
+}
+
 function DocNodeRenderer({ node, index }: { node: DocNode; index: number }): React.ReactNode {
   if (node.type === 'text') return renderTextNode(node, index);
 
   switch (node.type) {
+    case 'hardBreak':
+      return <br />;
     case 'paragraph':
       return (
-        <p className="my-4 text-base leading-relaxed text-foreground/90">
+        <p className="my-4 text-base leading-relaxed text-foreground/90" style={alignStyle(node)}>
           {renderChildren(node.content)}
         </p>
       );
@@ -174,8 +187,9 @@ function DocNodeRenderer({ node, index }: { node: DocNode; index: number }): Rea
     case 'table':
       return (
         <div className="my-6 overflow-x-auto rounded-xl border border-border">
+          {/* Rows need a <tbody>: <tr> directly in <table> breaks hydration. */}
           <table className="w-full text-left font-mono text-xs">
-            {renderChildren(node.content)}
+            <tbody>{renderChildren(node.content)}</tbody>
           </table>
         </div>
       );
@@ -187,12 +201,17 @@ function DocNodeRenderer({ node, index }: { node: DocNode; index: number }): Rea
       );
     case 'tableHeader':
       return (
-        <th className="bg-muted/70 px-4 py-3 font-bold uppercase tracking-wider text-foreground">
+        <th className="bg-muted/70 px-4 py-3 font-bold uppercase tracking-wider text-foreground [&_p]:my-0 [&_p]:text-xs">
           {renderChildren(node.content)}
         </th>
       );
     case 'tableCell':
-      return <td className="px-4 py-3 text-foreground/80">{renderChildren(node.content)}</td>;
+      // Cell text is wrapped in paragraphs; drop their article spacing.
+      return (
+        <td className="px-4 py-3 text-foreground/80 [&_p]:my-0 [&_p]:text-xs">
+          {renderChildren(node.content)}
+        </td>
+      );
     case 'eventTimelineBlock': {
       const attrs = node.attrs || {};
       return (
@@ -231,13 +250,16 @@ function DocNodeRenderer({ node, index }: { node: DocNode; index: number }): Rea
       );
     case 'youtubeEmbed':
     case 'youtube': {
-      const src = node.attrs?.src as string;
+      // Only YouTube is embeddable; anything else is dropped, never iframed.
+      const src = toYouTubeEmbedUrl(node.attrs?.src);
       if (!src) return null;
       return (
         <div className="my-8 aspect-video w-full overflow-hidden rounded-2xl border border-border shadow-md">
           <iframe
             src={src}
             title="Video player"
+            loading="lazy"
+            referrerPolicy="strict-origin-when-cross-origin"
             className="h-full w-full"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen

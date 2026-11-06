@@ -39,7 +39,7 @@ export default function AboutPage() {
           src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1600&q=85"
           alt="Expansive mountain range"
           fill
-          priority
+          preload
           sizes="(max-width: 1280px) 100vw, 1280px"
           className="object-cover"
         />

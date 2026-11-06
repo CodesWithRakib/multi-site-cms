@@ -13,6 +13,7 @@ import {
   Eye,
   EyeOff,
 } from 'lucide-react';
+import { NativeSelect } from '@multi-site-cms/ui';
 import { ShellLayout } from '@/components/shell';
 import { useAdmin } from '@/lib/admin-context';
 import {
@@ -248,22 +249,24 @@ export default function NewUserPage() {
             {/* Site Picker when site-scoped */}
             {initialRole !== 'super_admin' && initialRole !== 'none' && (
               <div>
-                <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">
+                <label
+                  htmlFor="new-user-site"
+                  className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5"
+                >
                   Assigned Site *
                 </label>
-                <select
+                <NativeSelect
+                  id="new-user-site"
                   required
                   value={selectedSiteId}
-                  onChange={(e) => setSelectedSiteId(e.target.value)}
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 dark:bg-slate-800 text-slate-900 dark:text-slate-100"
-                >
-                  <option value="">Select a target site...</option>
-                  {sitesData?.map((site) => (
-                    <option key={site.id} value={site.id}>
-                      {site.name} ({site.key})
-                    </option>
-                  ))}
-                </select>
+                  onValueChange={setSelectedSiteId}
+                  placeholder="Select a target site..."
+                  options={(sitesData ?? []).map((site) => ({
+                    value: site.id,
+                    label: `${site.name} (${site.key})`,
+                  }))}
+                  className="px-3 py-2 text-xs rounded-xl border-slate-200 dark:border-slate-700 dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+                />
               </div>
             )}
           </div>

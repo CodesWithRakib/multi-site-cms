@@ -111,7 +111,22 @@ export class PublishingService {
   }
 
   /**
-   * Publishes a publication immediately.
+   * Newest revision of a post. ADR-0005: "Editing creates a revision;
+   * publishing moves the publication's pinned revision" — so every publish
+   * action pins this, never the revision the publication was created with.
+   */
+  private async latestRevisionId(postId: string): Promise<string | null> {
+    const revisionRepo = await this.getRevisionRepo();
+    const latest = await revisionRepo.findOne({
+      where: { postId },
+      order: { revisionNumber: 'DESC' },
+      select: { id: true },
+    });
+    return latest?.id ?? null;
+  }
+
+  /**
+   * Publishes a publication immediately, pinning the post's latest revision.
    */
   async publishImmediately(
     actor: EffectiveAuthContext,
@@ -134,6 +149,7 @@ export class PublishingService {
       );
     }
 
+    pub.revisionId = (await this.latestRevisionId(pub.postId)) ?? pub.revisionId;
     const { post, revision, site } = await this.validateContentEligibility(
       pub.postId,
       pub.revisionId,
@@ -225,6 +241,89 @@ export class PublishingService {
   }
 
   /**
+   * Moves a published publication to the post's latest revision so edits
+   * made after publishing reach the live site. A no-op when already current.
+   * Emits PUBLICATION_UPDATED (cache revalidation only: an edit must not be
+   * re-broadcast as a new live update).
+   */
+  async updateLiveContent(
+    actor: EffectiveAuthContext,
+    siteId: string,
+    publicationId: string,
+  ): Promise<PostPublicationItem> {
+    this.checkSiteAccess(actor, siteId);
+
+    const publicationRepo = await this.getPublicationRepo();
+    const pub = await publicationRepo.findOne({ where: { id: publicationId, siteId } });
+    if (!pub) {
+      throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'publication.notFound');
+    }
+    if (pub.status !== 'published') {
+      throw new ApiException(
+        HttpStatus.BAD_REQUEST,
+        'VALIDATION_ERROR',
+        'publication.notPublished',
+      );
+    }
+
+    const latestId = await this.latestRevisionId(pub.postId);
+    if (!latestId || latestId === pub.revisionId) {
+      return this.mapToItem(pub);
+    }
+
+    const { post, revision, site } = await this.validateContentEligibility(
+      pub.postId,
+      latestId,
+      siteId,
+    );
+    const previousRevisionId = pub.revisionId;
+
+    return this.dataSource.transaction(async (manager) => {
+      pub.revisionId = latestId;
+      const savedPub = await manager.getRepository(PostPublication).save(pub);
+
+      const txOutboxRepo = manager.getRepository(OutboxEvent);
+      await txOutboxRepo.save(
+        txOutboxRepo.create({
+          eventType: OUTBOX_EVENT_TYPES.PUBLICATION_UPDATED,
+          eventVersion: 1,
+          siteId: savedPub.siteId,
+          publicationId: savedPub.id,
+          postId: savedPub.postId,
+          payload: {
+            publicationId: savedPub.id,
+            siteId: savedPub.siteId,
+            siteKey: site.key,
+            postId: savedPub.postId,
+            postType: post.type,
+            slug: savedPub.slug,
+            title: revision.title || savedPub.slug,
+            publishedAt: (savedPub.publishedAt ?? new Date()).toISOString(),
+            revisionId: savedPub.revisionId,
+            templateKey: savedPub.templateKey,
+          },
+          status: 'pending',
+          retryCount: 0,
+          maxRetries: 5,
+          nextRetryAt: new Date(),
+        }),
+      );
+
+      await this.auditService.record({
+        actorId: actor.user.id,
+        actorType: 'user',
+        siteId,
+        action: 'publication.update_live',
+        entityType: 'post_publication',
+        entityId: savedPub.id,
+        metadata: { slug: savedPub.slug, previousRevisionId, revisionId: latestId },
+      });
+
+      return this.mapToItem(savedPub);
+    });
+  }
+
+  /**
    * Schedules a publication for a future date/time.
    */
   async schedulePublication(
@@ -249,6 +348,7 @@ export class PublishingService {
       );
     }
 
+    pub.revisionId = (await this.latestRevisionId(pub.postId)) ?? pub.revisionId;
     const { site } = await this.validateContentEligibility(pub.postId, pub.revisionId, siteId);
 
     const scheduledDate = new Date(dto.scheduledFor);
@@ -347,6 +447,7 @@ export class PublishingService {
       );
     }
 
+    pub.revisionId = (await this.latestRevisionId(pub.postId)) ?? pub.revisionId;
     const { site } = await this.validateContentEligibility(pub.postId, pub.revisionId, siteId);
 
     const newScheduledDate = new Date(dto.scheduledFor);

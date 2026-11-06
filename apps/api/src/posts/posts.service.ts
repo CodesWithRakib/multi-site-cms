@@ -446,6 +446,20 @@ export class PostsService {
       order: { revisionNumber: 'DESC' },
     });
 
+    // The editor needs each publication's categories to show and edit them.
+    const categoryLinks =
+      publications.length > 0
+        ? await (
+            await getInitializedRepository(this.dataSource, PostPublicationCategory)
+          ).find({ where: { publicationId: In(publications.map((p) => p.id)) } })
+        : [];
+    const categoryIdsByPub = new Map<string, string[]>();
+    for (const link of categoryLinks) {
+      const list = categoryIdsByPub.get(link.publicationId) ?? [];
+      list.push(link.categoryId);
+      categoryIdsByPub.set(link.publicationId, list);
+    }
+
     return {
       id: post.id,
       authorId: post.authorId,
@@ -458,6 +472,7 @@ export class PostsService {
       currentRevisionNumber: latestRev?.revisionNumber,
       currentRevision: latestRev ? this.mapRevisionToItem(latestRev) : null,
       publications: publications.map((p) => ({
+        categoryIds: categoryIdsByPub.get(p.id) ?? [],
         id: p.id,
         siteId: p.siteId,
         postId: p.postId,

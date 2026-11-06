@@ -4,6 +4,15 @@ import React, { useState } from 'react';
 import { X, UserPlus, Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react';
 import { useCreateUserMutation, useAssignRoleMutation } from '@/lib/cms-api';
 import { useAdmin } from '@/lib/admin-context';
+import { NativeSelect, type NativeSelectOption } from '@multi-site-cms/ui';
+
+const MODAL_SELECT_CLASS =
+  'px-3.5 py-2 text-xs sm:text-sm rounded-xl border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 text-slate-900 dark:text-slate-100 focus:ring-emerald-500/20 focus:border-emerald-500';
+
+const CREATE_ROLE_OPTIONS: NativeSelectOption[] = [
+  { value: 'super_admin', label: 'Platform Super Admin (Global Access)' },
+  { value: 'admin', label: 'Site Admin (Full site control)' },
+];
 
 export interface CreateUserModalProps {
   isOpen: boolean;
@@ -182,36 +191,37 @@ export function CreateUserModal({ isOpen, onClose, onCreated, sites }: CreateUse
 
           {/* Role Selection */}
           <div>
-            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+            <label
+              htmlFor="create-user-role"
+              className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5"
+            >
               {t.users.selectRole || 'Role Permission'}
             </label>
-            <select
+            <NativeSelect
+              id="create-user-role"
               value={roleKey}
-              onChange={(e) => setRoleKey(e.target.value)}
-              className="w-full px-3.5 py-2 text-xs sm:text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 cursor-pointer"
-            >
-              <option value="super_admin">Platform Super Admin (Global Access)</option>
-              <option value="admin">Site Admin (Full site control)</option>
-            </select>
+              onValueChange={setRoleKey}
+              options={CREATE_ROLE_OPTIONS}
+              className={MODAL_SELECT_CLASS}
+            />
           </div>
 
           {/* Site Selection (if not super admin) */}
           {!isPlatformRole && (
             <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+              <label
+                htmlFor="create-user-site"
+                className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5"
+              >
                 Assigned Website *
               </label>
-              <select
+              <NativeSelect
+                id="create-user-site"
                 value={selectedSiteId}
-                onChange={(e) => setSelectedSiteId(e.target.value)}
-                className="w-full px-3.5 py-2 text-xs sm:text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 cursor-pointer"
-              >
-                {sites.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.name}
-                  </option>
-                ))}
-              </select>
+                onValueChange={setSelectedSiteId}
+                options={sites.map((s) => ({ value: s.id, label: s.name }))}
+                className={MODAL_SELECT_CLASS}
+              />
             </div>
           )}
 

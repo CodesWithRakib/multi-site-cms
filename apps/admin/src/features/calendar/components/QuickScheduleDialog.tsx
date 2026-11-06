@@ -3,7 +3,11 @@
 import React, { useState } from 'react';
 import { X, Calendar, Clock, AlertTriangle, Loader2 } from 'lucide-react';
 import type { SiteItem } from '@multi-site-cms/types';
+import { NativeSelect } from '@multi-site-cms/ui';
 import { useListPostsQuery, useSchedulePublicationMutation } from '@/lib/cms-api';
+
+const DIALOG_SELECT_CLASS =
+  'px-3 py-2 text-xs rounded-xl border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-indigo-500 font-medium';
 
 interface QuickScheduleDialogProps {
   isOpen: boolean;
@@ -178,24 +182,22 @@ function QuickScheduleDialogContent({
 
           {/* Site selection */}
           <div>
-            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+            <label
+              htmlFor="quick-schedule-site"
+              className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5"
+            >
               Target Publication Site
             </label>
-            <select
-              aria-label="Website"
+            <NativeSelect
+              id="quick-schedule-site"
               value={selectedSiteId}
-              onChange={(e) => {
-                setSelectedSiteId(e.target.value);
+              onValueChange={(value) => {
+                setSelectedSiteId(value);
                 setSelectedPostId('');
               }}
-              className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 font-medium"
-            >
-              {availableSites.map((site) => (
-                <option key={site.id} value={site.id}>
-                  {site.name}
-                </option>
-              ))}
-            </select>
+              options={availableSites.map((site) => ({ value: site.id, label: site.name }))}
+              className={DIALOG_SELECT_CLASS}
+            />
           </div>
 
           {/* Post selection */}
@@ -213,22 +215,20 @@ function QuickScheduleDialogContent({
                 No draft or schedulable articles found for this site.
               </p>
             ) : (
-              <select
+              <NativeSelect
                 aria-label="Post to schedule"
                 value={selectedPostId}
-                onChange={(e) => setSelectedPostId(e.target.value)}
-                className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 font-medium"
-              >
-                <option value="">-- Choose an article --</option>
-                {schedulablePosts.map((p) => {
+                onValueChange={setSelectedPostId}
+                placeholder="-- Choose an article --"
+                options={schedulablePosts.map((p) => {
                   const pub = p.publications?.find((pubItem) => pubItem.siteId === selectedSiteId);
-                  return (
-                    <option key={p.id} value={p.id}>
-                      {p.currentRevision?.title || p.id} ({pub?.status})
-                    </option>
-                  );
+                  return {
+                    value: p.id,
+                    label: `${p.currentRevision?.title || p.id} (${pub?.status})`,
+                  };
                 })}
-              </select>
+                className={DIALOG_SELECT_CLASS}
+              />
             )}
           </div>
 

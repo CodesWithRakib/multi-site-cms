@@ -2,6 +2,7 @@
 
 import { Search, X } from 'lucide-react';
 import type { SiteItem } from '@multi-site-cms/types';
+import { NativeSelect } from '@multi-site-cms/ui';
 
 import { useAdmin } from '@/lib/admin-context';
 
@@ -67,35 +68,26 @@ export function PostsFilterBar({
       </div>
 
       <div className="w-48">
-        <select
+        <NativeSelect
           aria-label="Filter by content type"
           value={typeFilter}
-          onChange={(e) => onTypeChange(e.target.value)}
+          onValueChange={onTypeChange}
+          options={[{ value: '', label: t.content.filterByType || 'All Types' }, ...CONTENT_TYPES]}
           className={SELECT_CLASS}
-        >
-          <option value="">{t.content.filterByType || 'All Types'}</option>
-          {CONTENT_TYPES.map((type) => (
-            <option key={type.value} value={type.value}>
-              {type.label}
-            </option>
-          ))}
-        </select>
+        />
       </div>
 
       <div className="w-48">
-        <select
+        <NativeSelect
           aria-label="Filter by website"
           value={activeSiteId || ''}
-          onChange={(e) => onSiteChange(e.target.value || null)}
+          onValueChange={(value) => onSiteChange(value || null)}
+          options={[
+            { value: '', label: t.content.filterBySite || 'All Websites' },
+            ...sites.map((site) => ({ value: site.id, label: site.name })),
+          ]}
           className={SELECT_CLASS}
-        >
-          <option value="">{t.content.filterBySite || 'All Websites'}</option>
-          {sites.map((site) => (
-            <option key={site.id} value={site.id}>
-              {site.name}
-            </option>
-          ))}
-        </select>
+        />
       </div>
 
       {hasActiveFilters && (

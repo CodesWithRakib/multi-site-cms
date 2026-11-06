@@ -6,13 +6,18 @@ import type { PublishingActionType } from './PublishingModal';
 
 interface PublicationStatusActionsProps {
   pub: PostPublicationItem;
+  /** The post's newest revision; when the live publication is older, offer "Update live". */
+  latestRevisionId?: string;
   onOpenPublishModal: (pub: PostPublicationItem, action: PublishingActionType) => void;
 }
 
 export function PublicationStatusActions({
   pub,
+  latestRevisionId,
   onOpenPublishModal,
 }: PublicationStatusActionsProps) {
+  const isLiveOutdated =
+    pub.status === 'published' && Boolean(latestRevisionId) && pub.revisionId !== latestRevisionId;
   const badgeColor =
     pub.status === 'published'
       ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
@@ -59,6 +64,17 @@ export function PublicationStatusActions({
             className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[11px] font-semibold transition-colors cursor-pointer"
           >
             Reschedule
+          </button>
+        )}
+
+        {isLiveOutdated && (
+          <button
+            type="button"
+            onClick={() => onOpenPublishModal(pub, 'updateLive')}
+            title="This site still shows an older version of the post"
+            className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[11px] font-semibold transition-colors cursor-pointer"
+          >
+            Update live
           </button>
         )}
 

@@ -337,6 +337,64 @@ describe('Publishing Engine, Scheduling & Outbox (e2e)', () => {
       expect(err.error.code).toBe('VALIDATION_ERROR');
     });
 
+    it('pushes edits made after publishing to the live site with update-live', async () => {
+      // An editor saves new text: a new revision; the live publication still
+      // shows revision 1 until it is explicitly updated (ADR-0005).
+      const revRepo = dataSource.getRepository(PostRevision);
+      const travelPost = await dataSource
+        .getRepository(Post)
+        .findOneOrFail({ where: { id: travelPostId } });
+      const edited = await revRepo.save(
+        revRepo.create({
+          postId: travelPostId,
+          createdBy: travelPost.authorId ?? undefined,
+          revisionNumber: 2,
+          title: 'Exploring the Swiss Alps (updated)',
+          body: { type: 'doc', content: [{ type: 'paragraph', text: 'New route notes.' }] },
+        }),
+      );
+
+      const url = `/api/v1/sites/${siteTravelId}/publications/${travelPublicationId}/update-live`;
+      const res = await request(app.getHttpServer())
+        .post(url)
+        .set('Cookie', travelAdminCookie)
+        .set('x-csrf-token', travelAdminCsrf);
+
+      expect(res.status).toBe(200);
+      const body = res.body as ApiSuccess<PostPublicationItem>;
+      expect(body.data.status).toBe('published');
+      expect(body.data.revisionId).toBe(edited.id);
+
+      const outboxRepo = dataSource.getRepository(OutboxEvent);
+      const updatedEvents = await outboxRepo.find({
+        where: { publicationId: travelPublicationId, eventType: 'publication.updated' },
+      });
+      expect(updatedEvents).toHaveLength(1);
+
+      // Already current: a no-op that emits nothing new.
+      const again = await request(app.getHttpServer())
+        .post(url)
+        .set('Cookie', travelAdminCookie)
+        .set('x-csrf-token', travelAdminCsrf)
+        .expect(200);
+      expect((again.body as ApiSuccess<PostPublicationItem>).data.revisionId).toBe(edited.id);
+      expect(
+        await outboxRepo.count({
+          where: { publicationId: travelPublicationId, eventType: 'publication.updated' },
+        }),
+      ).toBe(1);
+    });
+
+    it('refuses update-live for a publication that is not published', async () => {
+      const res = await request(app.getHttpServer())
+        .post(`/api/v1/sites/${siteAirSportsId}/publications/${airSportsPublicationId}/update-live`)
+        .set('Cookie', airSportsAdminCookie)
+        .set('x-csrf-token', airSportsAdminCsrf);
+
+      expect(res.status).toBe(400);
+      expect((res.body as ApiErrorResponse).error.code).toBe('VALIDATION_ERROR');
+    });
+
     it('unpublishes published content back to draft (published -> draft)', async () => {
       const res = await request(app.getHttpServer())
         .post(`/api/v1/sites/${siteTravelId}/publications/${travelPublicationId}/unpublish`)
@@ -480,12 +538,30 @@ describe('Publishing Engine, Scheduling & Outbox (e2e)', () => {
 
   describe('Real-Time Air Sports & Operational Health', () => {
     it('publishes Air Sports update and triggers specialized real-time event', async () => {
+      // The editor changed the text after the publication was created: publishing
+      // must ship the latest revision, not the one it was created with (ADR-0005).
+      const revRepo = dataSource.getRepository(PostRevision);
+      const airPost = await dataSource
+        .getRepository(Post)
+        .findOneOrFail({ where: { id: airSportsPostId } });
+      const latest = await revRepo.save(
+        revRepo.create({
+          postId: airSportsPostId,
+          createdBy: airPost.authorId ?? undefined,
+          revisionNumber: 2,
+          title: 'Championship Round 1 Wind Advisory (revised)',
+          body: { type: 'doc', content: [{ type: 'paragraph', text: 'Updated limits.' }] },
+        }),
+      );
+
       const res = await request(app.getHttpServer())
         .post(`/api/v1/sites/${siteAirSportsId}/publications/${airSportsPublicationId}/publish`)
         .set('Cookie', airSportsAdminCookie)
         .set('x-csrf-token', airSportsAdminCsrf);
 
       expect(res.status).toBe(200);
+      expect((res.body as ApiSuccess<PostPublicationItem>).data.revisionId).toBe(latest.id);
+      expect(latest.id).not.toBe(airSportsRevisionId);
 
       // Verify specialized Air Sports outbox event was recorded
       const outboxRepo = dataSource.getRepository(OutboxEvent);

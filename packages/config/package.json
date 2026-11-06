@@ -16,6 +16,10 @@
     "./security-headers": {
       "types": "./security-headers.d.mts",
       "default": "./security-headers.mjs"
+    },
+    "./embeds": {
+      "types": "./src/embeds.ts",
+      "default": "./src/embeds.ts"
     }
   },
   "scripts": {

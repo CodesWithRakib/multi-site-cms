@@ -198,6 +198,28 @@ export class PublicContentService {
       };
     }
 
+    const items = await this.toArticleSummaries(site.id, publications);
+
+    return {
+      items,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit) || 1,
+    };
+  }
+
+  /**
+   * Public summaries for publications of one site, with image, taxonomy and
+   * author resolved in batched queries (no N+1). Used by lists and by the
+   * related-articles block so both render the same card data.
+   */
+  private async toArticleSummaries(
+    siteId: string,
+    publications: readonly PostPublication[],
+  ): Promise<PublicArticleSummary[]> {
+    if (publications.length === 0) return [];
+
     const pubIds = publications.map((p) => p.id);
     const postIds = publications.map((p) => p.postId);
     const revisionIds = publications.map((p) => p.revisionId);
@@ -234,13 +256,13 @@ export class PublicContentService {
         .createQueryBuilder('ppc')
         .innerJoinAndSelect('ppc.category', 'cat')
         .where('ppc.publication_id IN (:...pubIds)', { pubIds })
-        .andWhere('ppc.site_id = :siteId', { siteId: site.id })
+        .andWhere('ppc.site_id = :siteId', { siteId: siteId })
         .getMany(),
       pubTagRepo
         .createQueryBuilder('ppt')
         .innerJoinAndSelect('ppt.tag', 'tag')
         .where('ppt.publication_id IN (:...pubIds)', { pubIds })
-        .andWhere('ppt.site_id = :siteId', { siteId: site.id })
+        .andWhere('ppt.site_id = :siteId', { siteId: siteId })
         .getMany(),
     ]);
 
@@ -262,7 +284,7 @@ export class PublicContentService {
       tagsByPub.set(pt.publicationId, list);
     }
 
-    const items: PublicArticleSummary[] = publications.map((pub) => {
+    return publications.map((pub) => {
       const post = postMap.get(pub.postId);
       const rev = revMap.get(pub.revisionId);
       const media = pub.featuredImageId ? (mediaMap.get(pub.featuredImageId) ?? null) : null;
@@ -292,14 +314,6 @@ export class PublicContentService {
         author: author ? { id: author.id, displayName: author.displayName } : null,
       };
     });
-
-    return {
-      items,
-      total,
-      page,
-      limit,
-      totalPages: Math.ceil(total / limit) || 1,
-    };
   }
 
   /**
@@ -421,36 +435,8 @@ export class PublicContentService {
       relatedPubs.push(...fallbackPubs);
     }
 
-    // Format related articles
-    let relatedArticles: PublicArticleSummary[] = [];
-    if (relatedPubs.length > 0) {
-      const relRevIds = relatedPubs.map((r) => r.revisionId);
-      const relRevs = await revisionRepo.findBy({ id: In(relRevIds) });
-      const relRevMap = new Map(relRevs.map((r) => [r.id, r]));
-
-      relatedArticles = relatedPubs.map((rp) => {
-        const rRev = relRevMap.get(rp.revisionId);
-        return {
-          id: rp.id,
-          publicationId: rp.id,
-          postId: rp.postId,
-          slug: rp.slug,
-          title: rRev?.title ?? 'Untitled',
-          excerpt: rRev?.excerpt ?? null,
-          type: post.type,
-          templateKey: rp.templateKey ?? null,
-          eventId: rp.eventId ?? null,
-          sourceLocale: post.sourceLocale,
-          publishedAt: rp.publishedAt ? rp.publishedAt.toISOString() : rp.createdAt.toISOString(),
-          updatedAt: rp.updatedAt.toISOString(),
-          readingTimeMinutes: rRev ? calculateReadingTimeMinutes(extractTextFromDoc(rRev.body)) : 1,
-          featuredImage: null,
-          categories: [],
-          tags: [],
-          author: null,
-        };
-      });
-    }
+    // Related articles carry the same card data as list items.
+    const relatedArticles = await this.toArticleSummaries(site.id, relatedPubs);
 
     // Adjacent articles (previous: older, next: newer)
     const [prevPub, nextPub] = await Promise.all([

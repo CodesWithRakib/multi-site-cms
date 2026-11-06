@@ -7,8 +7,17 @@ import { useUpdateUserMutation, useAssignRoleMutation, useRevokeRoleMutation } f
 import { useAdmin } from '@/lib/admin-context';
 import { ConfirmDialog } from '@/components/feedback';
 import { apiErrorMessage } from '@/lib/api-error';
+import { NativeSelect, type NativeSelectOption } from '@multi-site-cms/ui';
 
-import { USER_STATUS_OPTIONS } from '../roles';
+import { STATUS_SELECT_OPTIONS, toUserStatus } from '../roles';
+
+const INLINE_SELECT_CLASS =
+  'px-2.5 py-1.5 text-xs rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200';
+
+const ADD_ROLE_OPTIONS: NativeSelectOption[] = [
+  { value: 'super_admin', label: 'Super Admin (Platform)' },
+  { value: 'admin', label: 'Site Admin' },
+];
 
 export interface EditUserModalProps {
   user: UserItem | null;
@@ -185,21 +194,23 @@ export function EditUserModal({
 
           {/* Status */}
           <div>
-            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+            <label
+              htmlFor="edit-user-status"
+              className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5"
+            >
               {t.users.status || 'Account Status'}
             </label>
-            <select
+            <NativeSelect
+              id="edit-user-status"
               value={status}
               disabled={isDeactivationLocked}
-              onChange={(e) => setStatus(e.target.value as UserStatus)}
-              className="w-full px-3.5 py-2 text-xs sm:text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 disabled:opacity-50 cursor-pointer"
-            >
-              {USER_STATUS_OPTIONS.map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
+              onValueChange={(value) => {
+                const next = toUserStatus(value);
+                if (next) setStatus(next);
+              }}
+              options={STATUS_SELECT_OPTIONS}
+              className="px-3.5 py-2 text-xs sm:text-sm rounded-xl border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 text-slate-900 dark:text-slate-100 focus:ring-emerald-500/20 focus:border-emerald-500"
+            />
             {isDeactivationLocked && (
               <p className="text-[11px] text-amber-600 dark:text-amber-400 mt-1">
                 Account status is locked because this is the last active Super Admin.
@@ -287,27 +298,22 @@ export function EditUserModal({
                   Assign New Role
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  <select
+                  <NativeSelect
+                    aria-label="Role to assign"
                     value={roleKey}
-                    onChange={(e) => setRoleKey(e.target.value)}
-                    className="px-2.5 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200"
-                  >
-                    <option value="super_admin">Super Admin (Platform)</option>
-                    <option value="admin">Site Admin</option>
-                  </select>
+                    onValueChange={setRoleKey}
+                    options={ADD_ROLE_OPTIONS}
+                    className={INLINE_SELECT_CLASS}
+                  />
 
                   {roleKey !== 'super_admin' && (
-                    <select
+                    <NativeSelect
+                      aria-label="Site for the role"
                       value={selectedSiteId}
-                      onChange={(e) => setSelectedSiteId(e.target.value)}
-                      className="px-2.5 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200"
-                    >
-                      {sites.map((s) => (
-                        <option key={s.id} value={s.id}>
-                          {s.name}
-                        </option>
-                      ))}
-                    </select>
+                      onValueChange={setSelectedSiteId}
+                      options={sites.map((s) => ({ value: s.id, label: s.name }))}
+                      className={INLINE_SELECT_CLASS}
+                    />
                   )}
                 </div>
                 <div className="flex justify-end gap-2">

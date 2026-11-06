@@ -32,6 +32,14 @@ export function useAutosave<T>({
     dataRef.current = data;
   }, [data]);
 
+  // Callers usually pass a new `onSave` every render. Read it through a ref so
+  // `executeSave` stays stable; otherwise the scheduler below is rebuilt (and
+  // its pending timer cancelled) on every keystroke, and autosave never fires.
+  const onSaveRef = useRef(onSave);
+  useEffect(() => {
+    onSaveRef.current = onSave;
+  }, [onSave]);
+
   const schedulerRef = useRef<AutosaveScheduler | null>(null);
 
   // Online / Offline tracking
@@ -51,33 +59,30 @@ export function useAutosave<T>({
     };
   }, [status, isDirty]);
 
-  const executeSave = useCallback(
-    async (payloadToSave: T) => {
-      if (typeof navigator !== 'undefined' && !navigator.onLine) {
-        setStatus('offline');
-        return;
-      }
+  const executeSave = useCallback(async (payloadToSave: T) => {
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      setStatus('offline');
+      return;
+    }
 
-      setStatus('saving');
-      setConflictError(null);
+    setStatus('saving');
+    setConflictError(null);
 
-      try {
-        await onSave(payloadToSave);
-        setStatus('saved');
-        setLastSavedAt(new Date());
-        setIsDirty(false);
-      } catch (err: unknown) {
-        setStatus('failed');
-        const apiErr = err as { status?: number; code?: string; message?: string };
-        if (apiErr.status === 409 || apiErr.code === 'CONFLICT') {
-          setConflictError(
-            'Version conflict: Another editor has saved a newer revision of this post. Please review changes before overwriting.',
-          );
-        }
+    try {
+      await onSaveRef.current(payloadToSave);
+      setStatus('saved');
+      setLastSavedAt(new Date());
+      setIsDirty(false);
+    } catch (err: unknown) {
+      setStatus('failed');
+      const apiErr = err as { status?: number; code?: string; message?: string };
+      if (apiErr.status === 409 || apiErr.code === 'CONFLICT') {
+        setConflictError(
+          'Version conflict: Another editor has saved a newer revision of this post. Please review changes before overwriting.',
+        );
       }
-    },
-    [onSave],
-  );
+    }
+  }, []);
 
   useEffect(() => {
     const scheduler = new AutosaveScheduler(

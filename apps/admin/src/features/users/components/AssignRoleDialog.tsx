@@ -9,12 +9,19 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  NativeSelect,
 } from '@multi-site-cms/ui';
 
-import { ASSIGNABLE_ROLES, roleScope, type AssignableRoleKey } from '../roles';
+import {
+  ASSIGNABLE_ROLES,
+  ROLE_SELECT_OPTIONS,
+  roleScope,
+  toAssignableRoleKey,
+  type AssignableRoleKey,
+} from '../roles';
 
 const FIELD =
-  'w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100';
+  'px-3 py-2 text-xs rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100';
 
 interface AssignRoleDialogProps {
   readonly open: boolean;
@@ -68,19 +75,17 @@ export function AssignRoleDialog({
             >
               Role
             </label>
-            <select
+            <NativeSelect
               id="assign-role"
               value={roleKey}
-              onChange={(e) => setRoleKey(e.target.value as AssignableRoleKey)}
+              onValueChange={(value) => {
+                const key = toAssignableRoleKey(value);
+                if (key) setRoleKey(key);
+              }}
               aria-describedby="assign-role-help"
+              options={ROLE_SELECT_OPTIONS}
               className={FIELD}
-            >
-              {ASSIGNABLE_ROLES.map((role) => (
-                <option key={role.key} value={role.key}>
-                  {role.label}
-                </option>
-              ))}
-            </select>
+            />
             <p
               id="assign-role-help"
               className="text-[11px] text-slate-600 dark:text-slate-400 mt-1"
@@ -97,20 +102,18 @@ export function AssignRoleDialog({
               >
                 Site
               </label>
-              <select
+              <NativeSelect
                 id="assign-site"
                 required
                 value={siteId}
-                onChange={(e) => setSiteId(e.target.value)}
+                onValueChange={setSiteId}
+                placeholder="Choose a site…"
+                options={sites.map((site) => ({
+                  value: site.id,
+                  label: `${site.name} (${site.key})`,
+                }))}
                 className={FIELD}
-              >
-                <option value="">Choose a site…</option>
-                {sites.map((site) => (
-                  <option key={site.id} value={site.id}>
-                    {site.name} ({site.key})
-                  </option>
-                ))}
-              </select>
+              />
             </div>
           )}
 

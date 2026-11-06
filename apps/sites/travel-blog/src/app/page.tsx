@@ -1,28 +1,32 @@
 import type { Metadata } from 'next';
-import { DestinationSearchBar } from '@/components/home/DestinationSearchBar';
+
+import { CoverStory } from '@/components/home/CoverStory';
+import { KeepReading } from '@/components/home/KeepReading';
+import { LatestStories } from '@/components/home/LatestStories';
 import { NewsletterBanner } from '@/components/home/NewsletterBanner';
-import { PopularDestinations } from '@/components/home/PopularDestinations';
-import { TravelGuidesSection } from '@/components/home/TravelGuidesSection';
-import { TravelHero } from '@/components/home/TravelHero';
+import { TopicShowcase } from '@/components/home/TopicShowcase';
 import { siteConfig } from '@/config/site';
 import { fetchArticles, fetchCategories } from '@/lib/api';
+import { buildHomeFeed } from '@/lib/home-feed';
 
 export const revalidate = 60; // ISR revalidation every 60 seconds
 
 export const metadata: Metadata = {
-  title: `${siteConfig.name} — Explore the World`,
+  title: `${siteConfig.name} — ${siteConfig.tagline}`,
   description: siteConfig.description,
 };
 
+/** Enough stories for every slot: cover, also-new, latest grid, keep-reading. */
+const HOME_ARTICLE_LIMIT = 20;
+
 export default async function TravelHomePage() {
   const [articlesData, categories] = await Promise.all([
-    fetchArticles({ limit: 8 }),
+    fetchArticles({ limit: HOME_ARTICLE_LIMIT }),
     fetchCategories(),
   ]);
 
-  const articles = articlesData.items;
+  const feed = buildHomeFeed(articlesData.items, categories);
 
-  // Schema.org Structured Data
   const jsonLd = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -49,25 +53,13 @@ export default async function TravelHomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-16 sm:pb-24">
-        {/* Editorial Hero */}
-        <TravelHero articleCount={articlesData.total} topicCount={categories.length} />
+      <CoverStory lead={feed.lead} alsoNew={feed.alsoNew} />
 
-        {/* Floating Destination Search Filter */}
-        <div className="mb-16 sm:mb-24">
-          <DestinationSearchBar categories={categories} />
-        </div>
-
-        <div className="space-y-16 sm:space-y-24">
-          {/* Popular Destinations Showcase */}
-          <PopularDestinations />
-
-          {/* Dynamic Travel Guides Grid from Live Backend */}
-          <TravelGuidesSection articles={articles} />
-
-          {/* Illustrated Mint Newsletter Banner */}
-          <NewsletterBanner />
-        </div>
+      <div className="mx-auto max-w-7xl space-y-14 px-4 py-12 sm:space-y-16 sm:px-6 sm:py-14 lg:px-8">
+        <LatestStories articles={feed.latest} />
+        <TopicShowcase topics={feed.topics} />
+        <KeepReading articles={feed.more} />
+        <NewsletterBanner />
       </div>
     </>
   );

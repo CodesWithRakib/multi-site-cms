@@ -21,6 +21,7 @@ export interface SitePubConfig {
 
 interface PostSitePublicationCardProps {
   site: SiteItem;
+  latestRevisionId?: string;
   config: SitePubConfig;
   existingPub?: PostPublicationItem;
   onChange: (updated: SitePubConfig) => void;
@@ -29,6 +30,7 @@ interface PostSitePublicationCardProps {
 
 export function PostSitePublicationCard({
   site,
+  latestRevisionId,
   config,
   existingPub,
   onChange,
@@ -168,7 +170,11 @@ export function PostSitePublicationCard({
 
           {/* Live Publication Status & Quick Actions */}
           {existingPub && (
-            <PublicationStatusActions pub={existingPub} onOpenPublishModal={onOpenPublishModal} />
+            <PublicationStatusActions
+              pub={existingPub}
+              latestRevisionId={latestRevisionId}
+              onOpenPublishModal={onOpenPublishModal}
+            />
           )}
         </div>
       )}

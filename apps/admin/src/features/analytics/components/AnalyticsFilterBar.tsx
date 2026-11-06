@@ -3,6 +3,7 @@
 import React from 'react';
 import { Calendar, Globe, RefreshCw, Download } from 'lucide-react';
 import type { AnalyticsTimeframe } from '@multi-site-cms/types';
+import { NativeSelect } from '@multi-site-cms/ui';
 import { useAdmin } from '@/lib/admin-context';
 
 export interface AnalyticsFilterBarProps {
@@ -44,20 +45,20 @@ export function AnalyticsFilterBar({
       <div className="flex flex-wrap items-center gap-3">
         {isSuperAdmin && (
           <div className="relative min-w-[200px]">
-            <Globe className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-emerald-600 dark:text-emerald-400" />
-            <select
+            <Globe
+              aria-hidden="true"
+              className="pointer-events-none absolute left-3.5 top-1/2 z-10 -translate-y-1/2 size-4 text-emerald-600 dark:text-emerald-400"
+            />
+            <NativeSelect
               aria-label="Filter analytics by website"
               value={selectedSiteId}
-              onChange={(e) => onSiteChange(e.target.value)}
-              className="w-full pl-9 pr-8 py-2 text-xs font-semibold rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/30 transition-all cursor-pointer"
-            >
-              <option value="">{t('analytics.allWebsites')}</option>
-              {sites.map((site) => (
-                <option key={site.id} value={site.id}>
-                  {site.name}
-                </option>
-              ))}
-            </select>
+              onValueChange={onSiteChange}
+              options={[
+                { value: '', label: t('analytics.allWebsites') },
+                ...sites.map((site) => ({ value: site.id, label: site.name })),
+              ]}
+              className="pl-9 pr-3 py-2 text-xs font-semibold rounded-xl bg-slate-50 dark:bg-slate-800/80 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:ring-emerald-500/30"
+            />
           </div>
         )}
 

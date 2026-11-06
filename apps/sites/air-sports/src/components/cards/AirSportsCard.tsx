@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowUpRight, Clock, User as UserIcon } from 'lucide-react';
+import { ArrowUpRight, Clock, User as UserIcon, Wind } from 'lucide-react';
 import type { PublicArticleSummary } from '@multi-site-cms/types';
 
 interface AirSportsCardProps {
@@ -34,13 +34,16 @@ export function AirSportsCard({
                 src={article.featuredImage.url}
                 alt={article.featuredImage.altText || article.title}
                 fill
-                priority={priority}
+                preload={priority}
                 className="object-cover group-hover:scale-105 transition-transform duration-500"
                 sizes="(max-width: 1024px) 100vw, 60vw"
               />
             ) : (
-              <div className="size-full flex items-center justify-center bg-stone-900 text-stone-400 font-mono text-sm">
-                Air Sports Dispatch
+              <div
+                aria-hidden="true"
+                className="flex size-full items-center justify-center bg-[radial-gradient(ellipse_at_top_right,var(--color-brand-500)_0%,transparent_60%),linear-gradient(to_bottom,var(--color-brand-950),var(--color-neutral-950))]"
+              >
+                <Wind className="size-10 text-white/30" />
               </div>
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent lg:hidden" />
@@ -141,13 +144,16 @@ export function AirSportsCard({
               src={article.featuredImage.url}
               alt={article.featuredImage.altText || article.title}
               fill
-              priority={priority}
+              preload={priority}
               className="object-cover group-hover:scale-105 transition-transform duration-300"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
           ) : (
-            <div className="size-full flex items-center justify-center bg-stone-900 text-stone-400 font-mono text-xs uppercase">
-              Aviation Report
+            <div
+              aria-hidden="true"
+              className="flex size-full items-center justify-center bg-[radial-gradient(ellipse_at_top_right,var(--color-brand-500)_0%,transparent_60%),linear-gradient(to_bottom,var(--color-brand-950),var(--color-neutral-950))]"
+            >
+              <Wind className="size-10 text-white/30" />
             </div>
           )}
 

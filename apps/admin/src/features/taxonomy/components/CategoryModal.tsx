@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { X, Folder, Loader2 } from 'lucide-react';
 import type { CategoryItem } from '@multi-site-cms/types';
+import { NativeSelect } from '@multi-site-cms/ui';
 
 interface CategoryModalProps {
   isOpen: boolean;
@@ -201,22 +202,22 @@ function CategoryModalContent({
           {/* Parent Category & Display Order Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+              <label
+                htmlFor="category-parent"
+                className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5"
+              >
                 Parent Category (Optional)
               </label>
-              <select
-                aria-label="Parent category"
+              <NativeSelect
+                id="category-parent"
                 value={parentId}
-                onChange={(e) => setParentId(e.target.value)}
-                className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-emerald-500 font-medium"
-              >
-                <option value="">None (Top-Level Category)</option>
-                {parentCandidates.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
+                onValueChange={setParentId}
+                options={[
+                  { value: '', label: 'None (Top-Level Category)' },
+                  ...parentCandidates.map((c) => ({ value: c.id, label: c.name })),
+                ]}
+                className="px-3 py-2 text-xs rounded-xl border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-emerald-500 font-medium"
+              />
             </div>
 
             <div>

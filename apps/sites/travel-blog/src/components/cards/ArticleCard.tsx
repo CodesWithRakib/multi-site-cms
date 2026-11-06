@@ -1,9 +1,19 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import type { PublicArticleSummary } from '@multi-site-cms/types';
-import { ArrowUpRight, Calendar, Clock, MapPin } from 'lucide-react';
+import { ArrowUpRight, Calendar, Clock, ImageOff, MapPin } from 'lucide-react';
 import { BookmarkButton } from '@/components/ui/BookmarkButton';
 import { CategoryBadge } from '@/components/ui/CategoryBadge';
+import { AuthorAvatar } from '@/components/ui/AuthorAvatar';
+
+/** Shown when a story has no featured image (no stock photo stand-ins). */
+function ImagePlaceholder() {
+  return (
+    <div className="flex size-full items-center justify-center bg-muted text-muted-foreground">
+      <ImageOff aria-hidden="true" className="size-6" />
+    </div>
+  );
+}
 
 export interface ArticleCardProps {
   article: PublicArticleSummary;
@@ -29,17 +39,18 @@ export function ArticleCard({ article, variant = 'standard', priority = false }:
       <article className="group relative overflow-hidden rounded-3xl border border-border/80 bg-card shadow-sm transition-all duration-300 hover:shadow-xl hover:border-emerald-500/40">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-0">
           <div className="lg:col-span-7 relative aspect-[16/10] lg:aspect-auto min-h-[320px] lg:min-h-[460px] overflow-hidden bg-muted">
-            <Image
-              src={
-                article.featuredImage?.url ??
-                'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=85'
-              }
-              alt={article.featuredImage?.altText || article.title}
-              fill
-              priority={priority}
-              sizes="(max-width: 1024px) 100vw, 60vw"
-              className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-            />
+            {article.featuredImage ? (
+              <Image
+                src={article.featuredImage.url}
+                alt={article.featuredImage?.altText || article.title}
+                fill
+                preload={priority}
+                sizes="(max-width: 1024px) 100vw, 60vw"
+                className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+              />
+            ) : (
+              <ImagePlaceholder />
+            )}
             <div className="absolute left-4 top-4 z-10">
               <CategoryBadge label={categoryLabel} slug={category?.slug} />
             </div>
@@ -76,18 +87,17 @@ export function ArticleCard({ article, variant = 'standard', priority = false }:
 
             <div className="pt-6 mt-6 border-t border-border/70 flex items-center justify-between text-xs text-muted-foreground">
               <div className="flex items-center gap-2.5">
-                <div className="relative h-7 w-7 overflow-hidden rounded-full ring-1 ring-border">
-                  <Image
-                    src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80"
-                    alt={article.author?.displayName ?? 'Rakib Islam'}
-                    fill
-                    sizes="28px"
-                    className="object-cover"
-                  />
-                </div>
-                <span className="font-semibold text-foreground/80">
-                  {article.author?.displayName ?? 'Rakib Islam'}
-                </span>
+                {article.author && (
+                  <>
+                    <AuthorAvatar
+                      name={article.author.displayName}
+                      className="size-7 text-[10px]"
+                    />
+                    <span className="font-semibold text-foreground/80">
+                      {article.author.displayName}
+                    </span>
+                  </>
+                )}
               </div>
               <div className="flex items-center gap-3">
                 <span className="inline-flex items-center gap-1">
@@ -111,16 +121,17 @@ export function ArticleCard({ article, variant = 'standard', priority = false }:
     return (
       <article className="group relative flex gap-3.5 items-center rounded-xl p-2 transition hover:bg-muted/50">
         <div className="relative h-18 w-22 shrink-0 overflow-hidden rounded-xl bg-muted border border-border/80">
-          <Image
-            src={
-              article.featuredImage?.url ??
-              'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=300&q=80'
-            }
-            alt={article.featuredImage?.altText || article.title}
-            fill
-            sizes="88px"
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
-          />
+          {article.featuredImage ? (
+            <Image
+              src={article.featuredImage.url}
+              alt={article.featuredImage?.altText || article.title}
+              fill
+              sizes="88px"
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+          ) : (
+            <ImagePlaceholder />
+          )}
         </div>
         <div className="flex-1 min-w-0 space-y-1">
           <div className="flex items-center gap-2">
@@ -146,16 +157,17 @@ export function ArticleCard({ article, variant = 'standard', priority = false }:
     <article className="group flex flex-col justify-between overflow-hidden rounded-2xl border border-border/80 bg-card transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
       <div>
         <div className="relative aspect-[16/10] w-full overflow-hidden bg-muted">
-          <Image
-            src={
-              article.featuredImage?.url ??
-              'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80'
-            }
-            alt={article.featuredImage?.altText || article.title}
-            fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-          />
+          {article.featuredImage ? (
+            <Image
+              src={article.featuredImage.url}
+              alt={article.featuredImage?.altText || article.title}
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+            />
+          ) : (
+            <ImagePlaceholder />
+          )}
           <div className="absolute left-3 top-3 z-10">
             <CategoryBadge label={categoryLabel} slug={category?.slug} />
           </div>

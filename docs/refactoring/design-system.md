@@ -147,3 +147,34 @@ To avoid overlapping sticky headers, dialogs, and tooltips:
 | Modal Content         | `z-50`        | DialogContent, SheetContent              |
 | Popover / Dropdown    | `z-50`        | DropdownMenuContent, SelectContent       |
 | Toast / Notifications | `z-60`        | Global toaster, critical alert overlays  |
+
+## 6. Dropdowns (`NativeSelect`)
+
+Every single-value dropdown uses `NativeSelect` from `@multi-site-cms/ui`, never a
+raw `<select>`. It wraps the shadcn/Radix `Select` but keeps the native mental
+model:
+
+- API: `value` / `onValueChange(value: string)` / `options: { value, label, disabled? }[]`,
+  plus `id`, `name`, `required`, `disabled`, `placeholder` and `aria-*`.
+- Look: a bordered field with a chevron; the list opens `item-aligned` over the
+  trigger like the OS picker. Pass the old `<select>` classes as `className`
+  (they style the trigger). Add `w-auto` for inline filter bars.
+- An option with `value: ''` (e.g. "All websites") is supported; it is mapped to a
+  private sentinel because Radix reserves `""`.
+- No `""` option + empty `value` shows `placeholder` (use it for "Choose a site…").
+- Typed unions: narrow in `onValueChange` with a lookup (see `toUserStatus` in
+  `apps/admin/src/features/users/roles.ts`); do not cast with `as`.
+- Label with `<label htmlFor={id}>` or `aria-label`.
+
+## 7. Motion
+
+Entrance motion tokens live in `packages/ui/src/styles.css`:
+`animate-rise`, `animate-fade`, `animate-cover-zoom`, all on the strong ease-out
+curve `--ease-out-expo`. Rules:
+
+- Always prefix with `motion-safe:` so reduced-motion users see the final state.
+- Animate `transform` and `opacity` only; stagger with `[animation-delay:120ms]`.
+- Hover/press feedback stays short (150–200ms, `ease-out`); press uses
+  `active:scale-[0.97]`.
+- `tw-animate-css` is **not** installed: `animate-in`, `fade-in-*`,
+  `slide-in-*` classes are no-ops. Use the tokens above.

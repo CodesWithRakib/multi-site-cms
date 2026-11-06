@@ -9,7 +9,25 @@ import {
   Plus,
   Calendar as CalendarIcon,
 } from 'lucide-react';
+import { NativeSelect, type NativeSelectOption } from '@multi-site-cms/ui';
 import type { CalendarViewMode } from '../types';
+
+const FILTER_SELECT_CLASS =
+  'w-auto px-2.5 py-1.5 text-xs rounded-xl border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:ring-emerald-500 font-medium';
+
+const TYPE_OPTIONS: NativeSelectOption[] = [
+  { value: '', label: 'All Types' },
+  { value: 'travel_guide', label: 'Travel Guide' },
+  { value: 'air_sports_update', label: 'Air Sports Update' },
+  { value: 'article', label: 'Article' },
+];
+
+const STATUS_OPTIONS: NativeSelectOption[] = [
+  { value: '', label: 'All Statuses' },
+  { value: 'scheduled', label: 'Scheduled Only' },
+  { value: 'published', label: 'Published Only' },
+  { value: 'draft', label: 'Drafts Only' },
+];
 import { PublishingHealthBadge } from './PublishingHealthBadge';
 import type { SiteItem } from '@multi-site-cms/types';
 
@@ -132,45 +150,34 @@ export function CalendarHeader({
         {/* View mode toggle & Filters */}
         <div className="flex flex-wrap items-center gap-2.5">
           {/* Site Filter */}
-          <select
+          <NativeSelect
             aria-label="Filter by website"
             value={selectedSiteId}
-            onChange={(e) => onSiteChange(e.target.value)}
-            className="px-2.5 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-hidden focus:ring-2 focus:ring-emerald-500 font-medium"
-          >
-            <option value="">All Publications Sites</option>
-            {availableSites.map((site) => (
-              <option key={site.id} value={site.id}>
-                {site.name}
-              </option>
-            ))}
-          </select>
+            onValueChange={onSiteChange}
+            options={[
+              { value: '', label: 'All Publications Sites' },
+              ...availableSites.map((site) => ({ value: site.id, label: site.name })),
+            ]}
+            className={FILTER_SELECT_CLASS}
+          />
 
           {/* Type Filter */}
-          <select
+          <NativeSelect
             aria-label="Filter by content type"
             value={typeFilter}
-            onChange={(e) => onTypeFilterChange(e.target.value)}
-            className="px-2.5 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-hidden focus:ring-2 focus:ring-emerald-500 font-medium"
-          >
-            <option value="">All Types</option>
-            <option value="travel_guide">Travel Guide</option>
-            <option value="air_sports_update">Air Sports Update</option>
-            <option value="article">Article</option>
-          </select>
+            onValueChange={onTypeFilterChange}
+            options={TYPE_OPTIONS}
+            className={FILTER_SELECT_CLASS}
+          />
 
           {/* Status Filter */}
-          <select
+          <NativeSelect
             aria-label="Filter by status"
             value={statusFilter}
-            onChange={(e) => onStatusFilterChange(e.target.value)}
-            className="px-2.5 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-hidden focus:ring-2 focus:ring-emerald-500 font-medium"
-          >
-            <option value="">All Statuses</option>
-            <option value="scheduled">Scheduled Only</option>
-            <option value="published">Published Only</option>
-            <option value="draft">Drafts Only</option>
-          </select>
+            onValueChange={onStatusFilterChange}
+            options={STATUS_OPTIONS}
+            className={FILTER_SELECT_CLASS}
+          />
 
           {/* View Mode Toggle */}
           <div className="flex p-0.5 bg-slate-100 dark:bg-slate-800 rounded-xl text-xs font-semibold">

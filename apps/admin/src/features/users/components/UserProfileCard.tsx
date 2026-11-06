@@ -3,11 +3,12 @@
 import { useState, type FormEvent } from 'react';
 import { User } from 'lucide-react';
 import type { UserItem, UserStatus } from '@multi-site-cms/types';
+import { NativeSelect } from '@multi-site-cms/ui';
 
 import { useAdmin } from '@/lib/admin-context';
 import { formatDateTime } from '@/lib/i18n';
 
-import { USER_STATUS_OPTIONS } from '../roles';
+import { STATUS_SELECT_OPTIONS, toUserStatus } from '../roles';
 
 const STATUS_BADGE: Record<UserStatus, string> = {
   active: 'bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300',
@@ -146,19 +147,17 @@ export function UserProfileCard({
             >
               Status
             </label>
-            <select
+            <NativeSelect
               id="profile-status"
               value={status}
               disabled={statusLocked}
-              onChange={(e) => setStatus(e.target.value as UserStatus)}
-              className={`${FIELD} disabled:opacity-60`}
-            >
-              {USER_STATUS_OPTIONS.map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
+              onValueChange={(value) => {
+                const next = toUserStatus(value);
+                if (next) setStatus(next);
+              }}
+              options={STATUS_SELECT_OPTIONS}
+              className={FIELD}
+            />
             {statusLocked && (
               <p className="text-[11px] text-amber-800 dark:text-amber-300 mt-1">
                 The last active Super Admin must stay active.

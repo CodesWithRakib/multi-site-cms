@@ -1,9 +1,9 @@
 import Link from 'next/link';
-import Image from 'next/image';
 import { Calendar, ChevronRight, Clock, MapPin } from 'lucide-react';
 import type { PublicArticleDetail } from '@multi-site-cms/types';
 import { BookmarkButton } from '@/components/ui/BookmarkButton';
 import { CategoryBadge } from '@/components/ui/CategoryBadge';
+import { AuthorAvatar } from '@/components/ui/AuthorAvatar';
 import { ShareButtons } from '@/components/interactive/ShareButtons';
 
 interface ArticleDetailHeaderProps {
@@ -76,23 +76,12 @@ export function ArticleDetailHeader({
       {/* Author & Metrics Bar */}
       <div className="flex flex-wrap items-center justify-between gap-4 border-y border-border/80 py-4 text-xs sm:text-sm text-muted-foreground">
         <div className="flex items-center gap-3">
-          <div className="relative h-10 w-10 overflow-hidden rounded-full ring-2 ring-emerald-500/20">
-            <Image
-              src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
-              alt={article.author?.displayName || 'Rakib Islam'}
-              fill
-              sizes="40px"
-              className="object-cover"
-            />
-          </div>
-          <div>
-            <span className="font-bold text-foreground block">
-              {article.author?.displayName || 'Rakib Islam'}
-            </span>
-            <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">
-              Travel Storyteller
-            </span>
-          </div>
+          {article.author && (
+            <>
+              <AuthorAvatar name={article.author.displayName} className="size-10 text-sm" />
+              <span className="font-bold text-foreground">{article.author.displayName}</span>
+            </>
+          )}
         </div>
 
         <div className="flex items-center gap-5 text-xs">

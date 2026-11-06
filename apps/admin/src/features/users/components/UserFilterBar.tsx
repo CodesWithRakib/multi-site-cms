@@ -4,7 +4,12 @@ import React from 'react';
 import { Search, RefreshCw, X, Filter } from 'lucide-react';
 import { useAdmin } from '@/lib/admin-context';
 
-import { ASSIGNABLE_ROLES, USER_STATUS_OPTIONS } from '../roles';
+import { NativeSelect } from '@multi-site-cms/ui';
+
+import { ROLE_SELECT_OPTIONS, STATUS_SELECT_OPTIONS } from '../roles';
+
+const FILTER_SELECT_CLASS =
+  'w-auto px-3 py-2 text-xs font-semibold rounded-xl border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300 focus:ring-emerald-500/20 focus:border-emerald-500';
 
 export interface UserFilterBarProps {
   searchTerm: string;
@@ -74,46 +79,40 @@ export function UserFilterBar({
       {/* Select Filters & Refresh */}
       <div className="flex flex-wrap items-center gap-2">
         {/* Role Filter */}
-        <select
+        <NativeSelect
+          aria-label="Filter by role"
           value={roleFilter}
-          onChange={(e) => onRoleFilterChange(e.target.value)}
-          className="px-3 py-2 text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 cursor-pointer"
-        >
-          <option value="all">{t.users.allRoles || 'All Roles'}</option>
-          {ASSIGNABLE_ROLES.map((role) => (
-            <option key={role.key} value={role.key}>
-              {role.label}
-            </option>
-          ))}
-        </select>
+          onValueChange={onRoleFilterChange}
+          options={[
+            { value: 'all', label: t.users.allRoles || 'All Roles' },
+            ...ROLE_SELECT_OPTIONS,
+          ]}
+          className={FILTER_SELECT_CLASS}
+        />
 
         {/* Status Filter */}
-        <select
+        <NativeSelect
+          aria-label="Filter by status"
           value={statusFilter}
-          onChange={(e) => onStatusFilterChange(e.target.value)}
-          className="px-3 py-2 text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 cursor-pointer"
-        >
-          <option value="all">{t.users.allStatuses || 'All Statuses'}</option>
-          {USER_STATUS_OPTIONS.map(([value, label]) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          ))}
-        </select>
+          onValueChange={onStatusFilterChange}
+          options={[
+            { value: 'all', label: t.users.allStatuses || 'All Statuses' },
+            ...STATUS_SELECT_OPTIONS,
+          ]}
+          className={FILTER_SELECT_CLASS}
+        />
 
         {/* Site Filter */}
-        <select
+        <NativeSelect
+          aria-label="Filter by website"
           value={siteFilter}
-          onChange={(e) => onSiteFilterChange(e.target.value)}
-          className="px-3 py-2 text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 cursor-pointer"
-        >
-          <option value="all">{t.users.allSites || 'All Websites'}</option>
-          {sites.map((site) => (
-            <option key={site.id} value={site.id}>
-              {site.name}
-            </option>
-          ))}
-        </select>
+          onValueChange={onSiteFilterChange}
+          options={[
+            { value: 'all', label: t.users.allSites || 'All Websites' },
+            ...sites.map((site) => ({ value: site.id, label: site.name })),
+          ]}
+          className={FILTER_SELECT_CLASS}
+        />
 
         {/* Clear Filters Button */}
         {hasActiveFilters && (

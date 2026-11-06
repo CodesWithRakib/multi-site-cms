@@ -7,6 +7,7 @@ import { RichTextEditor } from '@/features/editor';
 import { MediaLibraryModal } from '@/features/media';
 import {
   useGetEffectivePolicyQuery,
+  useGetMediaAssetQuery,
   useListSitesQuery,
   useUpdatePostMutation,
 } from '@/lib/cms-api';
@@ -41,8 +42,16 @@ export function PostForm({ initialPost, isCreateMode = false }: PostFormProps) {
   );
   const [bodyHtml, setBodyHtml] = useState<string>('');
 
-  // Featured Image & Publications
-  const [featuredImage, setFeaturedImage] = useState<MediaAssetItem | null>(null);
+  // Featured image: `undefined` = untouched, so show the one already on the
+  // post's publications; a picked asset or `null` (removed) overrides it.
+  const [pickedImage, setPickedImage] = useState<MediaAssetItem | null | undefined>(undefined);
+  const existingImageId =
+    initialPost?.publications?.find((p) => p.featuredImageId)?.featuredImageId ?? null;
+  const { data: existingImage } = useGetMediaAssetQuery(existingImageId ?? '', {
+    skip: !existingImageId || pickedImage !== undefined,
+  });
+  const featuredImage = pickedImage === undefined ? (existingImage ?? null) : pickedImage;
+  const featuredImageChanged = pickedImage !== undefined;
   const [siteConfigs, setSiteConfigs] = useState<Record<string, SitePubConfig>>({});
 
   // Modals & targets
@@ -126,6 +135,7 @@ export function PostForm({ initialPost, isCreateMode = false }: PostFormProps) {
     sourceLocale,
     bodyJson,
     featuredImage,
+    featuredImageChanged,
     siteConfigs,
     sitesData,
     clearDraft,
@@ -141,7 +151,7 @@ export function PostForm({ initialPost, isCreateMode = false }: PostFormProps) {
 
   const handleMediaSelect = (asset: MediaAssetItem) => {
     if (mediaTarget === 'featured') {
-      setFeaturedImage(asset);
+      setPickedImage(asset);
       markDirty();
     } else if (mediaTarget === 'editor' && editorRef.current) {
       const url =
@@ -158,94 +168,100 @@ export function PostForm({ initialPost, isCreateMode = false }: PostFormProps) {
   };
 
   return (
-    <form onSubmit={handleFormSubmit} className="flex flex-col gap-6 w-full pb-16">
-      <PostFormHeader
-        isCreateMode={isCreateMode}
-        currentRevisionNumber={currentRevisionNumber}
-        lastSavedAt={lastSavedAt}
-        autosaveStatus={autosaveStatus}
-        isSubmitting={isSubmitting}
-        onOpenPreview={() => setIsPreviewOpen(true)}
-        hasInitialPost={Boolean(initialPost?.id)}
-        onSaveShortcut={() => void triggerManualSave()}
-      />
-
-      {hasRecoverableDraft && recoverableDraft && (
-        <PostDraftRecoveryBanner
-          savedAt={recoverableDraft.savedAt}
-          onRestore={handleRestoreDraft}
-          onDismiss={clearDraft}
+    <>
+      <form onSubmit={handleFormSubmit} className="flex flex-col gap-6 w-full pb-16">
+        <PostFormHeader
+          isCreateMode={isCreateMode}
+          currentRevisionNumber={currentRevisionNumber}
+          lastSavedAt={lastSavedAt}
+          autosaveStatus={autosaveStatus}
+          isSubmitting={isSubmitting}
+          onOpenPreview={() => setIsPreviewOpen(true)}
+          hasInitialPost={Boolean(initialPost?.id)}
+          onSaveShortcut={() => void triggerManualSave()}
         />
-      )}
 
-      <PostBasicFields
-        title={title}
-        onTitleChange={(val) => {
-          setTitle(val);
-          setIsLocalDirty(true);
-          markDirty();
-        }}
-        excerpt={excerpt}
-        onExcerptChange={(val) => {
-          setExcerpt(val);
-          setIsLocalDirty(true);
-          markDirty();
-        }}
-        type={type}
-        onTypeChange={(val) => {
-          setType(val);
-          setIsLocalDirty(true);
-          markDirty();
-        }}
-        sourceLocale={sourceLocale}
-        onLocaleChange={(val) => {
-          setSourceLocale(val);
-          setIsLocalDirty(true);
-          markDirty();
-        }}
-      />
+        {hasRecoverableDraft && recoverableDraft && (
+          <PostDraftRecoveryBanner
+            savedAt={recoverableDraft.savedAt}
+            onRestore={handleRestoreDraft}
+            onDismiss={clearDraft}
+          />
+        )}
 
-      <PostFeaturedImagePicker
-        featuredImage={featuredImage}
-        onSelectClick={() => {
-          setMediaTarget('featured');
-          setIsMediaLibraryOpen(true);
-        }}
-        onRemove={() => {
-          setFeaturedImage(null);
-          markDirty();
-        }}
-      />
+        <PostBasicFields
+          title={title}
+          onTitleChange={(val) => {
+            setTitle(val);
+            setIsLocalDirty(true);
+            markDirty();
+          }}
+          excerpt={excerpt}
+          onExcerptChange={(val) => {
+            setExcerpt(val);
+            setIsLocalDirty(true);
+            markDirty();
+          }}
+          type={type}
+          onTypeChange={(val) => {
+            setType(val);
+            setIsLocalDirty(true);
+            markDirty();
+          }}
+          sourceLocale={sourceLocale}
+          onLocaleChange={(val) => {
+            setSourceLocale(val);
+            setIsLocalDirty(true);
+            markDirty();
+          }}
+        />
 
-      <div className="flex flex-col gap-2">
-        <label className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 px-1">
-          Editorial Content Body
-        </label>
-        <RichTextEditor
-          initialContent={bodyJson}
-          contentType={type}
-          placeholder="Compose rich article content. Use toolbar for headings, lists, tables, images, destination guides, or timeline events..."
-          onChange={handleEditorChange}
-          onOpenMediaLibrary={() => {
-            setMediaTarget('editor');
+        <PostFeaturedImagePicker
+          featuredImage={featuredImage}
+          onSelectClick={() => {
+            setMediaTarget('featured');
             setIsMediaLibraryOpen(true);
           }}
-          editorRef={editorRef}
+          onRemove={() => {
+            setPickedImage(null);
+            markDirty();
+          }}
         />
-      </div>
 
-      <PostPublicationsSection
-        sites={sitesData}
-        title={title}
-        siteConfigs={siteConfigs}
-        existingPublications={initialPost?.publications}
-        onConfigChange={(sId, updated) => {
-          setSiteConfigs((prev) => ({ ...prev, [sId]: updated }));
-          markDirty();
-        }}
-        onOpenPublishModal={(pub, action) => setPublishingTarget({ publication: pub, action })}
-      />
+        <div className="flex flex-col gap-2">
+          <label className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 px-1">
+            Editorial Content Body
+          </label>
+          <RichTextEditor
+            initialContent={bodyJson}
+            contentType={type}
+            placeholder="Compose rich article content. Use toolbar for headings, lists, tables, images, destination guides, or timeline events..."
+            onChange={handleEditorChange}
+            onOpenMediaLibrary={() => {
+              setMediaTarget('editor');
+              setIsMediaLibraryOpen(true);
+            }}
+            editorRef={editorRef}
+          />
+        </div>
 
+        <PostPublicationsSection
+          sites={sitesData}
+          title={title}
+          siteConfigs={siteConfigs}
+          existingPublications={initialPost?.publications}
+          latestRevisionId={initialPost?.currentRevision?.id}
+          onConfigChange={(sId, updated) => {
+            setSiteConfigs((prev) => ({ ...prev, [sId]: updated }));
+            markDirty();
+          }}
+          onOpenPublishModal={(pub, action) => setPublishingTarget({ publication: pub, action })}
+        />
+      </form>
+
+      {/* Dialogs live outside the post <form>: PublishingModal has its own
+          <form>, and nested forms break submission (and its submit event
+          would also bubble into the post save handler). */}
       <MediaLibraryModal
         isOpen={isMediaLibraryOpen}
         onClose={() => setIsMediaLibraryOpen(false)}
@@ -271,6 +287,6 @@ export function PostForm({ initialPost, isCreateMode = false }: PostFormProps) {
           postTitle={title}
         />
       )}
-    </form>
+    </>
   );
 }

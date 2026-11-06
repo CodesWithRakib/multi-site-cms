@@ -30,6 +30,8 @@ export function isValidPublicationTransition(
  */
 export const OUTBOX_EVENT_TYPES = {
   PUBLICATION_PUBLISHED: 'publication.published',
+  /** A published publication moved to a newer revision (content edited). */
+  PUBLICATION_UPDATED: 'publication.updated',
   PUBLICATION_UNPUBLISHED: 'publication.unpublished',
   PUBLICATION_SCHEDULED: 'publication.scheduled',
   PUBLICATION_RESCHEDULED: 'publication.rescheduled',

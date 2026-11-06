@@ -15,7 +15,7 @@ export function ArticleHeroImage({ featuredImage, title }: ArticleHeroImageProps
         src={featuredImage.url}
         alt={featuredImage.altText || title}
         fill
-        priority
+        preload
         sizes="(max-width: 896px) 100vw, 896px"
         className="object-cover"
       />

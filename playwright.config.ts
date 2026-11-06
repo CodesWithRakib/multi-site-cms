@@ -19,6 +19,8 @@ const serverScript = isProductionBuild ? 'start' : 'dev';
 
 export default defineConfig({
   testDir: './e2e',
+  // Production smoke tests run only through playwright.prod.config.ts.
+  testIgnore: ['**/production/**'],
   fullyParallel: false,
   workers: process.env.CI ? 1 : undefined,
   forbidOnly: Boolean(process.env.CI),

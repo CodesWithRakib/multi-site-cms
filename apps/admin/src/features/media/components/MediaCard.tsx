@@ -39,7 +39,18 @@ export function MediaCard({
   return (
     <div
       onClick={() => onSelect && onSelect(asset)}
-      className={`group relative flex flex-col rounded-2xl overflow-hidden border transition-all cursor-pointer ${
+      // Keyboard users must be able to pick an asset too.
+      role={onSelect ? 'button' : undefined}
+      tabIndex={onSelect ? 0 : undefined}
+      aria-label={onSelect ? `Select ${asset.originalFilename || 'media asset'}` : undefined}
+      onKeyDown={(event) => {
+        if (!onSelect || event.target !== event.currentTarget) return;
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          onSelect(asset);
+        }
+      }}
+      className={`group relative flex flex-col rounded-2xl overflow-hidden border transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 ${
         isBatchSelected
           ? 'border-emerald-500 ring-2 ring-emerald-500/40 bg-emerald-50/20 dark:bg-emerald-950/20 shadow-md'
           : isSelected

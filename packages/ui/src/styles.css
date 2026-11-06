@@ -92,6 +92,43 @@
   --animate-collapsible-down: collapsible-down 0.2s ease-out;
   --animate-collapsible-up: collapsible-up 0.2s ease-out;
 
+  /* Entrance motion: strong ease-out, transform + opacity only. Pair with
+     `motion-safe:` so reduced-motion users get the final state instantly.
+     Stagger with `[animation-delay:120ms]`. */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-rise: rise 0.7s var(--ease-out-expo) both;
+  --animate-fade: fade 0.6s var(--ease-out-expo) both;
+  --animate-cover-zoom: cover-zoom 1.8s var(--ease-out-expo) both;
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes cover-zoom {
+    from {
+      transform: scale(1.08);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
+
   @keyframes accordion-down {
     from {
       height: 0;

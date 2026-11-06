@@ -114,6 +114,7 @@ describe('OpenAPI document', () => {
       `/${env.API_PREFIX}/sites/{siteId}/publications/{publicationId}/review`,
       `/${env.API_PREFIX}/sites/{siteId}/publications/{publicationId}/schedule`,
       `/${env.API_PREFIX}/sites/{siteId}/publications/{publicationId}/unpublish`,
+      `/${env.API_PREFIX}/sites/{siteId}/publications/{publicationId}/update-live`,
       `/${env.API_PREFIX}/sites/{siteId}/seo`,
       `/${env.API_PREFIX}/sites/{siteId}/settings`,
       `/${env.API_PREFIX}/sites/{siteId}/tags`,

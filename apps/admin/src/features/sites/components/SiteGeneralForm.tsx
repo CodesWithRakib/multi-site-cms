@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from 'react';
 import { Loader2, Save, Settings } from 'lucide-react';
 import type { SiteItem, SiteStatus } from '@multi-site-cms/types';
+import { NativeSelect, type NativeSelectOption } from '@multi-site-cms/ui';
 
 import { useAdmin } from '@/lib/admin-context';
 
@@ -32,6 +33,8 @@ const STATUSES: ReadonlyArray<readonly [SiteStatus, string]> = [
 
 const FIELD =
   'w-full px-3.5 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 text-slate-900 dark:text-slate-100 focus:outline-hidden focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 shadow-2xs';
+const SELECT_FIELD =
+  'px-3.5 py-2.5 text-xs rounded-xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 text-slate-900 dark:text-slate-100 focus:border-emerald-500 focus:ring-emerald-500/20 shadow-2xs';
 const LABEL = 'block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5';
 
 /** Options plus the stored value when it is not one of them (never hide data). */
@@ -40,6 +43,10 @@ function withCurrent(
   current: string,
 ): ReadonlyArray<readonly [string, string]> {
   return options.some(([value]) => value === current) ? options : [[current, current], ...options];
+}
+
+function toOptions(pairs: ReadonlyArray<readonly [string, string]>): NativeSelectOption[] {
+  return pairs.map(([value, label]) => ({ value, label }));
 }
 
 interface SiteGeneralFormProps {
@@ -106,54 +113,42 @@ export function SiteGeneralForm({ site, isSaving, onSave }: SiteGeneralFormProps
             <label htmlFor="site-timezone" className={LABEL}>
               {t.sites.timezone || 'Timezone'}
             </label>
-            <select
+            <NativeSelect
               id="site-timezone"
               value={values.timezone}
-              onChange={(e) => set('timezone', e.target.value)}
-              className={FIELD}
-            >
-              {withCurrent(TIMEZONES, values.timezone).map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
+              onValueChange={(value) => set('timezone', value)}
+              options={toOptions(withCurrent(TIMEZONES, values.timezone))}
+              className={SELECT_FIELD}
+            />
           </div>
 
           <div>
             <label htmlFor="site-locale" className={LABEL}>
               {t.sites.defaultLocale || 'Default locale'}
             </label>
-            <select
+            <NativeSelect
               id="site-locale"
               value={values.defaultLocale}
-              onChange={(e) => set('defaultLocale', e.target.value)}
-              className={FIELD}
-            >
-              {withCurrent(LOCALES, values.defaultLocale).map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
+              onValueChange={(value) => set('defaultLocale', value)}
+              options={toOptions(withCurrent(LOCALES, values.defaultLocale))}
+              className={SELECT_FIELD}
+            />
           </div>
 
           <div>
             <label htmlFor="site-status" className={LABEL}>
               Operational status
             </label>
-            <select
+            <NativeSelect
               id="site-status"
               value={values.status}
-              onChange={(e) => set('status', e.target.value as SiteStatus)}
-              className={FIELD}
-            >
-              {withCurrent(STATUSES, values.status).map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
+              onValueChange={(value) => {
+                const match = STATUSES.find(([status]) => status === value);
+                if (match) set('status', match[0]);
+              }}
+              options={toOptions(withCurrent(STATUSES, values.status))}
+              className={SELECT_FIELD}
+            />
           </div>
         </div>
 

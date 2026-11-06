@@ -1,9 +1,17 @@
 'use client';
 
+import { useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import type { MediaAssetItem, PostItem, SiteItem } from '@multi-site-cms/types';
-import { useCreatePostMutation, useCreatePublicationMutation } from '@/lib/cms-api';
+import { apiErrorMessage } from '@/lib/api-error';
+import {
+  useCreatePostMutation,
+  useCreatePublicationMutation,
+  useUpdatePublicationMutation,
+} from '@/lib/cms-api';
 import type { SitePubConfig } from '../components/PostSitePublicationCard';
+import { publicationChanges } from '../utils/publication-changes';
+import { slugifyTitle } from '../utils/slugify';
 
 export interface UsePostSubmitProps {
   isCreateMode: boolean;
@@ -14,6 +22,8 @@ export interface UsePostSubmitProps {
   sourceLocale: string;
   bodyJson: Record<string, unknown>;
   featuredImage: MediaAssetItem | null;
+  /** True when the editor picked or removed the featured image in this session. */
+  featuredImageChanged: boolean;
   siteConfigs: Record<string, SitePubConfig>;
   sitesData: SiteItem[];
   clearDraft: () => void;
@@ -29,6 +39,7 @@ export function usePostSubmit({
   sourceLocale,
   bodyJson,
   featuredImage,
+  featuredImageChanged,
   siteConfigs,
   sitesData,
   clearDraft,
@@ -37,90 +48,107 @@ export function usePostSubmit({
   const router = useRouter();
   const [createPost, { isLoading: isCreating }] = useCreatePostMutation();
   const [createPublication] = useCreatePublicationMutation();
+  const [updatePublication] = useUpdatePublicationMutation();
+  const [isSaving, setIsSaving] = useState(false);
 
-  const handleFormSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const createNewPost = async () => {
+    const publications = sitesData
+      .map((site) => ({ site, config: siteConfigs[site.id] }))
+      .filter(({ config }) => config?.enabled)
+      .map(({ site, config }) => ({
+        siteId: site.id,
+        slug: config?.slug || slugifyTitle(title),
+        status: config?.status,
+        scheduledFor: config?.scheduledFor,
+        categoryIds: config?.categoryIds.length ? config.categoryIds : undefined,
+        seoTitle: config?.seoTitle || undefined,
+        seoDescription: config?.seoDescription || undefined,
+        featuredImageId: featuredImage?.id,
+      }));
+
+    try {
+      const created = await createPost({
+        title: title.trim(),
+        excerpt: excerpt.trim() || undefined,
+        type,
+        sourceLocale,
+        body: bodyJson,
+        publications: publications.length > 0 ? publications : undefined,
+      }).unwrap();
+      clearDraft();
+      router.push(`/posts/${created.id}/edit`);
+    } catch (error: unknown) {
+      alert(`Failed to create post: ${apiErrorMessage(error, 'Server error')}`);
+    }
+  };
+
+  const saveExistingPost = async (postId: string) => {
+    await triggerManualSave();
+
+    const failures: string[] = [];
+    for (const site of sitesData) {
+      const config = siteConfigs[site.id];
+      const existingPub = initialPost?.publications?.find((p) => p.siteId === site.id);
+      try {
+        if (!existingPub && config?.enabled) {
+          await createPublication({
+            postId,
+            data: {
+              siteId: site.id,
+              slug: config.slug,
+              status: config.status,
+              categoryIds: config.categoryIds.length > 0 ? config.categoryIds : undefined,
+              seoTitle: config.seoTitle || undefined,
+              seoDescription: config.seoDescription || undefined,
+              featuredImageId: featuredImage?.id,
+            },
+          }).unwrap();
+        } else if (existingPub) {
+          const data = publicationChanges(config, {
+            changed: featuredImageChanged,
+            id: featuredImage?.id ?? null,
+          });
+          if (data) {
+            await updatePublication({
+              siteId: site.id,
+              publicationId: existingPub.id,
+              data,
+            }).unwrap();
+          }
+        }
+      } catch (error: unknown) {
+        failures.push(`${site.name}: ${apiErrorMessage(error, 'could not be saved')}`);
+      }
+    }
+
+    if (failures.length > 0) {
+      alert(`Some site settings were not saved:\n${failures.join('\n')}`);
+    }
+  };
+
+  const handleFormSubmit = async (event: FormEvent) => {
+    event.preventDefault();
     if (!title.trim()) {
       alert('Post title is required.');
       return;
     }
 
     if (isCreateMode) {
-      try {
-        const publicationsPayload = [];
-        for (const site of sitesData) {
-          const defaultSlug = (title || 'post-slug')
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/^-|-$/g, '');
-          const existingPub = initialPost?.publications?.find((p) => p.siteId === site.id);
-          const config = siteConfigs[site.id] || {
-            enabled: Boolean(existingPub),
-            slug: existingPub?.slug || defaultSlug,
-            status: 'draft' as const,
-            categoryIds: [],
-            seoTitle: existingPub?.seoTitle || '',
-            seoDescription: existingPub?.seoDescription || '',
-          };
+      await createNewPost();
+      return;
+    }
+    if (!initialPost?.id) return;
 
-          if (config.enabled) {
-            publicationsPayload.push({
-              siteId: site.id,
-              slug: config.slug,
-              status: config.status,
-              scheduledFor: config.scheduledFor,
-              categoryIds: config.categoryIds.length > 0 ? config.categoryIds : undefined,
-              seoTitle: config.seoTitle || undefined,
-              seoDescription: config.seoDescription || undefined,
-              featuredImageId: featuredImage?.id,
-            });
-          }
-        }
-
-        const created = await createPost({
-          title: title.trim(),
-          excerpt: excerpt.trim() || undefined,
-          type,
-          sourceLocale,
-          body: bodyJson,
-          publications: publicationsPayload.length > 0 ? publicationsPayload : undefined,
-        }).unwrap();
-
-        clearDraft();
-        router.push(`/posts/${created.id}/edit`);
-      } catch (err: unknown) {
-        alert('Failed to create post: ' + ((err as Error).message || 'Server error'));
-      }
-    } else {
-      await triggerManualSave();
-
-      for (const site of sitesData) {
-        const config = siteConfigs[site.id];
-        const existingPub = initialPost?.publications?.find((p) => p.siteId === site.id);
-        if (config?.enabled && !existingPub && initialPost?.id) {
-          try {
-            await createPublication({
-              postId: initialPost.id,
-              data: {
-                siteId: site.id,
-                slug: config.slug,
-                status: config.status,
-                categoryIds: config.categoryIds.length > 0 ? config.categoryIds : undefined,
-                seoTitle: config.seoTitle || undefined,
-                seoDescription: config.seoDescription || undefined,
-                featuredImageId: featuredImage?.id,
-              },
-            }).unwrap();
-          } catch {
-            // Ignored
-          }
-        }
-      }
+    setIsSaving(true);
+    try {
+      await saveExistingPost(initialPost.id);
+    } finally {
+      setIsSaving(false);
     }
   };
 
   return {
     handleFormSubmit,
-    isSubmitting: isCreating,
+    isSubmitting: isCreating || isSaving,
   };
 }

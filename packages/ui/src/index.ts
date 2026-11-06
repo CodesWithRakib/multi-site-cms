@@ -88,6 +88,11 @@ export {
   SelectTrigger,
   SelectValue,
 } from './components/select';
+export {
+  NativeSelect,
+  type NativeSelectOption,
+  type NativeSelectProps,
+} from './components/native-select';
 export { Separator, type SeparatorProps } from './components/separator';
 export {
   Sheet,

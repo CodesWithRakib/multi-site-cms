@@ -723,6 +723,17 @@ describe('CMS Core (Posts, Publications, Taxonomy, Media, OCC & Tenant Isolation
       const pub = (updateRes.body as ApiSuccess<PostPublicationItem>).data;
       expect(pub.categoryIds).toContain(childCategoryId);
       expect(pub.tagIds).toContain(tagId);
+
+      // The editor reads categories back from the post detail (regression:
+      // they were missing, so the edit form always showed none selected).
+      const detailRes = await request(app.getHttpServer())
+        .get(`/api/v1/posts/${post.id}`)
+        .set('Cookie', travelAdminCookie)
+        .expect(200);
+      const detailPub = (detailRes.body as ApiSuccess<PostItem>).data.publications?.find(
+        (p) => p.id === testPubId,
+      );
+      expect(detailPub?.categoryIds).toEqual([childCategoryId]);
     });
 
     it('refuses to delete a category or tag that a publication uses, with 409 (not 500)', async () => {

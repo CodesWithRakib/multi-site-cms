@@ -3,6 +3,7 @@
 import React from 'react';
 import { Layers, Plus, RefreshCw, Search, X } from 'lucide-react';
 import type { SiteItem } from '@multi-site-cms/types';
+import { NativeSelect } from '@multi-site-cms/ui';
 import type { TaxonomyTab } from '../types';
 
 interface TaxonomyHeaderProps {
@@ -83,21 +84,19 @@ export function TaxonomyHeader({
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-2xs">
         {/* Site Selector */}
         <div className="flex items-center gap-2">
-          <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 shrink-0">
+          <label
+            htmlFor="taxonomy-site-scope"
+            className="text-xs font-semibold text-slate-500 dark:text-slate-400 shrink-0"
+          >
             Site Scope:
           </label>
-          <select
-            aria-label="Website scope"
+          <NativeSelect
+            id="taxonomy-site-scope"
             value={effectiveSiteId || ''}
-            onChange={(e) => onSiteChange(e.target.value)}
-            className="px-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-emerald-500 font-medium"
-          >
-            {availableSites.map((site) => (
-              <option key={site.id} value={site.id}>
-                {site.name}
-              </option>
-            ))}
-          </select>
+            onValueChange={onSiteChange}
+            options={availableSites.map((site) => ({ value: site.id, label: site.name }))}
+            className="w-auto px-3 py-1.5 text-xs rounded-xl border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-emerald-500 font-medium"
+          />
         </div>
 
         {/* Search Bar */}

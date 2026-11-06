@@ -3,7 +3,17 @@
 import React, { useState } from 'react';
 import { Save, CheckCircle2, AlertCircle, RotateCw, AlertTriangle } from 'lucide-react';
 import type { PlatformMaintenanceSettings } from '@multi-site-cms/types';
+import { NativeSelect, type NativeSelectOption } from '@multi-site-cms/ui';
 import { useAdmin } from '@/lib/admin-context';
+import { SETTINGS_SELECT_CLASS } from './form-styles';
+
+/** Audit history is kept at least a year (enforced by the API). */
+const RETENTION_OPTIONS: NativeSelectOption[] = [
+  { value: '365', label: '365 Days (1 Year minimum)' },
+  { value: '730', label: '730 Days (2 Years, default)' },
+  { value: '1095', label: '1095 Days (3 Years)' },
+  { value: '1825', label: '1825 Days (5 Years)' },
+];
 
 interface MaintenanceSettingsFormProps {
   initialData?: PlatformMaintenanceSettings;
@@ -135,25 +145,24 @@ export function MaintenanceSettingsForm({
 
       {/* Audit retention days */}
       <div className="space-y-1.5 text-sm">
-        <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+        <label
+          htmlFor="settings-audit-retention"
+          className="text-xs font-semibold text-neutral-700 dark:text-neutral-300"
+        >
           {t('settings.auditRetentionDays')}
         </label>
-        <select
-          value={formData.auditRetentionDays}
-          onChange={(e) =>
+        <NativeSelect
+          id="settings-audit-retention"
+          value={String(formData.auditRetentionDays)}
+          onValueChange={(value) =>
             setFormData({
               ...formData,
-              auditRetentionDays: Number.parseInt(e.target.value, 10) || 730,
+              auditRetentionDays: Number.parseInt(value, 10) || 730,
             })
           }
-          className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50/70 dark:bg-neutral-800/80 text-neutral-900 dark:text-neutral-100 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 cursor-pointer"
-        >
-          {/* Audit history is kept at least a year (enforced by the API). */}
-          <option value={365}>365 Days (1 Year minimum)</option>
-          <option value={730}>730 Days (2 Years, default)</option>
-          <option value={1095}>1095 Days (3 Years)</option>
-          <option value={1825}>1825 Days (5 Years)</option>
-        </select>
+          options={RETENTION_OPTIONS}
+          className={SETTINGS_SELECT_CLASS}
+        />
       </div>
 
       <div className="pt-4 border-t border-neutral-100 dark:border-neutral-800 flex justify-end">

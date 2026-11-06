@@ -49,6 +49,9 @@ export function CustomBlockModal({
     <div
       role="dialog"
       aria-modal="true"
+      // React bubbles events through portals: without this, submitting a
+      // block form here would also submit (save) the surrounding post form.
+      onSubmit={(event) => event.stopPropagation()}
       className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-xs p-4 animate-in fade-in duration-150"
     >
       <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl max-w-lg w-full p-6 border border-slate-200 dark:border-slate-800 animate-in zoom-in-95 duration-150">
