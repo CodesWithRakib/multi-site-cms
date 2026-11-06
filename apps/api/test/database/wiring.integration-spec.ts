@@ -17,7 +17,7 @@ describe('database integration wiring', () => {
     expect(dataSource.options.synchronize).toBe(false);
     expect(dataSource.options.migrationsRun).toBe(false);
     expect(dataSource.options.migrations).toHaveLength(MIGRATIONS.length);
-    expect(MIGRATIONS).toHaveLength(13);
+    expect(MIGRATIONS).toHaveLength(14);
   });
 
   it('registers every domain entity', () => {

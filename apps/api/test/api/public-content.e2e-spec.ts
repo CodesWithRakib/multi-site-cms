@@ -416,6 +416,24 @@ describe('Public Content Discovery API (/api/v1/public/sites/:siteKey/*)', () =>
       expect(body.data[0]?.slug).toBe('hidden-fjords-norway');
     });
 
+    it('sorts by real readership with sort=popular (page views, last 30 days)', async () => {
+      // The older Norway post gets the views; newest-first would list Kyoto first.
+      for (let i = 0; i < 3; i++) {
+        await dataSource.query(
+          `INSERT INTO "analytics_page_views" ("site_id", "post_id", "path", "visitor_id")
+           VALUES ($1, $2, '/articles/hidden-fjords-norway', $3)`,
+          [siteTravelId, _publishedPost1Id, `visitor-${i}`],
+        );
+      }
+
+      const res = await request(app.getHttpServer())
+        .get('/api/v1/public/sites/travel-blog/posts?sort=popular')
+        .expect(200);
+      const slugs = (res.body as ApiSuccess<PublicArticleSummary[]>).data.map((a) => a.slug);
+      expect(slugs[0]).toBe('hidden-fjords-norway');
+      expect(slugs).toContain('kyoto-temples-guide');
+    });
+
     it('filters articles by templateKey=breaking', async () => {
       const res = await request(app.getHttpServer())
         .get('/api/v1/public/sites/air-sports/posts?templateKey=breaking')
@@ -505,6 +523,30 @@ describe('Public Content Discovery API (/api/v1/public/sites/:siteKey/*)', () =>
       const europe = body.data.find((t) => t.slug === 'europe');
       expect(europe).toBeDefined();
       expect(europe?.postCount).toBe(1);
+    });
+
+    it('does not count deleted posts in category or tag totals', async () => {
+      const posts = dataSource.getRepository(Post);
+      await posts.update({ id: _publishedPost1Id }, { deletedAt: new Date() });
+      try {
+        const cats = await request(app.getHttpServer())
+          .get('/api/v1/public/sites/travel-blog/categories')
+          .expect(200);
+        const adv = (cats.body as ApiSuccess<PublicCategoryItem[]>).data.find(
+          (c) => c.slug === 'adventure-escapes',
+        );
+        expect(adv?.postCount).toBe(0);
+
+        const tags = await request(app.getHttpServer())
+          .get('/api/v1/public/sites/travel-blog/tags')
+          .expect(200);
+        const europe = (tags.body as ApiSuccess<PublicTagItem[]>).data.find(
+          (t) => t.slug === 'europe',
+        );
+        expect(europe?.postCount).toBe(0);
+      } finally {
+        await posts.update({ id: _publishedPost1Id }, { deletedAt: null });
+      }
     });
   });
 

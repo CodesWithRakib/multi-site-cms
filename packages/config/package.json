@@ -20,6 +20,10 @@
     "./embeds": {
       "types": "./src/embeds.ts",
       "default": "./src/embeds.ts"
+    },
+    "./doc-outline": {
+      "types": "./src/doc-outline.ts",
+      "default": "./src/doc-outline.ts"
     }
   },
   "scripts": {

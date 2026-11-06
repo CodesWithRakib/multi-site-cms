@@ -4,6 +4,7 @@ import { AirSportsCallout } from './AirSportsCallout';
 import { AirSportsDestinationCard } from './AirSportsDestinationCard';
 import { AirSportsTimelineCard } from './AirSportsTimelineCard';
 import { toYouTubeEmbedUrl } from '@multi-site-cms/config/embeds';
+import { headingId } from '@multi-site-cms/config/doc-outline';
 
 export interface DocMark {
   type: string;
@@ -21,15 +22,6 @@ export interface DocNode {
 export interface DocRendererProps {
   document: Record<string, unknown> | null | undefined;
   className?: string;
-}
-
-function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .trim()
-    .replace(/[^\w\s-]/g, '')
-    .replace(/[\s_-]+/g, '-')
-    .replace(/^-+|-+$/g, '');
 }
 
 function renderChildren(content?: DocNode[]): React.ReactNode {
@@ -98,7 +90,7 @@ function DocNodeRenderer({ node, index }: { node: DocNode; index: number }): Rea
     case 'heading': {
       const level = (node.attrs?.level as number) || 2;
       const text = node.content?.map((c) => c.text).join('') || '';
-      const id = slugify(text);
+      const id = headingId(text);
       if (level === 1)
         return (
           <h1

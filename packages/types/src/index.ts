@@ -96,10 +96,15 @@ export interface AuthUser {
   id: string;
   email: string;
   displayName: string;
+  /** Profile photo URL, or null to show initials. */
+  avatarUrl: string | null;
   status: UserStatus;
   roles: UserRoleSummary[];
+  /** Platform-wide permissions (from platform-scoped roles). */
   permissions: string[];
   authorizedSiteIds: string[];
+  /** Permissions granted per site by site-scoped roles. Used only to shape the UI. */
+  sitePermissions: Record<string, string[]>;
   isSuperAdmin: boolean;
 }
 
@@ -326,6 +331,24 @@ export interface CategoryItem {
   children?: CategoryItem[];
 }
 
+export type EventStatus = 'scheduled' | 'live' | 'completed' | 'cancelled';
+
+/** A site event as the admin API returns it. */
+export interface EventItem {
+  id: string;
+  siteId: string;
+  slug: string;
+  name: string;
+  status: EventStatus;
+  startsAt: string;
+  endsAt: string | null;
+  description: string | null;
+  /** Publications (any status) that report on this event. */
+  publicationCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface TagItem {
   id: string;
   siteId: string;
@@ -392,7 +415,8 @@ export interface EventTimelineBlockAttributes {
   time: string;
   title: string;
   description?: string;
-  status: 'scheduled' | 'live' | 'completed' | 'delayed' | 'cancelled';
+  /** `none` hides the badge (e.g. a season or an itinerary step). */
+  status: 'none' | 'scheduled' | 'live' | 'completed' | 'delayed' | 'cancelled';
   windSpeed?: string;
   weatherCondition?: string;
   alertLevel?: 'normal' | 'advisory' | 'warning';
@@ -539,6 +563,8 @@ export interface PublicTaxonomyRef {
 export interface PublicArticleAuthor {
   id: string;
   displayName: string;
+  /** Author's profile photo, or null to show initials. */
+  avatarUrl: string | null;
 }
 
 export interface PublicArticleSummary {

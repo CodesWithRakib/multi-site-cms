@@ -4,7 +4,8 @@ import React from 'react';
 import Link from 'next/link';
 import { ExternalLink, Globe } from 'lucide-react';
 import type { PostPublicationItem, PublicationStatus, SiteItem } from '@multi-site-cms/types';
-import { useListCategoriesQuery } from '@/lib/cms-api';
+import { NativeSelect } from '@multi-site-cms/ui';
+import { useListCategoriesQuery, useListEventsQuery } from '@/lib/cms-api';
 import type { PublishingActionType } from './PublishingModal';
 import { PublicationStatusActions } from './PublicationStatusActions';
 import { publicationLiveUrl } from '../utils/post-display';
@@ -15,6 +16,8 @@ export interface SitePubConfig {
   status: PublicationStatus;
   scheduledFor?: string;
   categoryIds: string[];
+  /** Linked event on this site; '' when none. */
+  eventId: string;
   seoTitle: string;
   seoDescription: string;
 }
@@ -39,6 +42,8 @@ export function PostSitePublicationCard({
   const { data: categories = [] } = useListCategoriesQuery(site.id, {
     skip: !config.enabled,
   });
+
+  const { data: events = [] } = useListEventsQuery(site.id, { skip: !config.enabled });
 
   const liveUrl = publicationLiveUrl(site, existingPub ?? undefined);
 
@@ -137,6 +142,28 @@ export function PostSitePublicationCard({
                   );
                 })}
               </div>
+            </div>
+          )}
+
+          {/* Event link (only offered when the site has events) */}
+          {events.length > 0 && (
+            <div>
+              <label
+                htmlFor={`pub-event-${site.id}`}
+                className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1"
+              >
+                Reports on event
+              </label>
+              <NativeSelect
+                id={`pub-event-${site.id}`}
+                value={config.eventId}
+                onValueChange={(eventId) => onChange({ ...config, eventId })}
+                options={[
+                  { value: '', label: 'No event' },
+                  ...events.map((event) => ({ value: event.id, label: event.name })),
+                ]}
+                className="w-full px-3 py-1.5 rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
+              />
             </div>
           )}
 

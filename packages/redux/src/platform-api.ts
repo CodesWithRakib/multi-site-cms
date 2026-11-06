@@ -50,6 +50,7 @@ export function createPlatformApi(options: PlatformApiOptions) {
       'Health',
       'Auth',
       'Comment',
+      'Event',
     ],
     baseQuery: async (args: PlatformRequestArgs, { signal }) => {
       try {

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 
-import { CoverStory } from '@/components/home/CoverStory';
+import { HeroCarousel } from '@/components/home/HeroCarousel';
 import { KeepReading } from '@/components/home/KeepReading';
 import { LatestStories } from '@/components/home/LatestStories';
 import { NewsletterBanner } from '@/components/home/NewsletterBanner';
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   description: siteConfig.description,
 };
 
-/** Enough stories for every slot: cover, also-new, latest grid, keep-reading. */
+/** Enough stories for every slot: hero slides, latest grid, keep-reading. */
 const HOME_ARTICLE_LIMIT = 20;
 
 export default async function TravelHomePage() {
@@ -53,7 +53,7 @@ export default async function TravelHomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <CoverStory lead={feed.lead} alsoNew={feed.alsoNew} />
+      <HeroCarousel slides={feed.slides} />
 
       <div className="mx-auto max-w-7xl space-y-14 px-4 py-12 sm:space-y-16 sm:px-6 sm:py-14 lg:px-8">
         <LatestStories articles={feed.latest} />

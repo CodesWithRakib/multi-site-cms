@@ -3,6 +3,7 @@ import type { AuthUser } from '@multi-site-cms/types';
 import { type DataSource, type Repository } from 'typeorm';
 
 import { AuditService } from '../../common/audit/audit.service';
+import { ProfileService } from './profile.service';
 import { ApiException } from '../../common/exceptions/api.exception';
 import { getInitializedRepository } from '../../database/ensure-connected';
 import { DATA_SOURCE } from '../../database/database.tokens';
@@ -28,6 +29,7 @@ export class AuthService {
     private readonly sessionService: SessionService,
     private readonly authorizationService: AuthorizationService,
     private readonly auditService: AuditService,
+    private readonly profileService: ProfileService,
     private readonly settingsService: SettingsService,
   ) {}
 
@@ -165,7 +167,7 @@ export class AuthService {
 
     const csrfToken = this.sessionService.generateCsrfToken();
     const authContext = await this.authorizationService.resolveUserAccess(user);
-    const authUser = this.authorizationService.toAuthUser(authContext);
+    const authUser = await this.profileService.toAuthUser(authContext);
 
     await this.auditService.record({
       actorId: user.id,

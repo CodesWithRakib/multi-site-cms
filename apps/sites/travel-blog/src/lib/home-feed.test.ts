@@ -47,25 +47,27 @@ function category(id: string, postCount: number): PublicCategoryItem {
 }
 
 describe('buildHomeFeed', () => {
-  it('uses the newest story with an image as the cover and never repeats a story', () => {
+  it('fills the hero with the newest stories that have images and never repeats a story', () => {
     const articles = [
       article('no-image', { image: false }),
       ...Array.from({ length: 15 }, (_, i) => article(`a${i}`)),
     ];
     const feed = buildHomeFeed(articles, []);
 
-    expect(feed.lead?.id).toBe('a0');
-    expect(feed.alsoNew.map((a) => a.id)).toEqual(['no-image', 'a1', 'a2']);
+    expect(feed.slides.map((a) => a.id)).toEqual(['a0', 'a1', 'a2', 'a3']);
+    expect(feed.latest[0]?.id).toBe('no-image');
     expect(feed.latest).toHaveLength(5);
     expect(feed.more).toHaveLength(6);
 
-    const ids = [feed.lead, ...feed.alsoNew, ...feed.latest, ...feed.more].map((a) => a?.id);
+    const ids = [...feed.slides, ...feed.latest, ...feed.more].map((a) => a.id);
     expect(new Set(ids).size).toBe(ids.length);
   });
 
   it('falls back to the first story when none has an image, and handles no stories', () => {
-    expect(buildHomeFeed([article('x', { image: false })], []).lead?.id).toBe('x');
-    expect(buildHomeFeed([], []).lead).toBeUndefined();
+    expect(buildHomeFeed([article('x', { image: false })], []).slides.map((a) => a.id)).toEqual([
+      'x',
+    ]);
+    expect(buildHomeFeed([], []).slides).toEqual([]);
   });
 
   it('picks the busiest topics and pairs each with an image from its stories', () => {

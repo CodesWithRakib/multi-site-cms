@@ -134,10 +134,16 @@ export function AdminProvider({ children }: { children: ReactNode }) {
       if (!user) return false;
       if (user.isSuperAdmin) return true;
 
-      // Check global capabilities
+      // Platform-wide capability (also covers every site the user can reach).
       if (user.permissions?.includes(permission)) {
         if (!siteId) return true;
         return user.authorizedSiteIds?.includes(siteId) ?? false;
+      }
+
+      // Site-scoped capability from a site role. Only consulted for a specific
+      // site, so platform-level checks (routes, settings) are unaffected.
+      if (siteId) {
+        return user.sitePermissions?.[siteId]?.includes(permission) ?? false;
       }
 
       return false;

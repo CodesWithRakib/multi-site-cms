@@ -329,7 +329,7 @@ describe('Media Upload & Storage System', () => {
       expect(res.status).toBe(404);
     });
 
-    it('soft deletes media and updates status to archived', async () => {
+    it('deletes media: the record and its stored file are gone', async () => {
       const delRes = await request(app.getHttpServer())
         .delete(`/api/v1/media/${uploadedMediaId}`)
         .set('Cookie', travelAdminCookie)

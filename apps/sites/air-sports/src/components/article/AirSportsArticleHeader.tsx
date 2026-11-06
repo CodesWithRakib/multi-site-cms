@@ -1,8 +1,9 @@
 import React from 'react';
 import Link from 'next/link';
-import { Calendar, Clock, User as UserIcon } from 'lucide-react';
+import { Calendar, Clock } from 'lucide-react';
 import type { PublicArticleDetail } from '@multi-site-cms/types';
 import { ShareButtons } from '@/components/interactive/ShareButtons';
+import { AuthorAvatar } from '@/components/ui/AuthorAvatar';
 import { siteConfig } from '@/config/site';
 
 interface AirSportsArticleHeaderProps {
@@ -26,7 +27,7 @@ export function AirSportsArticleHeader({
         className="mb-6 flex items-center gap-2 text-xs font-mono text-muted-foreground"
       >
         <Link href="/" className="hover:text-primary transition-colors">
-          Radar
+          Home
         </Link>
         <span>/</span>
         {post.categories[0] ? (
@@ -89,8 +90,12 @@ export function AirSportsArticleHeader({
       <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-y border-border py-3.5 text-xs font-mono text-muted-foreground">
         <div className="flex flex-wrap items-center gap-4">
           {post.author && (
-            <span className="flex items-center gap-1.5 font-semibold text-foreground">
-              <UserIcon className="size-3.5 text-primary" />
+            <span className="flex items-center gap-2 font-semibold text-foreground">
+              <AuthorAvatar
+                name={post.author.displayName}
+                avatarUrl={post.author.avatarUrl}
+                className="size-7 font-sans text-[10px]"
+              />
               {post.author.displayName}
             </span>
           )}

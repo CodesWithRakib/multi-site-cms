@@ -52,6 +52,7 @@ export function PostPublicationsSection({
             slug: existingPub?.slug || defaultSlug,
             status: existingPub?.status || 'draft',
             categoryIds: existingPub?.categoryIds ?? [],
+            eventId: existingPub?.eventId ?? '',
             seoTitle: existingPub?.seoTitle || '',
             seoDescription: existingPub?.seoDescription || '',
           };

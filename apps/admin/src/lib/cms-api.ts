@@ -14,6 +14,8 @@ import type {
   AuditLogSummary,
   AuthUser,
   CategoryItem,
+  EventItem,
+  EventStatus,
   CommentStatus,
   CreateCategoryPayload,
   CreateDomainPayload,
@@ -79,6 +81,8 @@ export interface CreatePublicationPayload {
   seoDescription?: string;
   canonicalUrl?: string;
   featuredImageId?: string;
+  /** Event on the same site this publication reports on. */
+  eventId?: string;
   scheduledFor?: string;
   categoryIds?: string[];
   tagIds?: string[];
@@ -86,9 +90,13 @@ export interface CreatePublicationPayload {
 
 /** PATCH body for a publication; `null` clears an optional field. */
 export type UpdatePublicationPayload = Partial<
-  Omit<CreatePublicationPayload, 'siteId' | 'featuredImageId' | 'seoTitle' | 'seoDescription'>
+  Omit<
+    CreatePublicationPayload,
+    'siteId' | 'featuredImageId' | 'eventId' | 'seoTitle' | 'seoDescription'
+  >
 > & {
   featuredImageId?: string | null;
+  eventId?: string | null;
   seoTitle?: string | null;
   seoDescription?: string | null;
 };
@@ -153,6 +161,14 @@ export const cmsApi = platformApi.injectEndpoints({
       query: () => ({ path: '/auth/me' }),
       transformResponse: (response: ApiSuccess<unknown>) => response.data as AuthUser,
       providesTags: ['Auth'],
+    }),
+
+    /** Sets (mediaId) or removes (null) the signed-in user's profile photo. */
+    updateMyAvatar: build.mutation<AuthUser, { mediaId: string | null }>({
+      query: (body) => ({ path: '/auth/me/avatar', method: 'PATCH', body }),
+      transformResponse: (response: ApiSuccess<unknown>) => response.data as AuthUser,
+      // Posts list/preview show author photos, so refresh those too.
+      invalidatesTags: ['Auth', { type: 'Post' as const, id: 'LIST' }],
     }),
 
     login: build.mutation<LoginResponse, { email: string; password: string }>({
@@ -891,6 +907,52 @@ export const cmsApi = platformApi.injectEndpoints({
     }),
 
     // ==========================================
+    // Events
+    // ==========================================
+    listEvents: build.query<EventItem[], string>({
+      query: (siteId) => ({ path: `/sites/${siteId}/events`, query: { limit: 100 } }),
+      transformResponse: (response: ApiSuccess<unknown>) =>
+        (response.data as { items?: EventItem[] } | null)?.items ?? [],
+      providesTags: (_res, _err, siteId) => [{ type: 'Event' as const, id: siteId }],
+    }),
+
+    createEvent: build.mutation<EventItem, { siteId: string; data: EventPayload }>({
+      query: ({ siteId, data }) => ({
+        path: `/sites/${siteId}/events`,
+        method: 'POST',
+        body: data,
+      }),
+      transformResponse: (response: ApiSuccess<unknown>) => response.data as EventItem,
+      invalidatesTags: (_res, _err, { siteId }) => [{ type: 'Event' as const, id: siteId }],
+    }),
+
+    updateEvent: build.mutation<
+      EventItem,
+      { siteId: string; eventId: string; data: Partial<EventPayload> }
+    >({
+      query: ({ siteId, eventId, data }) => ({
+        path: `/sites/${siteId}/events/${eventId}`,
+        method: 'PATCH',
+        body: data,
+      }),
+      transformResponse: (response: ApiSuccess<unknown>) => response.data as EventItem,
+      invalidatesTags: (_res, _err, { siteId }) => [{ type: 'Event' as const, id: siteId }],
+    }),
+
+    deleteEvent: build.mutation<void, { siteId: string; eventId: string }>({
+      query: ({ siteId, eventId }) => ({
+        path: `/sites/${siteId}/events/${eventId}`,
+        method: 'DELETE',
+      }),
+      // Linked publications are detached server-side.
+      invalidatesTags: (_res, _err, { siteId }) => [
+        { type: 'Event' as const, id: siteId },
+        'Publication',
+        'Post',
+      ],
+    }),
+
+    // ==========================================
     // Taxonomy
     // ==========================================
     listCategories: build.query<CategoryItem[], string>({
@@ -1063,7 +1125,21 @@ export const cmsApi = platformApi.injectEndpoints({
   }),
 });
 
+export interface EventPayload {
+  name: string;
+  slug: string;
+  status: EventStatus;
+  startsAt: string;
+  endsAt: string | null;
+  description: string | null;
+}
+
 export const {
+  // Events
+  useListEventsQuery,
+  useCreateEventMutation,
+  useUpdateEventMutation,
+  useDeleteEventMutation,
   // Auth
   useGetCsrfQuery,
   useGetMeQuery,
@@ -1144,6 +1220,7 @@ export const {
   // Media
   useListMediaQuery,
   useGetMediaAssetQuery,
+  useUpdateMyAvatarMutation,
   useUploadMediaMutation,
   useUpdateMediaMutation,
   useDeleteMediaMutation,

@@ -9,6 +9,7 @@ const config: SitePubConfig = {
   slug: 'sunrise-hike',
   status: 'draft',
   categoryIds: ['cat-1'],
+  eventId: '',
   seoTitle: '  ',
   seoDescription: 'Climb before dawn',
 };
@@ -24,6 +25,7 @@ describe('publicationChanges', () => {
     expect(publicationChanges(config, unchangedImage)).toEqual({
       slug: 'sunrise-hike',
       categoryIds: ['cat-1'],
+      eventId: null,
       seoTitle: null,
       seoDescription: 'Climb before dawn',
     });

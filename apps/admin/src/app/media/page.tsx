@@ -106,7 +106,7 @@ export default function MediaPage() {
     if (!pendingDelete) return;
     const { ids } = pendingDelete;
     setIsDeleting(true);
-    // allSettled: one asset still in use must not hide the others' results.
+    // allSettled: one failed deletion must not hide the others' results.
     const results = await Promise.allSettled(ids.map((id) => deleteMedia(id).unwrap()));
     const deleted = ids.filter((_, index) => results[index]?.status === 'fulfilled');
     const failed = results.find((r): r is PromiseRejectedResult => r.status === 'rejected');
@@ -122,7 +122,7 @@ export default function MediaPage() {
         deleted.length === 1 ? 'Media deleted.' : `Deleted ${deleted.length} media items.`,
       );
     } else {
-      const reason = apiErrorMessage(failed.reason, 'it may be in use');
+      const reason = apiErrorMessage(failed.reason, 'please try again');
       notices.error(
         ids.length === 1
           ? `Could not delete: ${reason}`
@@ -323,7 +323,7 @@ export default function MediaPage() {
             ? `Delete ${pendingDelete.ids.length} media items?`
             : 'Delete this media item?'
         }
-        description="Deleted media is removed from the library. Items still used by a post cannot be deleted and stay in place."
+        description="The files are deleted from storage and removed from every post that uses them (featured images and images inside articles). This cannot be undone."
         confirmLabel="Delete"
         busyLabel="Deleting…"
         isBusy={isDeleting}

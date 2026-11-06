@@ -16,13 +16,17 @@ export function ArticleAuthorCard({ author }: ArticleAuthorCardProps) {
       aria-label="About the author"
       className="flex items-center gap-4 rounded-2xl border border-border/80 bg-card p-5 shadow-xs sm:p-6"
     >
-      <AuthorAvatar name={author.displayName} className="size-14 text-lg" />
+      <AuthorAvatar
+        name={author.displayName}
+        avatarUrl={author.avatarUrl}
+        className="size-14 text-lg"
+      />
       <div>
         <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           Written by
         </p>
         <p className="text-base font-bold text-foreground sm:text-lg">{author.displayName}</p>
-        <p className="text-xs text-muted-foreground">Contributor at {siteConfig.name}</p>
+        <p className="text-xs text-muted-foreground">Writes for {siteConfig.name}</p>
       </div>
     </section>
   );

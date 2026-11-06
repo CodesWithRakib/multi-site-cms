@@ -22,6 +22,7 @@ import { ApiException } from '../common/exceptions/api.exception';
 import { env } from '../config/env';
 import { DATA_SOURCE } from '../database/database.tokens';
 import { getInitializedRepository } from '../database/ensure-connected';
+import { Event } from '../database/entities/event.entity';
 import { PostPublicationCategory } from '../database/entities/post-publication-category.entity';
 import { PostPublicationTag } from '../database/entities/post-publication-tag.entity';
 import { PostPublication } from '../database/entities/post-publication.entity';
@@ -104,6 +105,12 @@ export class PostsService {
         if (!actor.isSuperAdmin && !actor.authorizedSiteIds.includes(pub.siteId)) {
           throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'sites.notFound');
         }
+        if (pub.eventId) {
+          const eventRepo = await getInitializedRepository(this.dataSource, Event);
+          if (!(await eventRepo.exists({ where: { id: pub.eventId, siteId: pub.siteId } }))) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, 'NOT_FOUND', 'event.notFound');
+          }
+        }
       }
     }
 
@@ -150,6 +157,7 @@ export class PostsService {
             seoDescription: pubDto.seoDescription?.trim() || null,
             canonicalUrl: pubDto.canonicalUrl?.trim() || null,
             featuredImageId: pubDto.featuredImageId || null,
+            eventId: pubDto.eventId || null,
             templateKey: pubDto.templateKey?.trim() || null,
             scheduledFor: pubDto.scheduledFor ? new Date(pubDto.scheduledFor) : null,
             publishedAt:

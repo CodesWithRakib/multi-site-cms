@@ -4,7 +4,7 @@ export interface EventTimelineBlockAttributes {
   time: string;
   title: string;
   description?: string;
-  status: 'scheduled' | 'live' | 'completed' | 'delayed' | 'cancelled';
+  status: 'none' | 'scheduled' | 'live' | 'completed' | 'delayed' | 'cancelled';
   windSpeed?: string;
   weatherCondition?: string;
   alertLevel?: 'normal' | 'advisory' | 'warning';

@@ -78,7 +78,11 @@ export function ArticleDetailHeader({
         <div className="flex items-center gap-3">
           {article.author && (
             <>
-              <AuthorAvatar name={article.author.displayName} className="size-10 text-sm" />
+              <AuthorAvatar
+                name={article.author.displayName}
+                avatarUrl={article.author.avatarUrl}
+                className="size-10 text-sm"
+              />
               <span className="font-bold text-foreground">{article.author.displayName}</span>
             </>
           )}

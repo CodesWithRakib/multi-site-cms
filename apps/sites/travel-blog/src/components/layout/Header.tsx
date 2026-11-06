@@ -8,11 +8,10 @@ import { cn } from '@multi-site-cms/ui';
 
 import { ThemeToggle, TravelLogo } from '@/components/ui';
 
-import { BookmarkNavTrigger } from './BookmarkNavTrigger';
-
 /**
- * Kept deliberately short. On phones the bottom AppTabBar carries the same
- * routes, so the header shows only the brand and quick actions there.
+ * Same structure as the Air Sports header: brand, a short pill navigation,
+ * and only search + theme on the right. On phones the bottom AppTabBar
+ * carries the routes.
  */
 const NAV_ITEMS = [
   { label: 'Home', href: '/' },
@@ -41,17 +40,13 @@ export function Header() {
                 href={item.href}
                 aria-current={active ? 'page' : undefined}
                 className={cn(
-                  'relative rounded-full px-4 py-2 text-sm font-semibold transition-colors duration-200',
-                  active ? 'text-foreground' : 'text-muted-foreground hover:text-foreground',
+                  'rounded-full px-5 py-2 text-sm font-semibold transition-colors duration-200',
+                  active
+                    ? 'bg-primary text-primary-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground',
                 )}
               >
                 {item.label}
-                {active && (
-                  <span
-                    aria-hidden="true"
-                    className="absolute inset-x-4 -bottom-0.5 h-0.5 rounded-full bg-primary"
-                  />
-                )}
               </Link>
             );
           })}
@@ -61,11 +56,10 @@ export function Header() {
           <Link
             href="/search"
             aria-label="Search stories"
-            className="hidden size-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground md:inline-flex"
+            className="inline-flex size-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
             <Search aria-hidden="true" className="size-4" />
           </Link>
-          <BookmarkNavTrigger />
           <ThemeToggle size="md" />
         </div>
       </div>

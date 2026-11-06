@@ -105,15 +105,6 @@ async function seedSites(dataSource: DataSource): Promise<void> {
         [siteRow.id, tag, tag.replace(/-/g, ' ')],
       );
     }
-
-    if (site.key === 'air-sports') {
-      await dataSource.query(
-        `INSERT INTO "events" ("site_id", "slug", "name", "status", "starts_at")
-         VALUES ($1, $2, $3, 'scheduled', now() + interval '7 days')
-         ON CONFLICT ("site_id", "slug") DO NOTHING`,
-        [siteRow.id, 'season-opener', 'Season opener'],
-      );
-    }
   }
 }
 

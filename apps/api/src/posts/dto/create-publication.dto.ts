@@ -70,6 +70,11 @@ export class CreatePublicationDto {
   @IsUUID('4')
   featuredImageId?: string;
 
+  @ApiPropertyOptional({ description: 'Event on the same site this publication reports on' })
+  @IsOptional()
+  @IsUUID('4')
+  eventId?: string;
+
   @ApiPropertyOptional({ description: 'Template key', example: 'standard-article' })
   @IsOptional()
   @IsString()

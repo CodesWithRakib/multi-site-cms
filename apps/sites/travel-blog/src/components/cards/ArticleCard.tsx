@@ -91,6 +91,7 @@ export function ArticleCard({ article, variant = 'standard', priority = false }:
                   <>
                     <AuthorAvatar
                       name={article.author.displayName}
+                      avatarUrl={article.author.avatarUrl}
                       className="size-7 text-[10px]"
                     />
                     <span className="font-semibold text-foreground/80">

@@ -39,9 +39,20 @@ export const OUTBOX_EVENT_TYPES = {
   PUBLICATION_ARCHIVED: 'publication.archived',
   PUBLICATION_RESTORED: 'publication.restored',
   AIR_SPORTS_UPDATE_PUBLISHED: 'air_sports.update.published',
+  /** A site event was created, edited or deleted (cache revalidation only). */
+  EVENT_CHANGED: 'event.changed',
 } as const;
 
 export type OutboxEventType = (typeof OUTBOX_EVENT_TYPES)[keyof typeof OUTBOX_EVENT_TYPES];
+
+export interface EventChangedPayload {
+  eventId: string;
+  siteId: string;
+  siteKey: string;
+  slug: string;
+  /** Previous slug when an edit renamed the event, so the old page is purged too. */
+  previousSlug?: string | null;
+}
 
 export interface PublicationPublishedPayload {
   publicationId: string;

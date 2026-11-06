@@ -7,29 +7,30 @@ export interface TopicCard {
 }
 
 export interface HomeFeed {
-  readonly lead: PublicArticleSummary | undefined;
-  readonly alsoNew: PublicArticleSummary[];
+  /** Hero slides: the newest stories that have a cover image. */
+  readonly slides: PublicArticleSummary[];
   readonly latest: PublicArticleSummary[];
   readonly more: PublicArticleSummary[];
   readonly topics: TopicCard[];
 }
 
-const ALSO_NEW = 3;
+const SLIDES = 4;
 const LATEST = 5;
 const MORE = 6;
 const TOPICS = 4;
 
 /**
  * Splits the newest published stories into the home page slots without
- * repeating a story. The cover prefers the newest story that has an image,
- * because the cover is built around it.
+ * repeating a story. The hero is built around images, so it takes the newest
+ * stories that have one (falling back to the newest story when none do).
  */
 export function buildHomeFeed(
   articles: readonly PublicArticleSummary[],
   categories: readonly PublicCategoryItem[],
 ): HomeFeed {
-  const lead = articles.find((article) => article.featuredImage) ?? articles[0];
-  const rest = articles.filter((article) => article !== lead);
+  const withImage = articles.filter((article) => article.featuredImage).slice(0, SLIDES);
+  const slides = withImage.length > 0 ? withImage : articles.slice(0, 1);
+  const rest = articles.filter((article) => !slides.includes(article));
 
   const topics = categories
     .filter((category) => category.postCount > 0)
@@ -45,10 +46,9 @@ export function buildHomeFeed(
     }));
 
   return {
-    lead,
-    alsoNew: rest.slice(0, ALSO_NEW),
-    latest: rest.slice(ALSO_NEW, ALSO_NEW + LATEST),
-    more: rest.slice(ALSO_NEW + LATEST, ALSO_NEW + LATEST + MORE),
+    slides,
+    latest: rest.slice(0, LATEST),
+    more: rest.slice(LATEST, LATEST + MORE),
     topics,
   };
 }

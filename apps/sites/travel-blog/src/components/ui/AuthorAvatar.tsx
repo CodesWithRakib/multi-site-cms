@@ -1,3 +1,5 @@
+import Image from 'next/image';
+
 import { cn } from '@multi-site-cms/ui';
 
 /** "Super Admin" → "SA". Never more than two letters. */
@@ -13,23 +15,29 @@ export function authorInitials(name: string): string {
 
 interface AuthorAvatarProps {
   readonly name: string;
+  /** Profile photo set by the author in the admin; initials when absent. */
+  readonly avatarUrl?: string | null;
   readonly className?: string;
 }
 
 /**
- * Initials avatar. Authors have no photo field in the CMS, so we never show
- * a stock portrait that would misrepresent who wrote the story.
+ * The author's own profile photo (uploaded in the admin), or their initials.
+ * Never a stock portrait that would misrepresent who wrote the story.
  */
-export function AuthorAvatar({ name, className }: AuthorAvatarProps) {
+export function AuthorAvatar({ name, avatarUrl, className }: AuthorAvatarProps) {
   return (
     <span
       aria-hidden="true"
       className={cn(
-        'flex shrink-0 items-center justify-center rounded-full bg-primary/10 font-bold text-primary ring-2 ring-primary/20',
+        'relative flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-primary/10 font-bold text-primary ring-2 ring-primary/20',
         className,
       )}
     >
-      {authorInitials(name)}
+      {avatarUrl ? (
+        <Image src={avatarUrl} alt="" fill sizes="96px" className="object-cover" />
+      ) : (
+        authorInitials(name)
+      )}
     </span>
   );
 }

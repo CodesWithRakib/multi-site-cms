@@ -11,7 +11,7 @@ export const revalidate = 300;
 export const metadata: Metadata = {
   title: 'Aviation Disciplines & Categories',
   description:
-    'Browse air sports coverage across paragliding, wingsuit proximity, drone racing, aerobatics, and ballooning.',
+    'Browse every air sports topic we cover, with the number of published stories in each.',
   alternates: {
     canonical: '/categories',
   },
@@ -34,7 +34,7 @@ export default async function CategoriesPage() {
           className="mb-6 flex items-center gap-2 text-xs font-mono text-muted-foreground"
         >
           <Link href="/" className="hover:text-primary transition-colors">
-            Radar
+            Home
           </Link>
           <span>/</span>
           <span className="text-foreground">Disciplines</span>

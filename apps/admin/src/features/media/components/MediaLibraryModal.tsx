@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Search, Filter, Loader2, ArrowLeft, ArrowRight, X } from 'lucide-react';
 import { ConfirmDialog } from '@/components/feedback';
+import { useAdmin } from '@/lib/admin-context';
 import { apiErrorMessage } from '@/lib/api-error';
 import { useDeleteMediaMutation, useListMediaQuery } from '@/lib/cms-api';
 import type { MediaAssetItem } from '@multi-site-cms/types';
@@ -32,6 +33,10 @@ export function MediaLibraryModal({
   siteId,
   title = 'Media Library',
 }: MediaLibraryModalProps) {
+  const { activeSiteId, isSuperAdmin } = useAdmin();
+  // Uploads must belong to a site the user manages: the API refuses
+  // unscoped uploads from site admins, so default to their active site.
+  const uploadSiteId = siteId ?? (isSuperAdmin ? undefined : (activeSiteId ?? undefined));
   const [activeTab, setActiveTab] = useState<'browse' | 'upload'>('browse');
   const [searchTerm, setSearchTerm] = useState('');
   const [mimeFilter, setMimeFilter] = useState('');
@@ -72,7 +77,7 @@ export function MediaLibraryModal({
       await deleteMedia(pendingDeleteId).unwrap();
     } catch (err: unknown) {
       setDeleteError(
-        apiErrorMessage(err, 'The media item could not be deleted; it may be in use.'),
+        apiErrorMessage(err, 'The media item could not be deleted. Please try again.'),
       );
     } finally {
       setPendingDeleteId(null);
@@ -126,7 +131,7 @@ export function MediaLibraryModal({
           {activeTab === 'upload' ? (
             <div className="max-w-xl mx-auto py-6">
               <MediaDropzone
-                siteId={siteId}
+                siteId={uploadSiteId}
                 onUploaded={(newAsset) => {
                   handleSelect(newAsset);
                 }}
@@ -242,7 +247,7 @@ export function MediaLibraryModal({
       <ConfirmDialog
         open={pendingDeleteId !== null}
         title="Delete this media item?"
-        description="It is removed from the library. Items still used by a post cannot be deleted."
+        description="The file is deleted from storage and removed from every post that uses it (featured images and images inside articles). This cannot be undone."
         confirmLabel="Delete"
         busyLabel="Deleting…"
         isBusy={isDeleting}

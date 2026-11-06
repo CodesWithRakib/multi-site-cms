@@ -41,6 +41,10 @@ export class User {
   @Column({ type: 'varchar', length: 16, nullable: true })
   phone!: string | null;
 
+  /** Profile photo: a media asset, cleared if the asset is deleted. */
+  @Column({ name: 'avatar_media_id', type: 'uuid', nullable: true })
+  avatarMediaId!: string | null;
+
   @Column({ name: 'last_login_at', type: 'timestamptz', nullable: true })
   lastLoginAt!: Date | null;
 

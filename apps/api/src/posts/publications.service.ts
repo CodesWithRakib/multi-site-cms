@@ -8,6 +8,7 @@ import { ApiException } from '../common/exceptions/api.exception';
 import { DATA_SOURCE } from '../database/database.tokens';
 import { getInitializedRepository } from '../database/ensure-connected';
 import { Category } from '../database/entities/category.entity';
+import { Event } from '../database/entities/event.entity';
 import { MediaAsset } from '../database/entities/media-asset.entity';
 import { PostPublicationCategory } from '../database/entities/post-publication-category.entity';
 import { PostPublicationTag } from '../database/entities/post-publication-tag.entity';
@@ -47,6 +48,15 @@ export class PublicationsService {
 
   private async getMediaRepo(): Promise<Repository<MediaAsset>> {
     return getInitializedRepository(this.dataSource, MediaAsset);
+  }
+
+  /** Rejects event IDs that do not exist on the publication's site. */
+  private async assertEventOnSite(eventId: string, siteId: string): Promise<void> {
+    const eventRepo = await getInitializedRepository(this.dataSource, Event);
+    const exists = await eventRepo.exists({ where: { id: eventId, siteId } });
+    if (!exists) {
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'NOT_FOUND', 'event.notFound');
+    }
   }
 
   private async getCategoryRepo(): Promise<Repository<Category>> {
@@ -135,6 +145,10 @@ export class PublicationsService {
       }
     }
 
+    if (dto.eventId) {
+      await this.assertEventOnSite(dto.eventId, dto.siteId);
+    }
+
     // 5. Validate categories and tags belong to the same site
     if (dto.categoryIds && dto.categoryIds.length > 0) {
       for (const catId of dto.categoryIds) {
@@ -173,6 +187,7 @@ export class PublicationsService {
         seoDescription: dto.seoDescription?.trim() || null,
         canonicalUrl: dto.canonicalUrl?.trim() || null,
         featuredImageId: dto.featuredImageId || null,
+        eventId: dto.eventId || null,
         templateKey: dto.templateKey?.trim() || null,
         scheduledFor: dto.scheduledFor ? new Date(dto.scheduledFor) : null,
         publishedAt:
@@ -382,6 +397,13 @@ export class PublicationsService {
         }
       }
       pub.featuredImageId = dto.featuredImageId || null;
+    }
+
+    if (dto.eventId !== undefined) {
+      if (dto.eventId) {
+        await this.assertEventOnSite(dto.eventId, siteId);
+      }
+      pub.eventId = dto.eventId || null;
     }
 
     if (dto.seoTitle !== undefined) {

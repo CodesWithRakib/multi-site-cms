@@ -53,7 +53,7 @@ export default async function CategoryArchivePage({ params }: CategoryPageProps)
           className="mb-6 flex items-center gap-2 text-xs font-mono text-muted-foreground"
         >
           <Link href="/" className="hover:text-primary transition-colors">
-            Radar
+            Home
           </Link>
           <span>/</span>
           <Link href="/categories" className="hover:text-primary transition-colors">

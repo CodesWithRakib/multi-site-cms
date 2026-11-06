@@ -68,8 +68,8 @@ export function AirSportsNewsletter() {
               Get Flight Inspiration
             </h2>
             <p className="text-sm sm:text-base text-sky-100 max-w-lg leading-relaxed">
-              Subscribe to our newsletter for the latest flight tips, world cup dispatches, and air
-              sports adventures.
+              New guides, event dates and safety notes from the Bangladesh sky, straight to your
+              inbox.
             </p>
           </div>
 

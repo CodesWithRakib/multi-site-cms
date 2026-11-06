@@ -1,9 +1,11 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { documentOutline } from '@multi-site-cms/config/doc-outline';
 import { ArticleAuthorCard } from '@/components/article/ArticleAuthorCard';
 import { ArticleDetailHeader } from '@/components/article/ArticleDetailHeader';
 import { ArticleHeroImage } from '@/components/article/ArticleHeroImage';
 import { ArticleNavigationAndRelated } from '@/components/article/ArticleNavigationAndRelated';
+import { ArticleTableOfContents } from '@/components/article/ArticleTableOfContents';
 import { ArticleCommentsSection } from '@/components/article/comments/ArticleCommentsSection';
 import { DocRenderer } from '@/components/content/DocRenderer';
 import { siteConfig } from '@/config/site';
@@ -85,6 +87,8 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
   });
 
   const isGuide = article.type === 'travel_guide';
+  const outline = documentOutline(article.body);
+  const hasOutline = outline.length >= 2;
   const articleUrl = `${siteConfig.url}/articles/${article.slug}`;
 
   const jsonLd = {
@@ -110,7 +114,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <article className="mx-auto max-w-4xl px-4 sm:px-6 py-8 sm:py-14 space-y-10">
+      <article className="mx-auto max-w-6xl px-4 sm:px-6 py-8 sm:py-14 space-y-10">
         {/* Header with Title, Breadcrumbs, Category Badges, Bookmark & Share */}
         <ArticleDetailHeader
           article={article}
@@ -121,16 +125,42 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
         {/* Panoramic Featured Hero Image */}
         <ArticleHeroImage featuredImage={article.featuredImage} title={article.title} />
 
-        {/* Rich Document Content */}
-        <div className="prose prose-emerald dark:prose-invert max-w-none font-serif text-foreground/90 leading-relaxed">
-          <DocRenderer document={article.body} />
+        <div
+          className={
+            hasOutline
+              ? 'grid gap-10 lg:grid-cols-[minmax(0,1fr)_15rem] xl:gap-14'
+              : 'mx-auto max-w-4xl'
+          }
+        >
+          <div className="min-w-0 space-y-10">
+            {/* On small screens the outline sits above the text, collapsed. */}
+            {hasOutline && (
+              <details className="rounded-2xl border border-border/80 bg-card p-4 lg:hidden">
+                <summary className="cursor-pointer text-sm font-semibold text-foreground">
+                  On this page <span className="text-muted-foreground">({outline.length})</span>
+                </summary>
+                <ArticleTableOfContents entries={outline} className="mt-4" />
+              </details>
+            )}
+
+            {/* Rich Document Content */}
+            <div className="prose prose-emerald dark:prose-invert max-w-none font-serif text-foreground/90 leading-relaxed [&_h2]:scroll-mt-24 [&_h3]:scroll-mt-24">
+              <DocRenderer document={article.body} />
+            </div>
+
+            {/* Author Bio Box */}
+            <ArticleAuthorCard author={article.author} />
+
+            {/* Reader Comments & Interactive Reviews Section */}
+            <ArticleCommentsSection slug={article.slug} initialData={initialComments} />
+          </div>
+
+          {hasOutline && (
+            <aside className="hidden lg:block">
+              <ArticleTableOfContents entries={outline} className="sticky top-24" />
+            </aside>
+          )}
         </div>
-
-        {/* Author Bio Box */}
-        <ArticleAuthorCard author={article.author} />
-
-        {/* Reader Comments & Interactive Reviews Section */}
-        <ArticleCommentsSection slug={article.slug} initialData={initialComments} />
 
         {/* Tags, Adjacent Stories, Related Dispatches & Newsletter */}
         <ArticleNavigationAndRelated

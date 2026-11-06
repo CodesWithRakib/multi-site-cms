@@ -2,10 +2,12 @@ import React from 'react';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
+import { documentOutline } from '@multi-site-cms/config/doc-outline';
 
 import { DocRenderer } from '@/components/content/DocRenderer';
 import { AirSportsArticleHeader } from '@/components/article/AirSportsArticleHeader';
 import { AirSportsArticleNavigation } from '@/components/article/AirSportsArticleNavigation';
+import { AirSportsTableOfContents } from '@/components/article/AirSportsTableOfContents';
 import { siteConfig } from '@/config/site';
 import { fetchArticleBySlug } from '@/lib/api';
 
@@ -82,6 +84,8 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
   });
 
   const isBreaking = post.templateKey === 'breaking';
+  const outline = documentOutline(post.body);
+  const hasOutline = outline.length >= 2;
 
   // Structured Data (JSON-LD)
   const isNews = post.type === 'news' || isBreaking;
@@ -155,41 +159,65 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
 
-      <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-        <AirSportsArticleHeader
-          post={post}
-          isBreaking={isBreaking}
-          formattedDate={formattedDate}
-          formattedTime={formattedTime}
-        />
+      <div
+        className={
+          hasOutline
+            ? 'mx-auto grid max-w-6xl gap-10 px-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_15rem] lg:px-8 xl:gap-14'
+            : 'mx-auto max-w-4xl px-4 sm:px-6 lg:px-8'
+        }
+      >
+        <div className="min-w-0">
+          <AirSportsArticleHeader
+            post={post}
+            isBreaking={isBreaking}
+            formattedDate={formattedDate}
+            formattedTime={formattedTime}
+          />
 
-        {/* Hero Featured Media */}
-        {post.featuredImage && (
-          <figure className="my-8 overflow-hidden rounded-3xl border border-border bg-muted shadow-md">
-            <div className="relative aspect-[16/10] w-full">
-              <Image
-                src={post.featuredImage.url}
-                alt={post.featuredImage.altText || post.title}
-                fill
-                preload
-                className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 896px"
-              />
-            </div>
-            {(post.featuredImage.caption || post.featuredImage.altText) && (
-              <figcaption className="p-3 text-center text-xs font-mono text-muted-foreground border-t border-border/40">
-                {post.featuredImage.caption || post.featuredImage.altText}
-              </figcaption>
-            )}
-          </figure>
-        )}
+          {/* Hero Featured Media */}
+          {post.featuredImage && (
+            <figure className="my-8 overflow-hidden rounded-3xl border border-border bg-muted shadow-md">
+              <div className="relative aspect-[16/10] w-full">
+                <Image
+                  src={post.featuredImage.url}
+                  alt={post.featuredImage.altText || post.title}
+                  fill
+                  preload
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 896px"
+                />
+              </div>
+              {(post.featuredImage.caption || post.featuredImage.altText) && (
+                <figcaption className="p-3 text-center text-xs font-mono text-muted-foreground border-t border-border/40">
+                  {post.featuredImage.caption || post.featuredImage.altText}
+                </figcaption>
+              )}
+            </figure>
+          )}
 
-        {/* Safe Document Body AST Rendering */}
-        <div className="my-8">
-          <DocRenderer document={post.body} />
+          {/* On small screens the outline sits above the text, collapsed. */}
+          {hasOutline && (
+            <details className="rounded-2xl border border-border bg-card p-4 lg:hidden">
+              <summary className="cursor-pointer font-mono text-xs font-bold uppercase tracking-[0.2em] text-foreground">
+                On this page <span className="text-muted-foreground">({outline.length})</span>
+              </summary>
+              <AirSportsTableOfContents entries={outline} className="mt-4" />
+            </details>
+          )}
+
+          {/* Safe Document Body AST Rendering */}
+          <div className="my-8 [&_h2]:scroll-mt-24 [&_h3]:scroll-mt-24">
+            <DocRenderer document={post.body} />
+          </div>
+
+          <AirSportsArticleNavigation post={post} />
         </div>
 
-        <AirSportsArticleNavigation post={post} />
+        {hasOutline && (
+          <aside className="hidden lg:block">
+            <AirSportsTableOfContents entries={outline} className="sticky top-24" />
+          </aside>
+        )}
       </div>
     </article>
   );

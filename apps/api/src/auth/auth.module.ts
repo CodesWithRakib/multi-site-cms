@@ -8,6 +8,7 @@ import { SiteAccessGuard } from './guards/site-access.guard';
 import { AuthService } from './services/auth.service';
 import { AuthorizationService } from './services/authorization.service';
 import { PasswordService } from './services/password.service';
+import { ProfileService } from './services/profile.service';
 import { SessionService } from './services/session.service';
 import { SettingsModule } from '../settings/settings.module';
 
@@ -20,6 +21,7 @@ import { SettingsModule } from '../settings/settings.module';
     SessionService,
     AuthorizationService,
     AuthService,
+    ProfileService,
     AuthGuard,
     PermissionsGuard,
     SiteAccessGuard,
@@ -27,6 +29,7 @@ import { SettingsModule } from '../settings/settings.module';
   ],
   exports: [
     PasswordService,
+    ProfileService,
     SessionService,
     AuthorizationService,
     AuthService,

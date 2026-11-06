@@ -18,6 +18,9 @@ import {
   type UploadedFilePayload,
 } from './storage/storage-provider.interface';
 import { SettingsService } from '../settings/settings.service';
+import { env } from '../config/env';
+import { detachMediaEverywhere } from './media-usage-cleanup';
+import { publicMediaUrl } from './public-media-url';
 import { validateAndInspectFile } from './utils/file-validator';
 
 @Injectable()
@@ -211,14 +214,15 @@ export class MediaService {
     return this.mapToItem(saved);
   }
 
+  /**
+   * Deletes a media asset for good: every place it is used is cleaned up
+   * first (featured images, inline images, avatars via FK), then the row is
+   * removed and the file is deleted from storage. External URLs registered
+   * as media (e.g. Unsplash) have no file of ours to delete.
+   */
   async deleteMedia(actor: EffectiveAuthContext, mediaId: string): Promise<void> {
     const mediaRepo = await this.getMediaRepo();
-    const publicationRepo = await this.getPublicationRepo();
-    const pubMediaRepo = await this.getPublicationMediaRepo();
-
-    const asset = await mediaRepo.findOne({
-      where: { id: mediaId },
-    });
+    const asset = await mediaRepo.findOne({ where: { id: mediaId } });
 
     if (!asset || asset.deletedAt) {
       throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'media.notFound');
@@ -226,25 +230,24 @@ export class MediaService {
 
     this.checkSiteAccess(actor, asset.siteId);
 
-    // Check if in use as featured image
-    const featuredUsage = await publicationRepo.count({
-      where: { featuredImageId: mediaId },
-    });
-    if (featuredUsage > 0) {
-      throw new ApiException(HttpStatus.BAD_REQUEST, 'VALIDATION_ERROR', 'media.cannotDeleteInUse');
-    }
+    // Every URL form an editor may have embedded for this asset.
+    const urls = new Set([
+      asset.storageKey,
+      this.storageProvider.getUrl(asset.storageKey),
+      publicMediaUrl(asset.storageKey, env.API_BASE_URL),
+    ]);
 
-    // Check if in use in publication media gallery/inline
-    const galleryUsage = await pubMediaRepo.count({
-      where: { mediaId },
+    const report = await this.dataSource.transaction(async (manager) => {
+      const cleanup = await detachMediaEverywhere(manager, asset.id, urls, actor.user.id);
+      // users.avatar_media_id is ON DELETE SET NULL.
+      await manager.getRepository(MediaAsset).delete({ id: asset.id });
+      return cleanup;
     });
-    if (galleryUsage > 0) {
-      throw new ApiException(HttpStatus.BAD_REQUEST, 'VALIDATION_ERROR', 'media.cannotDeleteInUse');
-    }
 
-    asset.deletedAt = new Date();
-    asset.status = 'archived';
-    await mediaRepo.save(asset);
+    if (this.ownsStoredFile(asset.storageKey)) {
+      // After commit: a failure here leaves an orphan file, never broken content.
+      await this.storageProvider.delete(asset.storageKey);
+    }
 
     await this.auditService.record({
       actorId: actor.user.id,
@@ -253,8 +256,14 @@ export class MediaService {
       action: 'media.delete',
       entityType: 'media_asset',
       entityId: asset.id,
-      metadata: { storageKey: asset.storageKey },
+      metadata: { storageKey: asset.storageKey, ...report },
     });
+  }
+
+  /** True for files in our own storage (local keys or our Cloudinary account). */
+  private ownsStoredFile(storageKey: string): boolean {
+    if (!storageKey.startsWith('http://') && !storageKey.startsWith('https://')) return true;
+    return storageKey.includes('res.cloudinary.com/');
   }
 
   async uploadMedia(

@@ -16,6 +16,7 @@ const STATUS_OPTIONS: ReadonlyArray<{
   { value: 'completed', label: 'Completed' },
   { value: 'delayed', label: 'Delayed' },
   { value: 'cancelled', label: 'Cancelled' },
+  { value: 'none', label: 'No status badge' },
 ];
 
 const ALERT_LEVEL_OPTIONS: ReadonlyArray<{

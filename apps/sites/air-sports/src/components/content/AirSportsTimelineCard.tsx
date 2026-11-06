@@ -48,11 +48,13 @@ export function AirSportsTimelineCard({
           </span>
           <h4 className="text-base font-bold text-foreground">{title}</h4>
         </div>
-        <span
-          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wider border ${badgeColor}`}
-        >
-          {status}
-        </span>
+        {status !== 'none' && (
+          <span
+            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wider border ${badgeColor}`}
+          >
+            {status}
+          </span>
+        )}
       </div>
 
       {description && (

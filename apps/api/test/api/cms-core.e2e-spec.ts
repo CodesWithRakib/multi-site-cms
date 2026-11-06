@@ -18,6 +18,7 @@ import request from 'supertest';
 import type { DataSource } from 'typeorm';
 
 import { AppModule } from '../../src/app.module';
+import { PostPublication } from '../../src/database/entities/post-publication.entity';
 import { PasswordService } from '../../src/auth/services/password.service';
 import { configureApp } from '../../src/bootstrap';
 import { Permission } from '../../src/database/entities/permission.entity';
@@ -822,38 +823,60 @@ describe('CMS Core (Posts, Publications, Taxonomy, Media, OCC & Tenant Isolation
       pubId = (postRes.body as ApiSuccess<PostItem>).data.publications?.[0]?.id ?? '';
     });
 
-    it('blocks deletion of media asset currently used as featured image with 400 Bad Request', async () => {
-      const res = await request(app.getHttpServer())
-        .delete(`/api/v1/media/${mediaId}`)
+    it('deletes media that is in use and removes it from every post', async () => {
+      const mediaRes = await request(app.getHttpServer())
+        .get(`/api/v1/media/${mediaId}`)
         .set('Cookie', travelAdminCookie)
-        .set('x-csrf-token', travelAdminCsrf)
-        .expect(400);
-
-      const body = res.body as ApiErrorResponse;
-      expect(body.error.code).toBe('VALIDATION_ERROR');
-    });
-
-    it('allows soft-deletion of media asset once featured image reference is removed', async () => {
-      // Remove featuredImageId from publication
-      await request(app.getHttpServer())
-        .patch(`/api/v1/sites/${siteTravelId}/publications/${pubId}`)
-        .set('Cookie', travelAdminCookie)
-        .set('x-csrf-token', travelAdminCsrf)
-        .send({ featuredImageId: null })
         .expect(200);
+      const mediaUrl = (mediaRes.body as ApiSuccess<{ url: string }>).data.url;
 
-      // Soft delete media
+      // A second post shows the same file inline in its body.
+      const inlineRes = await request(app.getHttpServer())
+        .post('/api/v1/posts')
+        .set('Cookie', travelAdminCookie)
+        .set('x-csrf-token', travelAdminCsrf)
+        .send({
+          title: 'Ridge Walk',
+          type: 'article',
+          body: {
+            type: 'doc',
+            content: [
+              { type: 'paragraph', content: [{ type: 'text', text: 'Before.' }] },
+              { type: 'image', attrs: { src: mediaUrl, alt: 'Peaks' } },
+              { type: 'paragraph', content: [{ type: 'text', text: 'After.' }] },
+            ],
+          },
+          publications: [{ siteId: siteTravelId, slug: 'ridge-walk' }],
+        })
+        .expect(201);
+      const inlinePost = (inlineRes.body as ApiSuccess<PostItem>).data;
+
       await request(app.getHttpServer())
         .delete(`/api/v1/media/${mediaId}`)
         .set('Cookie', travelAdminCookie)
         .set('x-csrf-token', travelAdminCsrf)
         .expect(204);
 
-      // Verify media is no longer retrievable
       await request(app.getHttpServer())
         .get(`/api/v1/media/${mediaId}`)
         .set('Cookie', travelAdminCookie)
         .expect(404);
+
+      // Featured image reference cleared.
+      const featured = await dataSource
+        .getRepository(PostPublication)
+        .findOneOrFail({ where: { id: pubId } });
+      expect(featured.featuredImageId).toBeNull();
+
+      // Inline image removed in a new revision; the publication follows it.
+      const detail = await request(app.getHttpServer())
+        .get(`/api/v1/posts/${inlinePost.id}`)
+        .set('Cookie', travelAdminCookie)
+        .expect(200);
+      const post = (detail.body as ApiSuccess<PostItem>).data;
+      expect(post.currentRevisionNumber).toBe(2);
+      expect(JSON.stringify(post.currentRevision?.body)).not.toContain(mediaUrl);
+      expect(post.publications?.[0]?.revisionId).toBe(post.currentRevision?.id);
     });
   });
 

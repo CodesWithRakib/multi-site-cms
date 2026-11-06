@@ -4,6 +4,7 @@ import type { DataSource } from 'typeorm';
 import { env } from '../../config/env';
 import { DATA_SOURCE } from '../../database/database.tokens';
 import type {
+  EventChangedPayload,
   PublicationPublishedPayload,
   PublicationUnpublishedPayload,
 } from '../publishing.types';
@@ -31,6 +32,15 @@ export class CacheInvalidationService {
   /**
    * Derives affected paths for a published or updated publication.
    */
+  /** Paths showing an event: the home page radar, the events index and its page. */
+  derivePathsForEvent(payload: EventChangedPayload): string[] {
+    const paths = new Set<string>(['/', '/events']);
+    for (const slug of [payload.slug, payload.previousSlug]) {
+      if (slug) paths.add(`/events/${slug}`);
+    }
+    return [...paths];
+  }
+
   derivePathsForPublication(
     payload: PublicationPublishedPayload | PublicationUnpublishedPayload,
   ): string[] {

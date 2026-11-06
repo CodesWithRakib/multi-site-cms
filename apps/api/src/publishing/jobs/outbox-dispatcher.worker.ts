@@ -5,6 +5,7 @@ import { OutboxEvent } from '../../database/entities/outbox-event.entity';
 import { CacheInvalidationService } from '../cache/cache-invalidation.service';
 import {
   OUTBOX_EVENT_TYPES,
+  type EventChangedPayload,
   type PublicationPublishedPayload,
   type PublicationUnpublishedPayload,
 } from '../publishing.types';
@@ -146,6 +147,22 @@ export class OutboxDispatcherWorker implements OnModuleDestroy {
         const typedPayload = payload as unknown as
           PublicationPublishedPayload | PublicationUnpublishedPayload;
         const paths = this.cacheInvalidationService.derivePathsForPublication(typedPayload);
+        const siteBaseUrl = await this.cacheInvalidationService.resolveSiteBaseUrl(siteKey);
+        const result = await this.cacheInvalidationService.revalidatePaths(
+          siteKey,
+          paths,
+          siteBaseUrl ?? undefined,
+        );
+
+        if (!result.success && result.error) {
+          throw new Error(`Cache revalidation failed: ${result.error}`);
+        }
+        break;
+      }
+
+      case OUTBOX_EVENT_TYPES.EVENT_CHANGED: {
+        const typedPayload = payload as unknown as EventChangedPayload;
+        const paths = this.cacheInvalidationService.derivePathsForEvent(typedPayload);
         const siteBaseUrl = await this.cacheInvalidationService.resolveSiteBaseUrl(siteKey);
         const result = await this.cacheInvalidationService.revalidatePaths(
           siteKey,

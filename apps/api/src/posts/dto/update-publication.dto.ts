@@ -65,6 +65,11 @@ export class UpdatePublicationDto {
   @IsUUID('4')
   featuredImageId?: string | null;
 
+  @ApiPropertyOptional({ description: 'Event on the same site; null detaches it' })
+  @IsOptional()
+  @IsUUID('4')
+  eventId?: string | null;
+
   @ApiPropertyOptional({ description: 'Template key', example: 'standard-article' })
   @IsOptional()
   @IsString()

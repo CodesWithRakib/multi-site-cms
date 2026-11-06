@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { CalloutBox } from './CalloutBox';
 import { DestinationInfoCard } from './DestinationInfoCard';
 import { toYouTubeEmbedUrl } from '@multi-site-cms/config/embeds';
+import { headingId } from '@multi-site-cms/config/doc-outline';
 import { EventTimelineCard } from './EventTimelineCard';
 
 interface TiptapMark {
@@ -33,15 +34,6 @@ function isSafeUrl(url?: unknown): boolean {
     trimmed.startsWith('mailto:') ||
     trimmed.startsWith('tel:')
   );
-}
-
-function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .trim()
-    .replace(/[^\w\s-]/g, '')
-    .replace(/[\s_-]+/g, '-')
-    .replace(/^-+|-+$/g, '');
 }
 
 function getNodeText(node: TiptapNode): string {
@@ -120,12 +112,12 @@ function renderTextWithMarks(text: string, marks?: TiptapMark[], key = 0): React
   return element;
 }
 
-function renderHeading(level: number, headingId: string, children: React.ReactNode, key: string) {
+function renderHeading(level: number, anchorId: string, children: React.ReactNode, key: string) {
   const cls = 'font-sans font-bold tracking-tight text-foreground scroll-mt-24 group';
   if (level === 1) {
     return (
-      <h1 key={key} id={headingId} className={`text-3xl sm:text-4xl mt-10 mb-4 ${cls}`}>
-        <a href={`#${headingId}`} className="no-underline hover:text-emerald-600">
+      <h1 key={key} id={anchorId} className={`text-3xl sm:text-4xl mt-10 mb-4 ${cls}`}>
+        <a href={`#${anchorId}`} className="no-underline hover:text-emerald-600">
           {children}
         </a>
       </h1>
@@ -135,10 +127,10 @@ function renderHeading(level: number, headingId: string, children: React.ReactNo
     return (
       <h2
         key={key}
-        id={headingId}
+        id={anchorId}
         className={`text-2xl sm:text-3xl mt-8 mb-4 border-b border-border/50 pb-2 ${cls}`}
       >
-        <a href={`#${headingId}`} className="no-underline hover:text-emerald-600">
+        <a href={`#${anchorId}`} className="no-underline hover:text-emerald-600">
           {children}
         </a>
       </h2>
@@ -146,15 +138,15 @@ function renderHeading(level: number, headingId: string, children: React.ReactNo
   }
   if (level === 3) {
     return (
-      <h3 key={key} id={headingId} className={`text-xl sm:text-2xl mt-6 mb-3 ${cls}`}>
-        <a href={`#${headingId}`} className="no-underline hover:text-emerald-600">
+      <h3 key={key} id={anchorId} className={`text-xl sm:text-2xl mt-6 mb-3 ${cls}`}>
+        <a href={`#${anchorId}`} className="no-underline hover:text-emerald-600">
           {children}
         </a>
       </h3>
     );
   }
   return (
-    <h4 key={key} id={headingId} className={`text-lg sm:text-xl mt-5 mb-2 ${cls}`}>
+    <h4 key={key} id={anchorId} className={`text-lg sm:text-xl mt-5 mb-2 ${cls}`}>
       {children}
     </h4>
   );
@@ -196,7 +188,7 @@ function renderNode(node: TiptapNode, index: number): React.ReactNode {
       );
     case 'heading': {
       const level = Number(node.attrs?.level) || 2;
-      return renderHeading(level, slugify(getNodeText(node)), children, key);
+      return renderHeading(level, headingId(getNodeText(node)), children, key);
     }
     case 'blockquote':
       return (

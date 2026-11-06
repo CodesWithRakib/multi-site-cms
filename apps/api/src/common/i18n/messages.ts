@@ -26,6 +26,7 @@ export const en = {
   'http.generic': 'The request could not be completed.',
 
   'auth.invalidCredentials': 'Invalid email or password.',
+  'profile.avatarNotImage': 'The profile photo must be an image.',
   'auth.accountInactive': 'This account is not active.',
   'auth.accountLocked': 'Account is temporarily locked. Please try again later.',
   'auth.sessionExpired': 'Your session has expired. Sign in to continue.',
@@ -80,6 +81,9 @@ export const en = {
   'category.cycleDetected': 'Category hierarchy cannot have circular references.',
   'category.cannotDeleteWithChildren': 'Category has subcategories and cannot be deleted.',
   'tag.notFound': 'Tag not found.',
+  'event.notFound': 'Event not found.',
+  'event.slugConflict': 'An event with this slug already exists for this site.',
+  'event.invalidTimeRange': 'An event cannot end before it starts.',
   'tag.inUse': 'This tag is used by published content. Remove it from those posts first.',
   'category.inUse':
     'This category is used by published content. Move those posts to another category first.',
@@ -138,6 +142,7 @@ export const bn: Record<MessageKey, string> = {
   'http.generic': 'অনুরোধটি সম্পন্ন করা যায়নি।',
 
   'auth.invalidCredentials': 'অবৈধ ইমেইল অথবা পাসওয়ার্ড।',
+  'profile.avatarNotImage': 'প্রোফাইল ছবি অবশ্যই একটি ইমেজ হতে হবে।',
   'auth.accountInactive': 'এই অ্যাকাউন্টটি সক্রিয় নয়।',
   'auth.accountLocked': 'অ্যাকাউন্টটি সাময়িকভাবে লক করা হয়েছে। কিছুক্ষণ পরে আবার চেষ্টা করুন।',
   'auth.sessionExpired': 'আপনার সেশনের মেয়াদ শেষ হয়েছে। চালিয়ে যেতে আবার সাইন ইন করুন।',
@@ -192,6 +197,9 @@ export const bn: Record<MessageKey, string> = {
   'category.cycleDetected': 'ক্যাটাগরি হায়ারার্কিতে চক্রাকার রেফারেন্স থাকতে পারবে না।',
   'category.cannotDeleteWithChildren': 'সাবক্যাটাগরি থাকা ক্যাটাগরি মুছে ফেলা যাবে না।',
   'tag.notFound': 'ট্যাগ পাওয়া যায়নি।',
+  'event.notFound': 'ইভেন্ট পাওয়া যায়নি।',
+  'event.slugConflict': 'এই সাইটে এই স্লাগের একটি ইভেন্ট ইতিমধ্যে রয়েছে।',
+  'event.invalidTimeRange': 'ইভেন্ট শুরু হওয়ার আগে শেষ হতে পারে না।',
   'tag.inUse': 'এই ট্যাগটি প্রকাশিত কনটেন্টে ব্যবহৃত হচ্ছে। আগে সেই পোস্টগুলো থেকে সরান।',
   'category.inUse':
     'এই ক্যাটাগরিটি প্রকাশিত কনটেন্টে ব্যবহৃত হচ্ছে। আগে সেই পোস্টগুলো অন্য ক্যাটাগরিতে সরান।',

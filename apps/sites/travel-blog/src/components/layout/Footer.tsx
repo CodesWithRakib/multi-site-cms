@@ -16,8 +16,32 @@ const FOOTER_LINKS = [
 
 export function Footer() {
   return (
-    <footer className="dark mt-8 bg-emerald-950 text-emerald-100/80 [color-scheme:dark]">
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+    <footer className="dark relative mt-8 overflow-hidden bg-[#061B1B] text-emerald-100/80 [color-scheme:dark]">
+      {/* Mountain silhouette backdrop */}
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-48 opacity-15"
+        aria-hidden="true"
+      >
+        <svg
+          viewBox="0 0 1440 220"
+          fill="none"
+          className="h-full w-full object-cover"
+          preserveAspectRatio="none"
+        >
+          <path
+            d="M0 220L180 140L360 180L540 100L720 160L900 80L1080 140L1260 90L1440 150V220H0Z"
+            fill="currentColor"
+            className="text-emerald-300"
+          />
+          <path
+            d="M0 220L220 170L440 200L660 130L880 180L1100 120L1320 170L1440 140V220H0Z"
+            fill="currentColor"
+            className="text-teal-400 opacity-60"
+          />
+        </svg>
+      </div>
+
+      <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="grid gap-10 lg:grid-cols-12 lg:gap-8">
           <div className="space-y-4 lg:col-span-5">
             <TravelLogo inverted showSubtitle />

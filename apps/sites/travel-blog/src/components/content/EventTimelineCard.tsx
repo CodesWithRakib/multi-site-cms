@@ -5,7 +5,7 @@ export interface EventTimelineCardProps {
   time?: string;
   title?: string;
   description?: string;
-  status?: 'scheduled' | 'live' | 'completed' | 'delayed' | 'cancelled';
+  status?: 'none' | 'scheduled' | 'live' | 'completed' | 'delayed' | 'cancelled';
   windSpeed?: string;
   weatherCondition?: string;
   alertLevel?: 'normal' | 'advisory' | 'warning';
@@ -50,11 +50,13 @@ export function EventTimelineCard({
           </span>
           <h4 className="text-base font-bold text-foreground">{title}</h4>
         </div>
-        <span
-          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider border ${badgeColor}`}
-        >
-          {status}
-        </span>
+        {status !== 'none' && (
+          <span
+            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider border ${badgeColor}`}
+          >
+            {status}
+          </span>
+        )}
       </div>
 
       {description && (

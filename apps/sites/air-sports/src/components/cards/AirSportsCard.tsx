@@ -1,7 +1,8 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowUpRight, Clock, User as UserIcon, Wind } from 'lucide-react';
+import { ArrowUpRight, Clock, Wind } from 'lucide-react';
+import { AuthorAvatar } from '@/components/ui/AuthorAvatar';
 import type { PublicArticleSummary } from '@multi-site-cms/types';
 
 interface AirSportsCardProps {
@@ -192,8 +193,12 @@ export function AirSportsCard({
 
       <div className="p-5 pt-0 border-t border-border/50 flex items-center justify-between text-xs font-mono text-muted-foreground mt-4">
         {article.author && (
-          <span className="flex items-center gap-1">
-            <UserIcon className="size-3 text-primary" />
+          <span className="flex items-center gap-1.5">
+            <AuthorAvatar
+              name={article.author.displayName}
+              avatarUrl={article.author.avatarUrl}
+              className="size-5 font-sans text-[8px]"
+            />
             {article.author.displayName}
           </span>
         )}

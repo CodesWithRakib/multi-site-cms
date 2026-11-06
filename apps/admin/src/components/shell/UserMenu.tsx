@@ -2,8 +2,10 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronDown, KeyRound, LogOut, Shield } from 'lucide-react';
+import { Camera, ChevronDown, KeyRound, LogOut, Shield } from 'lucide-react';
 import { ChangePasswordDialog } from '@/features/account/ChangePasswordDialog';
+import { ProfilePhotoDialog } from '@/features/account/ProfilePhotoDialog';
+import { UserAvatar } from '@/features/account/UserAvatar';
 import { useAdmin } from '@/lib/admin-context';
 import { useLogoutMutation } from '@/lib/cms-api';
 
@@ -11,6 +13,7 @@ export function UserMenu() {
   const { user, isSuperAdmin, t } = useAdmin();
   const [isOpen, setIsOpen] = useState(false);
   const [isPasswordOpen, setIsPasswordOpen] = useState(false);
+  const [isPhotoOpen, setIsPhotoOpen] = useState(false);
   const [logout, { isLoading: isLoggingOut }] = useLogoutMutation();
   const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -36,15 +39,6 @@ export function UserMenu() {
 
   if (!user) return null;
 
-  const initials = user.displayName
-    ? user.displayName
-        .split(' ')
-        .map((n) => n[0])
-        .join('')
-        .toUpperCase()
-        .slice(0, 2)
-    : 'U';
-
   return (
     <div className="relative" ref={dropdownRef}>
       <button
@@ -54,9 +48,11 @@ export function UserMenu() {
         aria-haspopup="menu"
         aria-expanded={isOpen}
       >
-        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-[11px] font-bold text-primary-foreground shadow-xs">
-          {initials}
-        </div>
+        <UserAvatar
+          name={user.displayName}
+          avatarUrl={user.avatarUrl}
+          className="size-7 text-[11px] shadow-xs"
+        />
 
         <div className="hidden sm:flex flex-col items-start text-left leading-tight">
           <span className="font-bold text-foreground max-w-[120px] truncate">
@@ -101,6 +97,18 @@ export function UserMenu() {
               role="menuitem"
               onClick={() => {
                 setIsOpen(false);
+                setIsPhotoOpen(true);
+              }}
+              className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-xs font-semibold text-foreground hover:bg-accent transition-colors"
+            >
+              <Camera className="w-4 h-4" aria-hidden="true" />
+              <span>Profile photo</span>
+            </button>
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                setIsOpen(false);
                 setIsPasswordOpen(true);
               }}
               className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-xs font-semibold text-foreground hover:bg-accent transition-colors"
@@ -123,6 +131,7 @@ export function UserMenu() {
       )}
 
       <ChangePasswordDialog open={isPasswordOpen} onClose={() => setIsPasswordOpen(false)} />
+      <ProfilePhotoDialog open={isPhotoOpen} onClose={() => setIsPhotoOpen(false)} />
     </div>
   );
 }

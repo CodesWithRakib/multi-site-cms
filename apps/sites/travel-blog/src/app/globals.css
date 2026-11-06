@@ -23,3 +23,13 @@
 [data-theme='dark'] .glass-pill {
   background-color: rgba(18, 28, 28, 0.85);
 }
+
+/* Hero carousel: progress of the active slide's autoplay timer. */
+@keyframes hero-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}

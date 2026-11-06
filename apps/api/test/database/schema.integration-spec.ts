@@ -146,7 +146,7 @@ describe('migration chain', () => {
       `SELECT "name" FROM "typeorm_migrations" ORDER BY "id"`,
     );
 
-    expect(applied).toHaveLength(13);
+    expect(applied).toHaveLength(14);
   });
 
   it('creates every expected table', async () => {
@@ -957,7 +957,8 @@ describe('pre-moderated comments migration', () => {
   });
 
   it('reverts cleanly and re-applies', async () => {
-    // UserPhone1793491212000 runs after this migration: undo it first.
+    // UserPhone and UserAvatar run after this migration: undo them first.
+    await dataSource.undoLastMigration({ transaction: 'all' });
     await dataSource.undoLastMigration({ transaction: 'all' });
     await dataSource.undoLastMigration({ transaction: 'all' });
     expect(await statusDefault()).toContain("'approved'");
@@ -990,9 +991,47 @@ describe('user phone migration', () => {
   });
 
   it('reverts cleanly and re-applies', async () => {
+    // UserAvatar runs after this migration: undo it first.
+    await dataSource.undoLastMigration({ transaction: 'all' });
     await dataSource.undoLastMigration({ transaction: 'all' });
     expect(await hasPhoneColumn()).toBe(false);
     await dataSource.runMigrations({ transaction: 'all' });
     expect(await hasPhoneColumn()).toBe(true);
+  });
+});
+
+describe('user avatar migration', () => {
+  async function hasAvatarColumn(): Promise<boolean> {
+    const rows: unknown[] = await dataSource.query(
+      `SELECT 1 FROM "information_schema"."columns"
+       WHERE "table_name" = 'users' AND "column_name" = 'avatar_media_id'`,
+    );
+    return rows.length === 1;
+  }
+
+  it('clears the avatar when its media asset is deleted', async () => {
+    const userId = await insertUser('avatar.check@example.test');
+    const media = (await dataSource.query(
+      `INSERT INTO "media_assets" ("storage_key", "mime_type", "byte_size", "checksum")
+       VALUES ('avatars/a.jpg', 'image/jpeg', 100, repeat('a', 64)) RETURNING "id"`,
+    )) as { id: string }[];
+    const mediaId = media[0]?.id;
+    await dataSource.query(`UPDATE "users" SET "avatar_media_id" = $1 WHERE "id" = $2`, [
+      mediaId,
+      userId,
+    ]);
+
+    await dataSource.query(`DELETE FROM "media_assets" WHERE "id" = $1`, [mediaId]);
+    const rows = (await dataSource.query(`SELECT "avatar_media_id" FROM "users" WHERE "id" = $1`, [
+      userId,
+    ])) as { avatar_media_id: string | null }[];
+    expect(rows[0]?.avatar_media_id).toBeNull();
+  });
+
+  it('reverts cleanly and re-applies', async () => {
+    await dataSource.undoLastMigration({ transaction: 'all' });
+    expect(await hasAvatarColumn()).toBe(false);
+    await dataSource.runMigrations({ transaction: 'all' });
+    expect(await hasAvatarColumn()).toBe(true);
   });
 });

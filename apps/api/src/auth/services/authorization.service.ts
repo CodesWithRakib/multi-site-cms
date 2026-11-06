@@ -109,15 +109,17 @@ export class AuthorizationService {
   /**
    * Converts an EffectiveAuthContext into a client-safe AuthUser DTO.
    */
-  toAuthUser(context: EffectiveAuthContext): AuthUser {
+  toAuthUser(context: EffectiveAuthContext, avatarUrl: string | null = null): AuthUser {
     return {
       id: context.user.id,
       email: context.user.email,
       displayName: context.user.displayName,
+      avatarUrl,
       status: context.user.status,
       roles: context.roles,
       permissions: context.permissions,
       authorizedSiteIds: context.authorizedSiteIds,
+      sitePermissions: context.sitePermissions,
       isSuperAdmin: context.isSuperAdmin,
     };
   }

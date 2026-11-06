@@ -11,6 +11,7 @@ import { NewsletterSubscribers1793491209000 } from './1793491209000-NewsletterSu
 import { PostComments1793491210000 } from './1793491210000-PostComments';
 import { PreModeratedComments1793491211000 } from './1793491211000-PreModeratedComments';
 import { UserPhone1793491212000 } from './1793491212000-UserPhone';
+import { UserAvatar1793491213000 } from './1793491213000-UserAvatar';
 
 /**
  * Ordered migration registry.
@@ -32,4 +33,5 @@ export const MIGRATIONS = [
   PostComments1793491210000,
   PreModeratedComments1793491211000,
   UserPhone1793491212000,
+  UserAvatar1793491213000,
 ] as const;

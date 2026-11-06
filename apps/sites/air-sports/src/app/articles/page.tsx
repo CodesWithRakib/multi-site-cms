@@ -44,7 +44,7 @@ export default async function ArticlesIndexPage({ searchParams }: ArticlesPagePr
           className="mb-6 flex items-center gap-2 text-xs font-mono text-muted-foreground"
         >
           <Link href="/" className="hover:text-primary transition-colors">
-            Radar
+            Home
           </Link>
           <span aria-hidden="true">/</span>
           <span className="text-foreground">Dispatches</span>

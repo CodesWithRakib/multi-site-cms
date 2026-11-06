@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Patch, Post, Req, Res } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import type { AuthUser, CsrfResponse, LoginResponse } from '@multi-site-cms/types';
 import type { Request, Response } from 'express';
@@ -8,8 +8,10 @@ import { CurrentUser } from './decorators/current-user.decorator';
 import { Public } from './decorators/public.decorator';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { LoginDto } from './dto/login.dto';
+import { UpdateAvatarDto } from './dto/update-avatar.dto';
 import { AuthService } from './services/auth.service';
 import { AuthorizationService } from './services/authorization.service';
+import { ProfileService } from './services/profile.service';
 import type { EffectiveAuthContext } from './services/authorization.service';
 import { CSRF_COOKIE_NAME, SESSION_COOKIE_NAME, SessionService } from './services/session.service';
 
@@ -19,6 +21,7 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly sessionService: SessionService,
     private readonly authorizationService: AuthorizationService,
+    private readonly profileService: ProfileService,
   ) {}
 
   @Public()
@@ -134,7 +137,18 @@ export class AuthController {
 
   @Get('me')
   async me(@CurrentUser() authContext: EffectiveAuthContext): Promise<AuthUser> {
-    return this.authorizationService.toAuthUser(authContext);
+    return this.profileService.toAuthUser(authContext);
+  }
+
+  /** The signed-in user sets or removes their own profile photo (any role). */
+  @Patch('me/avatar')
+  @HttpCode(HttpStatus.OK)
+  @Throttle({ default: { limit: 20, ttl: 60_000 } })
+  async updateAvatar(
+    @CurrentUser() authContext: EffectiveAuthContext,
+    @Body() dto: UpdateAvatarDto,
+  ): Promise<AuthUser> {
+    return this.profileService.updateAvatar(authContext, dto.mediaId);
   }
 
   @Public()

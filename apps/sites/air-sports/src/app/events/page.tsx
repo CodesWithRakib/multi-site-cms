@@ -10,16 +10,16 @@ import { fetchEvents } from '@/lib/api';
 export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: 'Championship Events & Competitions',
+  title: 'Events & Festivals',
   description:
-    'Comprehensive hubs for air sports championships, world cups, race circuits, and aeronautical speed trials.',
+    'Upcoming and past air sports events, festivals and meets, with every related dispatch.',
   alternates: {
     canonical: '/events',
   },
   openGraph: {
-    title: `Events & Race Circuits | ${siteConfig.name}`,
+    title: `Events & Festivals | ${siteConfig.name}`,
     description:
-      'Explore active and upcoming aviation competitions, hike-and-fly trials, and aerobatic events.',
+      'Upcoming and past air sports events, festivals and meets, with every related dispatch.',
     url: '/events',
   },
 };
@@ -40,10 +40,10 @@ export default async function EventsIndexPage() {
           className="mb-6 flex items-center gap-2 text-xs font-mono text-muted-foreground"
         >
           <Link href="/" className="hover:text-primary transition-colors">
-            Radar
+            Home
           </Link>
           <span>/</span>
-          <span className="text-foreground">Events Hub</span>
+          <span className="text-foreground">Events</span>
         </nav>
 
         {/* Header */}
@@ -51,25 +51,24 @@ export default async function EventsIndexPage() {
           <div className="flex items-center gap-2 mb-2">
             <Trophy className="size-4 text-primary" />
             <span className="font-mono text-xs font-bold uppercase tracking-wider text-primary">
-              Competition Hubs
+              Events
             </span>
           </div>
           <h1 className="text-4xl sm:text-5xl font-black uppercase tracking-tight text-foreground">
-            Aeronautical Championships
+            Events & Festivals
           </h1>
           <p className="mt-3 max-w-2xl text-base text-muted-foreground font-sans">
-            Dedicated race centers tracking live dispatches, heat results, pilot standings, and
-            meteorological calls.
+            Festivals, meets and competitions we cover. Each event page collects every dispatch
+            published about it.
           </p>
         </div>
 
         {events.length === 0 ? (
           <div className="rounded-3xl border border-dashed border-border p-16 text-center bg-card">
             <Radio className="mx-auto size-12 text-muted-foreground/40 mb-3" />
-            <h2 className="text-lg font-bold text-foreground">No Competition Hubs Active</h2>
+            <h2 className="text-lg font-bold text-foreground">No events yet</h2>
             <p className="mt-1 text-xs text-muted-foreground max-w-md mx-auto">
-              Championship hubs will be established when race schedules and official event dates are
-              announced.
+              Events appear here as soon as they are announced.
             </p>
           </div>
         ) : (
@@ -107,7 +106,7 @@ export default async function EventsIndexPage() {
                     id="upcoming-events-heading"
                     className="text-xl font-bold uppercase tracking-tight text-foreground font-mono"
                   >
-                    Upcoming Competitions ({upcomingEvents.length})
+                    Upcoming ({upcomingEvents.length})
                   </h2>
                 </div>
 
@@ -128,7 +127,7 @@ export default async function EventsIndexPage() {
                     id="completed-events-heading"
                     className="text-xl font-bold uppercase tracking-tight text-foreground font-mono"
                   >
-                    Archived Results & Past Circuits ({completedEvents.length})
+                    Past events ({completedEvents.length})
                   </h2>
                 </div>
 

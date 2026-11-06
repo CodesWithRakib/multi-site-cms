@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAdmin } from '@/lib/admin-context';
+import { SidebarProfile } from './SidebarProfile';
 import {
   Home,
   FileText,
@@ -15,9 +16,9 @@ import {
   BarChart2,
   Settings,
   ShieldCheck,
-  ChevronDown,
   Calendar,
   MessageSquare,
+  CalendarClock,
 } from 'lucide-react';
 import { useListCommentsQuery } from '@/lib/cms-api';
 
@@ -76,6 +77,12 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       label: t('nav.tags'),
       icon: Tag,
       active: pathname.includes('tags'),
+    },
+    {
+      href: '/events',
+      label: 'Events',
+      icon: CalendarClock,
+      active: pathname.startsWith('/events'),
     },
     {
       href: '/media',
@@ -190,90 +197,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             })}
         </nav>
 
-        {/* User Profile at bottom */}
-        <div className="p-4 border-t border-brand-900/80">
-          <div className="flex items-center justify-between px-2 py-1.5 rounded-xl hover:bg-white/[0.05] transition-colors cursor-pointer group">
-            <div className="flex items-center gap-3 min-w-0">
-              {/* Detailed vector avatar for Rakib Islam matching user screenshot */}
-              <div className="relative size-10 rounded-full overflow-hidden border-2 border-emerald-400/40 shrink-0 bg-brand-900 shadow-2xs">
-                <svg viewBox="0 0 100 100" className="size-full object-cover">
-                  <defs>
-                    <linearGradient id="skin" x1="0%" y1="0%" x2="0%" y2="100%">
-                      <stop offset="0%" stopColor="#f5ceb0" />
-                      <stop offset="100%" stopColor="#e3a77f" />
-                    </linearGradient>
-                    <linearGradient id="hair" x1="0%" y1="0%" x2="0%" y2="100%">
-                      <stop offset="0%" stopColor="#292524" />
-                      <stop offset="100%" stopColor="#0c0a09" />
-                    </linearGradient>
-                    <linearGradient id="shirt" x1="0%" y1="0%" x2="0%" y2="100%">
-                      <stop offset="0%" stopColor="#1e293b" />
-                      <stop offset="100%" stopColor="#0f172a" />
-                    </linearGradient>
-                  </defs>
-                  {/* Background light gradient */}
-                  <circle cx="50" cy="50" r="50" fill="#cbd5e1" />
-                  {/* Shirt & Shoulders */}
-                  <path
-                    d="M 12 100 Q 15 75 35 70 L 45 74 L 55 74 L 65 70 Q 85 75 88 100 Z"
-                    fill="url(#shirt)"
-                  />
-                  <polygon points="45,74 55,74 50,85" fill="#e3a77f" />
-                  {/* Neck */}
-                  <rect x="42" y="55" width="16" height="20" rx="3" fill="url(#skin)" />
-                  {/* Head */}
-                  <ellipse cx="50" cy="46" rx="20" ry="24" fill="url(#skin)" />
-                  {/* Beard */}
-                  <path
-                    d="M 33 46 Q 34 68 50 72 Q 66 68 67 46 Q 63 56 50 56 Q 37 56 33 46 Z"
-                    fill="url(#hair)"
-                  />
-                  {/* Mustache */}
-                  <path d="M 42 54 Q 50 58 58 54 Q 50 52 42 54 Z" fill="url(#hair)" />
-                  {/* Eyes & Brows */}
-                  <path
-                    d="M 38 37 Q 43 35 46 37"
-                    stroke="#1c1917"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    fill="none"
-                  />
-                  <path
-                    d="M 54 37 Q 57 35 62 37"
-                    stroke="#1c1917"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    fill="none"
-                  />
-                  <ellipse cx="42" cy="42" rx="2.5" ry="3" fill="#1c1917" />
-                  <ellipse cx="58" cy="42" rx="2.5" ry="3" fill="#1c1917" />
-                  <circle cx="43" cy="41" r="0.8" fill="#ffffff" />
-                  <circle cx="59" cy="41" r="0.8" fill="#ffffff" />
-                  {/* Nose */}
-                  <path
-                    d="M 50 41 L 49 48 L 52 48"
-                    stroke="#c2825b"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    fill="none"
-                  />
-                  {/* Hair */}
-                  <path
-                    d="M 28 42 Q 28 20 50 18 Q 72 20 72 42 Q 74 30 68 22 Q 58 16 42 18 Q 30 22 28 42 Z"
-                    fill="url(#hair)"
-                  />
-                </svg>
-              </div>
-              <div className="flex flex-col min-w-0 leading-tight">
-                <span className="text-xs font-bold text-white truncate">Rakib Islam</span>
-                <span className="text-[10px] text-teal-300/80 font-medium truncate">
-                  {t('nav.superAdmin')}
-                </span>
-              </div>
-            </div>
-            <ChevronDown className="w-3.5 h-3.5 text-teal-200/60 shrink-0 group-hover:text-white transition-colors" />
-          </div>
-        </div>
+        {/* Signed-in user: real name, role and profile photo (click to change it). */}
+        <SidebarProfile />
       </aside>
     </>
   );

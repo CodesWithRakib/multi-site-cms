@@ -24,6 +24,7 @@
     "db:seed:admins": "node dist/database/seeds/provision-site-admins.js",
     "bootstrap:platform": "node dist/database/cli/bootstrap-platform.js",
     "bootstrap:super-admin": "node dist/database/cli/bootstrap-super-admin.js",
+    "accounts:reset": "node dist/database/cli/reset-platform-accounts.js",
     "seed:production-content": "node dist/database/cli/seed-production-content.js",
     "db:cleanup:generated-analytics": "node dist/database/cli/remove-generated-analytics.js"
   },

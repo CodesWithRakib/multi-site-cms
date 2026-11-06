@@ -22,6 +22,7 @@ import { PublishingModule } from './publishing/publishing.module';
 import { SitesModule } from './sites/sites.module';
 import { SettingsModule } from './settings/settings.module';
 import { TaxonomyModule } from './taxonomy/taxonomy.module';
+import { EventsModule } from './events/events.module';
 import { UsersModule } from './users/users.module';
 
 @Module({
@@ -41,6 +42,7 @@ import { UsersModule } from './users/users.module';
     PostsModule,
     CommentsModule,
     TaxonomyModule,
+    EventsModule,
     MediaModule,
     PublishingModule,
     MaintenanceModule,

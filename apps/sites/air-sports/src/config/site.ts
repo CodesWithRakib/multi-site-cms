@@ -10,6 +10,6 @@ export const siteConfig = {
   name: 'Air Sports Live',
   tagline: 'Breaking updates and live coverage from the sky.',
   description:
-    'A live air sports desk covering competitions, records, events and the people pushing human flight forward.',
+    'Kites, drones and flying in Bangladesh: festivals, rules, weather and the people who take to the sky.',
   url: publicConfig.appUrl,
 } as const;

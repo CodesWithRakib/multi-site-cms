@@ -2,6 +2,7 @@ import { HttpStatus, Inject, Injectable, forwardRef } from '@nestjs/common';
 import type {
   PaginatedResult,
   PublicArticleDetail,
+  PublicArticleAuthor,
   PublicArticleImage,
   PublicArticleSummary,
   PublicCategoryItem,
@@ -19,6 +20,7 @@ import { DATA_SOURCE } from '../database/database.tokens';
 import { Category } from '../database/entities/category.entity';
 import { Event } from '../database/entities/event.entity';
 import { MediaAsset } from '../database/entities/media-asset.entity';
+import { publicMediaUrl } from '../media/public-media-url';
 import { PostPublicationCategory } from '../database/entities/post-publication-category.entity';
 import { PostPublicationTag } from '../database/entities/post-publication-tag.entity';
 import { PostPublication } from '../database/entities/post-publication.entity';
@@ -34,6 +36,9 @@ import type { SubscribeNewsletterDto } from './dto/subscribe-newsletter.dto';
 import { PostsService } from './posts.service';
 import { calculateReadingTimeMinutes, extractTextFromDoc } from './utils/body-validator';
 
+/** "Popular" ranks by page views in this trailing window. */
+const POPULAR_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
+
 @Injectable()
 export class PublicContentService {
   private readonly baseUrl: string;
@@ -48,11 +53,46 @@ export class PublicContentService {
   }
 
   private resolveMediaUrl(storageKey: string): string {
-    if (storageKey.startsWith('http://') || storageKey.startsWith('https://')) {
-      return storageKey;
-    }
-    const sanitizedKey = encodeURIComponent(storageKey).replace(/%2F/g, '/');
-    return `${this.baseUrl}/media/assets/${sanitizedKey}`;
+    return publicMediaUrl(storageKey, this.baseUrl);
+  }
+
+  /**
+   * Public author cards (name + profile photo) for a set of user ids, in two
+   * batched queries regardless of how many articles share an author.
+   */
+  private async authorRefs(
+    authorIds: readonly (string | null | undefined)[],
+  ): Promise<Map<string, PublicArticleAuthor>> {
+    const ids = [...new Set(authorIds.filter((id): id is string => Boolean(id)))];
+    if (ids.length === 0) return new Map();
+
+    const userRepo = await getInitializedRepository(this.dataSource, User);
+    const users = await userRepo.findBy({ id: In(ids) });
+    const avatarIds = users
+      .map((user) => user.avatarMediaId)
+      .filter((id): id is string => Boolean(id));
+    const avatars =
+      avatarIds.length > 0
+        ? await (
+            await getInitializedRepository(this.dataSource, MediaAsset)
+          ).findBy({ id: In(avatarIds) })
+        : [];
+    const avatarUrlById = new Map(
+      avatars
+        .filter((asset) => !asset.deletedAt)
+        .map((asset) => [asset.id, this.resolveMediaUrl(asset.storageKey)]),
+    );
+
+    return new Map(
+      users.map((user) => [
+        user.id,
+        {
+          id: user.id,
+          displayName: user.displayName,
+          avatarUrl: user.avatarMediaId ? (avatarUrlById.get(user.avatarMediaId) ?? null) : null,
+        },
+      ]),
+    );
   }
 
   private formatMediaImage(asset: MediaAsset | null): PublicArticleImage | null {
@@ -173,7 +213,15 @@ export class PublicContentService {
         qb.orderBy('pub.published_at', 'ASC');
         break;
       case 'popular':
-        qb.orderBy('pub.featured_image_id', 'DESC').addOrderBy('pub.published_at', 'DESC');
+        // Real readership: page views in the last 30 days (indexed by post).
+        qb.addSelect(
+          `(SELECT COUNT(*) FROM "analytics_page_views" v
+             WHERE v."post_id" = pub.post_id AND v."created_at" > :popularSince)`,
+          'popularity',
+        )
+          .setParameter('popularSince', new Date(Date.now() - POPULAR_WINDOW_MS))
+          .orderBy('popularity', 'DESC')
+          .addOrderBy('pub.published_at', 'DESC');
         break;
       case 'title_asc':
         qb.addSelect('rev.title').orderBy('rev.title', 'ASC');
@@ -231,7 +279,6 @@ export class PublicContentService {
     const postRepo = await getInitializedRepository(this.dataSource, Post);
     const revisionRepo = await getInitializedRepository(this.dataSource, PostRevision);
     const mediaRepo = await getInitializedRepository(this.dataSource, MediaAsset);
-    const userRepo = await getInitializedRepository(this.dataSource, User);
 
     const [posts, revisions, mediaAssets] = await Promise.all([
       postRepo.findBy({ id: In(postIds) }),
@@ -243,9 +290,7 @@ export class PublicContentService {
     const revMap = new Map(revisions.map((r) => [r.id, r]));
     const mediaMap = new Map(mediaAssets.map((m) => [m.id, m]));
 
-    const authorIds = posts.map((p) => p.authorId).filter((id): id is string => Boolean(id));
-    const authors = authorIds.length > 0 ? await userRepo.findBy({ id: In(authorIds) }) : [];
-    const authorMap = new Map(authors.map((a) => [a.id, a]));
+    const authorMap = await this.authorRefs(posts.map((p) => p.authorId));
 
     // Batch fetch taxonomies for these publications
     const pubCatRepo = await getInitializedRepository(this.dataSource, PostPublicationCategory);
@@ -311,7 +356,7 @@ export class PublicContentService {
         featuredImage: this.formatMediaImage(media),
         categories: categoriesByPub.get(pub.id) ?? [],
         tags: tagsByPub.get(pub.id) ?? [],
-        author: author ? { id: author.id, displayName: author.displayName } : null,
+        author: author ?? null,
       };
     });
   }
@@ -359,8 +404,9 @@ export class PublicContentService {
     }
 
     // Author
-    const userRepo = await getInitializedRepository(this.dataSource, User);
-    const author = post.authorId ? await userRepo.findOne({ where: { id: post.authorId } }) : null;
+    const author = post.authorId
+      ? ((await this.authorRefs([post.authorId])).get(post.authorId) ?? null)
+      : null;
 
     // Media
     let media: MediaAsset | null = null;
@@ -505,7 +551,7 @@ export class PublicContentService {
       featuredImage: this.formatMediaImage(media),
       categories,
       tags,
-      author: author ? { id: author.id, displayName: author.displayName } : null,
+      author: author ?? null,
       body: revision.body,
       seoTitle: pub.seoTitle,
       seoDescription: pub.seoDescription,
@@ -540,14 +586,22 @@ export class PublicContentService {
         'pub.id = ppc.publication_id AND pub.status = :published AND pub.published_at IS NOT NULL AND pub.published_at <= :now',
         { published: 'published', now },
       )
+      // Count only posts the public can actually open (not deleted/archived).
+      .leftJoin(
+        Post,
+        'post',
+        'post.id = pub.post_id AND post.deleted_at IS NULL AND post.status != :archived',
+        { archived: 'archived' },
+      )
       .where('cat.site_id = :siteId', { siteId: site.id })
+      .andWhere('cat.is_active = true')
       .select([
         'cat.id AS id',
         'cat.name AS name',
         'cat.slug AS slug',
         'cat.description AS description',
         'cat.parent_id AS "parentId"',
-        'COUNT(pub.id) AS "postCount"',
+        'COUNT(post.id) AS "postCount"',
       ])
       .groupBy('cat.id')
       .orderBy('cat.name', 'ASC')
@@ -587,13 +641,19 @@ export class PublicContentService {
         'pub.id = ppt.publication_id AND pub.status = :published AND pub.published_at IS NOT NULL AND pub.published_at <= :now',
         { published: 'published', now },
       )
+      .leftJoin(
+        Post,
+        'post',
+        'post.id = pub.post_id AND post.deleted_at IS NULL AND post.status != :archived',
+        { archived: 'archived' },
+      )
       .where('tag.site_id = :siteId', { siteId: site.id })
       .select([
         'tag.id AS id',
         'tag.name AS name',
         'tag.slug AS slug',
         'tag.description AS description',
-        'COUNT(pub.id) AS "postCount"',
+        'COUNT(post.id) AS "postCount"',
       ])
       .groupBy('tag.id')
       .orderBy('tag.name', 'ASC')
@@ -792,7 +852,6 @@ export class PublicContentService {
 
       const postRepo = await getInitializedRepository(this.dataSource, Post);
       const revisionRepo = await getInitializedRepository(this.dataSource, PostRevision);
-      const userRepo = await getInitializedRepository(this.dataSource, User);
       const mediaRepo = await getInitializedRepository(this.dataSource, MediaAsset);
       const pubCatRepo = await getInitializedRepository(this.dataSource, PostPublicationCategory);
       const pubTagRepo = await getInitializedRepository(this.dataSource, PostPublicationTag);
@@ -819,10 +878,7 @@ export class PublicContentService {
       const revMap = new Map(revisions.map((r) => [r.id, r]));
       const mediaMap = new Map(mediaList.map((m) => [m.id, m]));
 
-      const authorIds = posts.map((p) => p.authorId).filter(Boolean);
-      const authors =
-        authorIds.length > 0 ? await userRepo.find({ where: { id: In(authorIds) } }) : [];
-      const authorMap = new Map(authors.map((u) => [u.id, u]));
+      const authorMap = await this.authorRefs(posts.map((p) => p.authorId));
 
       const categoriesByPub = new Map<string, PublicTaxonomyRef[]>();
       for (const pc of pubCategories) {
@@ -870,7 +926,7 @@ export class PublicContentService {
           featuredImage: this.formatMediaImage(media),
           categories: categoriesByPub.get(pub.id) ?? [],
           tags: tagsByPub.get(pub.id) ?? [],
-          author: author ? { id: author.id, displayName: author.displayName } : null,
+          author: author ?? null,
         };
       });
     }

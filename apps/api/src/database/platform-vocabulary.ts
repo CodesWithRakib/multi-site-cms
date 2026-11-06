@@ -35,6 +35,7 @@ export const PERMISSIONS: readonly PermissionSeed[] = [
   { key: 'publication:schedule', description: 'Schedule or cancel a publication', admin: true },
   { key: 'publication:archive', description: 'Unpublish content from a site', admin: true },
   { key: 'taxonomy:manage', description: 'Manage site categories and tags', admin: true },
+  { key: 'event:manage', description: 'Create, edit, or delete site events', admin: true },
   { key: 'media:upload', description: 'Upload media to a site library', admin: true },
   { key: 'media:delete', description: 'Delete media from a site library', admin: true },
   { key: 'audit:read', description: 'Read the audit log', admin: false },
