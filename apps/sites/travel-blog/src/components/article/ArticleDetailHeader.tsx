@@ -24,7 +24,7 @@ export function ArticleDetailHeader({
       {/* Breadcrumb Navigation */}
       <nav
         aria-label="Breadcrumb"
-        className="flex items-center gap-1.5 text-xs text-muted-foreground"
+        className="flex min-w-0 flex-wrap items-center gap-1.5 text-xs text-muted-foreground"
       >
         <Link href="/" className="hover:text-emerald-600 transition-colors">
           Home
@@ -61,7 +61,7 @@ export function ArticleDetailHeader({
       </div>
 
       {/* Headline */}
-      <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground leading-[1.12]">
+      <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground leading-[1.12] text-balance wrap-break-word">
         {article.title}
       </h1>
 
@@ -87,7 +87,8 @@ export function ArticleDetailHeader({
           )}
         </div>
 
-        <div className="flex items-center gap-5 text-xs">
+        {/* Wraps on phones: date, reading time and share no longer force the page wider. */}
+        <div className="flex min-w-0 flex-wrap items-center gap-x-5 gap-y-3 text-xs">
           <span className="inline-flex items-center gap-1.5">
             <Calendar className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
             {publishedDate}
@@ -96,7 +97,7 @@ export function ArticleDetailHeader({
             <Clock className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
             {article.readingTimeMinutes} min read
           </span>
-          <div className="flex items-center gap-2 pl-2 border-l border-border/80">
+          <div className="flex w-full items-center gap-2 sm:w-auto sm:border-l sm:border-border/80 sm:pl-3">
             <ShareButtons title={article.title} url={articleUrl} />
           </div>
         </div>

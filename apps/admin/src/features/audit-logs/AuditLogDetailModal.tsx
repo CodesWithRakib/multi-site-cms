@@ -69,7 +69,7 @@ export function AuditLogDetailModal({ log, onClose }: AuditLogDetailModalProps) 
             >
               {log.action}
             </span>
-            <span className="text-xs text-neutral-400 font-mono">ID: #{log.id}</span>
+            <span className="text-xs text-neutral-500 font-mono">ID: #{log.id}</span>
           </div>
 
           <button
@@ -87,7 +87,7 @@ export function AuditLogDetailModal({ log, onClose }: AuditLogDetailModalProps) 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-xl bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-200/80 dark:border-neutral-800">
             {/* Actor */}
             <div className="space-y-1">
-              <span className="text-xs font-medium text-neutral-400 flex items-center gap-1.5">
+              <span className="text-xs font-medium text-neutral-500 flex items-center gap-1.5">
                 <User className="w-3.5 h-3.5" />
                 {t('auditLogs.actor')}
               </span>
@@ -101,7 +101,7 @@ export function AuditLogDetailModal({ log, onClose }: AuditLogDetailModalProps) 
 
             {/* Target Entity */}
             <div className="space-y-1">
-              <span className="text-xs font-medium text-neutral-400 flex items-center gap-1.5">
+              <span className="text-xs font-medium text-neutral-500 flex items-center gap-1.5">
                 <Shield className="w-3.5 h-3.5" />
                 {t('auditLogs.entity')}
               </span>
@@ -129,7 +129,7 @@ export function AuditLogDetailModal({ log, onClose }: AuditLogDetailModalProps) 
 
             {/* Site Scope */}
             <div className="space-y-1">
-              <span className="text-xs font-medium text-neutral-400 flex items-center gap-1.5">
+              <span className="text-xs font-medium text-neutral-500 flex items-center gap-1.5">
                 <Globe className="w-3.5 h-3.5" />
                 {t('auditLogs.site')}
               </span>
@@ -140,7 +140,7 @@ export function AuditLogDetailModal({ log, onClose }: AuditLogDetailModalProps) 
 
             {/* IP Address & Request ID */}
             <div className="space-y-1">
-              <span className="text-xs font-medium text-neutral-400 flex items-center gap-1.5">
+              <span className="text-xs font-medium text-neutral-500 flex items-center gap-1.5">
                 <Terminal className="w-3.5 h-3.5" />
                 {t('auditLogs.ipAddress')}
               </span>
@@ -167,7 +167,7 @@ export function AuditLogDetailModal({ log, onClose }: AuditLogDetailModalProps) 
                     key={key}
                     className="p-2.5 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-neutral-50/60 dark:bg-neutral-800/40 text-xs"
                   >
-                    <span className="block text-[11px] font-medium text-neutral-400 truncate">
+                    <span className="block text-[11px] font-medium text-neutral-500 truncate">
                       {key}
                     </span>
                     <span className="font-mono font-semibold text-neutral-800 dark:text-neutral-200 truncate block">
@@ -203,7 +203,7 @@ export function AuditLogDetailModal({ log, onClose }: AuditLogDetailModalProps) 
 
         {/* Footer */}
         <div className="flex items-center justify-between px-6 py-4 border-t border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/50">
-          <span className="text-xs text-neutral-400">
+          <span className="text-xs text-neutral-500">
             {new Date(log.createdAt).toLocaleString()}
           </span>
           <button

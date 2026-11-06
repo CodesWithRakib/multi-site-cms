@@ -71,7 +71,7 @@ export function AuditLogTable({
               ))
             ) : logs.length === 0 ? (
               <tr>
-                <td colSpan={7} className="py-12 text-center text-neutral-400">
+                <td colSpan={7} className="py-12 text-center text-neutral-500">
                   {t('auditLogs.noLogsFound')}
                 </td>
               </tr>
@@ -109,7 +109,7 @@ export function AuditLogTable({
                             (log.actorType === 'system' ? 'System' : 'Bootstrap System')}
                         </p>
                         {log.actorEmail && (
-                          <p className="text-[11px] text-neutral-400 truncate">{log.actorEmail}</p>
+                          <p className="text-[11px] text-neutral-500 truncate">{log.actorEmail}</p>
                         )}
                       </div>
                     </div>
@@ -129,7 +129,7 @@ export function AuditLogTable({
                         {log.siteName}
                       </span>
                     ) : (
-                      <span className="text-xs text-neutral-400">Platform Global</span>
+                      <span className="text-xs text-neutral-500">Platform Global</span>
                     )}
                   </td>
 

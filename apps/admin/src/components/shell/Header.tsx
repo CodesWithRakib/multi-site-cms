@@ -35,11 +35,11 @@ export function Header({ onMenuToggle, isMenuOpen = false }: HeaderProps) {
       {/* Pill Search Input */}
       <div className="flex-1 max-w-xl">
         <div className="relative flex items-center w-full">
-          <Search className="absolute left-4 size-4 text-slate-400 pointer-events-none" />
+          <Search className="absolute left-4 size-4 text-slate-500 pointer-events-none" />
           <input
             type="text"
             placeholder={t('dashboard.searchPlaceholder')}
-            className="w-full h-11 pl-11 pr-20 rounded-full bg-white dark:bg-slate-900/90 border border-slate-200/90 dark:border-slate-800 text-xs text-slate-700 dark:text-slate-200 placeholder:text-slate-400 shadow-2xs focus:outline-hidden focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 transition-all"
+            className="w-full h-11 pl-11 pr-20 rounded-full bg-white dark:bg-slate-900/90 border border-slate-200/90 dark:border-slate-800 text-xs text-slate-700 dark:text-slate-200 placeholder:text-slate-500 shadow-2xs focus:outline-hidden focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 transition-all"
           />
           <div className="absolute right-3.5 hidden sm:flex items-center gap-1 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-[10px] font-mono font-semibold text-slate-500 dark:text-slate-400">
             <span>Ctrl</span>
@@ -77,7 +77,7 @@ export function Header({ onMenuToggle, isMenuOpen = false }: HeaderProps) {
         >
           <Globe className="size-3.5 text-slate-500 dark:text-slate-400" />
           <span className="font-bold">{locale === 'en' ? 'EN' : 'বাং'}</span>
-          <ChevronDown className="size-3 text-slate-400" />
+          <ChevronDown className="size-3 text-slate-500" />
         </button>
       </div>
     </header>

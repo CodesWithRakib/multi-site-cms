@@ -54,7 +54,7 @@ export function LoginForm({ returnUrl }: LoginFormProps) {
         <h1 id="login-title" className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
           {t.auth.loginTitle}
         </h1>
-        <p className="mt-2 text-sm text-slate-300 sm:text-base">{t.auth.loginSubtitle}</p>
+        <p className="mt-2 text-sm text-slate-500 sm:text-base">{t.auth.loginSubtitle}</p>
       </header>
 
       {errorMessage && (
@@ -115,7 +115,7 @@ export function LoginForm({ returnUrl }: LoginFormProps) {
 
       {/* No account hints here: this page ships to production, and listing
           privileged emails helps targeted attacks (SEC-14). */}
-      <footer className="mt-8 flex items-center gap-3 text-xs text-slate-400">
+      <footer className="mt-8 flex items-center gap-3 text-xs text-slate-500">
         <span aria-hidden="true" className="h-px flex-1 bg-white/10" />
         <span className="flex items-center gap-1.5">
           <Lock aria-hidden="true" className="size-3.5" />

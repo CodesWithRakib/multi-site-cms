@@ -117,7 +117,7 @@ export default function NewSitePage() {
               <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
                 Tenant Parameters
               </h3>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-500">
                 Configure primary metadata and tenant identification.
               </p>
             </div>
@@ -157,7 +157,7 @@ export default function NewSitePage() {
                 placeholder="e.g. travel-blog or air-sports"
                 className="w-full px-3.5 py-2.5 text-xs font-mono rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 text-slate-900 dark:text-slate-100 focus:outline-hidden focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 shadow-2xs"
               />
-              <p className="text-[10px] text-slate-400 mt-1">
+              <p className="text-[10px] text-slate-500 mt-1">
                 Lowercase letters, numbers, and hyphens. Used in API routing, edge proxy, and tenant
                 scoping.
               </p>

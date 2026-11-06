@@ -64,7 +64,7 @@ export function PostBasicFields({
           value={title}
           onChange={(e) => onTitleChange(e.target.value)}
           placeholder="Enter an engaging, descriptive title..."
-          className="w-full px-4 py-3 text-lg font-bold border rounded-xl border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-hidden focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 transition-all font-sans"
+          className="w-full px-4 py-3 text-lg font-bold border rounded-xl border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 focus:outline-hidden focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 transition-all font-sans"
         />
       </div>
 
@@ -88,7 +88,7 @@ export function PostBasicFields({
           value={excerpt}
           onChange={(e) => onExcerptChange(e.target.value)}
           placeholder="Short lead paragraph or social summary for cards and search snippets..."
-          className="w-full px-4 py-2.5 text-sm border rounded-xl border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-hidden focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 transition-all font-sans resize-y"
+          className="w-full px-4 py-2.5 text-sm border rounded-xl border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 focus:outline-hidden focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 transition-all font-sans resize-y"
         />
       </div>
 

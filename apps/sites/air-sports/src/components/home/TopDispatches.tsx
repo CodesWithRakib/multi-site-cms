@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
+import Image from 'next/image';
+import { ArrowRight, Zap } from 'lucide-react';
 
 import type { PublicArticleSummary } from '@multi-site-cms/types';
 
@@ -33,11 +34,19 @@ export function TopDispatches({ articles }: TopDispatchesProps) {
       </h2>
 
       <article className="group relative overflow-hidden rounded-3xl border border-border bg-card lg:col-span-2">
-        <DispatchVisual
-          article={top}
-          sizes="(max-width: 1024px) 100vw, 66vw"
-          className="aspect-16/9 lg:aspect-21/9"
-        />
+        <div className="relative">
+          <DispatchVisual
+            article={top}
+            sizes="(max-width: 1024px) 100vw, 66vw"
+            className="aspect-16/9 lg:aspect-21/9"
+          />
+          {category && (
+            <span className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-brand-950/80 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur">
+              <Zap aria-hidden="true" className="size-3.5" />
+              {category.name}
+            </span>
+          )}
+        </div>
         <div className="p-5 sm:p-7">
           <p className="flex flex-wrap items-center gap-2 font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
             {category && <span className="text-primary">{category.name}</span>}
@@ -87,20 +96,32 @@ export function TopDispatches({ articles }: TopDispatchesProps) {
         {wire.length === 0 ? (
           <p className="py-6 text-sm text-muted-foreground">More dispatches are on the way.</p>
         ) : (
-          <ol className="relative mt-1 flex-1">
+          <ol className="mt-1 flex-1 divide-y divide-border">
             {wire.map((article) => (
-              <li key={article.id} className="relative border-l border-border pl-4">
-                <span
-                  aria-hidden="true"
-                  className="absolute -left-[4.5px] top-5 size-2 rounded-full border-2 border-card bg-primary"
-                />
-                <Link href={`/articles/${article.slug}`} className="group block py-3">
-                  <span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                    {formatPublishedDate(article.publishedAt)}
-                    {article.categories[0] && ` · ${article.categories[0].name}`}
+              <li key={article.id}>
+                <Link
+                  href={`/articles/${article.slug}`}
+                  className="group flex items-center gap-3 py-3"
+                >
+                  <span className="relative size-16 shrink-0 overflow-hidden rounded-lg bg-brand-950">
+                    {article.featuredImage && (
+                      <Image
+                        src={article.featuredImage.url}
+                        alt=""
+                        fill
+                        sizes="64px"
+                        className="object-cover"
+                      />
+                    )}
                   </span>
-                  <span className="mt-1 line-clamp-2 block text-sm font-bold leading-snug text-foreground group-hover:text-primary">
-                    {article.title}
+                  <span className="min-w-0">
+                    <span className="block text-[11px] font-medium text-muted-foreground">
+                      {formatPublishedDate(article.publishedAt)}
+                      {article.categories[0] && ` · ${article.categories[0].name}`}
+                    </span>
+                    <span className="mt-0.5 line-clamp-2 block text-sm font-bold leading-snug text-foreground group-hover:text-primary">
+                      {article.title}
+                    </span>
                   </span>
                 </Link>
               </li>

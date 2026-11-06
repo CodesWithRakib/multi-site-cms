@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowUpRight, Calendar, Clock } from 'lucide-react';
 import type { PublicArticle } from '@/lib/api';
+import { AuthorAvatar } from '@/components/ui/AuthorAvatar';
 import { CategoryBadge } from '@/components/ui/CategoryBadge';
 
 interface PortalArticleGridProps {
@@ -27,14 +28,11 @@ export function PortalArticleGrid({ articles }: PortalArticleGridProps) {
     <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
       {articles.map((article) => {
         const primaryCategory = article.categories?.[0];
-        const categoryName = primaryCategory?.name ?? 'Travel';
-        const formattedDate = article.publishedAt
-          ? new Date(article.publishedAt).toLocaleDateString('en-US', {
-              month: 'short',
-              day: 'numeric',
-              year: 'numeric',
-            })
-          : 'Recent';
+        const formattedDate = new Date(article.publishedAt).toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+        });
 
         return (
           <article
@@ -44,21 +42,27 @@ export function PortalArticleGrid({ articles }: PortalArticleGridProps) {
             <div>
               {/* Media Container with Category Overlay */}
               <div className="relative h-48 sm:h-52 w-full overflow-hidden bg-muted">
-                <Image
-                  src={
-                    article.featuredImage?.url ??
-                    'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80'
-                  }
-                  alt={article.featuredImage?.altText ?? article.title}
-                  fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
-                />
+                {article.featuredImage ? (
+                  <Image
+                    src={article.featuredImage.url}
+                    alt={article.featuredImage.altText ?? article.title}
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                ) : (
+                  <div
+                    aria-hidden="true"
+                    className="size-full bg-linear-to-br from-brand-700 via-brand-900 to-brand-950"
+                  />
+                )}
 
                 {/* Overlays */}
-                <div className="absolute left-3 top-3 z-10">
-                  <CategoryBadge label={categoryName} slug={primaryCategory?.slug} />
-                </div>
+                {primaryCategory && (
+                  <div className="absolute left-3 top-3 z-10">
+                    <CategoryBadge label={primaryCategory.name} slug={primaryCategory.slug} />
+                  </div>
+                )}
               </div>
 
               {/* Title & Metadata */}
@@ -83,20 +87,21 @@ export function PortalArticleGrid({ articles }: PortalArticleGridProps) {
 
             {/* Bottom Author Row & Action Button */}
             <div className="flex items-center justify-between border-t border-border/60 px-4 py-3 sm:px-5">
-              <div className="flex items-center gap-2.5">
-                <div className="relative h-7 w-7 overflow-hidden rounded-full ring-1 ring-border">
-                  <Image
-                    src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80"
-                    alt={article.author?.displayName ?? 'Rakib Islam'}
-                    fill
-                    sizes="28px"
-                    className="object-cover"
+              {/* Real author from the CMS: their uploaded photo, else initials. */}
+              {article.author ? (
+                <div className="flex items-center gap-2.5">
+                  <AuthorAvatar
+                    name={article.author.displayName}
+                    avatarUrl={article.author.avatarUrl}
+                    className="size-7 text-[10px]"
                   />
+                  <span className="text-xs font-semibold text-foreground/80">
+                    {article.author.displayName}
+                  </span>
                 </div>
-                <span className="text-xs font-semibold text-foreground/80">
-                  {article.author?.displayName ?? 'Rakib Islam'}
-                </span>
-              </div>
+              ) : (
+                <span />
+              )}
 
               <Link
                 href={`/articles/${article.slug}`}

@@ -51,7 +51,9 @@ export function MobileTabBar({
     <nav
       aria-label={label}
       className={cn(
-        'fixed inset-x-0 bottom-0 z-50 border-t border-border/80 bg-background/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-lg md:hidden',
+        // transform-gpu: own compositor layer, so mobile Safari/Chrome never drop the
+        // bar while the toolbar collapses or during momentum scrolling.
+        'fixed inset-x-0 bottom-0 z-50 transform-gpu border-t border-border/80 bg-background/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-lg md:hidden',
         className,
       )}
     >

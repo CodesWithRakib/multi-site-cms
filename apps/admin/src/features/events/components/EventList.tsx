@@ -59,7 +59,7 @@ export function EventList({ events, canManage, onEdit, onDelete }: EventListProp
               <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                 {formatRange(event)}
               </p>
-              <p className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-400">
+              <p className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
                 <span className="font-mono">/events/{event.slug}</span>
                 <span className="inline-flex items-center gap-1">
                   <FileText className="size-3" aria-hidden="true" />

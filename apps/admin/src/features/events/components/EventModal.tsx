@@ -174,7 +174,7 @@ function EventModalContent({
             </div>
             <div>
               <label htmlFor="event-ends" className={labelClass}>
-                Ends <span className="font-normal text-slate-400">(optional)</span>
+                Ends <span className="font-normal text-slate-500">(optional)</span>
               </label>
               <input
                 id="event-ends"

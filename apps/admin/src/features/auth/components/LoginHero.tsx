@@ -33,7 +33,7 @@ export function LoginHero() {
           <span className="text-brand-400">{t.auth.heroTitleAccent}</span> {t.auth.heroTitleTail}
         </p>
       </div>
-      <p className="mt-5 max-w-md text-lg leading-relaxed text-slate-300">{t.auth.heroSubtitle}</p>
+      <p className="mt-5 max-w-md text-lg leading-relaxed text-slate-500">{t.auth.heroSubtitle}</p>
 
       <span aria-hidden="true" className="mt-8 h-px w-10 bg-white/15" />
 
@@ -48,7 +48,7 @@ export function LoginHero() {
             </span>
             <span>
               <span className="block text-sm font-semibold text-white">{title}</span>
-              <span className="mt-1 block text-xs leading-snug text-slate-300">{description}</span>
+              <span className="mt-1 block text-xs leading-snug text-slate-500">{description}</span>
             </span>
           </li>
         ))}

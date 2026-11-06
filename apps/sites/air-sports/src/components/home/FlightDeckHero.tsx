@@ -20,6 +20,18 @@ interface FlightDeckHeroProps {
   readonly disciplines: readonly PublicCategoryItem[];
 }
 
+/** Accents the closing word of the headline, as in the design reference. */
+function HighlightedTitle({ title }: { readonly title: string }) {
+  const words = title.trim().split(/\s+/);
+  if (words.length < 3) return <>{title}</>;
+  const last = words[words.length - 1];
+  return (
+    <>
+      {words.slice(0, -1).join(' ')} <span className="text-brand-300">{last}</span>
+    </>
+  );
+}
+
 /**
  * Always-dark "flight deck" opener: the newest dispatch over its own image,
  * with live/upcoming events beside it. All content comes from the CMS.
@@ -46,8 +58,8 @@ export function FlightDeckHero({ lead, events, disciplines }: FlightDeckHeroProp
         />
       )}
       <div aria-hidden="true" className="absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-linear-to-t from-neutral-950 via-neutral-950/45 to-neutral-950/10" />
-        <div className="absolute inset-0 bg-linear-to-r from-neutral-950/85 via-neutral-950/30 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-brand-950 via-brand-950/45 to-brand-950/10" />
+        <div className="absolute inset-0 bg-linear-to-r from-brand-950/85 via-brand-950/30 to-transparent" />
         <div className="absolute -right-40 -top-40 size-[36rem] rounded-full bg-brand-500/20 blur-3xl" />
         {/* Altitude grid: thin lines that read as instrument markings. */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,rgb(255_255_255/0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgb(255_255_255/0.05)_1px,transparent_1px)] bg-size-[72px_72px] mask-[linear-gradient(to_bottom,black,transparent_85%)]" />
@@ -79,7 +91,7 @@ export function FlightDeckHero({ lead, events, disciplines }: FlightDeckHeroProp
           >
             {lead ? (
               <Link href={`/articles/${lead.slug}`} className="hover:text-brand-100">
-                {lead.title}
+                <HighlightedTitle title={lead.title} />
               </Link>
             ) : (
               siteConfig.tagline

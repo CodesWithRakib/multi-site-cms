@@ -1,11 +1,16 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, Compass, FolderKanban } from 'lucide-react';
-import { CategoryBadge } from '@/components/ui/CategoryBadge';
+import { ArrowUpRight, Compass, FolderKanban } from 'lucide-react';
+
 import { siteConfig } from '@/config/site';
-import { fetchCategories } from '@/lib/api';
+import { fetchArticles, fetchCategories } from '@/lib/api';
+import { assignTopicImages } from '@/lib/topic-images';
 
 export const revalidate = 300;
+
+/** Largest page the public API serves; enough recent stories to find a cover per topic. */
+const COVER_ARTICLE_LIMIT = 50;
 
 export const metadata: Metadata = {
   title: 'Categories & Topics — Travel Blog',
@@ -16,61 +21,81 @@ export const metadata: Metadata = {
 };
 
 export default async function CategoriesPage() {
-  const categories = await fetchCategories();
+  const [categories, articles] = await Promise.all([
+    fetchCategories(),
+    fetchArticles({ limit: COVER_ARTICLE_LIMIT }),
+  ]);
+
+  // Public pages only list topics that have published stories.
+  const topics = categories
+    .filter((category) => category.postCount > 0)
+    .sort((a, b) => b.postCount - a.postCount || a.name.localeCompare(b.name));
+  const images = assignTopicImages(articles.items, topics);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 sm:py-14 space-y-10">
-      <header className="border-b border-border/60 pb-8 space-y-3">
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-700 dark:text-emerald-300">
-          <FolderKanban className="h-3.5 w-3.5" /> Editorial Taxonomies
+    <div className="mx-auto max-w-7xl space-y-10 px-4 py-8 sm:px-6 sm:py-14 lg:px-8">
+      <header className="space-y-3 border-b border-border/60 pb-8">
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
+          <FolderKanban aria-hidden="true" className="size-3.5" /> Topics
         </span>
-        <h1 className="font-serif text-3xl sm:text-5xl font-extrabold tracking-tight text-foreground">
+        <h1 className="font-serif text-3xl font-extrabold tracking-tight text-foreground sm:text-5xl">
           Categories & Topics
         </h1>
-        <p className="text-base sm:text-lg text-muted-foreground max-w-2xl leading-relaxed">
-          Browse stories and dispatches organized by geographical focus, travel pace, and thematic
-          style.
+        <p className="max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+          Browse stories and dispatches by topic and travel style.
         </p>
       </header>
 
-      {categories.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {categories.map((cat) => (
-            <Link
-              key={cat.id}
-              href={`/categories/${cat.slug}`}
-              className="group flex flex-col justify-between rounded-2xl border border-border/80 bg-card p-6 shadow-2xs transition-all duration-300 hover:border-emerald-500/50 hover:shadow-lg hover:-translate-y-1"
-            >
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <CategoryBadge label={cat.name} slug={cat.slug} linked={false} />
-                  <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-semibold text-muted-foreground">
-                    {cat.postCount} {cat.postCount === 1 ? 'article' : 'articles'}
+      {topics.length > 0 ? (
+        <ul className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3">
+          {topics.map((topic) => {
+            const image = images.get(topic.id) ?? null;
+            return (
+              <li key={topic.id}>
+                <Link
+                  href={`/categories/${topic.slug}`}
+                  className="group relative flex aspect-4/5 flex-col justify-end overflow-hidden rounded-3xl bg-linear-to-br from-brand-700 via-brand-900 to-brand-950 p-4 text-white sm:aspect-4/3 sm:p-6"
+                >
+                  {image && (
+                    <Image
+                      src={image.url}
+                      alt=""
+                      fill
+                      sizes="(max-width: 1024px) 50vw, 33vw"
+                      className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                    />
+                  )}
+                  <span
+                    aria-hidden="true"
+                    className="absolute inset-0 bg-linear-to-t from-black/80 via-black/25 to-transparent"
+                  />
+                  <span className="absolute right-3 top-3 flex size-9 items-center justify-center rounded-full bg-white/15 backdrop-blur-md transition-colors duration-200 group-hover:bg-white group-hover:text-brand-900">
+                    <ArrowUpRight aria-hidden="true" className="size-4" />
                   </span>
-                </div>
-                <h2 className="text-lg font-bold text-foreground group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-                  {cat.name}
-                </h2>
-                {cat.description && (
-                  <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 leading-relaxed">
-                    {cat.description}
-                  </p>
-                )}
-              </div>
-
-              <div className="mt-6 flex items-center gap-1 text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                Explore collection{' '}
-                <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
-              </div>
-            </Link>
-          ))}
-        </div>
+                  <span className="relative">
+                    <span className="block font-serif text-xl font-bold sm:text-2xl">
+                      {topic.name}
+                    </span>
+                    {topic.description && (
+                      <span className="mt-1 line-clamp-2 hidden text-sm text-white/80 sm:block">
+                        {topic.description}
+                      </span>
+                    )}
+                    <span className="mt-1 block text-xs font-medium text-white/80">
+                      {topic.postCount} {topic.postCount === 1 ? 'article' : 'articles'}
+                    </span>
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
       ) : (
-        <div className="rounded-3xl border border-dashed border-border p-16 text-center space-y-2">
-          <Compass className="h-10 w-10 text-muted-foreground mx-auto" />
-          <h2 className="font-serif text-xl font-bold text-foreground">No Categories Found</h2>
+        <div className="space-y-2 rounded-3xl border border-dashed border-border p-10 text-center sm:p-16">
+          <Compass aria-hidden="true" className="mx-auto size-10 text-muted-foreground" />
+          <h2 className="font-serif text-xl font-bold text-foreground">No topics yet</h2>
           <p className="text-sm text-muted-foreground">
-            Categories configured in the CMS will appear here.
+            Topics with published stories will appear here.
           </p>
         </div>
       )}

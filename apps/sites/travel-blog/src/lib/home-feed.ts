@@ -1,5 +1,7 @@
 import type { PublicArticleSummary, PublicCategoryItem } from '@multi-site-cms/types';
 
+import { assignTopicImages } from './topic-images';
+
 export interface TopicCard {
   readonly category: PublicCategoryItem;
   /** Featured image of the newest story in this topic, if any has one. */
@@ -32,18 +34,15 @@ export function buildHomeFeed(
   const slides = withImage.length > 0 ? withImage : articles.slice(0, 1);
   const rest = articles.filter((article) => !slides.includes(article));
 
-  const topics = categories
+  const topCategories = categories
     .filter((category) => category.postCount > 0)
     .sort((a, b) => b.postCount - a.postCount || a.name.localeCompare(b.name))
-    .slice(0, TOPICS)
-    .map((category) => ({
-      category,
-      image:
-        articles.find(
-          (article) =>
-            article.featuredImage && article.categories.some((c) => c.id === category.id),
-        )?.featuredImage ?? null,
-    }));
+    .slice(0, TOPICS);
+  const images = assignTopicImages(articles, topCategories);
+  const topics = topCategories.map((category): TopicCard => ({
+    category,
+    image: images.get(category.id) ?? null,
+  }));
 
   return {
     slides,

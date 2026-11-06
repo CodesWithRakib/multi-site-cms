@@ -1,7 +1,11 @@
 import Link from 'next/link';
 
 import { AirSportsLogo } from '@/components/ui/AirSportsLogo';
+import { NewsletterForm } from '@/components/home/NewsletterForm';
 import { siteConfig } from '@/config/site';
+import { fetchCategories } from '@/lib/api';
+
+const FOOTER_DISCIPLINE_LIMIT = 5;
 
 /** Only routes that exist; disciplines come from the CMS on /categories. */
 const FOOTER_LINKS = [
@@ -11,7 +15,13 @@ const FOOTER_LINKS = [
   { label: 'Search', href: '/search' },
 ] as const;
 
-export function Footer() {
+export async function Footer() {
+  const categories = await fetchCategories();
+  const disciplines = categories
+    .filter((category) => category.postCount > 0)
+    .sort((a, b) => b.postCount - a.postCount || a.name.localeCompare(b.name))
+    .slice(0, FOOTER_DISCIPLINE_LIMIT);
+
   return (
     <footer className="dark relative mt-8 overflow-hidden bg-[#071E28] text-sky-100/80 [color-scheme:dark]">
       {/* Mountain silhouette backdrop */}
@@ -39,14 +49,17 @@ export function Footer() {
       </div>
 
       <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <div className="flex flex-col justify-between gap-10 md:flex-row">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.3fr]">
           <div className="max-w-sm space-y-4">
             <AirSportsLogo inverted showSubtitle />
             <p className="text-sm leading-relaxed">{siteConfig.description}</p>
           </div>
 
-          <nav aria-label="Footer">
-            <ul className="grid grid-cols-2 gap-x-12 gap-y-2 font-mono text-xs font-bold uppercase tracking-[0.15em]">
+          <nav aria-labelledby="footer-quick-links">
+            <h2 id="footer-quick-links" className="text-sm font-bold text-white">
+              Quick Links
+            </h2>
+            <ul className="mt-4 space-y-2.5 text-sm">
               {FOOTER_LINKS.map((link) => (
                 <li key={link.href}>
                   <Link href={link.href} className="transition-colors hover:text-white">
@@ -56,6 +69,37 @@ export function Footer() {
               ))}
             </ul>
           </nav>
+
+          <nav aria-labelledby="footer-disciplines">
+            <h2 id="footer-disciplines" className="text-sm font-bold text-white">
+              Disciplines
+            </h2>
+            <ul className="mt-4 space-y-2.5 text-sm">
+              {disciplines.map((category) => (
+                <li key={category.id}>
+                  <Link
+                    href={`/categories/${category.slug}`}
+                    className="transition-colors hover:text-white"
+                  >
+                    {category.name}
+                  </Link>
+                </li>
+              ))}
+              {disciplines.length === 0 && (
+                <li>
+                  <Link href="/categories" className="transition-colors hover:text-white">
+                    Browse all
+                  </Link>
+                </li>
+              )}
+            </ul>
+          </nav>
+
+          <div>
+            <h2 className="text-sm font-bold text-white">Stay Connected</h2>
+            <p className="mb-4 mt-4 text-sm">Get the latest updates and flight tips.</p>
+            <NewsletterForm variant="compact" />
+          </div>
         </div>
 
         <p className="mt-12 border-t border-white/10 pt-6 font-mono text-xs text-white/45">

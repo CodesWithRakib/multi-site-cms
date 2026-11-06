@@ -41,7 +41,7 @@ export function ShareButtons({ title, url }: ShareButtonsProps) {
   const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex flex-wrap items-center gap-2">
       <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mr-1">
         Share
       </span>

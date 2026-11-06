@@ -54,6 +54,7 @@ export function PortalContentContainer({
 
           {/* Filter Chips */}
           <PortalCategoryChips
+            categories={categories}
             activeSlug={activeCategorySlug}
             onSelectCategory={setActiveCategorySlug}
           />
@@ -65,7 +66,7 @@ export function PortalContentContainer({
         {/* Right 4-Column Sticky Sidebar */}
         <div className="lg:col-span-4">
           <div className="sticky top-28">
-            <PortalRightSidebar categories={categories} popularArticles={initialArticles} />
+            <PortalRightSidebar categories={categories} latestArticles={initialArticles} />
           </div>
         </div>
       </div>

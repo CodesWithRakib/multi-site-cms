@@ -115,6 +115,17 @@ database access pattern, or a competing UI system to finish a feature faster.
 | `visual-qa-testing`          | Multi-viewport (1440, 768, 375), dual-theme visual QA    |
 | `refactoring-standards`      | Safe route-by-route refactoring, 150-250 lines max/file  |
 
+Third-party skills from [skills.sh](https://www.skills.sh/) are installed in
+`.claude/skills/` (pinned in `skills-lock.json`). They are advisory references;
+the project rules above win on any conflict (e.g. one state manager, `@multi-site-cms/ui` tokens).
+
+| Third-party skill                           | Load it when you touch                                      |
+| ------------------------------------------- | ----------------------------------------------------------- |
+| `frontend-design` (anthropics/skills)       | New page/section visual design and polish                   |
+| `web-design-guidelines` (vercel-labs)       | UI review against web interface and accessibility rules     |
+| `vercel-react-best-practices` (vercel-labs) | React/Next.js performance, data fetching, bundle size       |
+| `vercel-composition-patterns` (vercel-labs) | Component APIs, compound components, avoiding boolean props |
+
 Each skill follows the same shape: purpose, when to use it, mandatory rules,
 workflow, anti-patterns, review checklist, project references.
 

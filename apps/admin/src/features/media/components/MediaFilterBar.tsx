@@ -95,7 +95,7 @@ export function MediaFilterBar({
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder="Search media by filename, alt text, or caption..."
-          className="w-full pl-10 pr-8 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-emerald-500 font-medium"
+          className="w-full pl-10 pr-8 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white placeholder:text-slate-500 focus:outline-hidden focus:ring-2 focus:ring-emerald-500 font-medium"
         />
         {searchTerm && (
           <button

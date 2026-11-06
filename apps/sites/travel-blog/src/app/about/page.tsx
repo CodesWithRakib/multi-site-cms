@@ -1,8 +1,18 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import { Compass, Globe, Shield, Sparkles } from 'lucide-react';
+import Link from 'next/link';
+
 import { NewsletterBanner } from '@/components/home/NewsletterBanner';
+import { AuthorAvatar } from '@/components/ui/AuthorAvatar';
 import { siteConfig } from '@/config/site';
+import { fetchArticles } from '@/lib/api';
+import { collectAuthors } from '@/lib/authors';
+
+export const revalidate = 300;
+
+/** Enough recent stories to find a cover image and every active author. */
+const ABOUT_ARTICLE_LIMIT = 30;
 
 export const metadata: Metadata = {
   title: 'About Us — Travel Blog',
@@ -13,7 +23,11 @@ export const metadata: Metadata = {
   },
 };
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const { items } = await fetchArticles({ limit: ABOUT_ARTICLE_LIMIT });
+  const cover = items.find((article) => article.featuredImage);
+  const authors = collectAuthors(items);
+
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 sm:py-16 space-y-16">
       {/* Editorial Hero */}
@@ -33,26 +47,31 @@ export default function AboutPage() {
         </p>
       </header>
 
-      {/* Hero Visual Card */}
-      <div className="relative aspect-[21/9] w-full overflow-hidden rounded-3xl bg-muted shadow-lg">
-        <Image
-          src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1600&q=85"
-          alt="Expansive mountain range"
-          fill
-          preload
-          sizes="(max-width: 1280px) 100vw, 1280px"
-          className="object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-        <div className="absolute bottom-6 left-6 sm:bottom-10 sm:left-10 text-white max-w-lg space-y-1">
-          <p className="font-handwriting text-2xl sm:text-3xl font-bold text-emerald-300">
-            Field Dispatches from Every Continent
-          </p>
-          <p className="text-xs sm:text-sm text-neutral-200">
-            From the high alpine glaciers of Switzerland to the tranquil temples of Kyoto.
-          </p>
-        </div>
-      </div>
+      {/* Hero visual: the newest real cover story (CMS), never a stock photo. */}
+      {cover?.featuredImage && (
+        <Link
+          href={`/articles/${cover.slug}`}
+          className="group relative block aspect-video w-full overflow-hidden rounded-3xl bg-muted shadow-lg sm:aspect-21/9"
+        >
+          <Image
+            src={cover.featuredImage.url}
+            alt={cover.featuredImage.altText ?? cover.title}
+            fill
+            preload
+            sizes="(max-width: 1280px) 100vw, 1280px"
+            className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+          />
+          <div className="absolute inset-0 bg-linear-to-t from-black/85 via-black/35 to-transparent" />
+          <div className="absolute inset-x-5 bottom-5 max-w-xl space-y-1 text-white sm:inset-x-10 sm:bottom-8">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-200">
+              Latest cover story
+            </p>
+            <p className="font-serif text-xl font-bold leading-snug text-balance sm:text-3xl">
+              {cover.title}
+            </p>
+          </div>
+        </Link>
+      )}
 
       {/* Editorial Pillars */}
       <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -90,37 +109,39 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Founder Spotlight */}
-      <section className="rounded-3xl border border-border/80 bg-card p-8 sm:p-12 shadow-sm">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-          <div className="lg:col-span-4 flex justify-center">
-            <div className="relative h-44 w-44 sm:h-56 sm:w-56 overflow-hidden rounded-3xl ring-4 ring-emerald-500/20 shadow-md">
-              <Image
-                src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80"
-                alt="Rakib Islam"
-                fill
-                sizes="224px"
-                className="object-cover"
-              />
-            </div>
-          </div>
-          <div className="lg:col-span-8 space-y-4 text-center lg:text-left">
-            <div>
-              <span className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
-                Founder & Lead Explorer
-              </span>
-              <h2 className="font-serif text-2xl sm:text-3xl font-extrabold text-foreground">
-                Rakib Islam
-              </h2>
-            </div>
-            <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-              &ldquo;Travel has always been more than sightseeing—it is an exercise in empathy and
-              discovery. Our goal with this platform is to give curious wanderers the confidence to
-              step off the beaten track and connect authentically with the world.&rdquo;
-            </p>
-          </div>
-        </div>
-      </section>
+      {/* Writers: real authors of published stories. */}
+      {authors.length > 0 && (
+        <section aria-labelledby="writers-heading" className="space-y-6">
+          <h2
+            id="writers-heading"
+            className="font-serif text-2xl font-extrabold tracking-tight text-foreground sm:text-3xl"
+          >
+            {authors.length === 1 ? 'Meet the writer' : 'Meet the writers'}
+          </h2>
+          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {authors.map((author) => (
+              <li
+                key={author.id}
+                className="flex items-center gap-4 rounded-2xl border border-border/80 bg-card p-5 shadow-xs"
+              >
+                <AuthorAvatar
+                  name={author.displayName}
+                  avatarUrl={author.avatarUrl}
+                  className="size-16 text-xl"
+                />
+                <div className="min-w-0">
+                  <p className="truncate text-base font-bold text-foreground">
+                    {author.displayName}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {author.storyCount} {author.storyCount === 1 ? 'story' : 'stories'} published
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {/* Newsletter */}
       <NewsletterBanner />

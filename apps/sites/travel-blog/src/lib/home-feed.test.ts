@@ -79,4 +79,14 @@ describe('buildHomeFeed', () => {
     expect(feed.topics[0]?.image).toBeNull();
     expect(feed.topics[1]?.image).toBe(image);
   });
+
+  it('avoids showing the same topic image twice when another story offers a different one', () => {
+    const other = { ...image, id: 'img-2', url: 'https://img.test/b.jpg' };
+    const shared = article('shared', { categoryIds: ['a', 'b'] });
+    const alt = { ...article('alt', { categoryIds: ['b'] }), featuredImage: other };
+
+    const feed = buildHomeFeed([shared, alt], [category('a', 2), category('b', 2)]);
+
+    expect(feed.topics.map((t) => t.image?.id)).toEqual(['img', 'img-2']);
+  });
 });

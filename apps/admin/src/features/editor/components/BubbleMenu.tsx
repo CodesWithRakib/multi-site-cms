@@ -13,6 +13,13 @@ import {
   Link as LinkIcon,
 } from 'lucide-react';
 
+/** Approximate rendered size of the menu, used only for edge clamping. */
+const MENU_WIDTH = 300;
+const MENU_HEIGHT = 40;
+const MENU_EDGE_GAP = 8;
+/** Below the sticky app header so the menu is never hidden behind it. */
+const MIN_TOP = 88;
+
 export interface EditorBubbleMenuProps {
   editor: Editor | null;
   onOpenLinkModal?: () => void;
@@ -35,10 +42,18 @@ export function EditorBubbleMenu({ editor, onOpenLinkModal }: EditorBubbleMenuPr
         const { from, to } = selection;
         const start = editor.view.coordsAtPos(from);
         const end = editor.view.coordsAtPos(to);
+        const bounds = editor.view.dom.getBoundingClientRect();
 
-        // Center horizontally over selection, 40px above
-        const left = (start.left + end.left) / 2;
-        const top = Math.min(start.top, end.top) - 44;
+        // Keep the whole menu inside the editor column so it never slides under
+        // the sidebar or past the right edge, wherever the selection is.
+        const center = (start.left + end.left) / 2;
+        const minLeft = bounds.left + MENU_EDGE_GAP;
+        const maxLeft = Math.max(minLeft, bounds.right - MENU_WIDTH - MENU_EDGE_GAP);
+        const left = Math.min(Math.max(center - MENU_WIDTH / 2, minLeft), maxLeft);
+
+        // Prefer above the selection; flip below when it would hit the header.
+        const above = Math.min(start.top, end.top) - MENU_HEIGHT - MENU_EDGE_GAP;
+        const top = above < MIN_TOP ? Math.max(start.bottom, end.bottom) + MENU_EDGE_GAP : above;
 
         setPosition({ top, left });
       } catch {
@@ -46,12 +61,14 @@ export function EditorBubbleMenu({ editor, onOpenLinkModal }: EditorBubbleMenuPr
       }
     };
 
+    const hide = () => setPosition(null);
+
     editor.on('selectionUpdate', updatePosition);
-    editor.on('blur', () => setPosition(null));
+    editor.on('blur', hide);
 
     return () => {
       editor.off('selectionUpdate', updatePosition);
-      editor.off('blur', () => setPosition(null));
+      editor.off('blur', hide);
     };
   }, [editor]);
 
@@ -70,9 +87,9 @@ export function EditorBubbleMenu({ editor, onOpenLinkModal }: EditorBubbleMenuPr
         position: 'fixed',
         top: `${position.top}px`,
         left: `${position.left}px`,
-        transform: 'translateX(-50%)',
+        width: `${MENU_WIDTH}px`,
       }}
-      className="z-40 flex items-center gap-0.5 p-1 bg-slate-900 text-white rounded-lg shadow-xl border border-slate-700 text-xs backdrop-blur-md animate-in fade-in duration-100"
+      className="z-40 flex items-center justify-center gap-0.5 p-1 bg-slate-900 text-white rounded-lg shadow-xl border border-slate-700 text-xs backdrop-blur-md animate-in fade-in duration-100"
     >
       <button
         type="button"

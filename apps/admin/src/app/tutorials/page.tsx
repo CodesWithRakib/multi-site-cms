@@ -239,8 +239,9 @@ export default function VideoTutorialPage() {
               <h1 className="text-sm font-bold text-white tracking-tight">
                 How to Create a Post & Master Every Editorial Toolbar Tool
               </h1>
-              <p className="text-[11px] text-slate-400">
-                Step-by-step creation tutorial showing each tool in action and how it renders in the content body.
+              <p className="text-[11px] text-slate-500">
+                Step-by-step creation tutorial showing each tool in action and how it renders in the
+                content body.
               </p>
             </div>
           </div>
@@ -365,7 +366,7 @@ export default function VideoTutorialPage() {
                       {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
                     </button>
 
-                    <span className="font-mono text-[11px] text-slate-300">
+                    <span className="font-mono text-[11px] text-slate-500">
                       {Math.floor(currentTime)}s / {Math.floor(duration)}s
                     </span>
 
@@ -387,11 +388,15 @@ export default function VideoTutorialPage() {
                       className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold transition-all cursor-pointer ${
                         voiceEnabled
                           ? 'bg-emerald-400 text-slate-950 shadow-sm'
-                          : 'bg-white/10 hover:bg-white/20 text-slate-300'
+                          : 'bg-white/10 hover:bg-white/20 text-slate-500'
                       }`}
                       title="Toggle Synchronized English Voice Narration"
                     >
-                      {voiceEnabled ? <Mic className="size-3.5" /> : <MicOff className="size-3.5" />}
+                      {voiceEnabled ? (
+                        <Mic className="size-3.5" />
+                      ) : (
+                        <MicOff className="size-3.5" />
+                      )}
                       <span>{voiceEnabled ? 'Voice Narration: ON' : 'Voice Narration: OFF'}</span>
                     </button>
 
@@ -427,7 +432,7 @@ export default function VideoTutorialPage() {
                     <span className="text-xs font-bold text-slate-900 dark:text-slate-100">
                       {activeChapter.toolName}
                     </span>
-                    <span className="text-[10px] font-mono text-slate-400">
+                    <span className="text-[10px] font-mono text-slate-500">
                       @ {activeChapter.time}s
                     </span>
                   </div>
@@ -449,7 +454,7 @@ export default function VideoTutorialPage() {
               <h2 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
                 Tools Used In Content Creation
               </h2>
-              <span className="text-[10px] text-slate-400">Click tool to jump</span>
+              <span className="text-[10px] text-slate-500">Click tool to jump</span>
             </div>
 
             <div className="flex flex-col gap-1.5 max-h-[580px] overflow-y-auto pr-1">
@@ -488,7 +493,7 @@ export default function VideoTutorialPage() {
                         >
                           {ch.toolName}
                         </span>
-                        <span className="text-[10px] font-mono text-slate-400 shrink-0">
+                        <span className="text-[10px] font-mono text-slate-500 shrink-0">
                           {ch.time}s
                         </span>
                       </div>

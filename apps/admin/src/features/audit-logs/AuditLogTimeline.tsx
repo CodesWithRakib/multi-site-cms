@@ -138,7 +138,7 @@ export function AuditLogTimeline({
                       )}
                     </div>
 
-                    <div className="flex items-center gap-1.5 text-xs text-neutral-400">
+                    <div className="flex items-center gap-1.5 text-xs text-neutral-500">
                       <Clock className="w-3.5 h-3.5" />
                       <span>
                         {new Date(log.createdAt).toLocaleDateString([], {
@@ -171,10 +171,10 @@ export function AuditLogTimeline({
                           (log.actorType === 'system' ? 'System Service' : 'Bootstrap')}
                       </span>
                       {log.actorEmail && (
-                        <span className="text-neutral-400 font-mono">({log.actorEmail})</span>
+                        <span className="text-neutral-500 font-mono">({log.actorEmail})</span>
                       )}
                       {log.ipAddress && (
-                        <span className="hidden sm:inline font-mono text-[11px] text-neutral-400">
+                        <span className="hidden sm:inline font-mono text-[11px] text-neutral-500">
                           IP: {log.ipAddress}
                         </span>
                       )}
