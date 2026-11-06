@@ -57,7 +57,7 @@ export function ShellLayout({
             {children}
           </main>
         </div>
-        <AdminTabBar />
+        <AdminTabBar hidden={sidebarOpen} />
       </div>
     </AuthGuard>
   );

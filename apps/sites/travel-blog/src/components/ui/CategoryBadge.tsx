@@ -4,7 +4,8 @@ import Link from 'next/link';
 interface CategoryBadgeProps {
   label: string;
   slug?: string;
-  variant?: 'emerald' | 'cyan' | 'amber' | 'neutral' | 'auto';
+  /** `overlay` is for badges sitting on photos: opaque enough to read on any image. */
+  variant?: 'emerald' | 'cyan' | 'amber' | 'neutral' | 'overlay' | 'auto';
   className?: string;
   size?: 'sm' | 'md';
   /** Set false inside an element that is already a link: nested <a> is invalid HTML. */
@@ -42,6 +43,7 @@ export function CategoryBadge({
           cyan: 'bg-cyan-500/15 text-cyan-700 dark:text-cyan-300 border-cyan-500/20',
           amber: 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/20',
           neutral: 'bg-neutral-500/10 text-neutral-700 dark:text-neutral-300 border-neutral-500/20',
+          overlay: 'bg-background/90 text-foreground border-border/60 shadow-xs',
         }[variant];
 
   const sizeClasses = {

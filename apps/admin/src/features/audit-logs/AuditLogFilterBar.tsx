@@ -148,7 +148,7 @@ export function AuditLogFilterBar({
       </div>
 
       {/* Middle/Bottom Row: Category Tabs + View Toggle + Live Stream + Export */}
-      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 pt-2 border-t border-neutral-100 dark:border-neutral-800">
+      <div className="flex flex-col 2xl:flex-row items-stretch 2xl:items-center justify-between gap-3 pt-2 border-t border-neutral-100 dark:border-neutral-800">
         {/* Category Tabs */}
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
           {categories.map((cat) => {
@@ -171,7 +171,7 @@ export function AuditLogFilterBar({
         </div>
 
         {/* Controls: View Mode + Live Polling + Export */}
-        <div className="flex items-center gap-2 self-end md:self-auto flex-wrap">
+        <div className="flex items-center gap-2 self-end 2xl:self-auto flex-wrap">
           {/* Table vs Timeline View Toggle */}
           <div className="inline-flex items-center p-0.5 rounded-lg bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
             <button

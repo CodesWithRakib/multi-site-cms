@@ -136,7 +136,7 @@ export function ContentActivityChart({
 
   return (
     <Card className="rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs h-full">
-      <CardHeader className="p-6 pb-4 border-b-0 flex flex-row items-center justify-between space-y-0">
+      <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3 space-y-0 border-b-0 p-6 pb-4">
         <div className="flex items-center gap-2">
           <BarChart2 className="size-4 text-emerald-600 dark:text-emerald-400" />
           <CardTitle className="text-base font-bold text-slate-900 dark:text-white font-sans flex items-center gap-2">

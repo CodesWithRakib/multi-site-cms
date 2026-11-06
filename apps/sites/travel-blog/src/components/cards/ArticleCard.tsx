@@ -51,7 +51,7 @@ export function ArticleCard({ article, variant = 'standard', priority = false }:
               <ImagePlaceholder />
             )}
             <div className="absolute left-4 top-4 z-10">
-              <CategoryBadge label={categoryLabel} slug={category?.slug} />
+              <CategoryBadge label={categoryLabel} slug={category?.slug} variant="overlay" />
             </div>
           </div>
 
@@ -159,7 +159,7 @@ export function ArticleCard({ article, variant = 'standard', priority = false }:
             <ImagePlaceholder />
           )}
           <div className="absolute left-3 top-3 z-10">
-            <CategoryBadge label={categoryLabel} slug={category?.slug} />
+            <CategoryBadge label={categoryLabel} slug={category?.slug} variant="overlay" />
           </div>
         </div>
 

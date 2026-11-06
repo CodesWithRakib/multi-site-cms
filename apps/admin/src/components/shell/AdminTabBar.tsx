@@ -12,7 +12,12 @@ import { useAdmin } from '@/lib/admin-context';
  * (content work), so no tab ever leads to a forbidden page; platform screens
  * stay in the sidebar drawer.
  */
-export function AdminTabBar() {
+interface AdminTabBarProps {
+  /** Hide while the sidebar drawer is open, so the bar never covers the drawer's profile menu. */
+  readonly hidden?: boolean;
+}
+
+export function AdminTabBar({ hidden = false }: AdminTabBarProps) {
   const pathname = usePathname() ?? '/';
   const { t } = useAdmin();
 
@@ -24,5 +29,13 @@ export function AdminTabBar() {
     { href: '/media', label: t('nav.tabMedia'), icon: <ImageIcon /> },
   ];
 
-  return <MobileTabBar items={tabs} pathname={pathname} linkComponent={Link} label="Admin" />;
+  return (
+    <MobileTabBar
+      items={tabs}
+      pathname={pathname}
+      linkComponent={Link}
+      label="Admin"
+      className={hidden ? 'hidden' : undefined}
+    />
+  );
 }

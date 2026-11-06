@@ -4,6 +4,7 @@ import React from 'react';
 import { Eye, ChevronLeft, ChevronRight, User, Terminal } from 'lucide-react';
 import type { AuditLogItem } from '@multi-site-cms/types';
 import { useAdmin } from '@/lib/admin-context';
+import { describeAuditAction } from './action-labels';
 
 interface AuditLogTableProps {
   logs: AuditLogItem[];
@@ -26,7 +27,7 @@ export function AuditLogTable({
   onSelectLog,
   isLoading,
 }: AuditLogTableProps) {
-  const { t } = useAdmin();
+  const { t, locale } = useAdmin();
 
   const getActionBadgeClass = (action: string) => {
     if (action.includes('delete') || action.includes('failed'))
@@ -83,13 +84,14 @@ export function AuditLogTable({
                   className="hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors cursor-pointer group"
                 >
                   {/* Action */}
-                  <td className="py-3 px-4 font-mono text-xs">
+                  <td className="py-3 px-4 text-xs">
                     <span
+                      title={log.action}
                       className={`inline-block px-2 py-0.5 rounded-md font-medium border ${getActionBadgeClass(
                         log.action,
                       )}`}
                     >
-                      {log.action}
+                      {describeAuditAction(log.action, locale).label}
                     </span>
                   </td>
 

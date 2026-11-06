@@ -41,10 +41,10 @@ export interface PublishingTarget {
  * State, data, and actions of the posts workspace. The page only composes
  * presentation components around this hook.
  */
-export function usePostsWorkspace() {
+export function usePostsWorkspace(initialSearch = '') {
   const { activeSiteId } = useAdmin();
 
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState(initialSearch);
   const [typeFilter, setTypeFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [page, setPage] = useState(1);

@@ -129,6 +129,44 @@ describe('DashboardService', () => {
     expect(result.recentActivity[0]?.summary).toContain('Published "Test Article"');
   });
 
+  it('summarizes sign-out, profile photo and unknown actions without leaking raw action codes', async () => {
+    const row = (id: string, action: string, metadata: Record<string, unknown> = {}) => ({
+      id,
+      action,
+      entityType: 'user',
+      entityId: null,
+      actorId: 'user-super-admin',
+      siteId: null,
+      createdAt: '2026-11-01T12:00:00Z',
+      metadata,
+      actorName: 'Super Admin',
+      actorEmail: 'admin@example.com',
+      siteName: null,
+    });
+
+    mockQuery.mockImplementation((sql: unknown) => {
+      if (typeof sql === 'string' && sql.includes('FROM audit_events ae')) {
+        return Promise.resolve([
+          row('1', 'auth.logout'),
+          row('2', 'user.avatar_update'),
+          row('3', 'billing.invoice_paid'),
+          row('4', 'billing.invoice_paid', { title: 'INV-7' }),
+        ]);
+      }
+      return Promise.resolve([]);
+    });
+
+    const result = await service.getOverview(mockSuperAdmin, { days: 7 });
+    const summaries = result.recentActivity.map((event) => event.summary);
+
+    expect(summaries).toEqual([
+      'Signed out of the administrative workspace',
+      'Updated a profile photo',
+      'Billing invoice paid',
+      'Billing invoice paid: "INV-7"',
+    ]);
+  });
+
   it('restricts client admin without siteId to their authorized site', async () => {
     mockQuery.mockImplementation((sql: unknown) => {
       if (typeof sql !== 'string') return Promise.resolve([]);

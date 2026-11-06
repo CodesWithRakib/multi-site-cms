@@ -60,7 +60,11 @@ export function PortalArticleGrid({ articles }: PortalArticleGridProps) {
                 {/* Overlays */}
                 {primaryCategory && (
                   <div className="absolute left-3 top-3 z-10">
-                    <CategoryBadge label={primaryCategory.name} slug={primaryCategory.slug} />
+                    <CategoryBadge
+                      label={primaryCategory.name}
+                      slug={primaryCategory.slug}
+                      variant="overlay"
+                    />
                   </div>
                 )}
               </div>

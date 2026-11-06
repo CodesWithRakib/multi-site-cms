@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import type { AuditLogItem } from '@multi-site-cms/types';
 import { useAdmin } from '@/lib/admin-context';
+import { describeAuditAction } from './action-labels';
 
 interface AuditLogTimelineProps {
   logs: AuditLogItem[];
@@ -66,7 +67,7 @@ export function AuditLogTimeline({
   onSelectLog,
   isLoading,
 }: AuditLogTimelineProps) {
-  const { t } = useAdmin();
+  const { t, locale } = useAdmin();
   const fromCount = total === 0 ? 0 : (page - 1) * limit + 1;
   const toCount = Math.min(page * limit, total);
 
@@ -124,9 +125,10 @@ export function AuditLogTimeline({
                   <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span
-                        className={`font-mono text-xs font-semibold px-2.5 py-0.5 rounded-md border ${config.badgeColor}`}
+                        title={log.action}
+                        className={`text-xs font-semibold px-2.5 py-0.5 rounded-md border ${config.badgeColor}`}
                       >
-                        {log.action}
+                        {describeAuditAction(log.action, locale).label}
                       </span>
                       <span className="text-xs font-medium px-2 py-0.5 rounded-md bg-neutral-200/70 dark:bg-neutral-700/60 text-neutral-700 dark:text-neutral-300 capitalize">
                         {log.entityType}

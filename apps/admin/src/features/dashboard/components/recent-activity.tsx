@@ -4,17 +4,57 @@ import React from 'react';
 import Link from 'next/link';
 import {
   CheckCircle2,
-  Pencil,
-  Image as ImageIcon,
-  Calendar,
   ArrowRight,
   Shield,
   FileText,
   Activity,
+  Image as ImageIcon,
+  Globe,
+  Layers,
+  MessageSquare,
+  Users,
+  type LucideIcon,
 } from 'lucide-react';
 import type { DashboardRecentActivityItem } from '@multi-site-cms/types';
 import { Card, CardHeader, CardTitle, CardContent } from '@multi-site-cms/ui';
+import { describeAuditAction, type AuditCategory } from '@/features/audit-logs/action-labels';
 import { useAdmin } from '@/lib/admin-context';
+
+const CATEGORY_STYLE: Readonly<Record<AuditCategory, { icon: LucideIcon; tone: string }>> = {
+  content: {
+    icon: FileText,
+    tone: 'bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400',
+  },
+  publishing: {
+    icon: CheckCircle2,
+    tone: 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400',
+  },
+  media: {
+    icon: ImageIcon,
+    tone: 'bg-purple-100 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400',
+  },
+  security: { icon: Shield, tone: 'bg-sky-100 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400' },
+  people: {
+    icon: Users,
+    tone: 'bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400',
+  },
+  site: {
+    icon: Globe,
+    tone: 'bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400',
+  },
+  comments: {
+    icon: MessageSquare,
+    tone: 'bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400',
+  },
+  taxonomy: {
+    icon: Layers,
+    tone: 'bg-teal-100 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400',
+  },
+  system: {
+    icon: Activity,
+    tone: 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300',
+  },
+};
 
 export interface RecentActivityProps {
   items?: DashboardRecentActivityItem[];
@@ -52,38 +92,10 @@ export function RecentActivity({ items = [], isLoading = false }: RecentActivity
     }
   }
 
-  // Map real dynamic audit events
+  // Map real audit events: the label and icon come from the exact action code.
   const mappedActivities = items.slice(0, 5).map((item) => {
-    const action = item.action.toLowerCase();
-    let title = t('dashboard.newPostCreated');
-    let Icon = Activity;
-    let iconBg = 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300';
-
-    if (action.includes('publish')) {
-      title = t('dashboard.newPostPublished');
-      Icon = CheckCircle2;
-      iconBg = 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400';
-    } else if (action.includes('schedule')) {
-      title = t('dashboard.postScheduled');
-      Icon = Calendar;
-      iconBg = 'bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400';
-    } else if (action.includes('media')) {
-      title = t('dashboard.mediaUploaded');
-      Icon = ImageIcon;
-      iconBg = 'bg-purple-100 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400';
-    } else if (action.includes('create')) {
-      title = t('dashboard.newPostCreated');
-      Icon = FileText;
-      iconBg = 'bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400';
-    } else if (action.includes('update')) {
-      title = t('dashboard.postUpdated');
-      Icon = Pencil;
-      iconBg = 'bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400';
-    } else if (action.includes('login') || action.includes('auth')) {
-      title = t('dashboard.adminSessionActive');
-      Icon = Shield;
-      iconBg = 'bg-sky-100 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400';
-    }
+    const { label: title, category } = describeAuditAction(item.action, locale);
+    const { icon: Icon, tone: iconBg } = CATEGORY_STYLE[category];
 
     const detail =
       item.summary ||

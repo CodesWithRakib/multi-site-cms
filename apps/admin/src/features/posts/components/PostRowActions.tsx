@@ -166,11 +166,13 @@ export function PostRowActions({
         <button
           type="button"
           onClick={() => onPublishingAction('publish', pub, title)}
-          className="px-2.5 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 text-xs font-semibold flex items-center gap-1 transition-colors cursor-pointer"
+          className="px-2.5 py-2 sm:py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 text-xs font-semibold flex items-center gap-1 transition-colors cursor-pointer"
           title={t.actions.publishNow}
+          aria-label={`${t.actions.publishNow || 'Publish'}: ${title}`}
         >
-          <Send className="size-3" aria-hidden="true" />
-          <span>{t.actions.publishNow || 'Publish'}</span>
+          <Send className="size-4 sm:size-3" aria-hidden="true" />
+          {/* Icon-only on phones so the story title keeps its width. */}
+          <span className="hidden sm:inline">{t.actions.publishNow || 'Publish'}</span>
         </button>
       )}
 

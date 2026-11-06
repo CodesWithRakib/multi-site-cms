@@ -14,6 +14,23 @@ interface CalendarMonthGridProps {
 
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
+/** Phones show one dot per publication; tapping the day opens the scheduler. */
+const MAX_DOTS = 3;
+
+function statusDotClass(status: CalendarEvent['status']): string {
+  switch (status) {
+    case 'scheduled':
+      return 'bg-indigo-500';
+    case 'published':
+      return 'bg-emerald-500';
+    case 'draft':
+    case 'in_review':
+      return 'bg-amber-500';
+    default:
+      return 'bg-slate-400';
+  }
+}
+
 export function CalendarMonthGrid({
   days,
   timezone = 'UTC',
@@ -22,9 +39,9 @@ export function CalendarMonthGrid({
 }: CalendarMonthGridProps) {
   return (
     <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-x-auto shadow-2xs">
-      <div className="min-w-[720px]">
+      <div>
         {/* Weekday headers */}
-        <div className="grid grid-cols-7 border-b border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 text-center py-2.5">
+        <div className="grid grid-cols-7 border-b border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 text-center py-2.5">
           {WEEKDAYS.map((day) => (
             <span key={day}>{day}</span>
           ))}
@@ -40,14 +57,14 @@ export function CalendarMonthGrid({
               <div
                 key={idx}
                 onClick={() => onDateClick(cell.date)}
-                className={`group min-h-[120px] p-2 flex flex-col justify-between transition-colors relative cursor-pointer hover:bg-slate-50/80 dark:hover:bg-slate-800/30 ${
+                className={`group min-h-16 sm:min-h-[120px] p-1 sm:p-2 flex flex-col justify-between transition-colors relative cursor-pointer hover:bg-slate-50/80 dark:hover:bg-slate-800/30 ${
                   cell.isCurrentMonth
                     ? 'bg-white dark:bg-slate-900'
                     : 'bg-slate-50/40 dark:bg-slate-950/40 opacity-45'
                 } ${cell.isToday ? 'ring-2 ring-emerald-500/30 dark:ring-emerald-500/40 bg-emerald-50/10' : ''}`}
               >
                 {/* Day header */}
-                <div className="flex items-center justify-between mb-1.5">
+                <div className="flex items-center justify-center sm:justify-between mb-1 sm:mb-1.5">
                   <span
                     className={`text-xs font-bold ${
                       cell.isToday
@@ -64,7 +81,7 @@ export function CalendarMonthGrid({
                       e.stopPropagation();
                       onDateClick(cell.date);
                     }}
-                    className="opacity-0 group-hover:opacity-100 p-1 rounded-md text-slate-500 dark:text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 transition-all"
+                    className="hidden sm:block opacity-0 group-hover:opacity-100 focus-visible:opacity-100 p-1 rounded-md text-slate-500 dark:text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 transition-all"
                     title="Schedule post on this date"
                   >
                     <Plus className="w-3.5 h-3.5" />
@@ -72,7 +89,22 @@ export function CalendarMonthGrid({
                 </div>
 
                 {/* Event list */}
-                <div className="flex-1 space-y-1.5 overflow-hidden">
+                {cell.events.length > 0 && (
+                  <div
+                    className="flex items-center justify-center gap-0.5 sm:hidden"
+                    aria-label={`${cell.events.length} publication${cell.events.length === 1 ? '' : 's'}`}
+                  >
+                    {cell.events.slice(0, MAX_DOTS).map((ev) => (
+                      <span
+                        key={ev.id}
+                        aria-hidden="true"
+                        className={`size-1.5 rounded-full ${statusDotClass(ev.status)}`}
+                      />
+                    ))}
+                  </div>
+                )}
+
+                <div className="hidden flex-1 space-y-1.5 overflow-hidden sm:block">
                   {displayedEvents.map((ev) => (
                     <CalendarEventBadge
                       key={ev.id}

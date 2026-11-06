@@ -2,28 +2,28 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ArrowRight, MoreVertical, Link2, FileText, Eye, Globe } from 'lucide-react';
-import type { DashboardRecentContentItem } from '@multi-site-cms/types';
+import { ArrowRight, MoreVertical, Link2, Eye, Globe, Users } from 'lucide-react';
+import type { AnalyticsSitePerformance } from '@multi-site-cms/types';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@multi-site-cms/ui';
 import { useAdmin } from '@/lib/admin-context';
 
 export interface YourWebsitesProps {
-  recentContent?: DashboardRecentContentItem[];
+  /** Real per-site traffic for the selected period; undefined while loading. */
+  sitePerformance?: AnalyticsSitePerformance[];
 }
 
-export function YourWebsites({ recentContent = [] }: YourWebsitesProps) {
+const compactNumber = new Intl.NumberFormat('en', {
+  notation: 'compact',
+  maximumFractionDigits: 1,
+});
+
+export function YourWebsites({ sitePerformance }: YourWebsitesProps) {
   const { availableSites, setActiveSiteId, t } = useAdmin();
 
-  // Compute posts count per site dynamically
-  const sitePostCounts = React.useMemo(() => {
-    const counts = new Map<string, number>();
-    for (const item of recentContent) {
-      if (item.siteId) {
-        counts.set(item.siteId, (counts.get(item.siteId) || 0) + 1);
-      }
-    }
-    return counts;
-  }, [recentContent]);
+  const performanceBySite = React.useMemo(
+    () => new Map((sitePerformance ?? []).map((entry) => [entry.siteId, entry])),
+    [sitePerformance],
+  );
 
   return (
     <Card className="rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs h-full">
@@ -38,7 +38,7 @@ export function YourWebsites({ recentContent = [] }: YourWebsitesProps) {
         </div>
         <Link
           href="/sites"
-          className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 flex items-center gap-1 transition-colors"
+          className="flex shrink-0 items-center gap-1 whitespace-nowrap text-xs font-semibold text-emerald-600 transition-colors hover:text-emerald-700 dark:text-emerald-400"
         >
           <span>{t('dashboard.viewAll')}</span>
           <ArrowRight className="size-3.5" />
@@ -70,14 +70,19 @@ export function YourWebsites({ recentContent = [] }: YourWebsitesProps) {
               site.domains?.[0]?.hostname ||
               `${site.key}.yourdomain.com`;
             const domainUrl = `https://${primaryDomain}`;
-            const postsCount = sitePostCounts.get(site.id) || (isAirSports ? 5 : 5);
-            const viewsEstimate = isAirSports ? '558K Views' : '642K Views';
+            const performance = performanceBySite.get(site.id);
+            const viewsLabel = sitePerformance
+              ? `${compactNumber.format(performance?.pageViews ?? 0)} Views`
+              : '…';
+            const visitorsLabel = sitePerformance
+              ? `${compactNumber.format(performance?.uniqueVisitors ?? 0)} Visitors`
+              : '…';
             const isActive = site.status === 'active';
 
             return (
               <div
                 key={site.id}
-                className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-3.5 rounded-xl border border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-800/30 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-all group"
+                className="flex flex-col justify-between gap-3 p-3.5 rounded-xl border border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-800/30 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-all group"
               >
                 {/* Left Thumbnail + Info */}
                 <div className="flex items-center gap-3.5 min-w-0">
@@ -179,17 +184,15 @@ export function YourWebsites({ recentContent = [] }: YourWebsitesProps) {
                 </div>
 
                 {/* Right: Posts, Views, Manage Button */}
-                <div className="flex items-center gap-3 sm:gap-4 shrink-0 justify-between sm:justify-end">
-                  <div className="flex flex-col text-left sm:text-right text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+                <div className="flex items-center gap-3 sm:gap-4 shrink-0 justify-between">
+                  <div className="flex flex-col text-left text-[11px] text-slate-500 dark:text-slate-400 font-medium">
                     <div className="flex items-center gap-1 sm:justify-end">
-                      <FileText className="size-3 text-slate-500 dark:text-slate-400" />
-                      <span>
-                        {postsCount} {t('dashboard.posts')}
-                      </span>
+                      <Eye className="size-3 text-slate-500 dark:text-slate-400" />
+                      <span>{viewsLabel}</span>
                     </div>
                     <div className="flex items-center gap-1 sm:justify-end mt-0.5">
-                      <Eye className="size-3 text-slate-500 dark:text-slate-400" />
-                      <span>{viewsEstimate}</span>
+                      <Users className="size-3 text-slate-500 dark:text-slate-400" />
+                      <span>{visitorsLabel}</span>
                     </div>
                   </div>
 

@@ -343,8 +343,22 @@ export class DashboardService {
         return `Uploaded media asset ${subject}`;
       case 'site.update':
         return `Updated site configuration for ${event.siteName || subject}`;
-      default:
-        return `${action.replace('.', ' ')}: ${subject}`;
+      case 'auth.logout':
+        return 'Signed out of the administrative workspace';
+      case 'auth.password_changed':
+        return 'Changed the account password';
+      case 'user.avatar_update':
+        return 'Updated a profile photo';
+      case 'user.created':
+        return 'Created a user account';
+      case 'user.updated':
+        return 'Updated a user account';
+      default: {
+        // Never expose the raw action code; "a.b_c" becomes "A b c".
+        const readable = action.replace(/[._]+/g, ' ').trim();
+        const sentence = readable.charAt(0).toUpperCase() + readable.slice(1);
+        return metaTitle || metaSlug ? `${sentence}: ${subject}` : sentence;
+      }
     }
   }
 

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { X, Copy, Check, Shield, Globe, Terminal, User, ArrowUpRight } from 'lucide-react';
 import type { AuditLogItem } from '@multi-site-cms/types';
 import { useAdmin } from '@/lib/admin-context';
+import { describeAuditAction } from './action-labels';
 
 interface AuditLogDetailModalProps {
   log: AuditLogItem | null;
@@ -22,7 +23,7 @@ function getResourceRoute(entityType: string): string | null {
 }
 
 export function AuditLogDetailModal({ log, onClose }: AuditLogDetailModalProps) {
-  const { t } = useAdmin();
+  const { t, locale } = useAdmin();
   const [copied, setCopied] = useState(false);
 
   if (!log) return null;
@@ -63,13 +64,15 @@ export function AuditLogDetailModal({ log, onClose }: AuditLogDetailModalProps) 
         <div className="flex items-center justify-between px-6 py-4.5 border-b border-neutral-200 dark:border-neutral-800">
           <div className="flex items-center gap-2.5">
             <span
-              className={`px-2.5 py-1 text-xs font-mono font-semibold rounded-md border ${getActionTheme(
+              className={`px-2.5 py-1 text-xs font-semibold rounded-md border ${getActionTheme(
                 log.action,
               )}`}
             >
-              {log.action}
+              {describeAuditAction(log.action, locale).label}
             </span>
-            <span className="text-xs text-neutral-500 font-mono">ID: #{log.id}</span>
+            <span className="text-xs text-neutral-500 font-mono">
+              {log.action} · ID: #{log.id}
+            </span>
           </div>
 
           <button

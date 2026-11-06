@@ -1,5 +1,8 @@
 'use client';
 
+import { Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
+
 import { ActionNotice } from '@/components/feedback';
 import { ShellLayout } from '@/components/shell';
 import { DeletePostDialog } from '@/features/posts/components/DeletePostDialog';
@@ -16,9 +19,9 @@ import { useAdmin } from '@/lib/admin-context';
  * Posts workspace: orchestration only. State and data live in
  * usePostsWorkspace; each section is a component in features/posts.
  */
-export default function PostsPage() {
+function PostsWorkspacePage({ initialSearch }: { readonly initialSearch: string }) {
   const { setActiveSiteId } = useAdmin();
-  const workspace = usePostsWorkspace();
+  const workspace = usePostsWorkspace(initialSearch);
   const { filters, publishingTarget } = workspace;
 
   return (
@@ -74,5 +77,19 @@ export default function PostsPage() {
         />
       )}
     </ShellLayout>
+  );
+}
+
+/** Reads `?q=` (set by the header search) and restarts the workspace when it changes. */
+function PostsRoute() {
+  const query = useSearchParams().get('q') ?? '';
+  return <PostsWorkspacePage key={query} initialSearch={query} />;
+}
+
+export default function PostsPage() {
+  return (
+    <Suspense fallback={null}>
+      <PostsRoute />
+    </Suspense>
   );
 }
