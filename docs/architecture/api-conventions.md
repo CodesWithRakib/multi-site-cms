@@ -110,6 +110,36 @@ Reserved convention for Phase 02 list endpoints:
 Never accept a free-form `sort`/`filter` expression. Never return an unbounded
 list.
 
+### Implemented behavior
+
+Two modes exist; pick by the shape of the data.
+
+| Mode            | Use for                                                                              | Request              | Response                                            |
+| --------------- | ------------------------------------------------------------------------------------ | -------------------- | --------------------------------------------------- |
+| Offset          | Lists people browse and jump around (posts, users, comments, media, public archives) | `?page=3&limit=20`   | `items`, `total`, `page`, `limit`, `totalPages`     |
+| Keyset (cursor) | Append-only, fast-growing lists (audit log)                                          | `?cursor=…&limit=20` | the above plus `nextCursor` (null on the last page) |
+
+- `limit` is capped at 100 on every list; admin offers 10 / 20 / 50 / 100.
+- A cursor is opaque, base64url of the last row's `bigint` id, and is validated
+  strictly: a malformed or tampered cursor is a `400 VALIDATION_ERROR`
+  (`apps/api/src/common/pagination/cursor.ts`). With a cursor the query is
+  `WHERE id < $n ORDER BY id DESC`, never `OFFSET`, so it stays fast and stable
+  while rows arrive. `total` still counts everything the filters match.
+- Audit log: `GET /audit-logs?cursor=…`; `page` keeps working for existing clients.
+
+### Client conventions
+
+| Where                          | Use                                                                                      |
+| ------------------------------ | ---------------------------------------------------------------------------------------- |
+| Admin browsed lists            | `useUrlPagination` (`?page=&limit=`, Back works, stale pages corrected) + `Pagination`   |
+| Admin append-only lists        | `CursorPagination` (Newer / Older / Latest) with the cursor trail kept in the page       |
+| Admin reference data           | `fetchAllPages` (sites, categories, tags, events): never a silently truncated first page |
+| Public sites (server-rendered) | `PaginationLinks` from `@multi-site-cms/ui`: every page is a crawlable `?page=N` URL     |
+
+URL parameters are untrusted: `page` and `limit` are parsed defensively
+(`parsePageParam`, `parsePageSize`), a size the screen does not offer falls back
+to the default, and a page past the end redirects to the last/first page.
+
 ## Caching semantics
 
 - Authenticated or per-user responses: `Cache-Control: no-store`.

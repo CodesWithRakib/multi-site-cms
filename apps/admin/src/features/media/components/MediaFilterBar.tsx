@@ -37,7 +37,7 @@ export function MediaFilterBar({
             onClick={() => onSiteChange(null)}
             className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               !activeSiteId
-                ? 'bg-brand-900 dark:bg-slate-800 text-brand-400 shadow-xs ring-1 ring-brand-400/30'
+                ? 'bg-brand-900 dark:bg-slate-800 text-white shadow-xs ring-1 ring-brand-400/30'
                 : 'bg-slate-100 dark:bg-slate-800/50 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
             }`}
           >
@@ -53,7 +53,7 @@ export function MediaFilterBar({
                 onClick={() => onSiteChange(site.id)}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   isActive
-                    ? 'bg-brand-900 dark:bg-slate-800 text-brand-400 shadow-xs ring-1 ring-brand-400/30'
+                    ? 'bg-brand-900 dark:bg-slate-800 text-white shadow-xs ring-1 ring-brand-400/30'
                     : 'bg-slate-100 dark:bg-slate-800/50 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
                 }`}
               >

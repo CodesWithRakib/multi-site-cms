@@ -1,32 +1,18 @@
 'use client';
 
 import React from 'react';
-import { Eye, ChevronLeft, ChevronRight, User, Terminal } from 'lucide-react';
+import { Eye, User, Terminal } from 'lucide-react';
 import type { AuditLogItem } from '@multi-site-cms/types';
 import { useAdmin } from '@/lib/admin-context';
 import { describeAuditAction } from './action-labels';
 
 interface AuditLogTableProps {
   logs: AuditLogItem[];
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-  onPageChange: (newPage: number) => void;
   onSelectLog: (log: AuditLogItem) => void;
   isLoading: boolean;
 }
 
-export function AuditLogTable({
-  logs,
-  total,
-  page,
-  limit,
-  totalPages,
-  onPageChange,
-  onSelectLog,
-  isLoading,
-}: AuditLogTableProps) {
+export function AuditLogTable({ logs, onSelectLog, isLoading }: AuditLogTableProps) {
   const { t, locale } = useAdmin();
 
   const getActionBadgeClass = (action: string) => {
@@ -42,9 +28,6 @@ export function AuditLogTable({
       return 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20';
     return 'bg-purple-500/10 text-purple-700 dark:text-purple-400 border-purple-500/20';
   };
-
-  const fromCount = total === 0 ? 0 : (page - 1) * limit + 1;
-  const toCount = Math.min(page * limit, total);
 
   return (
     <div className="w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl overflow-hidden shadow-xs flex flex-col">
@@ -171,42 +154,6 @@ export function AuditLogTable({
             )}
           </tbody>
         </table>
-      </div>
-
-      {/* Pagination Footer */}
-      <div className="flex items-center justify-between px-4 py-3 border-t border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-800/20 text-xs">
-        <span className="text-neutral-500">
-          {t('auditLogs.paginationShowing')
-            .replace('{from}', fromCount.toString())
-            .replace('{to}', toCount.toString())
-            .replace('{total}', total.toString())}
-        </span>
-
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            disabled={page <= 1 || isLoading}
-            onClick={() => onPageChange(page - 1)}
-            className="inline-flex items-center gap-1 px-2.5 py-1.5 font-medium rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            <ChevronLeft className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">{t('auditLogs.previous')}</span>
-          </button>
-
-          <span className="px-2 font-medium text-neutral-700 dark:text-neutral-300">
-            {page} / {totalPages}
-          </span>
-
-          <button
-            type="button"
-            disabled={page >= totalPages || isLoading}
-            onClick={() => onPageChange(page + 1)}
-            className="inline-flex items-center gap-1 px-2.5 py-1.5 font-medium rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            <span className="hidden sm:inline">{t('auditLogs.next')}</span>
-            <ChevronRight className="w-3.5 h-3.5" />
-          </button>
-        </div>
       </div>
     </div>
   );

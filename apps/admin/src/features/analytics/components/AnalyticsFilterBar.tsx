@@ -74,7 +74,7 @@ export function AnalyticsFilterBar({
                 onClick={() => onTimeframeChange(key)}
                 className={`px-3 py-1 text-xs font-bold rounded-lg transition-all ${
                   isActive
-                    ? 'bg-emerald-500 text-white shadow-xs'
+                    ? 'bg-emerald-600 text-white shadow-xs'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
                 }`}
               >

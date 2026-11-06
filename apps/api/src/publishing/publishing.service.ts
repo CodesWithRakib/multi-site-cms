@@ -1,5 +1,5 @@
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, In, Repository } from 'typeorm';
 
 import type { PostPublicationItem } from '@multi-site-cms/types';
 import type { EffectiveAuthContext } from '../auth/services/authorization.service';
@@ -14,6 +14,7 @@ import { PostPublication } from '../database/entities/post-publication.entity';
 import { PostRevision } from '../database/entities/post-revision.entity';
 import { Post } from '../database/entities/post.entity';
 import { Site } from '../database/entities/site.entity';
+import { resolveHealthScope } from './health-scope';
 import type {
   ArchivePublicationDto,
   CancelScheduleDto,
@@ -868,28 +869,50 @@ export class PublishingService {
   }
 
   /**
-   * Operational health statistics for queues and scheduling.
+   * Operational health statistics for queues and scheduling. Queue sizes are
+   * scoped to the sites the actor may reach; only a Super Admin sees the whole
+   * platform. Worker flags describe the process, not tenant data.
    */
   async getHealthStats(
+    actor: Pick<EffectiveAuthContext, 'isSuperAdmin' | 'authorizedSiteIds'>,
     scheduledWorkerActive = false,
     outboxWorkerActive = false,
   ): Promise<PublishingHealthStats> {
+    const scope = resolveHealthScope(actor);
+    const flags = {
+      isScheduledWorkerActive: scheduledWorkerActive,
+      isOutboxDispatcherActive: outboxWorkerActive,
+    };
+
+    if (scope !== null && scope.length === 0) {
+      return {
+        scheduledPublicationsPending: 0,
+        oldestPendingScheduledFor: null,
+        outboxBacklogPending: 0,
+        outboxDeadLetterCount: 0,
+        ...flags,
+      };
+    }
+
     const pubRepo = await this.getPublicationRepo();
     const outboxRepo = await this.getOutboxRepo();
 
-    const pendingScheduled = await pubRepo
-      .createQueryBuilder('pp')
-      .where("pp.status = 'scheduled' AND pp.scheduled_for IS NOT NULL")
-      .getCount();
+    const scheduled = () => {
+      const query = pubRepo
+        .createQueryBuilder('pp')
+        .where("pp.status = 'scheduled' AND pp.scheduled_for IS NOT NULL");
+      return scope === null
+        ? query
+        : query.andWhere('pp.siteId IN (:...siteIds)', { siteIds: scope });
+    };
+    const siteFilter = scope === null ? {} : { siteId: In([...scope]) };
 
-    const oldestScheduled = await pubRepo
-      .createQueryBuilder('pp')
-      .select('MIN(pp.scheduled_for)', 'oldest')
-      .where("pp.status = 'scheduled' AND pp.scheduled_for IS NOT NULL")
-      .getRawOne();
-
-    const outboxBacklog = await outboxRepo.count({ where: { status: 'pending' } });
-    const outboxDeadLetter = await outboxRepo.count({ where: { status: 'dead_letter' } });
+    const pendingScheduled = await scheduled().getCount();
+    const oldestScheduled = await scheduled().select('MIN(pp.scheduled_for)', 'oldest').getRawOne();
+    const outboxBacklog = await outboxRepo.count({ where: { status: 'pending', ...siteFilter } });
+    const outboxDeadLetter = await outboxRepo.count({
+      where: { status: 'dead_letter', ...siteFilter },
+    });
 
     return {
       scheduledPublicationsPending: pendingScheduled,
@@ -898,8 +921,7 @@ export class PublishingService {
         : null,
       outboxBacklogPending: outboxBacklog,
       outboxDeadLetterCount: outboxDeadLetter,
-      isScheduledWorkerActive: scheduledWorkerActive,
-      isOutboxDispatcherActive: outboxWorkerActive,
+      ...flags,
     };
   }
 

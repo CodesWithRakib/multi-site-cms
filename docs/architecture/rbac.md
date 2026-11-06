@@ -45,6 +45,30 @@ Legend: ✅ allowed, ➖ not applicable, 🔒 requires explicit Super Admin acti
 | `audit:read`             | all         | ➖                    |
 | `platform:configure`     | ✅          | ➖                    |
 
+## Admin UI visibility
+
+The admin hides what a caller cannot use; this is cosmetic, the API enforces
+every rule above. The sidebar and route guards use these checks:
+
+| Screen / control                          | Shown when                  |
+| ----------------------------------------- | --------------------------- |
+| Content, Engagement, Help sections        | any signed-in user          |
+| Websites (`/sites`)                       | Super Admin                 |
+| User Management (`/users`)                | `user:read`                 |
+| Settings (`/settings`)                    | `platform:configure`        |
+| Activity Logs (`/audit-logs`)             | `audit:read`                |
+| Delete post / delete comment              | `post:delete` (Super Admin) |
+| Dashboard "System Status", `/sites` links | Super Admin                 |
+
+`GET /publishing/health` needs `publication:publish`, and its queue sizes
+(scheduled, outbox backlog, dead letters) are scoped to the caller's authorized
+sites; only a Super Admin sees the whole platform. Another tenant's queue size
+is tenant data.
+
+Tags are managed on the Categories & Tags screen (`/taxonomy`), not a separate
+route. Site-scoped permissions are not visible to `can(permission)` without a
+site id, so platform screens never appear for a site-scoped Admin.
+
 "Limited keys" means a site-settings allowlist. An Admin must not be able to
 change a setting that affects billing, storage scope, or cross-site publishing.
 

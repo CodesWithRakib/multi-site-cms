@@ -68,7 +68,7 @@ export function MediaCard({
           }}
           className={`absolute top-2 left-2 z-10 size-5 rounded-md border flex items-center justify-center transition-all ${
             isBatchSelected
-              ? 'bg-emerald-500 border-emerald-500 text-white shadow-xs'
+              ? 'bg-emerald-600 border-emerald-600 text-white shadow-xs'
               : 'border-white/80 bg-black/40 hover:bg-black/60 text-white opacity-0 group-hover:opacity-100 backdrop-blur-xs'
           }`}
           title="Select asset"

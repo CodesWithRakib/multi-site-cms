@@ -54,6 +54,11 @@ import type {
   VerificationChallenge,
 } from '@multi-site-cms/types';
 import { platformApi } from './store';
+import type { PlatformApiError } from '@multi-site-cms/redux';
+import { ALL_PAGES_LIMIT, fetchAllPages } from './pagination/fetch-all-pages';
+
+/** The error shape the shared base query returns (see @multi-site-cms/redux). */
+type FetchBaseQueryErrorLike = PlatformApiError;
 
 export interface CreatePostPayload {
   type: string;
@@ -216,22 +221,11 @@ export const cmsApi = platformApi.injectEndpoints({
     // Sites & Domains
     // ==========================================
     listSites: build.query<SiteItem[], void>({
-      query: () => ({ path: '/sites' }),
-      transformResponse: (response: ApiSuccess<unknown>) => {
-        const payload = response.data;
-        if (Array.isArray(payload)) {
-          return payload as SiteItem[];
-        }
-        if (
-          payload &&
-          typeof payload === 'object' &&
-          'items' in payload &&
-          Array.isArray((payload as { items: unknown }).items)
-        ) {
-          return (payload as { items: SiteItem[] }).items;
-        }
-        return [] as SiteItem[];
-      },
+      // Whole list: the admin context and every site picker need every site.
+      queryFn: (_arg, _api, _extra, baseQuery) =>
+        fetchAllPages<SiteItem, FetchBaseQueryErrorLike>((page) =>
+          baseQuery({ path: '/sites', query: { page, limit: ALL_PAGES_LIMIT } }),
+        ),
       providesTags: (result) =>
         result
           ? [
@@ -910,9 +904,13 @@ export const cmsApi = platformApi.injectEndpoints({
     // Events
     // ==========================================
     listEvents: build.query<EventItem[], string>({
-      query: (siteId) => ({ path: `/sites/${siteId}/events`, query: { limit: 100 } }),
-      transformResponse: (response: ApiSuccess<unknown>) =>
-        (response.data as { items?: EventItem[] } | null)?.items ?? [],
+      queryFn: (siteId, _api, _extra, baseQuery) =>
+        fetchAllPages<EventItem, FetchBaseQueryErrorLike>((page) =>
+          baseQuery({
+            path: `/sites/${siteId}/events`,
+            query: { page, limit: ALL_PAGES_LIMIT },
+          }),
+        ),
       providesTags: (_res, _err, siteId) => [{ type: 'Event' as const, id: siteId }],
     }),
 
@@ -956,22 +954,13 @@ export const cmsApi = platformApi.injectEndpoints({
     // Taxonomy
     // ==========================================
     listCategories: build.query<CategoryItem[], string>({
-      query: (siteId) => ({ path: `/sites/${siteId}/categories` }),
-      transformResponse: (response: ApiSuccess<unknown>) => {
-        const payload = response.data;
-        if (Array.isArray(payload)) {
-          return payload as CategoryItem[];
-        }
-        if (
-          payload &&
-          typeof payload === 'object' &&
-          'items' in payload &&
-          Array.isArray((payload as { items: unknown }).items)
-        ) {
-          return (payload as { items: CategoryItem[] }).items;
-        }
-        return [] as CategoryItem[];
-      },
+      queryFn: (siteId, _api, _extra, baseQuery) =>
+        fetchAllPages<CategoryItem, FetchBaseQueryErrorLike>((page) =>
+          baseQuery({
+            path: `/sites/${siteId}/categories`,
+            query: { page, limit: ALL_PAGES_LIMIT },
+          }),
+        ),
       providesTags: (_res, _err, siteId) => [
         { type: 'Taxonomy' as const, id: `CATEGORIES_${siteId}` },
       ],
@@ -1015,22 +1004,10 @@ export const cmsApi = platformApi.injectEndpoints({
     }),
 
     listTags: build.query<TagItem[], string>({
-      query: (siteId) => ({ path: `/sites/${siteId}/tags` }),
-      transformResponse: (response: ApiSuccess<unknown>) => {
-        const payload = response.data;
-        if (Array.isArray(payload)) {
-          return payload as TagItem[];
-        }
-        if (
-          payload &&
-          typeof payload === 'object' &&
-          'items' in payload &&
-          Array.isArray((payload as { items: unknown }).items)
-        ) {
-          return (payload as { items: TagItem[] }).items;
-        }
-        return [] as TagItem[];
-      },
+      queryFn: (siteId, _api, _extra, baseQuery) =>
+        fetchAllPages<TagItem, FetchBaseQueryErrorLike>((page) =>
+          baseQuery({ path: `/sites/${siteId}/tags`, query: { page, limit: ALL_PAGES_LIMIT } }),
+        ),
       providesTags: (_res, _err, siteId) => [{ type: 'Taxonomy' as const, id: `TAGS_${siteId}` }],
     }),
 

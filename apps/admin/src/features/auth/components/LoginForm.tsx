@@ -97,7 +97,7 @@ export function LoginForm({ returnUrl }: LoginFormProps) {
           type="submit"
           disabled={isLoading}
           aria-busy={isLoading}
-          className="mt-2 h-12 w-full rounded-xl bg-brand-400 text-base font-semibold text-brand-950 hover:bg-brand-300 focus-visible:ring-brand-300 focus-visible:ring-offset-slate-950 [&_svg]:size-5"
+          className="mt-2 h-12 w-full rounded-xl bg-brand-600 text-base font-semibold text-white hover:bg-brand-700 focus-visible:ring-brand-300 focus-visible:ring-offset-slate-950 [&_svg]:size-5"
         >
           {isLoading ? (
             <>

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Server, Database, Zap, Layers, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { Server, Layers, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@multi-site-cms/ui';
 import { useGetPublishingHealthQuery } from '@/lib/cms-api';
 import { useAdmin } from '@/lib/admin-context';
@@ -22,36 +22,17 @@ export function SystemStatusCard() {
     : true;
   const scheduledCount = health?.scheduledPublicationsPending ?? 0;
 
+  // Only signals we really measure: the API answered, and the publishing workers.
   const services = [
     {
       id: 'api',
       name: t('dashboard.apiServer'),
       status: isHealthy ? t('dashboard.online') : 'Degraded',
-      sub: isHealthy ? 'Latency < 12ms' : 'Error',
+      sub: isHealthy ? 'Responding' : 'Error',
       icon: Server,
       iconColor: 'text-blue-500',
       iconBg: 'bg-blue-50 dark:bg-blue-950/50',
       online: isHealthy,
-    },
-    {
-      id: 'db',
-      name: t('dashboard.database'),
-      status: isHealthy ? t('dashboard.online') : 'Checking...',
-      sub: isHealthy ? 'Active Pool' : 'Reconnecting',
-      icon: Database,
-      iconColor: 'text-purple-600 dark:text-purple-400',
-      iconBg: 'bg-purple-50 dark:bg-purple-950/50',
-      online: isHealthy,
-    },
-    {
-      id: 'cdn',
-      name: t('dashboard.cdn'),
-      status: t('dashboard.online'),
-      sub: 'Edge Active',
-      icon: Zap,
-      iconColor: 'text-sky-500',
-      iconBg: 'bg-sky-50 dark:bg-sky-950/50',
-      online: true,
     },
     {
       id: 'publishing',

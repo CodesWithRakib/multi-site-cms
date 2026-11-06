@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useAdmin } from '@/lib/admin-context';
 import { Check, ShieldAlert, XCircle, Trash2, X } from 'lucide-react';
 import type { CommentStatus } from '@multi-site-cms/types';
 
@@ -19,6 +20,8 @@ export function CommentsBatchActions({
   onBatchDelete,
   onClearSelection,
 }: CommentsBatchActionsProps) {
+  const { can } = useAdmin();
+
   if (selectedCount === 0) return null;
 
   return (
@@ -66,16 +69,18 @@ export function CommentsBatchActions({
           <span>Reject</span>
         </button>
 
-        {/* Delete */}
-        <button
-          type="button"
-          disabled={isUpdating}
-          onClick={onBatchDelete}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-red-500/30 bg-card hover:bg-red-50 dark:hover:bg-red-950/40 px-3 py-1.5 text-xs font-semibold text-red-600 dark:text-red-400 transition-colors disabled:opacity-50 cursor-pointer"
-        >
-          <Trash2 className="h-3.5 w-3.5" />
-          <span>Delete</span>
-        </button>
+        {/* Delete: the API requires post:delete, which site admins do not have. */}
+        {can('post:delete') && (
+          <button
+            type="button"
+            disabled={isUpdating}
+            onClick={onBatchDelete}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-red-500/30 bg-card hover:bg-red-50 dark:hover:bg-red-950/40 px-3 py-1.5 text-xs font-semibold text-red-600 dark:text-red-400 transition-colors disabled:opacity-50 cursor-pointer"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+            <span>Delete</span>
+          </button>
+        )}
 
         {/* Clear selection */}
         <button

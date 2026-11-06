@@ -19,6 +19,9 @@ type PostsTableProps = Pick<
   | 'refetch'
   | 'page'
   | 'setPage'
+  | 'limit'
+  | 'limits'
+  | 'setLimit'
   | 'totalPages'
   | 'totalPosts'
   | 'openPublishing'
@@ -35,6 +38,9 @@ export function PostsTable({
   refetch,
   page,
   setPage,
+  limit,
+  limits,
+  setLimit,
   totalPages,
   totalPosts,
   openPublishing,
@@ -88,7 +94,7 @@ export function PostsTable({
           </p>
           <Link
             href="/posts/new"
-            className="mt-2 flex items-center gap-2 rounded-xl bg-gradient-to-r from-brand-400 to-brand-300 text-brand-950 font-bold px-4 py-2 text-xs shadow-xs"
+            className="mt-2 flex items-center gap-2 rounded-xl bg-brand-600 text-white font-bold px-4 py-2 text-xs shadow-xs"
           >
             <Plus className="size-4 stroke-[2.5]" aria-hidden="true" />
             <span>{t.content.newPost}</span>
@@ -141,7 +147,10 @@ export function PostsTable({
         page={page}
         totalPages={totalPages}
         totalPosts={totalPosts}
+        pageSize={limit}
+        pageSizeOptions={limits}
         onPageChange={setPage}
+        onPageSizeChange={setLimit}
       />
     </div>
   );

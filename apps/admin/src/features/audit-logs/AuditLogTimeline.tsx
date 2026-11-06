@@ -2,8 +2,6 @@
 
 import React from 'react';
 import {
-  ChevronLeft,
-  ChevronRight,
   KeyRound,
   FileEdit,
   Trash2,
@@ -19,11 +17,6 @@ import { describeAuditAction } from './action-labels';
 
 interface AuditLogTimelineProps {
   logs: AuditLogItem[];
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-  onPageChange: (newPage: number) => void;
   onSelectLog: (log: AuditLogItem) => void;
   isLoading: boolean;
 }
@@ -57,19 +50,8 @@ function getTimelineActionConfig(action: string) {
   };
 }
 
-export function AuditLogTimeline({
-  logs,
-  total,
-  page,
-  limit,
-  totalPages,
-  onPageChange,
-  onSelectLog,
-  isLoading,
-}: AuditLogTimelineProps) {
+export function AuditLogTimeline({ logs, onSelectLog, isLoading }: AuditLogTimelineProps) {
   const { t, locale } = useAdmin();
-  const fromCount = total === 0 ? 0 : (page - 1) * limit + 1;
-  const toCount = Math.min(page * limit, total);
 
   if (isLoading) {
     return (
@@ -215,39 +197,6 @@ export function AuditLogTimeline({
               </div>
             );
           })}
-        </div>
-      </div>
-
-      {/* Pagination Footer */}
-      <div className="flex items-center justify-between px-4 py-3 border-t border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-800/20 text-xs">
-        <span className="text-neutral-500">
-          Showing {fromCount} to {toCount} of {total} events
-        </span>
-
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            disabled={page <= 1 || isLoading}
-            onClick={() => onPageChange(page - 1)}
-            className="inline-flex items-center gap-1 px-2.5 py-1.5 font-medium rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            <ChevronLeft className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Previous</span>
-          </button>
-
-          <span className="px-2 font-medium text-neutral-700 dark:text-neutral-300">
-            {page} / {totalPages}
-          </span>
-
-          <button
-            type="button"
-            disabled={page >= totalPages || isLoading}
-            onClick={() => onPageChange(page + 1)}
-            className="inline-flex items-center gap-1 px-2.5 py-1.5 font-medium rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            <span className="hidden sm:inline">Next</span>
-            <ChevronRight className="w-3.5 h-3.5" />
-          </button>
         </div>
       </div>
     </div>

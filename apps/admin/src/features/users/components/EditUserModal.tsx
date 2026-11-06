@@ -328,7 +328,7 @@ export function EditUserModal({
                     type="button"
                     onClick={handleAssignRole}
                     disabled={isAssigning}
-                    className="px-3 py-1 text-xs font-bold bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-colors cursor-pointer"
+                    className="px-3 py-1 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors cursor-pointer"
                   >
                     {isAssigning ? 'Saving...' : 'Add Role'}
                   </button>
@@ -350,7 +350,7 @@ export function EditUserModal({
             <button
               type="submit"
               disabled={isUpdating}
-              className="flex items-center gap-2 px-5 py-2 text-xs font-bold rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white shadow-md shadow-emerald-500/20 transition-all disabled:opacity-50 cursor-pointer"
+              className="flex items-center gap-2 px-5 py-2 text-xs font-bold rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-500/20 transition-all disabled:opacity-50 cursor-pointer"
             >
               {isUpdating && <Loader2 className="size-3.5 animate-spin" />}
               <span>{t.users.saveChanges || 'Save Changes'}</span>

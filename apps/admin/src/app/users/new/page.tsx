@@ -282,7 +282,7 @@ export default function NewUserPage() {
             <button
               type="submit"
               disabled={isCreating || isAssigning}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-white font-bold text-xs rounded-xl shadow-md shadow-emerald-500/20 transition-all cursor-pointer"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-bold text-xs rounded-xl shadow-md shadow-emerald-500/20 transition-all cursor-pointer"
             >
               {isCreating || isAssigning ? (
                 <Loader2 className="w-4 h-4 animate-spin" />

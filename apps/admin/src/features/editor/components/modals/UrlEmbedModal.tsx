@@ -48,7 +48,7 @@ export function UrlEmbedModal({ type, onClose, onSubmit }: UrlEmbedModalProps) {
         </button>
         <button
           type="submit"
-          className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl cursor-pointer"
+          className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl cursor-pointer"
         >
           Confirm
         </button>

@@ -860,15 +860,22 @@ export interface AuditLogQueryParams {
   startDate?: string;
   endDate?: string;
   page?: number;
+  /** Keyset cursor from a previous response; takes precedence over `page`. */
+  cursor?: string;
   limit?: number;
 }
 
+/**
+ * Audit log page. Offset mode (`page`) and keyset mode (`cursor`) both work;
+ * `nextCursor` is the cursor for the next, older page, or null on the last page.
+ */
 export interface PaginatedAuditLogs {
   items: AuditLogItem[];
   total: number;
   page: number;
   limit: number;
   totalPages: number;
+  nextCursor: string | null;
 }
 
 /**

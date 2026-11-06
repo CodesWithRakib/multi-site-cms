@@ -1,5 +1,6 @@
 'use client';
 
+import { useClampPage, useUrlPagination } from '@/lib/pagination/useUrlPagination';
 import { useMemo, useState } from 'react';
 import type { UserItem, UserStatus } from '@multi-site-cms/types';
 
@@ -26,7 +27,8 @@ export function useUsersDirectory() {
   const [roleFilter, setRoleFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [siteFilter, setSiteFilter] = useState('all');
-  const [page, setPage] = useState(1);
+  const pagination = useUrlPagination({ defaultLimit: USERS_PAGE_SIZE });
+  const { page, limit, limits, setPage, setLimit, resetPage } = pagination;
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<UserItem | null>(null);
   const [pendingToggle, setPendingToggle] = useState<UserItem | null>(null);
@@ -38,8 +40,9 @@ export function useUsersDirectory() {
     roleKey: roleFilter !== 'all' ? roleFilter : undefined,
     siteId: siteFilter !== 'all' ? siteFilter : undefined,
     page,
-    limit: USERS_PAGE_SIZE,
+    limit,
   });
+  useClampPage(pagination, usersQuery.data?.totalPages ?? 1, Boolean(usersQuery.data));
   const { data: stats, isLoading: isStatsLoading } = useGetUserStatsQuery();
   const { data: sitesData } = useListSitesQuery();
   const [updateUser, { isLoading: isTogglingStatus }] = useUpdateUserMutation();
@@ -53,7 +56,7 @@ export function useUsersDirectory() {
     <T>(setter: (value: T) => void) =>
     (value: T) => {
       setter(value);
-      setPage(1);
+      resetPage();
     };
 
   const requestToggle = (user: UserItem) => {
@@ -85,6 +88,9 @@ export function useUsersDirectory() {
     totalPages: usersQuery.data?.totalPages ?? 1,
     page,
     setPage,
+    limit,
+    limits,
+    setLimit,
     isLoading: usersQuery.isLoading,
     isFetching: usersQuery.isFetching,
     error: usersQuery.error,

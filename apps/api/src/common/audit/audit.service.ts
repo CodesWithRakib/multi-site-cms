@@ -1,3 +1,4 @@
+import { decodeIdCursor, encodeIdCursor } from '../pagination/cursor';
 import { ForbiddenException, Inject, Injectable, Logger } from '@nestjs/common';
 import type { AuditLogItem, AuditLogSummary, PaginatedAuditLogs } from '@multi-site-cms/types';
 import { type DataSource, type Repository } from 'typeorm';
@@ -93,7 +94,9 @@ export class AuditService {
   ): Promise<PaginatedAuditLogs> {
     const page = query.page && query.page > 0 ? query.page : 1;
     const limit = query.limit && query.limit > 0 ? Math.min(query.limit, 100) : 20;
-    const offset = (page - 1) * limit;
+    const cursorId = query.cursor ? decodeIdCursor(query.cursor) : null;
+    // Keyset mode never skips rows: the cursor replaces OFFSET.
+    const offset = cursorId ? 0 : (page - 1) * limit;
 
     const conditions: string[] = [];
     const params: unknown[] = [];
@@ -111,7 +114,7 @@ export class AuditService {
         conditions.push(`ae.site_id = ANY($${pIdx++})`);
         params.push(actor.authorizedSiteIds);
       } else {
-        return { items: [], total: 0, page, limit, totalPages: 0 };
+        return { items: [], total: 0, page, limit, totalPages: 0, nextCursor: null };
       }
     }
 
@@ -174,6 +177,16 @@ export class AuditService {
 
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
+    // Rows older than the cursor; applied to the items query only, so `total`
+    // still counts everything the filters match.
+    const filterParams = [...params];
+    const itemConditions = [...conditions];
+    if (cursorId) {
+      itemConditions.push(`ae.id < $${pIdx++}`);
+      params.push(cursorId);
+    }
+    const itemsWhere = itemConditions.length > 0 ? `WHERE ${itemConditions.join(' AND ')}` : '';
+
     const countSql = `
       SELECT COUNT(*)::int AS total
       FROM audit_events ae
@@ -182,7 +195,7 @@ export class AuditService {
     `;
     const countRes: Array<{ total?: number | string }> = await this.dataSource.query(
       countSql,
-      params,
+      filterParams,
     );
     const total = Number(countRes[0]?.total ?? 0);
 
@@ -206,12 +219,20 @@ export class AuditService {
       FROM audit_events ae
       LEFT JOIN users u ON ae.actor_id = u.id
       LEFT JOIN sites s ON ae.site_id = s.id
-      ${whereClause}
+      ${itemsWhere}
       ORDER BY ae.id DESC
       LIMIT $${pIdx++} OFFSET $${pIdx++};
     `;
 
-    const rows: RawAuditRow[] = await this.dataSource.query(itemsSql, [...params, limit, offset]);
+    // One extra row tells us whether an older page exists.
+    const fetched: RawAuditRow[] = await this.dataSource.query(itemsSql, [
+      ...params,
+      limit + 1,
+      offset,
+    ]);
+    const hasMore = fetched.length > limit;
+    const rows = hasMore ? fetched.slice(0, limit) : fetched;
+    const lastRow = rows[rows.length - 1];
 
     const items: AuditLogItem[] = rows.map((r) => {
       const fallbackName =
@@ -246,6 +267,7 @@ export class AuditService {
       page,
       limit,
       totalPages: Math.max(1, Math.ceil(total / limit)),
+      nextCursor: hasMore && lastRow ? encodeIdCursor(lastRow.id) : null,
     };
   }
 

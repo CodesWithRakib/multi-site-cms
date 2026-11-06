@@ -1,5 +1,3 @@
-'use client';
-
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 
@@ -9,16 +7,15 @@ interface PortalCategoryChipsProps {
   /** Real CMS topics that have published stories. */
   readonly categories: readonly PublicCategory[];
   readonly activeSlug: string | null;
-  readonly onSelectCategory: (slug: string | null) => void;
 }
 
 const MAX_CHIPS = 6;
 
-export function PortalCategoryChips({
-  categories,
-  activeSlug,
-  onSelectCategory,
-}: PortalCategoryChipsProps) {
+/**
+ * Topic filters as links (`/articles?category=slug`): the filter runs on the
+ * server across every story, is shareable, and works without JavaScript.
+ */
+export function PortalCategoryChips({ categories, activeSlug }: PortalCategoryChipsProps) {
   const chips = [
     { label: 'All', slug: null },
     ...categories
@@ -30,15 +27,15 @@ export function PortalCategoryChips({
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
-      <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Filter by topic">
+      <nav aria-label="Filter by topic" className="flex flex-wrap items-center gap-2">
         {chips.map((chip) => {
           const isActive = activeSlug === chip.slug;
           return (
-            <button
+            <Link
               key={chip.label}
-              type="button"
-              aria-pressed={isActive}
-              onClick={() => onSelectCategory(chip.slug)}
+              href={chip.slug ? `/articles?category=${chip.slug}` : '/articles'}
+              aria-current={isActive ? 'true' : undefined}
+              scroll={false}
               className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-all ${
                 isActive
                   ? 'bg-primary text-primary-foreground shadow-sm'
@@ -46,10 +43,10 @@ export function PortalCategoryChips({
               }`}
             >
               {chip.label}
-            </button>
+            </Link>
           );
         })}
-      </div>
+      </nav>
 
       <Link
         href="/categories"

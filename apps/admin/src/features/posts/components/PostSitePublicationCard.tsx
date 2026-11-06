@@ -49,14 +49,14 @@ export function PostSitePublicationCard({
 
   return (
     <div
-      className={`flex flex-col p-5 rounded-2xl border transition-all ${
+      className={`flex min-w-0 flex-col p-4 sm:p-5 rounded-2xl border transition-all ${
         config.enabled
           ? 'border-emerald-500/70 bg-emerald-50/20 dark:bg-emerald-950/20 shadow-2xs'
           : 'border-slate-200/90 dark:border-slate-800 bg-slate-50/40 dark:bg-slate-900/40'
       }`}
     >
       {/* Site Header */}
-      <div className="flex items-center justify-between pb-3.5 border-b border-slate-200/60 dark:border-slate-800">
+      <div className="flex flex-wrap items-center justify-between gap-2 pb-3.5 border-b border-slate-200/60 dark:border-slate-800">
         <label className="flex items-center gap-2.5 font-bold text-sm cursor-pointer text-slate-800 dark:text-slate-200">
           <input
             type="checkbox"

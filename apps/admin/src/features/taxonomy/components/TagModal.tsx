@@ -179,7 +179,7 @@ function TagModalContent({ onClose, editingTag, onSave, isSaving }: ContentProps
             <button
               type="submit"
               disabled={isSaving}
-              className="px-4 py-2 text-xs font-bold rounded-xl bg-gradient-to-r from-brand-400 to-brand-300 hover:from-brand-500 hover:to-brand-400 text-brand-950 shadow-xs flex items-center gap-1.5 disabled:opacity-50 cursor-pointer"
+              className="px-4 py-2 text-xs font-bold rounded-xl bg-brand-600 hover:bg-brand-700 text-white shadow-xs flex items-center gap-1.5 disabled:opacity-50 cursor-pointer"
             >
               {isSaving ? (
                 <>

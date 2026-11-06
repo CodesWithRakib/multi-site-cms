@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import Script from 'next/script';
 import { JetBrains_Mono, Plus_Jakarta_Sans } from 'next/font/google';
-import type { ReactNode } from 'react';
+import { Suspense, type ReactNode } from 'react';
 
 import { Providers } from '@/components/providers';
 import { publicConfig } from '@/config/env';
@@ -58,7 +58,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body
         className={`${sansFont.variable} ${monoFont.variable} min-h-dvh bg-background font-sans antialiased text-foreground`}
       >
-        <Providers>{children}</Providers>
+        <Providers>
+          {/* useSearchParams (URL pagination) needs a Suspense boundary above it. */}
+          <Suspense fallback={null}>{children}</Suspense>
+        </Providers>
       </body>
     </html>
   );

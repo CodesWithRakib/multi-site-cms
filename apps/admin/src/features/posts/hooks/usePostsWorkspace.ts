@@ -6,6 +6,7 @@ import type { PostPublicationItem } from '@multi-site-cms/types';
 import type { PublishingActionType } from '@/features/posts/components/PublishingModal';
 import { useActionNotice } from '@/components/feedback';
 import { apiErrorMessage } from '@/lib/api-error';
+import { useClampPage, useUrlPagination } from '@/lib/pagination/useUrlPagination';
 import { useAdmin } from '@/lib/admin-context';
 import {
   useDeletePostMutation,
@@ -47,7 +48,8 @@ export function usePostsWorkspace(initialSearch = '') {
   const [searchTerm, setSearchTerm] = useState(initialSearch);
   const [typeFilter, setTypeFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
-  const [page, setPage] = useState(1);
+  const pagination = useUrlPagination({ defaultLimit: POSTS_PAGE_SIZE });
+  const { page, limit, limits, setPage, setLimit, resetPage } = pagination;
   const [publishingTarget, setPublishingTarget] = useState<PublishingTarget | null>(null);
   const [pendingDelete, setPendingDelete] = useState<PendingDelete | null>(null);
   const notices = useActionNotice();
@@ -67,7 +69,7 @@ export function usePostsWorkspace(initialSearch = '') {
     status: statusFilter || undefined,
     search: searchTerm.trim() || undefined,
     page,
-    limit: POSTS_PAGE_SIZE,
+    limit,
   });
 
   // Metric cards and tab counters: counted by the API over every visible post,
@@ -82,6 +84,7 @@ export function usePostsWorkspace(initialSearch = '') {
   const posts = useMemo(() => postsData?.items ?? [], [postsData?.items]);
   const totalPosts = postsData?.total || posts.length;
   const totalPages = postsData?.totalPages || 1;
+  useClampPage(pagination, totalPages, Boolean(postsData));
 
   const stats = useMemo<PostsStats>(() => {
     const byStatus = statusCounts?.byStatus;
@@ -138,14 +141,14 @@ export function usePostsWorkspace(initialSearch = '') {
     <T>(setter: (value: T) => void) =>
     (value: T) => {
       setter(value);
-      setPage(1);
+      resetPage();
     };
 
   const clearFilters = () => {
     setSearchTerm('');
     setTypeFilter('');
     setStatusFilter('');
-    setPage(1);
+    resetPage();
   };
 
   return {
@@ -161,6 +164,10 @@ export function usePostsWorkspace(initialSearch = '') {
     refetch,
     page,
     setPage,
+    resetPage,
+    limit,
+    limits,
+    setLimit,
     totalPages,
     totalPosts,
     filters: { searchTerm, typeFilter, statusFilter },

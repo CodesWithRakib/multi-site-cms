@@ -10,7 +10,6 @@ import {
   FileText,
   Globe,
   Layers,
-  Tag,
   Image as ImageIcon,
   Users,
   BarChart2,
@@ -20,8 +19,25 @@ import {
   MessageSquare,
   CalendarClock,
   PlayCircle,
+  type LucideIcon,
 } from 'lucide-react';
 import { useListCommentsQuery } from '@/lib/cms-api';
+
+interface NavItem {
+  readonly href: string;
+  readonly label: string;
+  readonly icon: LucideIcon;
+  readonly active: boolean;
+  readonly badge?: number;
+  readonly superAdminOnly?: boolean;
+  readonly requiredPermission?: string;
+}
+
+interface NavSection {
+  readonly key: string;
+  readonly title?: string;
+  readonly items: readonly NavItem[];
+}
 
 interface SidebarProps {
   isOpen: boolean;
@@ -34,96 +50,130 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const { data: commentsData } = useListCommentsQuery({ limit: 1 });
   const pendingCommentsCount = commentsData?.counts.pending ?? 0;
 
-  const navItems = [
+  const sections: readonly NavSection[] = [
     {
-      href: '/',
-      label: t('nav.dashboard'),
-      icon: Home,
-      active: pathname === '/',
+      key: 'main',
+      items: [{ href: '/', label: t('nav.dashboard'), icon: Home, active: pathname === '/' }],
     },
     {
-      href: '/posts',
-      label: t('nav.posts'),
-      icon: FileText,
-      active: pathname.startsWith('/posts'),
+      key: 'content',
+      title: t('nav.sectionContent'),
+      items: [
+        {
+          href: '/posts',
+          label: t('nav.posts'),
+          icon: FileText,
+          active: pathname.startsWith('/posts'),
+        },
+        {
+          href: '/calendar',
+          label: t('nav.calendar'),
+          icon: Calendar,
+          active: pathname.startsWith('/calendar'),
+        },
+        {
+          // Tags live on the same page (tab), so one entry covers both.
+          href: '/taxonomy',
+          label: t('nav.categories'),
+          icon: Layers,
+          active: pathname.startsWith('/taxonomy'),
+        },
+        {
+          href: '/media',
+          label: t('nav.mediaLibrary'),
+          icon: ImageIcon,
+          active: pathname.startsWith('/media'),
+        },
+        {
+          href: '/events',
+          label: t('nav.events'),
+          icon: CalendarClock,
+          active: pathname.startsWith('/events'),
+        },
+      ],
     },
     {
-      href: '/comments',
-      label: 'Comments',
-      icon: MessageSquare,
-      active: pathname.startsWith('/comments'),
-      badge: pendingCommentsCount > 0 ? pendingCommentsCount : undefined,
+      key: 'engagement',
+      title: t('nav.sectionEngagement'),
+      items: [
+        {
+          href: '/comments',
+          label: t('nav.comments'),
+          icon: MessageSquare,
+          active: pathname.startsWith('/comments'),
+          badge: pendingCommentsCount > 0 ? pendingCommentsCount : undefined,
+        },
+        {
+          href: '/analytics',
+          label: t('nav.analytics'),
+          icon: BarChart2,
+          active: pathname.startsWith('/analytics'),
+        },
+      ],
     },
     {
-      href: '/calendar',
-      label: t('nav.calendar'),
-      icon: Calendar,
-      active: pathname.startsWith('/calendar'),
+      // Platform screens: each entry is hidden unless the caller may open it.
+      key: 'administration',
+      title: t('nav.sectionAdministration'),
+      items: [
+        {
+          href: '/sites',
+          superAdminOnly: true,
+          label: t('nav.websites'),
+          icon: Globe,
+          active: pathname.startsWith('/sites'),
+        },
+        {
+          href: '/users',
+          requiredPermission: 'user:read',
+          label: t('nav.users'),
+          icon: Users,
+          active: pathname.startsWith('/users'),
+        },
+        {
+          href: '/settings',
+          requiredPermission: 'platform:configure',
+          label: t('nav.settings'),
+          icon: Settings,
+          active: pathname.startsWith('/settings'),
+        },
+        {
+          href: '/audit-logs',
+          requiredPermission: 'audit:read',
+          label: t('nav.activityLogs'),
+          icon: ShieldCheck,
+          active: pathname.startsWith('/audit-logs'),
+        },
+      ],
     },
     {
-      href: '/sites',
-      superAdminOnly: true,
-      label: t('nav.websites'),
-      icon: Globe,
-      active: pathname.startsWith('/sites'),
-    },
-    {
-      href: '/taxonomy',
-      label: t('nav.categories'),
-      icon: Layers,
-      active: pathname.startsWith('/taxonomy') && !pathname.includes('tags'),
-    },
-    {
-      href: '/taxonomy?tab=tags',
-      label: t('nav.tags'),
-      icon: Tag,
-      active: pathname.includes('tags'),
-    },
-    {
-      href: '/events',
-      label: 'Events',
-      icon: CalendarClock,
-      active: pathname.startsWith('/events'),
-    },
-    {
-      href: '/media',
-      label: t('nav.mediaLibrary'),
-      icon: ImageIcon,
-      active: pathname.startsWith('/media'),
-    },
-    {
-      href: '/users',
-      requiredPermission: 'user:read',
-      label: t('nav.users'),
-      icon: Users,
-      active: pathname.startsWith('/users'),
-    },
-    {
-      href: '/analytics',
-      label: t('nav.analytics'),
-      icon: BarChart2,
-      active: pathname.startsWith('/analytics'),
-    },
-    {
-      href: '/settings',
-      requiredPermission: 'platform:configure',
-      label: t('nav.settings'),
-      icon: Settings,
-      active: pathname.startsWith('/settings'),
-    },
-    {
-      href: '/audit-logs',
-      label: t('nav.activityLogs'),
-      icon: ShieldCheck,
-      active: pathname.startsWith('/audit-logs'),
-    },
-    {
-      href: '/tutorials',
-      label: 'Video Guide',
-      icon: PlayCircle,
-      active: pathname.startsWith('/tutorials'),
+      key: 'help',
+      title: t('nav.sectionHelp'),
+      items: [
+        {
+          href: '/tutorials',
+          label: t('nav.videoGuide'),
+          icon: PlayCircle,
+          active: pathname.startsWith('/tutorials'),
+        },
+      ],
     },
   ];
+
+  // Hide links the user cannot open (the API enforces access either way) and
+  // drop sections left empty.
+  const visibleSections = sections
+    .map((section) => ({
+      ...section,
+      items: section.items.filter((item) =>
+        item.superAdminOnly
+          ? isSuperAdmin
+          : item.requiredPermission
+            ? can(item.requiredPermission)
+            : true,
+      ),
+    }))
+    .filter((section) => section.items.length > 0);
 
   return (
     <>
@@ -205,42 +255,49 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         </div>
 
         {/* Navigation list */}
-        <nav className="relative z-10 flex-1 space-y-1 overflow-y-auto px-4 py-2 scrollbar-thin">
-          {navItems
-            // Hide links the user cannot open; the API enforces access either way.
-            .filter((item) =>
-              'superAdminOnly' in item && item.superAdminOnly
-                ? isSuperAdmin
-                : 'requiredPermission' in item && item.requiredPermission
-                  ? can(item.requiredPermission)
-                  : true,
-            )
-            .map((item) => {
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={item.label}
-                  href={item.href}
-                  onClick={onClose}
-                  aria-current={item.active ? 'page' : undefined}
-                  className={`flex items-center gap-3.5 rounded-xl px-4 py-2.5 text-[13px] font-semibold transition-all ${
-                    item.active
-                      ? 'bg-white/15 text-white font-bold ring-1 ring-white/25 shadow-md shadow-black/20 backdrop-blur-sm'
-                      : 'text-white hover:bg-white/10'
-                  }`}
-                >
-                  <Icon
-                    className={`h-4 w-4 shrink-0 ${item.active ? 'text-brand-300' : 'text-white'}`}
-                  />
-                  <span className="flex-1">{item.label}</span>
-                  {typeof item.badge === 'number' && (
-                    <span className="inline-flex items-center justify-center rounded-full bg-amber-400 px-1.5 py-0.5 text-[10px] font-bold text-slate-900 shadow-2xs">
-                      {item.badge}
-                    </span>
-                  )}
-                </Link>
-              );
-            })}
+        <nav
+          aria-label="Admin navigation"
+          className="relative z-10 flex-1 space-y-4 overflow-y-auto px-4 py-2 scrollbar-thin"
+        >
+          {visibleSections.map((section) => (
+            <div key={section.key} role="group" aria-label={section.title}>
+              {section.title && (
+                <p className="px-4 pb-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-white/70">
+                  {section.title}
+                </p>
+              )}
+              <ul className="space-y-1">
+                {section.items.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <li key={item.href}>
+                      <Link
+                        href={item.href}
+                        onClick={onClose}
+                        aria-current={item.active ? 'page' : undefined}
+                        className={`flex items-center gap-3.5 rounded-xl px-4 py-2.5 text-[13px] font-semibold transition-all ${
+                          item.active
+                            ? 'bg-white/15 text-white font-bold ring-1 ring-white/25 shadow-md shadow-black/20 backdrop-blur-sm'
+                            : 'text-white hover:bg-white/10'
+                        }`}
+                      >
+                        <Icon
+                          aria-hidden="true"
+                          className={`h-4 w-4 shrink-0 ${item.active ? 'text-brand-300' : 'text-white'}`}
+                        />
+                        <span className="flex-1">{item.label}</span>
+                        {typeof item.badge === 'number' && (
+                          <span className="inline-flex items-center justify-center rounded-full bg-amber-400 px-1.5 py-0.5 text-[10px] font-bold text-slate-900 shadow-2xs">
+                            {item.badge}
+                          </span>
+                        )}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ))}
         </nav>
 
         {/* Signed-in user: real name, role and profile photo (click to change it). */}

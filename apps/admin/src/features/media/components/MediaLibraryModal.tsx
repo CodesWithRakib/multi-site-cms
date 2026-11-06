@@ -2,7 +2,8 @@
 
 import { useState, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
-import { Search, Filter, Loader2, ArrowLeft, ArrowRight, X } from 'lucide-react';
+import { Search, Filter, Loader2, X } from 'lucide-react';
+import { Pagination } from '@/components/navigation/Pagination';
 import { ConfirmDialog } from '@/components/feedback';
 import { useAdmin } from '@/lib/admin-context';
 import { apiErrorMessage } from '@/lib/api-error';
@@ -29,6 +30,9 @@ export interface MediaLibraryModalProps {
   title?: string;
 }
 
+/** The picker shows a fixed 12-item grid; there is no size choice in a dialog. */
+const MODAL_PAGE_SIZE = 12;
+
 export function MediaLibraryModal({
   isOpen,
   onClose,
@@ -53,7 +57,7 @@ export function MediaLibraryModal({
       search: searchTerm.trim() || undefined,
       mimeType: mimeFilter || undefined,
       page,
-      limit: 12,
+      limit: MODAL_PAGE_SIZE,
     },
     { skip: !isOpen },
   );
@@ -233,30 +237,17 @@ export function MediaLibraryModal({
                 </div>
               )}
 
-              {/* Pagination */}
-              {mediaData && mediaData.totalPages > 1 && (
-                <div className="flex items-center justify-between border-t border-slate-200 dark:border-slate-800 pt-3 mt-auto text-xs text-slate-500 dark:text-slate-400">
-                  <span>
-                    Page {mediaData.page} of {mediaData.totalPages} ({mediaData.total} total)
-                  </span>
-                  <div className="flex items-center gap-1">
-                    <button
-                      type="button"
-                      disabled={page <= 1}
-                      onClick={() => setPage((p) => Math.max(1, p - 1))}
-                      className="p-1.5 border rounded-md disabled:opacity-30 hover:bg-slate-100 dark:hover:bg-slate-800"
-                    >
-                      <ArrowLeft className="w-3.5 h-3.5" />
-                    </button>
-                    <button
-                      type="button"
-                      disabled={page >= mediaData.totalPages}
-                      onClick={() => setPage((p) => p + 1)}
-                      className="p-1.5 border rounded-md disabled:opacity-30 hover:bg-slate-100 dark:hover:bg-slate-800"
-                    >
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
+              {/* Pagination: component state, not the URL, because this is a dialog. */}
+              {mediaData && (
+                <div className="mt-auto overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800">
+                  <Pagination
+                    page={mediaData.page}
+                    totalPages={mediaData.totalPages}
+                    total={mediaData.total}
+                    pageSize={MODAL_PAGE_SIZE}
+                    itemLabel="items"
+                    onPageChange={setPage}
+                  />
                 </div>
               )}
             </div>

@@ -8,7 +8,7 @@ import { primaryDomainUrl } from '@/features/sites/utils/site-url';
 import { useAdmin } from '@/lib/admin-context';
 
 export function QuickActions() {
-  const { t, availableSites } = useAdmin();
+  const { t, availableSites, isSuperAdmin } = useAdmin();
   const liveSites = availableSites.flatMap((site) => {
     const url = primaryDomainUrl(site.domains ?? []);
     return url ? [{ id: site.id, name: site.name, url }] : [];
@@ -33,7 +33,7 @@ export function QuickActions() {
         {/* 1. Primary Action: Write New Post */}
         <Link
           href="/posts/new"
-          className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-brand-400 to-brand-300 hover:from-brand-500 hover:to-brand-400 text-brand-950 font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-all"
+          className="w-full py-3.5 px-4 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-all"
         >
           <Pencil className="size-4 stroke-[2.5]" />
           <span>{t('dashboard.writeNewPost')}</span>
@@ -50,13 +50,15 @@ export function QuickActions() {
         </Link>
 
         {/* 2. Manage Websites */}
-        <Link
-          href="/sites"
-          className="w-full py-3 px-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 font-semibold text-xs flex items-center justify-center gap-2.5 shadow-2xs transition-all"
-        >
-          <Globe className="size-4 text-slate-500 dark:text-slate-400" />
-          <span>{t('dashboard.manageWebsites')}</span>
-        </Link>
+        {isSuperAdmin && (
+          <Link
+            href="/sites"
+            className="w-full py-3 px-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 font-semibold text-xs flex items-center justify-center gap-2.5 shadow-2xs transition-all"
+          >
+            <Globe className="size-4 text-slate-500 dark:text-slate-400" />
+            <span>{t('dashboard.manageWebsites')}</span>
+          </Link>
+        )}
 
         {/* 3. View Analytics */}
         <Link

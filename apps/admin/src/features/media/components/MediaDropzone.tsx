@@ -222,7 +222,7 @@ export function MediaDropzone({ siteId, onUploaded, onFinishedAll }: MediaDropzo
                 type="button"
                 onClick={handleUploadAll}
                 disabled={pendingCount === 0 || isUploadingAll}
-                className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-brand-400 to-brand-300 text-brand-950 font-bold rounded-xl hover:brightness-105 disabled:opacity-50 disabled:cursor-not-allowed transition-all text-xs shadow-md shadow-emerald-500/20 cursor-pointer"
+                className="flex items-center gap-2 px-5 py-2.5 bg-brand-600 text-white font-bold rounded-xl hover:brightness-105 disabled:opacity-50 disabled:cursor-not-allowed transition-all text-xs shadow-md shadow-emerald-500/20 cursor-pointer"
               >
                 {isUploadingAll ? (
                   <Loader2 className="w-4 h-4 animate-spin" />

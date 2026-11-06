@@ -1,18 +1,26 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { Radio, Tag as TagIcon } from 'lucide-react';
+
+import { PaginationLinks, pageHref, parsePageParam } from '@multi-site-cms/ui';
 
 import { AirSportsCard } from '@/components/cards/AirSportsCard';
 import { siteConfig } from '@/config/site';
 import { fetchArticles, fetchTags } from '@/lib/api';
 
+/** Articles per archive page; further pages are `?page=N`. */
+const PAGE_SIZE = 24;
+
 interface TagPageProps {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ page?: string | string[] }>;
 }
 
-export async function generateMetadata({ params }: TagPageProps): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: TagPageProps): Promise<Metadata> {
   const { slug } = await params;
+  const page = parsePageParam((await searchParams).page);
   const tags = await fetchTags();
   const tag = tags.find((t) => t.slug === slug);
 
@@ -23,7 +31,7 @@ export async function generateMetadata({ params }: TagPageProps): Promise<Metada
     title,
     description,
     alternates: {
-      canonical: `/tags/${slug}`,
+      canonical: pageHref(`/tags/${slug}`, page),
     },
     openGraph: {
       title: `${title} | ${siteConfig.name}`,
@@ -33,15 +41,20 @@ export async function generateMetadata({ params }: TagPageProps): Promise<Metada
   };
 }
 
-export default async function TagArchivePage({ params }: TagPageProps) {
+export default async function TagArchivePage({ params, searchParams }: TagPageProps) {
   const { slug } = await params;
+  const page = parsePageParam((await searchParams).page);
   const [articlesRes, tags] = await Promise.all([
-    fetchArticles({ tagSlug: slug, limit: 24 }),
+    fetchArticles({ tagSlug: slug, page, limit: PAGE_SIZE }),
     fetchTags(),
   ]);
 
   const tag = tags.find((t) => t.slug === slug);
   const articles = articlesRes.items;
+  const totalPages = Math.max(1, articlesRes.totalPages);
+
+  // A stale or crafted page past the end goes back to the first page.
+  if (page > 1 && articles.length === 0) redirect(`/tags/${slug}`);
 
   return (
     <div className="min-h-screen py-10 sm:py-14">
@@ -99,6 +112,15 @@ export default async function TagArchivePage({ params }: TagPageProps) {
             ))}
           </div>
         )}
+
+        <PaginationLinks
+          page={page}
+          totalPages={totalPages}
+          hrefFor={(target) => pageHref(`/tags/${slug}`, target)}
+          linkComponent={Link}
+          label="Tag pages"
+          className="mt-12 border-t border-border pt-6"
+        />
       </div>
     </div>
   );

@@ -1,7 +1,9 @@
 'use client';
 
+import { Pagination } from '@/components/navigation/Pagination';
+import { useClampPage, useUrlPagination } from '@/lib/pagination/useUrlPagination';
 import React, { useState, useMemo } from 'react';
-import { Loader2, ChevronLeft, ChevronRight, Image as ImageIcon } from 'lucide-react';
+import { Loader2, Image as ImageIcon } from 'lucide-react';
 import { ActionNotice, ConfirmDialog, useActionNotice } from '@/components/feedback';
 import { ShellLayout } from '@/components/shell';
 import { apiErrorMessage } from '@/lib/api-error';
@@ -23,13 +25,21 @@ import {
   type MediaStats,
 } from '@/features/media';
 
+/** Media is a card grid, so sizes are multiples of the grid columns. */
+const MEDIA_PAGE_SIZE = 24;
+const MEDIA_PAGE_SIZES: readonly number[] = [12, 24, 48, 96];
+
 export default function MediaPage() {
   const { t, activeSiteId, activeSite, availableSites, setActiveSiteId } = useAdmin();
 
   // Search, format filter & pagination
   const [searchTerm, setSearchTerm] = useState('');
   const [mimeFilter, setMimeFilter] = useState('');
-  const [page, setPage] = useState(1);
+  const urlPagination = useUrlPagination({
+    defaultLimit: MEDIA_PAGE_SIZE,
+    limits: MEDIA_PAGE_SIZES,
+  });
+  const { page, limit, limits, setPage, setLimit, resetPage } = urlPagination;
   const [viewMode, setViewMode] = useState<MediaViewMode>('grid');
   const [activeTab, setActiveTab] = useState<MediaTab>('browse');
 
@@ -52,8 +62,9 @@ export default function MediaPage() {
     search: searchTerm.trim() || undefined,
     mimeType: mimeFilter || undefined,
     page,
-    limit: 24,
+    limit,
   });
+  useClampPage(urlPagination, mediaData?.totalPages ?? 1, Boolean(mediaData));
 
   const [deleteMedia] = useDeleteMediaMutation();
   const [updateMedia] = useUpdateMediaMutation();
@@ -186,17 +197,17 @@ export default function MediaPage() {
           availableSites={availableSites}
           onSiteChange={(sId) => {
             setActiveSiteId(sId);
-            setPage(1);
+            resetPage();
           }}
           mimeFilter={mimeFilter}
           onMimeFilterChange={(mime) => {
             setMimeFilter(mime);
-            setPage(1);
+            resetPage();
           }}
           searchTerm={searchTerm}
           onSearchChange={(term) => {
             setSearchTerm(term);
-            setPage(1);
+            resetPage();
           }}
         />
 
@@ -247,30 +258,17 @@ export default function MediaPage() {
                   />
                 )}
 
-                {mediaData && mediaData.totalPages > 1 && (
-                  <div className="flex items-center justify-between border-t border-slate-200 dark:border-slate-800 pt-4 text-xs text-slate-500 dark:text-slate-400">
-                    <span>
-                      Page {mediaData.page} of {mediaData.totalPages} ({mediaData.total} items)
-                    </span>
-                    <div className="flex items-center gap-1.5">
-                      <button
-                        type="button"
-                        disabled={page <= 1}
-                        onClick={() => setPage((p) => Math.max(1, p - 1))}
-                        className="p-1.5 border border-slate-200 dark:border-slate-700 rounded-lg disabled:opacity-40 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
-                      >
-                        <ChevronLeft className="w-4 h-4" />
-                      </button>
-                      <button
-                        type="button"
-                        disabled={page >= mediaData.totalPages}
-                        onClick={() => setPage((p) => p + 1)}
-                        className="p-1.5 border border-slate-200 dark:border-slate-700 rounded-lg disabled:opacity-40 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
-                      >
-                        <ChevronRight className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
+                {mediaData && (
+                  <Pagination
+                    page={mediaData.page}
+                    totalPages={mediaData.totalPages}
+                    total={mediaData.total}
+                    pageSize={limit}
+                    pageSizeOptions={limits}
+                    itemLabel="items"
+                    onPageChange={setPage}
+                    onPageSizeChange={setLimit}
+                  />
                 )}
               </>
             ) : (
@@ -288,7 +286,7 @@ export default function MediaPage() {
                 <button
                   type="button"
                   onClick={() => setActiveTab('upload')}
-                  className="mt-5 px-5 py-2.5 bg-gradient-to-r from-brand-400 to-brand-300 text-brand-950 rounded-xl text-xs font-bold hover:brightness-105 shadow-md shadow-emerald-500/20 cursor-pointer transition-all"
+                  className="mt-5 px-5 py-2.5 bg-brand-600 text-white rounded-xl text-xs font-bold hover:brightness-105 shadow-md shadow-emerald-500/20 cursor-pointer transition-all"
                 >
                   + {t.media.uploadFirst || 'Upload First Asset'}
                 </button>

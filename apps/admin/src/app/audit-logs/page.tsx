@@ -3,7 +3,9 @@
 import React, { useState } from 'react';
 import { ShieldCheck, History } from 'lucide-react';
 import type { AuditLogCategory, AuditLogItem } from '@multi-site-cms/types';
+import { CursorPagination } from '@/components/navigation/CursorPagination';
 import { ShellLayout } from '@/components/shell';
+import { useUrlPagination } from '@/lib/pagination/useUrlPagination';
 import { useAdmin } from '@/lib/admin-context';
 import { useListAuditLogsQuery, useGetAuditSummaryQuery, useListSitesQuery } from '@/lib/cms-api';
 import {
@@ -39,7 +41,12 @@ export default function AuditLogsPage() {
   const { t, activeSiteId } = useAdmin();
 
   // Search & Filter State
-  const [page, setPage] = useState(1);
+  // Newest-first keyset pagination: `trail` holds the cursors of the pages we
+  // moved past, so "Newer" can walk back and "Latest" can clear it.
+  const { limit, limits, setLimit } = useUrlPagination({ defaultLimit: 20 });
+  const [trail, setTrail] = useState<string[]>([]);
+  const cursor = trail[trail.length - 1];
+  const resetTrail = () => setTrail([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<AuditLogCategory>('all');
   const [selectedSiteId, setSelectedSiteId] = useState<string | undefined>(
@@ -64,8 +71,8 @@ export default function AuditLogsPage() {
     refetch: refetchLogs,
   } = useListAuditLogsQuery(
     {
-      page,
-      limit: 15,
+      cursor,
+      limit,
       search: searchTerm.trim() || undefined,
       category: selectedCategory !== 'all' ? selectedCategory : undefined,
       siteId: selectedSiteId || undefined,
@@ -96,27 +103,27 @@ export default function AuditLogsPage() {
 
   const handleSearchChange = (value: string) => {
     setSearchTerm(value);
-    setPage(1);
+    resetTrail();
   };
 
   const handleCategoryChange = (category: AuditLogCategory) => {
     setSelectedCategory(category);
-    setPage(1);
+    resetTrail();
   };
 
   const handleSiteChange = (siteId?: string) => {
     setSelectedSiteId(siteId);
-    setPage(1);
+    resetTrail();
   };
 
   const handleEntityTypeChange = (entityType?: string) => {
     setSelectedEntityType(entityType);
-    setPage(1);
+    resetTrail();
   };
 
   const handleDatePresetChange = (preset: string) => {
     setSelectedDatePreset(preset);
-    setPage(1);
+    resetTrail();
   };
 
   // CSV Export
@@ -162,7 +169,7 @@ export default function AuditLogsPage() {
   };
 
   return (
-    <ShellLayout>
+    <ShellLayout requiredPermission="audit:read">
       <div className="w-full space-y-6 pb-12">
         {/* Page Header */}
         <div>
@@ -218,26 +225,39 @@ export default function AuditLogsPage() {
         {viewMode === 'table' ? (
           <AuditLogTable
             logs={logsData?.items ?? []}
-            total={logsData?.total ?? 0}
-            page={logsData?.page ?? page}
-            limit={logsData?.limit ?? 15}
-            totalPages={logsData?.totalPages ?? 1}
-            onPageChange={setPage}
             onSelectLog={setSelectedLog}
             isLoading={isLogsLoading}
           />
         ) : (
           <AuditLogTimeline
             logs={logsData?.items ?? []}
-            total={logsData?.total ?? 0}
-            page={logsData?.page ?? page}
-            limit={logsData?.limit ?? 15}
-            totalPages={logsData?.totalPages ?? 1}
-            onPageChange={setPage}
             onSelectLog={setSelectedLog}
             isLoading={isLogsLoading}
           />
         )}
+
+        <div className="overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-800">
+          <CursorPagination
+            shown={logsData?.items.length ?? 0}
+            total={logsData?.total ?? 0}
+            itemLabel="events"
+            hasNewer={trail.length > 0}
+            hasOlder={Boolean(logsData?.nextCursor)}
+            onNewer={() => setTrail((current) => current.slice(0, -1))}
+            onOlder={() => {
+              const next = logsData?.nextCursor;
+              if (next) setTrail((current) => [...current, next]);
+            }}
+            onLatest={resetTrail}
+            pageSize={limit}
+            pageSizeOptions={limits}
+            onPageSizeChange={(size) => {
+              resetTrail();
+              setLimit(size);
+            }}
+            isLoading={isLogsFetching}
+          />
+        </div>
 
         {/* Detail Inspection Modal */}
         <AuditLogDetailModal log={selectedLog} onClose={() => setSelectedLog(null)} />

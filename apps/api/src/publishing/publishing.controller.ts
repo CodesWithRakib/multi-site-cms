@@ -162,10 +162,15 @@ export class PublishingController {
 
   @Get('publishing/health')
   @RequirePermissions('publication:publish')
-  @ApiOperation({ summary: 'Get operational health and queue metrics for publishing engine' })
+  @ApiOperation({
+    summary: 'Get operational health and queue metrics for publishing engine',
+    description:
+      "Queue sizes cover only the caller's authorized sites; a Super Admin sees the whole platform.",
+  })
   @ApiResponse({ status: 200, description: 'Publishing health metrics' })
-  async getHealth(): Promise<PublishingHealthStats> {
+  async getHealth(@CurrentUser() actor: EffectiveAuthContext): Promise<PublishingHealthStats> {
     return this.publishingService.getHealthStats(
+      actor,
       this.scheduledWorker.getIsRunning(),
       this.outboxWorker.getIsRunning(),
     );

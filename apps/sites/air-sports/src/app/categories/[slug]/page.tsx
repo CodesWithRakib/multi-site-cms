@@ -1,18 +1,29 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { Layers, Radio } from 'lucide-react';
+
+import { PaginationLinks, pageHref, parsePageParam } from '@multi-site-cms/ui';
 
 import { AirSportsCard } from '@/components/cards/AirSportsCard';
 import { siteConfig } from '@/config/site';
 import { fetchArticles, fetchCategories } from '@/lib/api';
 
+/** Articles per archive page; further pages are `?page=N`. */
+const PAGE_SIZE = 24;
+
 interface CategoryPageProps {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ page?: string | string[] }>;
 }
 
-export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+  searchParams,
+}: CategoryPageProps): Promise<Metadata> {
   const { slug } = await params;
+  const page = parsePageParam((await searchParams).page);
   const categories = await fetchCategories();
   const category = categories.find((c) => c.slug === slug);
 
@@ -24,7 +35,7 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
     title,
     description,
     alternates: {
-      canonical: `/categories/${slug}`,
+      canonical: pageHref(`/categories/${slug}`, page),
     },
     openGraph: {
       title: `${title} | ${siteConfig.name}`,
@@ -34,15 +45,20 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
   };
 }
 
-export default async function CategoryArchivePage({ params }: CategoryPageProps) {
+export default async function CategoryArchivePage({ params, searchParams }: CategoryPageProps) {
   const { slug } = await params;
+  const page = parsePageParam((await searchParams).page);
   const [articlesRes, categories] = await Promise.all([
-    fetchArticles({ categorySlug: slug, limit: 24 }),
+    fetchArticles({ categorySlug: slug, page, limit: PAGE_SIZE }),
     fetchCategories(),
   ]);
 
   const category = categories.find((c) => c.slug === slug);
   const articles = articlesRes.items;
+  const totalPages = Math.max(1, articlesRes.totalPages);
+
+  // A stale or crafted page past the end goes back to the first page.
+  if (page > 1 && articles.length === 0) redirect(`/categories/${slug}`);
 
   return (
     <div className="min-h-screen py-10 sm:py-14">
@@ -107,6 +123,15 @@ export default async function CategoryArchivePage({ params }: CategoryPageProps)
             ))}
           </div>
         )}
+
+        <PaginationLinks
+          page={page}
+          totalPages={totalPages}
+          hrefFor={(target) => pageHref(`/categories/${slug}`, target)}
+          linkComponent={Link}
+          label="Discipline pages"
+          className="mt-12 border-t border-border pt-6"
+        />
       </div>
     </div>
   );

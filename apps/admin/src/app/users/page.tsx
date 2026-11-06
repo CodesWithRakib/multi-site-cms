@@ -12,7 +12,7 @@ import {
   UserStatsCards,
   UserTable,
 } from '@/features/users';
-import { USERS_PAGE_SIZE, useUsersDirectory } from '@/features/users/hooks/useUsersDirectory';
+import { useUsersDirectory } from '@/features/users/hooks/useUsersDirectory';
 import { useAdmin } from '@/lib/admin-context';
 
 /**
@@ -118,9 +118,11 @@ export default function UsersPage() {
               page={directory.page}
               totalPages={directory.totalPages}
               total={directory.total}
-              pageSize={USERS_PAGE_SIZE}
+              pageSize={directory.limit}
+              pageSizeOptions={directory.limits}
               itemLabel="users"
               onPageChange={directory.setPage}
+              onPageSizeChange={directory.setLimit}
             />
           </div>
         )}

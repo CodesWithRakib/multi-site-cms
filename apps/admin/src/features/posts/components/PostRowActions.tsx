@@ -77,7 +77,7 @@ export function PostRowActions({
   onSubmitForReview,
   onDelete,
 }: PostRowActionsProps) {
-  const { t } = useAdmin();
+  const { t, can } = useAdmin();
   const editable = status === 'draft' || status === 'in_review';
 
   const publicationActions: MenuAction[] = pub
@@ -202,15 +202,19 @@ export function PostRowActions({
             </DropdownMenuItem>
           ))}
 
-          <DropdownMenuSeparator className="my-1 bg-slate-100 dark:bg-slate-800" />
+          {can('post:delete') && (
+            <>
+              <DropdownMenuSeparator className="my-1 bg-slate-100 dark:bg-slate-800" />
 
-          <DropdownMenuItem
-            onSelect={() => onDelete(postId, title)}
-            className={`${ITEM} ${TONE.danger}`}
-          >
-            <Trash2 className="size-3.5" aria-hidden="true" />
-            <span>{t.actions.delete}</span>
-          </DropdownMenuItem>
+              <DropdownMenuItem
+                onSelect={() => onDelete(postId, title)}
+                className={`${ITEM} ${TONE.danger}`}
+              >
+                <Trash2 className="size-3.5" aria-hidden="true" />
+                <span>{t.actions.delete}</span>
+              </DropdownMenuItem>
+            </>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

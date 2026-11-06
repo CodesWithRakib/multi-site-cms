@@ -1,20 +1,26 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { ChevronRight, Tag as TagIcon } from 'lucide-react';
+import { PaginationLinks, pageHref, parsePageParam } from '@multi-site-cms/ui';
 import { ArticleCard } from '@/components/cards/ArticleCard';
 import { NewsletterBanner } from '@/components/home/NewsletterBanner';
 import { siteConfig } from '@/config/site';
 import { fetchArticles, fetchTags } from '@/lib/api';
 
+/** Articles per archive page; further pages are `?page=N`. */
+const PAGE_SIZE = 24;
+
 export const revalidate = 60;
 
 interface TagPageProps {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ page?: string | string[] }>;
 }
 
-export async function generateMetadata({ params }: TagPageProps): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: TagPageProps): Promise<Metadata> {
   const { slug } = await params;
+  const page = parsePageParam((await searchParams).page);
   const tags = await fetchTags();
   const tag = tags.find((t) => t.slug === slug);
 
@@ -31,16 +37,17 @@ export async function generateMetadata({ params }: TagPageProps): Promise<Metada
       tag.description ||
       `Browse travel stories and articles tagged with #${tag.name} on ${siteConfig.name}.`,
     alternates: {
-      canonical: `/tags/${tag.slug}`,
+      canonical: pageHref(`/tags/${tag.slug}`, page),
     },
   };
 }
 
-export default async function TagDetailPage({ params }: TagPageProps) {
+export default async function TagDetailPage({ params, searchParams }: TagPageProps) {
   const { slug } = await params;
+  const page = parsePageParam((await searchParams).page);
   const [tags, articlesData] = await Promise.all([
     fetchTags(),
-    fetchArticles({ tagSlug: slug, limit: 24 }),
+    fetchArticles({ tagSlug: slug, page, limit: PAGE_SIZE }),
   ]);
 
   const tag = tags.find((t) => t.slug === slug);
@@ -50,6 +57,10 @@ export default async function TagDetailPage({ params }: TagPageProps) {
   }
 
   const articles = articlesData.items;
+  const totalPages = Math.max(1, articlesData.totalPages);
+
+  // A stale or crafted page past the end goes back to the first page.
+  if (page > 1 && articles.length === 0) redirect(`/tags/${slug}`);
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 sm:py-14 space-y-10">
@@ -101,6 +112,14 @@ export default async function TagDetailPage({ params }: TagPageProps) {
           <p className="text-sm text-muted-foreground">Check back soon for new dispatches.</p>
         </div>
       )}
+
+      <PaginationLinks
+        page={page}
+        totalPages={totalPages}
+        hrefFor={(target) => pageHref(`/tags/${slug}`, target)}
+        linkComponent={Link}
+        label="Tag pages"
+      />
 
       <div className="pt-8">
         <NewsletterBanner />

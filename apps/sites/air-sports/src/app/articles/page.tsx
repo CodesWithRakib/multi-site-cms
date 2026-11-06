@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Newspaper, Radio } from 'lucide-react';
 
+import { PaginationLinks, pageHref, parsePageParam } from '@multi-site-cms/ui';
+
 import { AirSportsCard } from '@/components/cards/AirSportsCard';
 import { siteConfig } from '@/config/site';
 import { fetchArticles } from '@/lib/api';
@@ -12,15 +14,8 @@ interface ArticlesPageProps {
   searchParams: Promise<{ page?: string | string[] }>;
 }
 
-/** Accepts only a positive integer page; anything else falls back to page 1. */
-function parsePage(value: string | string[] | undefined): number {
-  const raw = Array.isArray(value) ? value[0] : value;
-  const page = Number(raw);
-  return Number.isInteger(page) && page >= 1 ? page : 1;
-}
-
 export async function generateMetadata({ searchParams }: ArticlesPageProps): Promise<Metadata> {
-  const page = parsePage((await searchParams).page);
+  const page = parsePageParam((await searchParams).page);
   const canonical = page > 1 ? `/articles?page=${page}` : '/articles';
 
   return {
@@ -32,7 +27,7 @@ export async function generateMetadata({ searchParams }: ArticlesPageProps): Pro
 }
 
 export default async function ArticlesIndexPage({ searchParams }: ArticlesPageProps) {
-  const page = parsePage((await searchParams).page);
+  const page = parsePageParam((await searchParams).page);
   const result = await fetchArticles({ page, limit: PAGE_SIZE });
   const totalPages = Math.max(1, result.totalPages);
 
@@ -89,38 +84,14 @@ export default async function ArticlesIndexPage({ searchParams }: ArticlesPagePr
           </div>
         )}
 
-        {totalPages > 1 && (
-          <nav
-            aria-label="Pagination"
-            className="mt-12 flex items-center justify-between border-t border-border pt-6 font-mono text-xs"
-          >
-            {page > 1 ? (
-              <Link
-                href={page === 2 ? '/articles' : `/articles?page=${page - 1}`}
-                rel="prev"
-                className="rounded-lg border border-border px-4 py-2 font-bold uppercase hover:border-primary hover:text-primary"
-              >
-                ← Newer
-              </Link>
-            ) : (
-              <span />
-            )}
-            <span className="text-muted-foreground" aria-current="page">
-              Page {page} of {totalPages}
-            </span>
-            {page < totalPages ? (
-              <Link
-                href={`/articles?page=${page + 1}`}
-                rel="next"
-                className="rounded-lg border border-border px-4 py-2 font-bold uppercase hover:border-primary hover:text-primary"
-              >
-                Older →
-              </Link>
-            ) : (
-              <span />
-            )}
-          </nav>
-        )}
+        <PaginationLinks
+          page={page}
+          totalPages={totalPages}
+          hrefFor={(target) => pageHref('/articles', target)}
+          linkComponent={Link}
+          label="Dispatch pages"
+          className="mt-12 border-t border-border pt-6"
+        />
       </div>
     </div>
   );

@@ -1,21 +1,30 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { ChevronRight } from 'lucide-react';
+import { PaginationLinks, pageHref, parsePageParam } from '@multi-site-cms/ui';
 import { ArticleCard } from '@/components/cards/ArticleCard';
 import { NewsletterBanner } from '@/components/home/NewsletterBanner';
 import { CategoryBadge } from '@/components/ui/CategoryBadge';
 import { siteConfig } from '@/config/site';
 import { fetchArticles, fetchCategories } from '@/lib/api';
 
+/** Articles per archive page; further pages are `?page=N`. */
+const PAGE_SIZE = 24;
+
 export const revalidate = 60;
 
 interface CategoryPageProps {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ page?: string | string[] }>;
 }
 
-export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+  searchParams,
+}: CategoryPageProps): Promise<Metadata> {
   const { slug } = await params;
+  const page = parsePageParam((await searchParams).page);
   const categories = await fetchCategories();
   const category = categories.find((c) => c.slug === slug);
 
@@ -32,7 +41,7 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
       category.description ||
       `Browse travel articles filed under ${category.name} on ${siteConfig.name}.`,
     alternates: {
-      canonical: `/categories/${category.slug}`,
+      canonical: pageHref(`/categories/${category.slug}`, page),
     },
     openGraph: {
       title: `${category.name} | ${siteConfig.name}`,
@@ -42,11 +51,12 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
   };
 }
 
-export default async function CategoryDetailPage({ params }: CategoryPageProps) {
+export default async function CategoryDetailPage({ params, searchParams }: CategoryPageProps) {
   const { slug } = await params;
+  const page = parsePageParam((await searchParams).page);
   const [categories, articlesData] = await Promise.all([
     fetchCategories(),
-    fetchArticles({ categorySlug: slug, limit: 24 }),
+    fetchArticles({ categorySlug: slug, page, limit: PAGE_SIZE }),
   ]);
 
   const category = categories.find((c) => c.slug === slug);
@@ -56,6 +66,10 @@ export default async function CategoryDetailPage({ params }: CategoryPageProps) 
   }
 
   const articles = articlesData.items;
+  const totalPages = Math.max(1, articlesData.totalPages);
+
+  // A stale or crafted page past the end goes back to the first page.
+  if (page > 1 && articles.length === 0) redirect(`/categories/${slug}`);
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 sm:py-14 space-y-10">
@@ -110,6 +124,14 @@ export default async function CategoryDetailPage({ params }: CategoryPageProps) 
           </p>
         </div>
       )}
+
+      <PaginationLinks
+        page={page}
+        totalPages={totalPages}
+        hrefFor={(target) => pageHref(`/categories/${slug}`, target)}
+        linkComponent={Link}
+        label="Category pages"
+      />
 
       {/* Newsletter */}
       <div className="pt-8">

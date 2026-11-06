@@ -92,7 +92,7 @@ export default function EventsPage() {
               <button
                 type="button"
                 onClick={openCreate}
-                className="inline-flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2 text-sm font-semibold text-white shadow-xs hover:bg-brand-600"
+                className="inline-flex items-center gap-2 rounded-xl bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-xs hover:bg-brand-700"
               >
                 <CalendarPlus className="size-4" aria-hidden="true" />
                 New event

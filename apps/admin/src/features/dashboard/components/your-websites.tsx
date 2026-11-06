@@ -18,7 +18,7 @@ const compactNumber = new Intl.NumberFormat('en', {
 });
 
 export function YourWebsites({ sitePerformance }: YourWebsitesProps) {
-  const { availableSites, setActiveSiteId, t } = useAdmin();
+  const { availableSites, setActiveSiteId, isSuperAdmin, t } = useAdmin();
 
   const performanceBySite = React.useMemo(
     () => new Map((sitePerformance ?? []).map((entry) => [entry.siteId, entry])),
@@ -36,13 +36,15 @@ export function YourWebsites({ sitePerformance }: YourWebsitesProps) {
             {t('dashboard.manageWebsitesSub')} ({availableSites.length} {t('dashboard.registered')})
           </CardDescription>
         </div>
-        <Link
-          href="/sites"
-          className="flex shrink-0 items-center gap-1 whitespace-nowrap text-xs font-semibold text-emerald-600 transition-colors hover:text-emerald-700 dark:text-emerald-400"
-        >
-          <span>{t('dashboard.viewAll')}</span>
-          <ArrowRight className="size-3.5" />
-        </Link>
+        {isSuperAdmin && (
+          <Link
+            href="/sites"
+            className="flex shrink-0 items-center gap-1 whitespace-nowrap text-xs font-semibold text-emerald-600 transition-colors hover:text-emerald-700 dark:text-emerald-400"
+          >
+            <span>{t('dashboard.viewAll')}</span>
+            <ArrowRight className="size-3.5" />
+          </Link>
+        )}
       </CardHeader>
 
       <CardContent className="p-6 pt-0 space-y-4">
@@ -53,14 +55,18 @@ export function YourWebsites({ sitePerformance }: YourWebsitesProps) {
               No websites found
             </p>
             <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-              Create your first website property to begin publishing.
+              {isSuperAdmin
+                ? 'Create your first website property to begin publishing.'
+                : 'No website is assigned to your account yet. Ask a Super Admin for access.'}
             </p>
-            <Link
-              href="/sites"
-              className="mt-3 px-3.5 py-1.5 rounded-lg bg-emerald-500 text-white text-xs font-semibold hover:bg-emerald-600 transition-colors"
-            >
-              Add Website
-            </Link>
+            {isSuperAdmin && (
+              <Link
+                href="/sites"
+                className="mt-3 px-3.5 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-semibold hover:bg-emerald-700 transition-colors"
+              >
+                Add Website
+              </Link>
+            )}
           </div>
         ) : (
           availableSites.map((site) => {
@@ -197,25 +203,29 @@ export function YourWebsites({ sitePerformance }: YourWebsitesProps) {
                   </div>
 
                   <div className="flex items-center gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setActiveSiteId(site.id);
-                      }}
-                      className="px-3.5 py-1.5 rounded-full bg-emerald-50 hover:bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 dark:hover:bg-emerald-900/60 text-xs font-semibold flex items-center gap-1 transition-colors cursor-pointer"
-                      title={`Filter dashboard to ${site.name}`}
-                    >
-                      <span>{t('dashboard.manage')}</span>
-                      <ArrowRight className="size-3" />
-                    </button>
+                    {availableSites.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setActiveSiteId(site.id);
+                        }}
+                        className="px-3.5 py-1.5 rounded-full bg-emerald-50 hover:bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 dark:hover:bg-emerald-900/60 text-xs font-semibold flex items-center gap-1 transition-colors cursor-pointer"
+                        title={`Filter dashboard to ${site.name}`}
+                      >
+                        <span>{t('dashboard.manage')}</span>
+                        <ArrowRight className="size-3" />
+                      </button>
+                    )}
 
-                    <Link
-                      href={`/sites`}
-                      className="p-1 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
-                      aria-label={`Options for ${site.name}`}
-                    >
-                      <MoreVertical className="size-4" />
-                    </Link>
+                    {isSuperAdmin && (
+                      <Link
+                        href={`/sites`}
+                        className="p-1 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                        aria-label={`Options for ${site.name}`}
+                      >
+                        <MoreVertical className="size-4" />
+                      </Link>
+                    )}
                   </div>
                 </div>
               </div>

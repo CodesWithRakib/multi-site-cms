@@ -27,8 +27,8 @@ export function PostFormHeader({
   onSaveShortcut,
 }: PostFormHeaderProps) {
   return (
-    <div className="sticky top-0 z-30 flex flex-wrap items-center justify-between gap-4 p-4 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-2xl border border-slate-100 dark:border-slate-800 shadow-xs">
-      <div className="flex items-center gap-3">
+    <div className="sticky top-0 z-30 flex items-center justify-between gap-2 sm:gap-4 p-3 sm:p-4 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-2xl border border-slate-100 dark:border-slate-800 shadow-xs">
+      <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
         <Link
           href="/posts"
           className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
@@ -36,11 +36,11 @@ export function PostFormHeader({
         >
           <ArrowLeft className="w-5 h-5" />
         </Link>
-        <div>
-          <h1 className="text-lg font-bold text-slate-900 dark:text-slate-100">
+        <div className="min-w-0">
+          <h1 className="truncate text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100">
             {isCreateMode ? 'Create New Post' : 'Edit Post'}
           </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
+          <p className="truncate text-[11px] sm:text-xs text-slate-500 dark:text-slate-400">
             {isCreateMode
               ? 'Draft will be auto-saved and backed up locally'
               : `Revision #${currentRevisionNumber} • Last saved: ${
@@ -51,37 +51,50 @@ export function PostFormHeader({
       </div>
 
       {/* Action Controls */}
-      <div className="flex items-center gap-3">
+      <div className="flex shrink-0 items-center gap-2 sm:gap-3">
         {!isCreateMode && (
-          <div className="flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800">
+          <div
+            role="status"
+            className="flex items-center gap-2 whitespace-nowrap text-xs font-medium px-2.5 sm:px-3 py-2 sm:py-1.5 rounded-full bg-slate-100 dark:bg-slate-800"
+          >
             {autosaveStatus === 'saving' && (
               <>
                 <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-600 dark:text-emerald-400" />
-                <span className="text-slate-600 dark:text-slate-400">Saving...</span>
+                <span className="sr-only sm:not-sr-only text-slate-600 dark:text-slate-400">
+                  Saving...
+                </span>
               </>
             )}
             {autosaveStatus === 'unsaved' && (
               <>
                 <div className="size-2 rounded-full bg-amber-500 animate-pulse" />
-                <span className="text-amber-600 dark:text-amber-400 font-medium">Unsaved</span>
+                <span className="sr-only sm:not-sr-only text-amber-600 dark:text-amber-400 font-medium">
+                  Unsaved
+                </span>
               </>
             )}
             {autosaveStatus === 'saved' && (
               <>
                 <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                <span className="text-slate-600 dark:text-slate-400">All changes saved</span>
+                <span className="sr-only sm:not-sr-only text-slate-600 dark:text-slate-400">
+                  All changes saved
+                </span>
               </>
             )}
             {autosaveStatus === 'failed' && (
               <>
                 <AlertTriangle className="w-3.5 h-3.5 text-rose-500" />
-                <span className="text-rose-500 font-semibold">Save failed</span>
+                <span className="sr-only sm:not-sr-only text-rose-500 font-semibold">
+                  Save failed
+                </span>
               </>
             )}
             {autosaveStatus === 'offline' && (
               <>
                 <WifiOff className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
-                <span className="text-slate-500 dark:text-slate-400">Offline</span>
+                <span className="sr-only sm:not-sr-only text-slate-500 dark:text-slate-400">
+                  Offline
+                </span>
               </>
             )}
           </div>
@@ -91,10 +104,11 @@ export function PostFormHeader({
           <button
             type="button"
             onClick={onOpenPreview}
-            className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+            aria-label="Preview"
+            className="flex items-center gap-1.5 px-3 py-2.5 sm:py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
           >
             <Eye className="w-3.5 h-3.5 text-blue-500" />
-            <span>Preview</span>
+            <span className="hidden sm:inline">Preview</span>
           </button>
         )}
 
@@ -102,7 +116,7 @@ export function PostFormHeader({
           type="submit"
           disabled={isSubmitting}
           onClick={onSaveShortcut}
-          className="flex items-center gap-2 px-5 py-2 text-xs font-bold text-brand-950 bg-gradient-to-r from-brand-400 to-brand-300 hover:brightness-105 active:scale-95 disabled:opacity-50 rounded-xl shadow-xs transition-all cursor-pointer"
+          className="flex items-center gap-2 whitespace-nowrap px-4 sm:px-5 py-2.5 sm:py-2 text-xs font-bold text-white bg-brand-600 hover:brightness-105 active:scale-95 disabled:opacity-50 rounded-xl shadow-xs transition-all cursor-pointer"
         >
           {isSubmitting ? (
             <>
@@ -114,7 +128,8 @@ export function PostFormHeader({
           ) : (
             <>
               <Save className="w-3.5 h-3.5" />
-              <span>Save Changes</span>
+              <span className="sm:hidden">Save</span>
+              <span className="hidden sm:inline">Save Changes</span>
             </>
           )}
         </button>

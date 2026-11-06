@@ -53,7 +53,7 @@ export function SitesFilters({
               onClick={() => onStatusChange(tab.id)}
               className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                 isActive
-                  ? 'bg-brand-400 text-brand-950 font-bold shadow-xs'
+                  ? 'bg-brand-600 text-white font-bold shadow-xs'
                   : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
               }`}
             >
@@ -61,7 +61,7 @@ export function SitesFilters({
               <span
                 className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
                   isActive
-                    ? 'bg-brand-950/15 text-brand-950'
+                    ? 'bg-white/20 text-white'
                     : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'
                 }`}
               >

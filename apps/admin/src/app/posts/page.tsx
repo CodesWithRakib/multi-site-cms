@@ -51,7 +51,7 @@ function PostsWorkspacePage({ initialSearch }: { readonly initialSearch: string 
           onTypeChange={workspace.setTypeFilter}
           onSiteChange={(siteId) => {
             setActiveSiteId(siteId);
-            workspace.setPage(1);
+            workspace.resetPage();
           }}
           onClear={workspace.clearFilters}
         />

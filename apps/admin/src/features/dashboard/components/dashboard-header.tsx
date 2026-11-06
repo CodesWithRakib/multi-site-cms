@@ -3,6 +3,7 @@
 import React from 'react';
 import { Calendar } from 'lucide-react';
 import { useAdmin } from '@/lib/admin-context';
+import { greetingName } from '../utils/greeting-name';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@multi-site-cms/ui';
 
 export interface DashboardHeaderProps {
@@ -13,7 +14,8 @@ export interface DashboardHeaderProps {
 }
 
 export function DashboardHeader({ days, onDaysChange }: DashboardHeaderProps) {
-  const { t } = useAdmin();
+  const { t, user } = useAdmin();
+  const name = greetingName(user?.displayName);
 
   return (
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-1 pb-1">
@@ -24,7 +26,7 @@ export function DashboardHeader({ days, onDaysChange }: DashboardHeaderProps) {
             👋
           </span>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white font-sans">
-            {t('dashboard.welcome')}
+            {name ? `${t('dashboard.welcome')}, ${name}!` : `${t('dashboard.welcome')}!`}
           </h1>
         </div>
         <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">

@@ -26,7 +26,7 @@ export function PostPublicationsSection({
   onOpenPublishModal,
 }: PostPublicationsSectionProps) {
   return (
-    <div className="flex flex-col gap-4 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-xs">
+    <div className="flex flex-col gap-4 bg-white dark:bg-slate-900 p-4 sm:p-6 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-xs">
       <div>
         <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 font-sans">
           Site Publications

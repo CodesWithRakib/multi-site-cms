@@ -85,7 +85,7 @@ export function UserTable({
                   {/* Administrator: Avatar, Name & Email */}
                   <td className="py-3.5 px-4">
                     <div className="flex items-center gap-3">
-                      <div className="size-9 rounded-xl bg-linear-to-tr from-emerald-600 via-teal-600 to-cyan-500 flex items-center justify-center text-white font-black text-xs shrink-0 shadow-xs">
+                      <div className="size-9 rounded-xl bg-linear-to-tr from-emerald-700 via-teal-700 to-cyan-700 flex items-center justify-center text-white font-black text-xs shrink-0 shadow-xs">
                         {initials}
                       </div>
                       <div className="min-w-0">

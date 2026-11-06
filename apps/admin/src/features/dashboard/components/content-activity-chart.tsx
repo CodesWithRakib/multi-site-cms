@@ -160,7 +160,7 @@ export function ContentActivityChart({
                 onClick={() => handleRangeClick(tab.value)}
                 className={`px-2.5 py-1 text-[11px] font-bold rounded-lg transition-all ${
                   isActive
-                    ? 'bg-brand-400 text-brand-950 shadow-2xs'
+                    ? 'bg-brand-600 text-white shadow-2xs'
                     : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
                 }`}
               >

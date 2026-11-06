@@ -207,7 +207,7 @@ export default function NewSitePage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-brand-400 to-brand-300 text-brand-950 text-xs font-bold shadow-xs hover:brightness-105 active:scale-95 transition-all disabled:opacity-50 cursor-pointer"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand-600 text-white text-xs font-bold shadow-xs hover:brightness-105 active:scale-95 transition-all disabled:opacity-50 cursor-pointer"
               >
                 {isLoading ? (
                   <Loader2 className="size-4 animate-spin text-brand-950" />

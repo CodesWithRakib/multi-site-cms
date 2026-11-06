@@ -232,7 +232,7 @@ export default function VideoTutorialPage() {
         {/* Sleek Top Header Bar */}
         <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-xl bg-slate-900 border border-slate-800 text-white shadow-xs">
           <div className="flex items-center gap-2.5">
-            <Badge className="bg-brand-400 text-brand-950 font-bold px-2 py-0.5 text-[11px]">
+            <Badge className="bg-brand-600 text-white font-bold px-2 py-0.5 text-[11px]">
               Masterclass Video
             </Badge>
             <div>
@@ -257,7 +257,7 @@ export default function VideoTutorialPage() {
             <a
               href="/videos/admin-tutorial.webm"
               download="editorial-toolbar-masterclass.webm"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand-400 hover:bg-brand-300 text-brand-950 text-xs font-bold transition-all"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold transition-all"
             >
               <Download className="size-3.5" />
               <span>Download Video</span>
@@ -296,7 +296,7 @@ export default function VideoTutorialPage() {
                 <button
                   type="button"
                   onClick={togglePlay}
-                  className="absolute z-10 size-16 rounded-full bg-brand-400 text-brand-950 flex items-center justify-center shadow-2xl hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                  className="absolute z-10 size-16 rounded-full bg-brand-600 text-white flex items-center justify-center shadow-2xl hover:scale-105 active:scale-95 transition-all cursor-pointer"
                   aria-label="Play Tutorial"
                 >
                   <Play className="w-7 h-7 fill-brand-950 ml-1" />
@@ -387,7 +387,7 @@ export default function VideoTutorialPage() {
                       onClick={toggleVoice}
                       className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold transition-all cursor-pointer ${
                         voiceEnabled
-                          ? 'bg-emerald-400 text-slate-950 shadow-sm'
+                          ? 'bg-emerald-700 text-white shadow-sm'
                           : 'bg-white/10 hover:bg-white/20 text-slate-500'
                       }`}
                       title="Toggle Synchronized English Voice Narration"
@@ -475,7 +475,7 @@ export default function VideoTutorialPage() {
                     <div
                       className={`p-1.5 rounded-lg shrink-0 mt-0.5 ${
                         isActive
-                          ? 'bg-brand-400 text-brand-950 font-bold'
+                          ? 'bg-brand-600 text-white font-bold'
                           : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
                       }`}
                     >

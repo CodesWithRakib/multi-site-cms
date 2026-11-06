@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useAdmin } from '@/lib/admin-context';
 import { Check, ShieldAlert, XCircle, Trash2, ExternalLink, Mail, Star, Globe } from 'lucide-react';
 import type { AdminCommentItem, CommentStatus } from '@multi-site-cms/types';
 
@@ -60,6 +61,8 @@ export function CommentModerationCard({
   onUpdateStatus,
   onDelete,
 }: CommentModerationCardProps) {
+  const { can } = useAdmin();
+  const canDelete = can('post:delete');
   const initials = getInitials(comment.authorName);
   const statusBadge = getStatusBadge(comment.status);
   const formattedDate = new Date(comment.createdAt).toLocaleString('en-US', {
@@ -207,15 +210,17 @@ export function CommentModerationCard({
                 </button>
               )}
 
-              <button
-                type="button"
-                onClick={() => onDelete(comment.id)}
-                aria-label="Delete comment permanently"
-                title="Delete comment permanently"
-                className="rounded-lg p-1.5 text-muted-foreground/60 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/40 transition-colors cursor-pointer"
-              >
-                <Trash2 className="h-3.5 w-3.5" />
-              </button>
+              {canDelete && (
+                <button
+                  type="button"
+                  onClick={() => onDelete(comment.id)}
+                  aria-label="Delete comment permanently"
+                  title="Delete comment permanently"
+                  className="rounded-lg p-1.5 text-muted-foreground/60 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/40 transition-colors cursor-pointer"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              )}
             </div>
           </div>
         </div>

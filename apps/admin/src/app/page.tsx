@@ -13,7 +13,7 @@ import { ContentActivityChart } from '@/features/dashboard/components/content-ac
 import { SystemStatusCard } from '@/features/dashboard/components/system-status-card';
 
 export default function AdminDashboardPage() {
-  const { activeSiteId } = useAdmin();
+  const { activeSiteId, isSuperAdmin } = useAdmin();
   const [days, setDays] = useState<number>(30);
 
   const {
@@ -72,7 +72,7 @@ export default function AdminDashboardPage() {
 
         {/* 3. Bottom Row: Dynamic Analytics Chart (7 cols) | Live System Health (5 cols) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
-          <div className="lg:col-span-7 flex flex-col">
+          <div className={`flex flex-col ${isSuperAdmin ? 'lg:col-span-7' : 'lg:col-span-12'}`}>
             <ContentActivityChart
               data={overview?.activitySeries}
               isLoading={isLoading}
@@ -81,9 +81,11 @@ export default function AdminDashboardPage() {
             />
           </div>
 
-          <div className="lg:col-span-5 flex flex-col">
-            <SystemStatusCard />
-          </div>
+          {isSuperAdmin && (
+            <div className="lg:col-span-5 flex flex-col">
+              <SystemStatusCard />
+            </div>
+          )}
         </div>
       </div>
     </ShellLayout>

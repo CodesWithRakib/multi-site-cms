@@ -11,7 +11,7 @@ import { useSitesRegistry } from '@/features/sites/hooks/useSitesRegistry';
 import { useAdmin } from '@/lib/admin-context';
 
 const CREATE_LINK =
-  'flex items-center gap-2 rounded-xl bg-gradient-to-r from-brand-400 to-brand-300 text-brand-950 font-bold px-4 py-2 text-xs shadow-xs hover:brightness-105 transition-all';
+  'flex items-center gap-2 rounded-xl bg-brand-600 text-white font-bold px-4 py-2 text-xs shadow-xs hover:brightness-105 transition-all';
 
 /**
  * Site registry: orchestration only. Data comes from useSitesRegistry; each

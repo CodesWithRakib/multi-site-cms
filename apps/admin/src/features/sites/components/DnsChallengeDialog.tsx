@@ -125,7 +125,7 @@ export function DnsChallengeDialog({
             type="button"
             onClick={() => challenge && onVerify(challenge.domainId)}
             disabled={!challenge || isVerifying}
-            className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-brand-400 to-brand-300 text-brand-950 text-xs font-bold shadow-xs hover:brightness-105 transition-all disabled:opacity-50 cursor-pointer"
+            className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-brand-600 text-white text-xs font-bold shadow-xs hover:brightness-105 transition-all disabled:opacity-50 cursor-pointer"
           >
             {isVerifying && <Loader2 className="size-3.5 animate-spin" aria-hidden="true" />}
             <span>{isVerifying ? 'Checking…' : 'Verify DNS record now'}</span>

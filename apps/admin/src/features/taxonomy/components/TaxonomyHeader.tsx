@@ -72,7 +72,7 @@ export function TaxonomyHeader({
             type="button"
             onClick={onOpenCreate}
             disabled={!effectiveSiteId}
-            className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-brand-400 to-brand-300 hover:from-brand-500 hover:to-brand-400 text-brand-950 font-bold text-xs flex items-center gap-2 shadow-xs transition-all cursor-pointer disabled:opacity-50"
+            className="px-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition-all cursor-pointer disabled:opacity-50"
           >
             <Plus className="size-4 stroke-[2.5]" />
             <span>{activeTab === 'categories' ? 'New Category' : 'New Tag'}</span>

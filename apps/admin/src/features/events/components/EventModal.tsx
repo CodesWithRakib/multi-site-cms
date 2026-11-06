@@ -214,7 +214,7 @@ function EventModalContent({
             <button
               type="submit"
               disabled={isSaving}
-              className="flex items-center gap-1.5 rounded-xl bg-brand-500 px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-brand-600 disabled:opacity-50"
+              className="flex items-center gap-1.5 rounded-xl bg-brand-600 px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-brand-700 disabled:opacity-50"
             >
               {isSaving && <Loader2 className="size-3.5 animate-spin" aria-hidden="true" />}
               {isSaving ? 'Saving…' : editingEvent ? 'Save changes' : 'Create event'}

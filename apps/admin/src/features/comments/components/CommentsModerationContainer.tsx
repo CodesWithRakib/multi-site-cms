@@ -12,7 +12,8 @@ import {
 import { CommentModerationCard } from './CommentModerationCard';
 import { CommentsBatchActions } from './CommentsBatchActions';
 import { CommentsFilterBar } from './CommentsFilterBar';
-import { CommentsPagination } from './CommentsPagination';
+import { Pagination } from '@/components/navigation/Pagination';
+import { useClampPage, useUrlPagination } from '@/lib/pagination/useUrlPagination';
 import { CommentsStatusTabs } from './CommentsStatusTabs';
 import { ConfirmDialog } from '@/components/feedback';
 
@@ -20,8 +21,8 @@ export function CommentsModerationContainer() {
   const [activeStatus, setActiveStatus] = useState<string>('all');
   const [search, setSearch] = useState<string>('');
   const [selectedSiteId, setSelectedSiteId] = useState<string>('');
-  const [page, setPage] = useState<number>(1);
-  const [limit, setLimit] = useState<number>(20);
+  const urlPagination = useUrlPagination({ defaultLimit: 20 });
+  const { page, limit, limits, setPage, setLimit, resetPage } = urlPagination;
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [pendingDeleteIds, setPendingDeleteIds] = useState<string[] | null>(null);
   const [toastMessage, setToastMessage] = useState<{
@@ -108,6 +109,7 @@ export function CommentsModerationContainer() {
   const comments = data?.items ?? [];
   const counts = data?.counts ?? { all: 0, pending: 0, approved: 0, rejected: 0, spam: 0 };
   const pagination = data?.pagination ?? { total: 0, page: 1, limit: 20, totalPages: 1 };
+  useClampPage(urlPagination, pagination.totalPages, Boolean(data));
 
   return (
     <div className="space-y-6">
@@ -154,7 +156,7 @@ export function CommentsModerationContainer() {
         counts={counts}
         onStatusChange={(st) => {
           setActiveStatus(st);
-          setPage(1);
+          resetPage();
           setSelectedIds([]);
         }}
       />
@@ -166,11 +168,11 @@ export function CommentsModerationContainer() {
         isFetching={isFetching}
         onSearchChange={(val) => {
           setSearch(val);
-          setPage(1);
+          resetPage();
         }}
         onSiteChange={(site) => {
           setSelectedSiteId(site);
-          setPage(1);
+          resetPage();
         }}
         onRefresh={() => refetch()}
       />
@@ -233,16 +235,15 @@ export function CommentsModerationContainer() {
       )}
 
       {/* Pagination Controls */}
-      <CommentsPagination
-        page={pagination.page}
-        limit={pagination.limit}
-        total={pagination.total}
+      <Pagination
+        page={page}
         totalPages={pagination.totalPages}
-        onPageChange={(p) => setPage(p)}
-        onLimitChange={(l) => {
-          setLimit(l);
-          setPage(1);
-        }}
+        total={pagination.total}
+        pageSize={limit}
+        pageSizeOptions={limits}
+        itemLabel="comments"
+        onPageChange={setPage}
+        onPageSizeChange={setLimit}
       />
 
       <ConfirmDialog

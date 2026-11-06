@@ -57,7 +57,7 @@ export function EditorToolbar({
   const sep = <div className="w-[1px] h-4 bg-slate-200 dark:border-slate-800 my-auto mx-1" />;
 
   return (
-    <div className="sticky top-[7.5rem] sm:top-[5.5rem] z-20 flex flex-wrap items-center gap-0.5 p-2 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 rounded-t-xl">
+    <div className="sticky top-[4.1rem] sm:top-[5.5rem] z-20 flex flex-nowrap items-center gap-0.5 overflow-x-auto sm:flex-wrap sm:overflow-visible [&>*]:shrink-0 p-2 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 rounded-t-xl">
       <EditorFormattingGroup editor={editor} />
 
       {sep}

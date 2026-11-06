@@ -1,6 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsIn, IsInt, IsOptional, IsString, IsUUID, Max, Min } from 'class-validator';
+import { IsIn, IsInt, IsOptional, IsString, IsUUID, Max, MaxLength, Min } from 'class-validator';
 import type { AuditLogCategory } from '@multi-site-cms/types';
 
 export class AuditLogQueryDto {
@@ -56,6 +56,15 @@ export class AuditLogQueryDto {
   @IsInt()
   @Min(1)
   page?: number = 1;
+
+  @ApiPropertyOptional({
+    description:
+      'Opaque keyset cursor from a previous response (`nextCursor`). When set, `page` is ignored and the next older page is returned.',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
+  cursor?: string;
 
   @ApiPropertyOptional({ description: 'Page limit', default: 20 })
   @IsOptional()
