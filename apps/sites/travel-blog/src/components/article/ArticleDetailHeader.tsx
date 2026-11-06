@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { Calendar, ChevronRight, Clock, MapPin } from 'lucide-react';
 import type { PublicArticleDetail } from '@multi-site-cms/types';
-import { BookmarkButton } from '@/components/ui/BookmarkButton';
 import { CategoryBadge } from '@/components/ui/CategoryBadge';
 import { AuthorAvatar } from '@/components/ui/AuthorAvatar';
 import { ShareButtons } from '@/components/interactive/ShareButtons';
@@ -98,14 +97,6 @@ export function ArticleDetailHeader({
             {article.readingTimeMinutes} min read
           </span>
           <div className="flex items-center gap-2 pl-2 border-l border-border/80">
-            <BookmarkButton
-              articleId={article.id}
-              articleSlug={article.slug}
-              articleTitle={article.title}
-              featuredImageUrl={article.featuredImage?.url}
-              categoryName={article.categories[0]?.name}
-              readingTimeMinutes={article.readingTimeMinutes}
-            />
             <ShareButtons title={article.title} url={articleUrl} />
           </div>
         </div>

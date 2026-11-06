@@ -5,7 +5,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowUpRight, Calendar, Clock } from 'lucide-react';
 import type { PublicArticle } from '@/lib/api';
-import { BookmarkButton } from '@/components/ui/BookmarkButton';
 import { CategoryBadge } from '@/components/ui/CategoryBadge';
 
 interface PortalArticleGridProps {
@@ -43,7 +42,7 @@ export function PortalArticleGrid({ articles }: PortalArticleGridProps) {
             className="group flex flex-col justify-between overflow-hidden rounded-2xl border border-border/80 bg-card transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
           >
             <div>
-              {/* Media Container with Category & Bookmark Overlays */}
+              {/* Media Container with Category Overlay */}
               <div className="relative h-48 sm:h-52 w-full overflow-hidden bg-muted">
                 <Image
                   src={
@@ -59,9 +58,6 @@ export function PortalArticleGrid({ articles }: PortalArticleGridProps) {
                 {/* Overlays */}
                 <div className="absolute left-3 top-3 z-10">
                   <CategoryBadge label={categoryName} slug={primaryCategory?.slug} />
-                </div>
-                <div className="absolute right-3 top-3 z-10">
-                  <BookmarkButton articleId={article.id} articleTitle={article.title} />
                 </div>
               </div>
 

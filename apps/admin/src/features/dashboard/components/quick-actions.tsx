@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Pencil, Globe, BarChart2, ExternalLink, ArrowRight } from 'lucide-react';
+import { Pencil, Globe, BarChart2, ExternalLink, ArrowRight, PlayCircle } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@multi-site-cms/ui';
 import { primaryDomainUrl } from '@/features/sites/utils/site-url';
 import { useAdmin } from '@/lib/admin-context';
@@ -38,6 +38,15 @@ export function QuickActions() {
           <Pencil className="size-4 stroke-[2.5]" />
           <span>{t('dashboard.writeNewPost')}</span>
           <ArrowRight className="size-3.5 stroke-[2.5]" />
+        </Link>
+
+        {/* 2. Video Guide */}
+        <Link
+          href="/tutorials"
+          className="w-full py-3 px-4 rounded-xl bg-brand-50 dark:bg-brand-950/40 border border-brand-200 dark:border-brand-800 text-brand-900 dark:text-brand-300 hover:bg-brand-100 dark:hover:bg-brand-900/60 font-bold text-xs flex items-center justify-center gap-2.5 shadow-2xs transition-all"
+        >
+          <PlayCircle className="size-4 text-brand-600 dark:text-brand-400" />
+          <span>Watch Video Guide</span>
         </Link>
 
         {/* 2. Manage Websites */}

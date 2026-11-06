@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useSyncExternalStore } from 'react';
+import { createPortal } from 'react-dom';
 import { Search, Filter, Loader2, ArrowLeft, ArrowRight, X } from 'lucide-react';
 import { ConfirmDialog } from '@/components/feedback';
 import { useAdmin } from '@/lib/admin-context';
@@ -17,6 +18,8 @@ const MIME_FILTER_OPTIONS: NativeSelectOption[] = [
   { value: 'application/pdf', label: 'PDF Documents' },
   { value: 'video/', label: 'Videos' },
 ];
+
+const emptySubscribe = () => () => {};
 
 export interface MediaLibraryModalProps {
   isOpen: boolean;
@@ -57,7 +60,13 @@ export function MediaLibraryModal({
 
   const [deleteMedia, { isLoading: isDeleting }] = useDeleteMediaMutation();
 
-  if (!isOpen) return null;
+  const isClient = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false,
+  );
+
+  if (!isOpen || !isClient) return null;
 
   const handleSelect = (asset: MediaAssetItem) => {
     onSelectMedia(asset);
@@ -84,8 +93,18 @@ export function MediaLibraryModal({
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 sm:p-6">
+  // Portal to <body>: an opener inside a transformed ancestor (the sidebar
+  // uses translate-x) would otherwise trap this `fixed` overlay inside it.
+  return createPortal(
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={title}
+      // React bubbles events through portals: keep uploads from submitting
+      // a surrounding form (the post editor).
+      onSubmit={(event) => event.stopPropagation()}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 sm:p-6"
+    >
       <div className="flex flex-col bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-4xl w-full h-[85vh] border border-slate-200 dark:border-slate-800 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800">
@@ -120,6 +139,7 @@ export function MediaLibraryModal({
           <button
             type="button"
             onClick={onClose}
+            aria-label="Close media library"
             className="p-1 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
           >
             <X className="w-5 h-5" />
@@ -254,6 +274,7 @@ export function MediaLibraryModal({
         onConfirm={() => void confirmDelete()}
         onCancel={() => setPendingDeleteId(null)}
       />
-    </div>
+    </div>,
+    document.body,
   );
 }

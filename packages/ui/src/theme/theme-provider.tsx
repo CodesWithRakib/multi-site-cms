@@ -51,6 +51,10 @@ export function ThemeProvider({
   // an effect, so hydration never mismatches.
   const [theme, setThemeState] = useState<ThemeMode>(defaultTheme);
   const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>('light');
+  // False until the saved preference has been read. Until then the
+  // pre-paint script's choice stays on <html>: applying the default
+  // ('system') first would flash the OS theme over a saved one on reload.
+  const [hasLoadedPreference, setHasLoadedPreference] = useState(false);
 
   useEffect(() => {
     try {
@@ -61,9 +65,11 @@ export function ThemeProvider({
     } catch {
       // Storage unavailable (private mode): keep the default.
     }
+    setHasLoadedPreference(true);
   }, [storageKey]);
 
   useEffect(() => {
+    if (!hasLoadedPreference) return undefined;
     const media = window.matchMedia('(prefers-color-scheme: dark)');
     const update = () => {
       const resolved: ResolvedTheme =
@@ -74,7 +80,7 @@ export function ThemeProvider({
     update();
     media.addEventListener('change', update);
     return () => media.removeEventListener('change', update);
-  }, [theme]);
+  }, [theme, hasLoadedPreference]);
 
   const setTheme = useCallback(
     (next: ThemeMode) => {

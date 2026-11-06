@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 
 import type { PublicArticleSummary } from '@multi-site-cms/types';
+import { cn } from '@multi-site-cms/ui';
 
 import { StoryCard } from './StoryCard';
 
@@ -9,10 +10,26 @@ interface LatestStoriesProps {
   readonly articles: readonly PublicArticleSummary[];
 }
 
+type GridLayout = 'quad' | 'stack' | 'pair';
+
+/**
+ * Picks a layout that leaves no empty cells next to the feature tile:
+ * 4+ stories → 2×2 beside it, 2–3 → a column of two, 0–1 → side by side.
+ */
+function chooseLayout(secondaryCount: number): GridLayout {
+  if (secondaryCount >= 4) return 'quad';
+  if (secondaryCount >= 2) return 'stack';
+  return 'pair';
+}
+
+const VISIBLE: Record<GridLayout, number> = { quad: 4, stack: 2, pair: 1 };
+
 /** Editorial grid: one feature tile plus up to four regular stories. */
 export function LatestStories({ articles }: LatestStoriesProps) {
   if (articles.length === 0) return null;
   const [feature, ...rest] = articles;
+  const layout = chooseLayout(rest.length);
+  const secondary = rest.slice(0, VISIBLE[layout]);
 
   return (
     <section aria-labelledby="latest-heading" className="space-y-6">
@@ -40,13 +57,25 @@ export function LatestStories({ articles }: LatestStoriesProps) {
         </Link>
       </div>
 
-      <div className="grid gap-x-5 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
+      <div
+        className={cn(
+          'grid gap-x-5 gap-y-8 sm:grid-cols-2',
+          layout === 'quad' && 'lg:grid-cols-4',
+          layout === 'stack' && 'lg:grid-cols-3',
+        )}
+      >
         {feature && (
-          <div className="flex sm:col-span-2 lg:row-span-2">
+          <div
+            className={cn(
+              'flex',
+              secondary.length !== 1 && 'sm:col-span-2',
+              layout !== 'pair' && 'lg:row-span-2',
+            )}
+          >
             <StoryCard article={feature} size="feature" />
           </div>
         )}
-        {rest.map((article) => (
+        {secondary.map((article) => (
           <StoryCard key={article.id} article={article} />
         ))}
       </div>

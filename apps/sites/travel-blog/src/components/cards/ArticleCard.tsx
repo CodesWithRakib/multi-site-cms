@@ -2,7 +2,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import type { PublicArticleSummary } from '@multi-site-cms/types';
 import { ArrowUpRight, Calendar, Clock, ImageOff, MapPin } from 'lucide-react';
-import { BookmarkButton } from '@/components/ui/BookmarkButton';
 import { CategoryBadge } from '@/components/ui/CategoryBadge';
 import { AuthorAvatar } from '@/components/ui/AuthorAvatar';
 
@@ -53,16 +52,6 @@ export function ArticleCard({ article, variant = 'standard', priority = false }:
             )}
             <div className="absolute left-4 top-4 z-10">
               <CategoryBadge label={categoryLabel} slug={category?.slug} />
-            </div>
-            <div className="absolute right-4 top-4 z-10">
-              <BookmarkButton
-                articleId={article.id}
-                articleSlug={article.slug}
-                articleTitle={article.title}
-                featuredImageUrl={article.featuredImage?.url}
-                categoryName={categoryLabel}
-                readingTimeMinutes={article.readingTimeMinutes}
-              />
             </div>
           </div>
 
@@ -171,16 +160,6 @@ export function ArticleCard({ article, variant = 'standard', priority = false }:
           )}
           <div className="absolute left-3 top-3 z-10">
             <CategoryBadge label={categoryLabel} slug={category?.slug} />
-          </div>
-          <div className="absolute right-3 top-3 z-10">
-            <BookmarkButton
-              articleId={article.id}
-              articleSlug={article.slug}
-              articleTitle={article.title}
-              featuredImageUrl={article.featuredImage?.url}
-              categoryName={categoryLabel}
-              readingTimeMinutes={article.readingTimeMinutes}
-            />
           </div>
         </div>
 

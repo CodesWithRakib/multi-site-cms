@@ -17,6 +17,10 @@ import { seedProductionContent } from '../seeds/production/seed-production-conte
  * the first active Super Admin).
  *
  *   node --env-file=.env.prod dist/database/cli/seed-production-content.js --confirm
+ *
+ * --sites-only creates just the sites and their verified primary domains (no
+ * taxonomy, no articles, no author needed). Use it when the editorial content
+ * comes from scripts/demo-content instead.
  */
 async function main(): Promise<void> {
   if (!process.argv.includes('--confirm')) {
@@ -31,9 +35,28 @@ async function main(): Promise<void> {
     );
   }
 
+  const sitesOnly = process.argv.includes('--sites-only');
+
   const dataSource = new DataSource(buildDataSourceOptions(env.DATABASE_URL));
   await dataSource.initialize();
   try {
+    if (sitesOnly) {
+      const report = await seedProductionContent(dataSource, {
+        sites: PRODUCTION_SITES.map((site) => ({
+          ...site,
+          categories: [],
+          tags: [],
+          articles: [],
+        })),
+        siteUrls: env.SITE_REVALIDATE_URLS,
+        authorId: '',
+        storage: new LocalStorageProvider(),
+      });
+      console.log(`[SEED] Sites created: ${report.sitesCreated.join(', ') || 'none'}`);
+      console.log(`[SEED] Domains added: ${report.domainsAdded.join(', ') || 'none'}`);
+      return;
+    }
+
     const email = process.env.SEED_AUTHOR_EMAIL?.trim().toLowerCase() || null;
     const authors = (await dataSource.query(
       `SELECT u."id" FROM "users" u

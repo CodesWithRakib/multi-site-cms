@@ -2,24 +2,34 @@
 
 import { useState, useEffect } from 'react';
 import { Monitor, Tablet, Smartphone, ShieldCheck, X, Loader2 } from 'lucide-react';
+import type { JSONContent } from '@tiptap/react';
+import { ReadOnlyDocument } from '@/features/editor';
 import { useGeneratePreviewTokenMutation, useGetPostPreviewQuery } from '@/lib/cms-api';
+
+/** What is in the editor right now, including unsaved changes. */
+export interface PostPreviewDraft {
+  title: string;
+  excerpt: string;
+  body: JSONContent;
+}
 
 export interface PostPreviewModalProps {
   isOpen: boolean;
   onClose: () => void;
   postId: string;
   siteId?: string;
-  fallbackTitle?: string;
-  fallbackBodyHtml?: string;
+  draft?: PostPreviewDraft;
 }
+
+const hasBlocks = (doc: JSONContent | undefined): doc is JSONContent =>
+  Array.isArray(doc?.content) && doc.content.length > 0;
 
 export function PostPreviewModal({
   isOpen,
   onClose,
   postId,
   siteId,
-  fallbackTitle,
-  fallbackBodyHtml,
+  draft,
 }: PostPreviewModalProps) {
   const [device, setDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
   const [generateToken, { data: tokenData, isLoading: isTokenLoading }] =
@@ -43,9 +53,13 @@ export function PostPreviewModal({
   const isAirSports =
     previewData?.site?.key === 'air-sports' || previewData?.post.type === 'air_sports_update';
 
-  const title = previewData?.revision?.title || fallbackTitle || 'Untitled Post';
-  const excerpt = previewData?.revision?.excerpt;
-  const body = previewData?.revision?.body;
+  // Prefer the editor's current content so unsaved edits are previewed too;
+  // fall back to the last saved revision.
+  const title = draft?.title || previewData?.revision?.title || 'Untitled Post';
+  const excerpt = draft?.excerpt || previewData?.revision?.excerpt;
+  const savedBody = previewData?.revision?.body as JSONContent | undefined;
+  const body = hasBlocks(draft?.body) ? draft.body : savedBody;
+  const siteName = previewData?.site?.name ?? (isAirSports ? 'Air Sports' : 'Travel Blog');
 
   // Derive preview container width
   const containerWidthClass =
@@ -118,9 +132,7 @@ export function PostPreviewModal({
                   : 'bg-slate-900 text-white font-serif text-lg font-bold'
               }`}
             >
-              <span>
-                {isAirSports ? '⚡ AIR SPORTS LIVE UPDATES' : '🌍 WANDERLUST TRAVEL BLOG'}
-              </span>
+              <span>{siteName}</span>
               <span className="text-xs font-sans font-medium opacity-80">
                 {previewData?.site?.primaryDomain || 'preview.internal'}
               </span>
@@ -163,19 +175,12 @@ export function PostPreviewModal({
                   </p>
                 )}
 
-                {/* Rendered HTML or fallback */}
-                {fallbackBodyHtml ? (
-                  <div
-                    className="prose dark:prose-invert max-w-none text-slate-800 dark:text-slate-200"
-                    dangerouslySetInnerHTML={{ __html: fallbackBodyHtml }}
+                {hasBlocks(body) ? (
+                  <ReadOnlyDocument
+                    content={body}
+                    contentType={previewData?.post.type}
+                    className="text-slate-800 dark:text-slate-200"
                   />
-                ) : body && body.content ? (
-                  <div className="prose dark:prose-invert max-w-none text-slate-800 dark:text-slate-200">
-                    <p className="text-slate-600 dark:text-slate-400 italic text-sm">
-                      [Document structure validated with{' '}
-                      {Array.isArray(body.content) ? body.content.length : 0} content blocks]
-                    </p>
-                  </div>
                 ) : (
                   <p className="text-slate-500 dark:text-slate-400 text-sm">
                     No body content written yet.

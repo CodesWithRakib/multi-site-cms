@@ -5,7 +5,6 @@ import { ImageOff } from 'lucide-react';
 import type { PublicArticleSummary } from '@multi-site-cms/types';
 import { cn } from '@multi-site-cms/ui';
 
-import { BookmarkButton } from '@/components/ui';
 import { formatPublishedDate } from '@/lib/format';
 
 interface StoryCardProps {
@@ -35,9 +34,6 @@ export function StoryCard({ article, size = 'default' }: StoryCardProps) {
             <ImageOff aria-hidden="true" className="size-8" />
           </div>
         )}
-        <div className="absolute right-3 top-3 z-20">
-          <BookmarkButton articleId={article.id} articleTitle={article.title} size="sm" />
-        </div>
       </div>
 
       <div className="flex flex-col gap-2 px-1 pt-4">

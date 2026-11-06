@@ -1,4 +1,5 @@
 export * from './components/RichTextEditor';
+export * from './components/ReadOnlyDocument';
 export * from './components/EditorToolbar';
 export * from './components/BubbleMenu';
 export * from './components/WordCountBar';

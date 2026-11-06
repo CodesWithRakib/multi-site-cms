@@ -19,6 +19,7 @@ import {
   Calendar,
   MessageSquare,
   CalendarClock,
+  PlayCircle,
 } from 'lucide-react';
 import { useListCommentsQuery } from '@/lib/cms-api';
 
@@ -115,6 +116,12 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       label: t('nav.activityLogs'),
       icon: ShieldCheck,
       active: pathname.startsWith('/audit-logs'),
+    },
+    {
+      href: '/tutorials',
+      label: 'Video Guide',
+      icon: PlayCircle,
+      active: pathname.startsWith('/tutorials'),
     },
   ];
 

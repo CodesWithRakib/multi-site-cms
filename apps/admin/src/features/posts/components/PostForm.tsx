@@ -40,7 +40,6 @@ export function PostForm({ initialPost, isCreateMode = false }: PostFormProps) {
   const [bodyJson, setBodyJson] = useState<Record<string, unknown>>(
     initialPost?.currentRevision?.body || { type: 'doc', content: [] },
   );
-  const [bodyHtml, setBodyHtml] = useState<string>('');
 
   // Featured image: `undefined` = untouched, so show the one already on the
   // post's publications; a picked asset or `null` (removed) overrides it.
@@ -142,9 +141,8 @@ export function PostForm({ initialPost, isCreateMode = false }: PostFormProps) {
     triggerManualSave,
   });
 
-  const handleEditorChange = (json: Record<string, unknown>, html: string) => {
+  const handleEditorChange = (json: Record<string, unknown>) => {
     setBodyJson(json);
-    setBodyHtml(html);
     setIsLocalDirty(true);
     markDirty();
   };
@@ -273,8 +271,7 @@ export function PostForm({ initialPost, isCreateMode = false }: PostFormProps) {
           isOpen={isPreviewOpen}
           onClose={() => setIsPreviewOpen(false)}
           postId={initialPost.id}
-          fallbackTitle={title}
-          fallbackBodyHtml={bodyHtml}
+          draft={{ title, excerpt, body: bodyJson }}
         />
       )}
 

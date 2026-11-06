@@ -20,32 +20,9 @@
  */
 
 import { createApi, itemsOf } from './lib/api.mjs';
+import { CATALOGUE } from './catalogue.mjs';
 import { EVENTS } from './events.mjs';
-import { MEDIA } from './media.mjs';
-import airDroneRules from './content/air-drone-rules.mjs';
-import airFlyingSeasons from './content/air-flying-seasons.mjs';
-import airShakrain from './content/air-shakrain-kites.mjs';
-import travelBandarban from './content/travel-bandarban.mjs';
-import travelCoxsBazar from './content/travel-coxs-bazar.mjs';
-import travelOldDhaka from './content/travel-old-dhaka.mjs';
-import travelRatargul from './content/travel-ratargul.mjs';
-import travelSajek from './content/travel-sajek.mjs';
-import travelSrimangal from './content/travel-srimangal.mjs';
-import travelSundarbans from './content/travel-sundarbans.mjs';
-
-/** Published oldest first, so the list order on the sites matches this array reversed. */
-const POSTS = [
-  travelOldDhaka,
-  airFlyingSeasons,
-  travelRatargul,
-  travelBandarban,
-  airDroneRules,
-  travelSrimangal,
-  travelCoxsBazar,
-  airShakrain,
-  travelSajek,
-  travelSundarbans,
-];
+import { POSTS } from './posts.mjs';
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -176,7 +153,7 @@ async function main() {
   // Upload every catalogued photo so the Media Library is well stocked,
   // even the ones no post uses yet.
   const media = {};
-  for (const [key, entry] of Object.entries(MEDIA)) {
+  for (const [key, entry] of Object.entries(CATALOGUE)) {
     const site = siteByKey.get(entry.site);
     if (!site) throw new Error(`Site "${entry.site}" not found`);
     media[key] = { ...(await findOrUploadMedia(entry, site.id)), caption: entry.caption };
