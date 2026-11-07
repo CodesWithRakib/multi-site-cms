@@ -5,7 +5,7 @@ import { AirSportsNewsletter } from '@/components/home/AirSportsNewsletter';
 import { FlightDeckHero } from '@/components/home/FlightDeckHero';
 import { LatestDispatches } from '@/components/home/LatestDispatches';
 import { TopDispatches } from '@/components/home/TopDispatches';
-import { siteConfig } from '@/config/site';
+import { siteConfig, feedAlternates } from '@/config/site';
 import { fetchArticles, fetchCategories, fetchEvents } from '@/lib/api';
 import { upcomingEvents } from '@/lib/format';
 
@@ -14,7 +14,7 @@ export const revalidate = 30; // ISR 30s
 export const metadata: Metadata = {
   title: `${siteConfig.name} — ${siteConfig.tagline}`,
   description: siteConfig.description,
-  alternates: { canonical: '/' },
+  alternates: { canonical: '/', types: feedAlternates },
   openGraph: { url: '/' },
 };
 

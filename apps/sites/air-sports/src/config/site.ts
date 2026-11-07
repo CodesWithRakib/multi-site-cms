@@ -19,3 +19,6 @@ export const siteConfig = {
  * `openGraph` replaces the root one entirely, so it must pass this explicitly.
  */
 export const defaultOgImage = { url: '/opengraph-image', width: 1200, height: 630 } as const;
+
+/** Feed autodiscovery. A page that sets its own `alternates` replaces the root one, so the home page repeats it. */
+export const feedAlternates = { 'application/rss+xml': '/feed.xml' } as const;

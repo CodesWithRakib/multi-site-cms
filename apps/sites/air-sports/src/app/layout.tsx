@@ -6,7 +6,7 @@ import { Caveat, JetBrains_Mono, Plus_Jakarta_Sans } from 'next/font/google';
 import { AppTabBar } from '@/components/layout/AppTabBar';
 import { Footer } from '@/components/layout/Footer';
 import { Header } from '@/components/layout/Header';
-import { siteConfig } from '@/config/site';
+import { siteConfig, feedAlternates } from '@/config/site';
 
 import {
   SkipLink,
@@ -50,6 +50,7 @@ export const metadata: Metadata = {
     template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,
+  alternates: { types: feedAlternates },
   openGraph: {
     type: 'website',
     siteName: siteConfig.name,

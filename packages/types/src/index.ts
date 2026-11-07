@@ -182,8 +182,32 @@ export interface SiteLocales {
   fallbackLocale: string;
 }
 
+/** One value card on the About page (e.g. "Depth over clicks"). */
+export interface SiteAboutPillar {
+  title: string;
+  body: string;
+}
+
+/**
+ * Content of a site's public About page, written by the site owner in the admin.
+ * Plain text only: it is rendered as text, never as HTML or Markdown.
+ */
+export interface SiteAbout {
+  /** Small label above the headline, e.g. "Our Mission". */
+  eyebrow: string;
+  headline: string;
+  /** Optional accent phrase shown after the headline. */
+  highlight: string;
+  /** Introduction; blank lines separate paragraphs. */
+  intro: string;
+  pillars: SiteAboutPillar[];
+  /** Show the real authors of published stories on the page. */
+  showWriters: boolean;
+}
+
 export interface SiteSettings {
   branding?: Partial<SiteBranding>;
+  about?: Partial<SiteAbout>;
   seo?: Partial<SiteSeo>;
   navigation?: SiteNavigationItem[];
   locales?: Partial<SiteLocales>;
@@ -236,6 +260,8 @@ export interface PublicSiteConfig {
   branding: SiteBranding;
   navigation: PublicNavigationItem[];
   seo: SiteSeo;
+  /** The owner-written About page, or null until the owner has saved one. */
+  about: SiteAbout | null;
 }
 
 export type PostType =

@@ -235,3 +235,5 @@ export const updatePlatformSettingsSchema = z.object({
 });
 
 export type UpdatePlatformSettingsInput = z.infer<typeof updatePlatformSettingsSchema>;
+
+export * from './site-about';

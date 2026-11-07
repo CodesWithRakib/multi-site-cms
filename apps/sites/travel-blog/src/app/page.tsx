@@ -6,7 +6,7 @@ import { KeepReading } from '@/components/home/KeepReading';
 import { LatestStories } from '@/components/home/LatestStories';
 import { NewsletterBanner } from '@/components/home/NewsletterBanner';
 import { TopicShowcase } from '@/components/home/TopicShowcase';
-import { siteConfig } from '@/config/site';
+import { siteConfig, feedAlternates } from '@/config/site';
 import { fetchArticles, fetchCategories } from '@/lib/api';
 import { buildHomeFeed } from '@/lib/home-feed';
 
@@ -15,7 +15,7 @@ export const revalidate = 60; // ISR revalidation every 60 seconds
 export const metadata: Metadata = {
   title: `${siteConfig.name} — ${siteConfig.tagline}`,
   description: siteConfig.description,
-  alternates: { canonical: '/' },
+  alternates: { canonical: '/', types: feedAlternates },
   openGraph: { url: '/' },
 };
 

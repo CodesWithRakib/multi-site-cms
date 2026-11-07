@@ -43,6 +43,17 @@ from published public data only (no drafts or private fields). Titles are
 stripped of Markdown link characters. It is optional for Google; it helps
 non-Google assistants.
 
+## RSS feed
+
+`/feed.xml` is RSS 2.0 of the newest 20 published articles, built by
+`buildRssFeed` from `@multi-site-cms/ui`. Every CMS string goes through
+`escapeXml`, which also drops control characters XML 1.0 cannot carry (one in a
+title would otherwise make the feed unparseable for every reader). An item with
+an unparseable date omits `pubDate`; GUIDs are the permanent article URLs.
+Autodiscovery (`<link rel="alternate" type="application/rss+xml">`) is declared
+in the root layout **and repeated on the home page**, because a page that sets
+its own `alternates` replaces the root one (`feedAlternates` in `config/site.ts`).
+
 ## Admin
 
 The admin sends `noindex, nofollow` on every page and `robots.txt` disallows
