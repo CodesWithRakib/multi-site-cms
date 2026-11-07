@@ -14,6 +14,7 @@
 | `/categories/[slug]` | `src/app/categories/[slug]/page.tsx` | Dynamic / ISR    | Filtered chronological archive of dispatches in a discipline.                                                            |
 | `/tags`              | `src/app/tags/page.tsx`              | ISR (300s)       | Topic tag index with dispatch counts.                                                                                    |
 | `/tags/[slug]`       | `src/app/tags/[slug]/page.tsx`       | Dynamic / ISR    | Filtered chronological archive for a tag.                                                                                |
+| `/about`             | `src/app/about/page.tsx`             | ISR (300s)       | Owner-written About page from the public site config (`resolveAboutContent`), with real authors and neutral fallbacks.   |
 | `/search`            | `src/app/search/page.tsx`            | Dynamic SSR      | Server-rendered keyword search across published headlines and excerpts.                                                  |
 | `/preview/[postId]`  | `src/app/preview/[postId]/page.tsx`  | SSR (No-Store)   | Authenticated editorial preview with signed HMAC token verification and crawler suppression headers.                     |
 | `/sitemap.xml`       | `src/app/sitemap.ts`                 | Dynamic / Cached | Dynamic XML sitemap linking all published dispatches and events.                                                         |

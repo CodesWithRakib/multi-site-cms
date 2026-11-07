@@ -25,7 +25,7 @@ export function EventsPanel({ events }: EventsPanelProps) {
         </h2>
         <Link
           href="/events"
-          className="inline-flex items-center gap-1 text-xs font-semibold text-brand-300 hover:text-white"
+          className="touch-target inline-flex items-center gap-1 text-xs font-semibold text-brand-300 hover:text-white"
         >
           All events
           <ArrowUpRight aria-hidden="true" className="size-3.5" />
@@ -55,7 +55,7 @@ export function EventsPanel({ events }: EventsPanelProps) {
                   </span>
                 </span>
                 {event.status === 'live' ? (
-                  <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-rose-500/15 px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-wider text-rose-300">
+                  <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-rose-500/15 px-2.5 py-1 font-mono text-[11px] font-bold uppercase tracking-wider text-rose-300">
                     <span className="relative flex size-1.5">
                       <span className="absolute inline-flex size-full rounded-full bg-rose-400 opacity-75 motion-safe:animate-ping" />
                       <span className="relative inline-flex size-1.5 rounded-full bg-rose-400" />
@@ -63,7 +63,7 @@ export function EventsPanel({ events }: EventsPanelProps) {
                     Live
                   </span>
                 ) : (
-                  <span className="shrink-0 rounded-full bg-white/10 px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-wider text-white/70">
+                  <span className="shrink-0 rounded-full bg-white/10 px-2.5 py-1 font-mono text-[11px] font-bold uppercase tracking-wider text-white/70">
                     Soon
                   </span>
                 )}

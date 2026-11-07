@@ -66,7 +66,7 @@ export function AirSportsCard({
                 {article.categories[0] && (
                   <Link
                     href={`/categories/${article.categories[0].slug}`}
-                    className="font-mono text-xs text-muted-foreground hover:text-primary transition-colors"
+                    className="touch-target font-mono text-xs text-muted-foreground hover:text-primary transition-colors"
                   >
                     #{article.categories[0].name}
                   </Link>
@@ -94,7 +94,7 @@ export function AirSportsCard({
 
               <Link
                 href={`/articles/${article.slug}`}
-                className="inline-flex items-center gap-1 font-sans font-bold text-primary group-hover:translate-x-1 transition-transform"
+                className="touch-target inline-flex items-center gap-1 font-sans font-bold text-primary group-hover:translate-x-1 transition-transform"
               >
                 Read Coverage
                 <ArrowUpRight className="size-4" />
@@ -122,7 +122,7 @@ export function AirSportsCard({
         )}
 
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 text-[10px] font-mono text-muted-foreground mb-1">
+          <div className="flex items-center gap-2 text-[11px] font-mono text-muted-foreground mb-1">
             <span>{formattedDate}</span>
             {isBreaking && <span className="text-rose-600 font-bold uppercase">Breaking</span>}
           </div>
@@ -159,7 +159,7 @@ export function AirSportsCard({
           )}
 
           {isBreaking && (
-            <span className="absolute top-3 left-3 rounded-full bg-rose-600 px-2.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-white shadow-xs">
+            <span className="absolute top-3 left-3 rounded-full bg-rose-600 px-2.5 py-0.5 font-mono text-[11px] font-bold uppercase tracking-wider text-white shadow-xs">
               Breaking
             </span>
           )}
@@ -170,7 +170,7 @@ export function AirSportsCard({
             {article.categories[0] && (
               <Link
                 href={`/categories/${article.categories[0].slug}`}
-                className="text-primary font-bold hover:underline"
+                className="touch-target text-primary font-bold hover:underline"
               >
                 {article.categories[0].name}
               </Link>
@@ -205,7 +205,7 @@ export function AirSportsCard({
 
         <Link
           href={`/articles/${article.slug}`}
-          className="ml-auto font-sans font-semibold text-primary hover:underline text-xs"
+          className="touch-target ml-auto font-sans font-semibold text-primary hover:underline text-xs"
         >
           Read Report →
         </Link>

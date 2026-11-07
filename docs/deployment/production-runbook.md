@@ -107,3 +107,18 @@ come from the hosting platform at request time and need no declaration.
 With `NODE_ENV=production` the API does not read the development `.env`, so
 `node --env-file=.env.prod …` uses production values only (previously, missing
 keys such as Cloudinary credentials were filled in from development).
+
+### Starting About page copy
+
+`seed:about` gives each site a starting About page so the public page is not
+empty. Idempotent: a site whose owner already wrote an About page is skipped;
+`--force` overwrites. It writes only `settings.about`, never other settings.
+
+```
+pnpm --filter @multi-site-cms/api build
+node --env-file=.env.prod apps/api/dist/database/cli/seed-about-content.js --confirm
+```
+
+The copy lives in `seeds/about-content.ts` and is a draft for the owner to
+rewrite in the admin (Content, About page). Run it against production only with
+the operator's go-ahead.

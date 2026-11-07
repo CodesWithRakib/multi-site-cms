@@ -125,6 +125,7 @@ export { JsonLd, type JsonLdProps } from './components/json-ld';
 export { breadcrumbJsonLd, serializeJsonLd, type BreadcrumbTrailItem } from './lib/json-ld';
 export { buildLlmsTxt, type LlmsLink, type LlmsTxtInput } from './lib/llms-txt';
 export { buildRssFeed, escapeXml, type RssFeedInput, type RssItem } from './lib/rss';
+export { collectAuthors, type AuthorSummary } from './lib/authors';
 export { SkipLink, type SkipLinkProps } from './components/skip-link';
 export { Skeleton, type SkeletonProps } from './components/skeleton';
 export { StatusPage, type StatusPageProps } from './components/status-page';

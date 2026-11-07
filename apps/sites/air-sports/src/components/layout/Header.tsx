@@ -17,6 +17,7 @@ const NAV_ITEMS = [
   { label: 'Home', href: '/' },
   { label: 'Dispatches', href: '/articles' },
   { label: 'Events', href: '/events' },
+  { label: 'About', href: '/about' },
 ] as const;
 
 function isActive(pathname: string, href: string): boolean {
@@ -40,7 +41,7 @@ export function Header() {
                 href={item.href}
                 aria-current={active ? 'page' : undefined}
                 className={cn(
-                  'rounded-full px-4 py-2 font-mono text-xs font-bold uppercase tracking-[0.15em] transition-colors duration-200',
+                  'rounded-full px-4 py-2.5 font-mono text-xs font-bold uppercase tracking-[0.15em] transition-colors duration-200',
                   active
                     ? 'bg-foreground text-background'
                     : 'text-muted-foreground hover:text-foreground',

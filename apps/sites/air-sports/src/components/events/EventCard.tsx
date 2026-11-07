@@ -88,7 +88,7 @@ export function EventCard({ event }: EventCardProps) {
 
         <Link
           href={`/events/${event.slug}`}
-          className="inline-flex items-center gap-1 font-sans font-bold text-primary group-hover:translate-x-0.5 transition-transform"
+          className="touch-target inline-flex items-center gap-1 font-sans font-bold text-primary group-hover:translate-x-0.5 transition-transform"
         >
           Event Hub
           <ChevronRight className="size-4" />

@@ -21,6 +21,7 @@ export async function GET(): Promise<Response> {
         summary: 'Every published dispatch',
       },
       { title: 'Events', url: `${siteConfig.url}/events`, summary: 'Live and upcoming coverage' },
+      { title: 'About', url: `${siteConfig.url}/about`, summary: 'Who we are and what we cover' },
       {
         title: 'Disciplines',
         url: `${siteConfig.url}/categories`,

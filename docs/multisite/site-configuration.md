@@ -86,7 +86,7 @@ text, never as HTML or Markdown, so markup typed by an owner is shown literally.
 
 Until an owner saves, `about` is `null` in the public config and the page shows
 neutral text built from the site name and description (`resolveAboutContent`).
-Only the travel-blog has an About page; air-sports ignores the field.
+Both public sites render it (`/about`): the travel-blog and air-sports share `resolveAboutContent` and `collectAuthors` instead of duplicating them. Each site's own copy of the page only supplies its styling.
 
 ---
 

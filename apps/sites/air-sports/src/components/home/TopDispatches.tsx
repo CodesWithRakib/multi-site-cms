@@ -86,7 +86,7 @@ export function TopDispatches({ articles }: TopDispatchesProps) {
           </h2>
           <Link
             href="/articles"
-            className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
+            className="touch-target inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
           >
             All
             <ArrowRight aria-hidden="true" className="size-3.5" />

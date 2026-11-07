@@ -22,7 +22,7 @@ export function AirSportsArticleNavigation({ post }: AirSportsArticleNavigationP
             <Link
               key={tag.id}
               href={`/tags/${tag.slug}`}
-              className="rounded-lg border border-border bg-card px-2.5 py-1 font-mono text-xs text-foreground hover:border-primary hover:text-primary transition-colors shadow-xs"
+              className="rounded-lg border border-border bg-card px-3 py-2 font-mono text-xs text-foreground hover:border-primary hover:text-primary transition-colors shadow-xs"
             >
               #{tag.name}
             </Link>

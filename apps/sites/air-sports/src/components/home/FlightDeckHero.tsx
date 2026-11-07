@@ -78,7 +78,7 @@ export function FlightDeckHero({ lead, events, disciplines }: FlightDeckHeroProp
               {isBreaking ? 'Breaking' : 'Latest dispatch'}
             </span>
             {category && (
-              <Link href={`/categories/${category.slug}`} className="hover:text-white">
+              <Link href={`/categories/${category.slug}`} className="touch-target hover:text-white">
                 {category.name}
               </Link>
             )}
@@ -138,10 +138,10 @@ export function FlightDeckHero({ lead, events, disciplines }: FlightDeckHeroProp
                 <Link
                   key={discipline.id}
                   href={`/categories/${discipline.slug}`}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-semibold text-white/90 backdrop-blur transition-colors duration-200 hover:border-white/40 hover:bg-white/10"
+                  className="inline-flex min-h-10 items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5 text-xs font-semibold text-white/90 backdrop-blur transition-colors duration-200 hover:border-white/40 hover:bg-white/10"
                 >
                   {discipline.name}
-                  <span className="font-mono text-[10px] text-white/50">
+                  <span className="font-mono text-[11px] text-white/50">
                     {discipline.postCount}
                   </span>
                 </Link>

@@ -102,7 +102,7 @@ export function SearchFilters({ state, categories, tags, totalStories }: SearchF
                   href={searchHref(state, { tag: active ? '' : tag.slug })}
                   aria-current={active ? 'true' : undefined}
                   className={cn(
-                    'rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors duration-200',
+                    'inline-flex min-h-10 items-center rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-colors duration-200',
                     active
                       ? 'border-primary bg-primary text-primary-foreground'
                       : 'border-border bg-card text-foreground/80 hover:border-primary/40 hover:text-primary',

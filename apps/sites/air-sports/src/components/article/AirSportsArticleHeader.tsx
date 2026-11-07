@@ -43,7 +43,9 @@ export function AirSportsArticleHeader({
           </Link>
         )}
         <span>/</span>
-        <span className="text-foreground truncate max-w-[200px] sm:max-w-xs">{post.slug}</span>
+        <span aria-current="page" className="text-foreground truncate max-w-[200px] sm:max-w-xs">
+          {post.title}
+        </span>
       </nav>
 
       {/* Header Tags & Metadata */}
@@ -58,7 +60,7 @@ export function AirSportsArticleHeader({
           <Link
             key={c.id}
             href={`/categories/${c.slug}`}
-            className="rounded-full border border-border bg-card px-3 py-0.5 font-mono text-xs font-semibold text-muted-foreground hover:text-primary transition-colors shadow-xs"
+            className="rounded-full border border-border bg-card px-3 py-2 font-mono text-xs font-semibold text-muted-foreground hover:text-primary transition-colors shadow-xs"
           >
             #{c.name}
           </Link>
@@ -67,7 +69,7 @@ export function AirSportsArticleHeader({
         {post.event && (
           <Link
             href={`/events/${post.event.slug}`}
-            className="rounded-full bg-primary/10 border border-primary/25 px-3 py-0.5 font-mono text-xs font-bold uppercase tracking-wider text-primary hover:bg-primary/20 transition-colors"
+            className="touch-target rounded-full bg-primary/10 border border-primary/25 px-3 py-1 font-mono text-xs font-bold uppercase tracking-wider text-primary hover:bg-primary/20 transition-colors"
           >
             Hub: {post.event.name}
           </Link>

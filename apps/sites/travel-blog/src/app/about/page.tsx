@@ -2,13 +2,13 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import { BookOpen, Compass, Globe, Heart, Shield, Sparkles, type LucideIcon } from 'lucide-react';
 import Link from 'next/link';
+import { collectAuthors } from '@multi-site-cms/ui';
+import { resolveAboutContent } from '@multi-site-cms/validation/site-about';
 
 import { NewsletterBanner } from '@/components/home/NewsletterBanner';
 import { AuthorAvatar } from '@/components/ui/AuthorAvatar';
 import { siteConfig } from '@/config/site';
 import { fetchArticles, fetchSiteConfig } from '@/lib/api';
-import { resolveAboutContent } from '@/lib/about';
-import { collectAuthors } from '@/lib/authors';
 
 export const revalidate = 300;
 

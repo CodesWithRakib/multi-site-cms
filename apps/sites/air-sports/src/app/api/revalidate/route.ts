@@ -13,6 +13,7 @@ const SITE_TAGS = [
   'air-sports-events',
   'air-sports-categories',
   'air-sports-tags',
+  'air-sports-config',
 ] as const;
 
 /**

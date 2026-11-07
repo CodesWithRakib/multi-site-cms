@@ -6,6 +6,7 @@ import type {
   PublicCategoryItem,
   PublicEventDetail,
   PublicEventSummary,
+  PublicSiteConfig,
   PublicSitemapItem,
   PublicTagItem,
 } from '@multi-site-cms/types';
@@ -101,6 +102,26 @@ export async function fetchArticleBySlug(slug: string): Promise<PublicArticleDet
     return json.data || null;
   } catch (error) {
     console.warn(`[Air Sports API] Failed to fetch article ${slug}:`, error);
+    return null;
+  }
+}
+
+/**
+ * Public site configuration, including the owner-written About page.
+ * Null when the API is unreachable so pages fall back to neutral defaults.
+ */
+export async function fetchSiteConfig(): Promise<PublicSiteConfig | null> {
+  try {
+    const res = await fetch(buildUrl('/config'), {
+      signal: apiTimeoutSignal(),
+      next: { revalidate: 300, tags: ['air-sports-config'] },
+      headers: { Accept: 'application/json' },
+    });
+    if (!res.ok) return null;
+    const json = (await res.json()) as { data: PublicSiteConfig };
+    return json.data ?? null;
+  } catch (error) {
+    console.warn('[Air Sports API] Failed to fetch site config:', error);
     return null;
   }
 }

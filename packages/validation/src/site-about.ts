@@ -1,4 +1,4 @@
-import type { SiteAbout, SiteAboutPillar } from '@multi-site-cms/types';
+import type { PublicSiteConfig, SiteAbout, SiteAboutPillar } from '@multi-site-cms/types';
 
 /** Limits enforced by the API (class-validator) and mirrored by the admin form. */
 export const SITE_ABOUT_LIMITS = {
@@ -62,4 +62,43 @@ export function aboutParagraphs(intro: string): string[] {
     .split(/\n\s*\n/)
     .map((paragraph) => paragraph.replace(/\s*\n\s*/g, ' ').trim())
     .filter((paragraph) => paragraph.length > 0);
+}
+
+export interface AboutContent {
+  readonly eyebrow: string;
+  readonly headline: string;
+  readonly highlight: string;
+  readonly paragraphs: readonly string[];
+  readonly pillars: readonly SiteAboutPillar[];
+  readonly showWriters: boolean;
+  /** Plain-text summary for `<meta name="description">`. */
+  readonly summary: string;
+}
+
+/**
+ * What a public About page shows. The owner's text wins; whatever they left
+ * blank falls back to neutral values built from the site's own name and
+ * description, so the page is never empty and never claims anything the owner
+ * did not write.
+ */
+export function resolveAboutContent(
+  config: PublicSiteConfig | null,
+  fallback: { readonly name: string; readonly description: string },
+): AboutContent {
+  const siteName = config?.branding.displayName || fallback.name;
+  const siteDescription = config?.branding.description || fallback.description;
+  const about = hasSiteAboutContent(config?.about) ? config.about : null;
+
+  const paragraphs = about ? aboutParagraphs(about.intro) : [];
+  const resolvedParagraphs = paragraphs.length > 0 ? paragraphs : [siteDescription];
+
+  return {
+    eyebrow: about?.eyebrow || 'About',
+    headline: about?.headline || `About ${siteName}`,
+    highlight: about?.highlight ?? '',
+    paragraphs: resolvedParagraphs,
+    pillars: about?.pillars ?? [],
+    showWriters: about?.showWriters ?? true,
+    summary: (resolvedParagraphs[0] ?? siteDescription).slice(0, 200),
+  };
 }

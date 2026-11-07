@@ -54,7 +54,7 @@ export function AirSportsTableOfContents({ entries, className }: AirSportsTableO
                 href={`#${entry.id}`}
                 aria-current={active ? 'location' : undefined}
                 className={cn(
-                  '-ml-px block border-l-2 py-1.5 text-sm leading-snug transition-colors duration-200',
+                  '-ml-px block border-l-2 py-2.5 text-sm leading-snug transition-colors duration-200',
                   entry.level > 2 ? 'pl-7' : 'pl-4',
                   active
                     ? 'border-primary font-semibold text-primary'

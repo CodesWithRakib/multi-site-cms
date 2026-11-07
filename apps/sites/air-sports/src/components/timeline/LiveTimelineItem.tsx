@@ -43,11 +43,11 @@ export function LiveTimelineItem({ article, isLatest }: LiveTimelineItemProps) {
           >
             {timeFormatted}
           </time>
-          <span className="text-[10px] text-muted-foreground uppercase">{dateFormatted}</span>
+          <span className="text-[11px] text-muted-foreground uppercase">{dateFormatted}</span>
         </div>
 
         {isLatest && (
-          <span className="mt-2 inline-flex items-center rounded-full bg-primary/20 px-2 py-0.5 text-[9px] font-mono font-bold uppercase tracking-wider text-primary">
+          <span className="mt-2 inline-flex items-center rounded-full bg-primary/20 px-2 py-0.5 text-[11px] font-mono font-bold uppercase tracking-wider text-primary">
             Latest
           </span>
         )}
@@ -57,7 +57,7 @@ export function LiveTimelineItem({ article, isLatest }: LiveTimelineItemProps) {
       <div className="flex-1 min-w-0">
         <div className="flex flex-wrap items-center gap-2 mb-1.5">
           {isBreaking && (
-            <span className="inline-flex items-center rounded-md bg-rose-500/15 border border-rose-500/30 px-2 py-0.5 text-[10px] font-mono font-bold uppercase tracking-wider text-rose-600">
+            <span className="inline-flex items-center rounded-md bg-rose-500/15 border border-rose-500/30 px-2 py-0.5 text-[11px] font-mono font-bold uppercase tracking-wider text-rose-600">
               Breaking
             </span>
           )}
@@ -66,14 +66,14 @@ export function LiveTimelineItem({ article, isLatest }: LiveTimelineItemProps) {
             <Link
               key={c.id}
               href={`/categories/${c.slug}`}
-              className="text-[11px] font-mono text-muted-foreground hover:text-primary transition-colors"
+              className="touch-target text-[11px] font-mono text-muted-foreground hover:text-primary transition-colors"
             >
               #{c.name}
             </Link>
           ))}
 
           {isUpdated && (
-            <span className="text-[10px] font-mono text-amber-600/80 uppercase">Updated</span>
+            <span className="text-[11px] font-mono text-amber-600/80 uppercase">Updated</span>
           )}
         </div>
 
@@ -114,7 +114,7 @@ export function LiveTimelineItem({ article, isLatest }: LiveTimelineItemProps) {
 
           <Link
             href={`/articles/${article.slug}`}
-            className="ml-auto font-sans font-semibold text-primary hover:underline text-xs"
+            className="touch-target ml-auto font-sans font-semibold text-primary hover:underline text-xs"
           >
             Full Story →
           </Link>

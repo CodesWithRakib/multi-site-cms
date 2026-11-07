@@ -139,7 +139,9 @@ export default async function EventDetailPage({ params }: EventPageProps) {
             Events Hub
           </Link>
           <span>/</span>
-          <span className="text-foreground">{event.slug}</span>
+          <span aria-current="page" className="max-w-[16rem] truncate text-foreground">
+            {event.name}
+          </span>
         </nav>
 
         {/* Event Header Banner */}

@@ -44,6 +44,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'daily',
       priority: 0.9,
     },
+    // No trustworthy timestamp for the About page, so no lastModified.
+    { url: `${siteConfig.url}/about`, changeFrequency: 'monthly', priority: 0.4 },
     {
       url: `${siteConfig.url}/categories`,
       lastModified: latest,
