@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { parseBrowseParams } from './browse-params';
-import { FEED_PAGE_SIZE, feedQueryString, nextToken, parseFeedRequest } from './feed-request';
+import { parseBrowseParams } from './browse';
+import { FEED_PAGE_SIZE, feedQueryString, nextToken, parseFeedRequest } from './feed';
 
 const parse = (qs: string) => parseFeedRequest(new URLSearchParams(qs));
 

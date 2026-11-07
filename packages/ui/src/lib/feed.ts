@@ -1,4 +1,4 @@
-import { browseParams, parseBrowseParams, type BrowseState } from './browse-params';
+import { browseParams, parseBrowseParams, type BrowseState } from './browse';
 
 /** Stories loaded per scroll step, and the most a client may ask for. */
 export const FEED_PAGE_SIZE = 12;

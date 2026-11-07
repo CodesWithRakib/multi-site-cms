@@ -1,7 +1,3 @@
-'use client';
-
-import React from 'react';
-
 interface SearchHighlightProps {
   text: string;
   query?: string;
@@ -34,7 +30,7 @@ export function SearchHighlight({ text, query = '', className = '' }: SearchHigh
           return (
             <mark
               key={`match-${index}-${part}`}
-              className="rounded bg-emerald-200/80 px-1 py-0.5 font-semibold text-emerald-950 dark:bg-emerald-900/70 dark:text-emerald-100"
+              className="rounded bg-primary/20 px-1 py-0.5 font-semibold text-foreground"
             >
               {part}
             </mark>

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { browseHref, isFiltered, parseBrowseParams } from './browse-params';
+import { browseHref, isFiltered, parseBrowseParams } from './browse';
 
 describe('parseBrowseParams', () => {
   it('reads valid params', () => {

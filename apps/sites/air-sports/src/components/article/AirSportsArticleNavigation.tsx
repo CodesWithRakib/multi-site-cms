@@ -83,7 +83,7 @@ export function AirSportsArticleNavigation({ post }: AirSportsArticleNavigationP
             </h2>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2">
             {post.relatedArticles.map((rel) => (
               <AirSportsCard key={rel.id} article={rel} variant="standard" />
             ))}

@@ -1,6 +1,6 @@
 import type {
+  CursorPage,
   ListPublicPostsQuery,
-  PaginatedResult,
   PublicArticleDetail,
   PublicArticleSummary,
   PublicCategoryItem,
@@ -32,20 +32,26 @@ function buildUrl(endpoint: string, params?: Record<string, unknown>): string {
   return url.toString();
 }
 
-/**
- * Fetch published articles / updates for Air Sports.
- */
-export async function fetchArticles(
-  params?: ListPublicPostsQuery,
-): Promise<PaginatedResult<PublicArticleSummary>> {
-  const emptyResult: PaginatedResult<PublicArticleSummary> = {
+export type ArticlesResult =
+  { readonly ok: true; readonly data: CursorPage<PublicArticleSummary> } | { readonly ok: false };
+
+function emptyPage(params?: ListPublicPostsQuery): CursorPage<PublicArticleSummary> {
+  return {
     items: [],
     total: 0,
     page: params?.page ?? 1,
     limit: params?.limit ?? 12,
     totalPages: 1,
+    nextCursor: null,
   };
+}
 
+/**
+ * Published articles / updates for Air Sports, with page or cursor paging.
+ * Unlike `fetchArticles` it says whether the CMS answered, so a caller that
+ * appends to a list (infinite scroll) can tell "no more" from "failed".
+ */
+export async function fetchArticlesResult(params?: ListPublicPostsQuery): Promise<ArticlesResult> {
   try {
     const url = buildUrl('/posts', params as Record<string, unknown>);
     const res = await fetch(url, {
@@ -58,27 +64,46 @@ export async function fetchArticles(
     });
 
     if (!res.ok) {
-      if (res.status === 404) return emptyResult;
+      // An unknown site is simply empty; anything else is a failure.
+      if (res.status === 404) return { ok: true, data: emptyPage(params) };
       console.warn(`[Air Sports API] Fetch articles returned ${res.status}`);
-      return emptyResult;
+      return { ok: false };
     }
 
     const json = (await res.json()) as {
       data: PublicArticleSummary[];
-      pagination: { total: number; page: number; limit: number; totalPages: number };
+      pagination: {
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+        nextCursor?: string | null;
+      };
     };
 
     return {
-      items: json.data || [],
-      total: json.pagination?.total || 0,
-      page: json.pagination?.page || 1,
-      limit: json.pagination?.limit || 12,
-      totalPages: json.pagination?.totalPages || 1,
+      ok: true,
+      data: {
+        items: json.data || [],
+        total: json.pagination?.total || 0,
+        page: json.pagination?.page || 1,
+        limit: json.pagination?.limit || 12,
+        totalPages: json.pagination?.totalPages || 1,
+        nextCursor: json.pagination?.nextCursor ?? null,
+      },
     };
   } catch (error) {
     console.warn('[Air Sports API] Failed to fetch articles:', error);
-    return emptyResult;
+    return { ok: false };
   }
+}
+
+/** Published articles, or an empty page when the CMS cannot be reached. */
+export async function fetchArticles(
+  params?: ListPublicPostsQuery,
+): Promise<CursorPage<PublicArticleSummary>> {
+  const result = await fetchArticlesResult(params);
+  return result.ok ? result.data : emptyPage(params);
 }
 
 /**

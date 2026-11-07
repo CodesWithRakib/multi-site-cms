@@ -73,39 +73,13 @@ visible on the server (works without JavaScript), only hides content that is
 still below the fold after hydration, and does nothing for visitors who prefer
 reduced motion.
 
-## Stories page: search, filters and infinite scroll
+## Stories page
 
-`/articles` renders the first 12 stories on the server (fast, indexable) and
-`ArticleFeed` loads the rest as the reader nears the end of the list, with
-skeleton cards while a batch loads and a retry button if it fails.
-
-- **Cursor, not offset.** `GET /public/sites/:key/posts` returns
-  `pagination.nextCursor` (null at the end). Pass it back as `?cursor=` to get the
-  stories after it. The cursor is an opaque keyset `(published_at, id)`, so a
-  story published while the reader scrolls is never skipped or repeated, and two
-  stories with the same timestamp keep a stable order. `total` always means all
-  stories matching the filters, not what is left. A malformed cursor, or a cursor
-  with a sort other than newest, is a `400`.
-- **The browser never calls the CMS API.** `/api/articles` (Next route handler)
-  validates the cursor, category and limit (`lib/feed-request.ts`), calls the
-  API and returns `{ items, total, nextCursor }`. An upstream failure is a `502`,
-  never an empty list, so the feed shows "try again" instead of silently ending.
-- **One page for finding stories.** `/articles` is search, topic, sort and the list.
-  Everything is in the URL (`?q=`, `?category=`, `?tag=`, `?sort=`), parsed once in
-  `lib/browse-params.ts` and shared by the page, the links and the feed. `/search` is
-  no longer a page: it redirects (308) to `/articles` with the same query. Search
-  results are `noindex`.
-- **One topic filter**, the chips above the list (no counts); choosing a topic keeps
-  the search text and sort. "All" loads every published story. Switching filters
-  remounts the feed so a cursor never leaks between lists.
-- **Sort.** Latest continues by cursor; Popular, Oldest and A-Z have no stable
-  cursor and continue by page number (`FeedNext` in `lib/feed-request.ts`).
-- **Freshness.** Stories, topics and the site config share one 60 second window.
-  When content is published the revalidation webhook refreshes them immediately
-  (see `docs/publishing/cache-invalidation.md`); where it is not configured (local
-  development) they follow within about a minute or two.
-- **Without JavaScript** the numbered `?page=N` links inside `<noscript>` keep
-  every story reachable.
+`/articles` is the single page for search, topic, sort and the infinite list. The
+logic is shared with Air Sports and documented once in
+[`docs/sites/browse-and-feed.md`](../browse-and-feed.md). Travel Blog specifics:
+the 12-story first batch, `ArticleCard` rows and cards, a sidebar with the latest
+reads and the newsletter, and illustrated empty states.
 
 ## Typography
 

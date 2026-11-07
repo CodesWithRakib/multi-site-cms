@@ -1,17 +1,22 @@
 import Link from 'next/link';
 import { BookOpen } from 'lucide-react';
 
-import { PaginationLinks } from '@multi-site-cms/ui';
+import {
+  BROWSE_PATH,
+  BrowseSearchForm,
+  BrowseSortTabs,
+  BrowseTopicChips,
+  browseHref,
+  isFiltered,
+  PaginationLinks,
+  type BrowseState,
+  type FeedNext,
+} from '@multi-site-cms/ui';
 
 import { PageHeader } from '@/components/ui/PageHeader';
 import type { PublicArticle, PublicCategory } from '@/lib/api';
-import { BROWSE_PATH, browseHref, isFiltered, type BrowseState } from '@/lib/browse-params';
-import type { FeedNext } from '@/lib/feed-request';
 
 import { ArticleFeed } from './ArticleFeed';
-import { BrowseSearchForm } from './BrowseSearchForm';
-import { BrowseSortTabs } from './BrowseSortTabs';
-import { PortalCategoryChips } from './PortalCategoryChips';
 import { PortalRightSidebar } from './PortalRightSidebar';
 
 interface PortalContentContainerProps {
@@ -75,15 +80,24 @@ export function PortalContentContainer({
         }
         scene="mountains"
       >
-        <BrowseSearchForm state={state} />
+        <BrowseSearchForm
+          state={state}
+          placeholder="Search places, routes and tips…"
+          className="mt-5"
+        />
       </PageHeader>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-12" id="blogs-grid">
         <div className="space-y-5 lg:col-span-8">
-          <PortalCategoryChips categories={categories} state={state} />
+          <BrowseTopicChips
+            topics={categories}
+            state={state}
+            linkComponent={Link}
+            label="Filter by topic"
+          />
 
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <BrowseSortTabs state={state} />
+            <BrowseSortTabs state={state} linkComponent={Link} />
             <p className="text-sm text-muted-foreground" aria-live="polite">
               {total === 0 ? 'No stories found' : `${total} ${total === 1 ? 'story' : 'stories'}`}
               {filtered && (

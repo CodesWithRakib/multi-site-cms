@@ -1,6 +1,6 @@
 import type { PublicArticleSummary, PublicCategoryItem } from '@multi-site-cms/types';
 
-import { assignTopicImages } from './topic-images';
+import { assignTopicImages } from '@multi-site-cms/ui';
 
 export interface TopicCard {
   readonly category: PublicCategoryItem;

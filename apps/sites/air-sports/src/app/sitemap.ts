@@ -6,7 +6,7 @@ import { fetchCategories, fetchEvents, fetchSitemapEntries, fetchTags } from '@/
 export const revalidate = 300;
 
 /**
- * Only indexable, content-bearing URLs. `/search` is `noindex`, so listing it
+ * Only indexable, content-bearing URLs. Search results are `noindex`, so listing them
  * contradicted itself; previews and paginated pages are left out on purpose.
  * `lastModified` is the newest real change, never "now".
  */

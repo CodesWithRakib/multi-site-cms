@@ -12,7 +12,6 @@ const FOOTER_LINKS = [
   { label: 'Dispatches', href: '/articles' },
   { label: 'Events', href: '/events' },
   { label: 'Disciplines', href: '/categories' },
-  { label: 'Search', href: '/search' },
   { label: 'About', href: '/about' },
 ] as const;
 

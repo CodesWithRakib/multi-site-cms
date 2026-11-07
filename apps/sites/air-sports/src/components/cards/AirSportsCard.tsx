@@ -3,18 +3,22 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowUpRight, Clock, Wind } from 'lucide-react';
 import { AuthorAvatar } from '@/components/ui/AuthorAvatar';
+import { SearchHighlight } from '@multi-site-cms/ui';
 import type { PublicArticleSummary } from '@multi-site-cms/types';
 
 interface AirSportsCardProps {
   article: PublicArticleSummary;
   variant?: 'hero' | 'standard' | 'compact';
   priority?: boolean;
+  /** Search text to highlight in the title and excerpt (standard variant). */
+  highlight?: string;
 }
 
 export function AirSportsCard({
   article,
   variant = 'standard',
   priority = false,
+  highlight = '',
 }: AirSportsCardProps) {
   const publishedDate = new Date(article.publishedAt);
   const formattedDate = publishedDate.toLocaleDateString([], {
@@ -139,7 +143,7 @@ export function AirSportsCard({
   return (
     <article className="group flex flex-col justify-between overflow-hidden rounded-2xl border border-border bg-card shadow-xs hover:border-foreground/30 hover:shadow-md transition-all">
       <div>
-        <div className="relative aspect-[16/10] w-full overflow-hidden bg-muted">
+        <div className="relative aspect-video w-full overflow-hidden bg-muted">
           {article.featuredImage ? (
             <Image
               src={article.featuredImage.url}
@@ -165,8 +169,8 @@ export function AirSportsCard({
           )}
         </div>
 
-        <div className="p-5">
-          <div className="flex flex-wrap items-center gap-2 mb-2 text-xs font-mono text-muted-foreground">
+        <div className="p-4 sm:p-5">
+          <div className="mb-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-mono text-muted-foreground">
             {article.categories[0] && (
               <Link
                 href={`/categories/${article.categories[0].slug}`}
@@ -180,34 +184,39 @@ export function AirSportsCard({
           </div>
 
           <h3 className="text-lg font-bold tracking-tight text-foreground group-hover:text-primary transition-colors line-clamp-2">
-            <Link href={`/articles/${article.slug}`}>{article.title}</Link>
+            <Link href={`/articles/${article.slug}`}>
+              <SearchHighlight text={article.title} query={highlight} />
+            </Link>
           </h3>
 
           {article.excerpt && (
-            <p className="mt-2 text-xs text-foreground/80 leading-relaxed line-clamp-3">
-              {article.excerpt}
+            <p className="mt-2 text-sm text-foreground/80 leading-relaxed line-clamp-2">
+              <SearchHighlight text={article.excerpt} query={highlight} />
             </p>
           )}
         </div>
       </div>
 
-      <div className="p-5 pt-0 border-t border-border/50 flex items-center justify-between text-xs font-mono text-muted-foreground mt-4">
-        {article.author && (
-          <span className="flex items-center gap-1.5">
+      <div className="mt-3 flex items-center justify-between gap-3 border-t border-border/50 px-4 py-3 text-xs sm:px-5">
+        {article.author ? (
+          <span className="flex min-w-0 items-center gap-1.5 font-mono text-muted-foreground">
             <AuthorAvatar
               name={article.author.displayName}
               avatarUrl={article.author.avatarUrl}
-              className="size-5 font-sans text-[8px]"
+              className="size-5 shrink-0 font-sans text-[8px]"
             />
-            {article.author.displayName}
+            <span className="truncate">{article.author.displayName}</span>
           </span>
+        ) : (
+          <span />
         )}
 
         <Link
           href={`/articles/${article.slug}`}
-          className="touch-target ml-auto font-sans font-semibold text-primary hover:underline text-xs"
+          className="touch-target inline-flex shrink-0 items-center gap-1 whitespace-nowrap font-sans font-semibold text-primary hover:underline"
         >
-          Read Report →
+          Read report
+          <ArrowUpRight aria-hidden="true" className="size-3.5" />
         </Link>
       </div>
     </article>

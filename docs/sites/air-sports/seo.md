@@ -22,7 +22,7 @@ To enable Google Rich Snippets for sports coverage and live news, structured JSO
 
 ### 2.1 Homepage
 
-- **`schema.org/WebSite`**: Declares site name and search action target (`/search?q={search_term_string}`).
+- **`schema.org/WebSite`**: Declares site name and search action target (`/articles?q={search_term_string}`).
 - **`schema.org/Organization`**: Declares editorial desk identity, logo URL, and verified social handles.
 
 ### 2.2 Articles & Live Dispatches

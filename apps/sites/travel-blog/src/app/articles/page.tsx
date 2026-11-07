@@ -1,13 +1,18 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
-import { JsonLd } from '@multi-site-cms/ui';
+import {
+  browseHref,
+  FEED_PAGE_SIZE,
+  isFiltered,
+  JsonLd,
+  nextToken,
+  parseBrowseParams,
+} from '@multi-site-cms/ui';
 
 import { PortalContentContainer } from '@/components/portal/PortalContentContainer';
 import { siteConfig } from '@/config/site';
 import { fetchArticles, fetchCategories } from '@/lib/api';
-import { browseHref, isFiltered, parseBrowseParams } from '@/lib/browse-params';
-import { FEED_PAGE_SIZE, nextToken } from '@/lib/feed-request';
 
 export const revalidate = 60; // ISR revalidation every 60s
 

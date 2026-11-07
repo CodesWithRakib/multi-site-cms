@@ -4,22 +4,22 @@
 
 `apps/sites/air-sports` utilizes Next.js 16 App Router with React Server Components (RSC) by default.
 
-| Route Pattern        | Component Path                       | Rendering Mode   | Purpose & Content                                                                                                        |
-| -------------------- | ------------------------------------ | ---------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `/`                  | `src/app/page.tsx`                   | ISR (30s)        | Radar feed: Breaking news ticker, featured hero story, active competition hubs, live timeline updates, and reports grid. |
-| `/articles/[slug]`   | `src/app/articles/[slug]/page.tsx`   | Dynamic / ISR    | Full dispatch, article, or race analysis with author, telemetry, Schema.org NewsArticle, and safe ProseMirror AST.       |
-| `/events`            | `src/app/events/page.tsx`            | ISR (60s)        | Championship directory listing active, upcoming, and completed competition hubs.                                         |
-| `/events/[slug]`     | `src/app/events/[slug]/page.tsx`     | Dynamic / ISR    | Dedicated event hub with dates, overview, and chronological timeline of updates attached to this event.                  |
-| `/categories`        | `src/app/categories/page.tsx`        | ISR (300s)       | Aviation disciplines index (paragliding, aerobatics, drone racing, etc.) with published dispatch counts.                 |
-| `/categories/[slug]` | `src/app/categories/[slug]/page.tsx` | Dynamic / ISR    | Filtered chronological archive of dispatches in a discipline.                                                            |
-| `/tags`              | `src/app/tags/page.tsx`              | ISR (300s)       | Topic tag index with dispatch counts.                                                                                    |
-| `/tags/[slug]`       | `src/app/tags/[slug]/page.tsx`       | Dynamic / ISR    | Filtered chronological archive for a tag.                                                                                |
-| `/about`             | `src/app/about/page.tsx`             | ISR (300s)       | Owner-written About page from the public site config (`resolveAboutContent`), with real authors and neutral fallbacks.   |
-| `/search`            | `src/app/search/page.tsx`            | Dynamic SSR      | Server-rendered keyword search across published headlines and excerpts.                                                  |
-| `/preview/[postId]`  | `src/app/preview/[postId]/page.tsx`  | SSR (No-Store)   | Authenticated editorial preview with signed HMAC token verification and crawler suppression headers.                     |
-| `/sitemap.xml`       | `src/app/sitemap.ts`                 | Dynamic / Cached | Dynamic XML sitemap linking all published dispatches and events.                                                         |
-| `/robots.txt`        | `src/app/robots.ts`                  | Static           | Search crawler rules (disallowing `/preview/*` and `/api/*`).                                                            |
-| `/api/revalidate`    | `src/app/api/revalidate/route.ts`    | API Route        | Webhook receiver for instant cache invalidation triggered by outbox publishing events.                                   |
+| Route Pattern        | Component Path                       | Rendering Mode   | Purpose & Content                                                                                                                                                                   |
+| -------------------- | ------------------------------------ | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/`                  | `src/app/page.tsx`                   | ISR (30s)        | Radar feed: Breaking news ticker, featured hero story, active competition hubs, live timeline updates, and reports grid.                                                            |
+| `/articles`          | `src/app/articles/page.tsx`          | ISR (30s)        | The one page for finding dispatches: search (`?q=`), discipline (`?category=`), tag, sort and infinite scroll. `/search` redirects here (308). See `docs/sites/browse-and-feed.md`. |
+| `/articles/[slug]`   | `src/app/articles/[slug]/page.tsx`   | Dynamic / ISR    | Full dispatch, article, or race analysis with author, telemetry, Schema.org NewsArticle, and safe ProseMirror AST.                                                                  |
+| `/events`            | `src/app/events/page.tsx`            | ISR (60s)        | Championship directory listing active, upcoming, and completed competition hubs.                                                                                                    |
+| `/events/[slug]`     | `src/app/events/[slug]/page.tsx`     | Dynamic / ISR    | Dedicated event hub with dates, overview, and chronological timeline of updates attached to this event.                                                                             |
+| `/categories`        | `src/app/categories/page.tsx`        | ISR (300s)       | Aviation disciplines index (paragliding, aerobatics, drone racing, etc.) with published dispatch counts.                                                                            |
+| `/categories/[slug]` | `src/app/categories/[slug]/page.tsx` | Dynamic / ISR    | Filtered chronological archive of dispatches in a discipline.                                                                                                                       |
+| `/tags`              | `src/app/tags/page.tsx`              | ISR (300s)       | Topic tag index with dispatch counts.                                                                                                                                               |
+| `/tags/[slug]`       | `src/app/tags/[slug]/page.tsx`       | Dynamic / ISR    | Filtered chronological archive for a tag.                                                                                                                                           |
+| `/about`             | `src/app/about/page.tsx`             | ISR (300s)       | Owner-written About page from the public site config (`resolveAboutContent`), with real authors and neutral fallbacks.                                                              |
+| `/preview/[postId]`  | `src/app/preview/[postId]/page.tsx`  | SSR (No-Store)   | Authenticated editorial preview with signed HMAC token verification and crawler suppression headers.                                                                                |
+| `/sitemap.xml`       | `src/app/sitemap.ts`                 | Dynamic / Cached | Dynamic XML sitemap linking all published dispatches and events.                                                                                                                    |
+| `/robots.txt`        | `src/app/robots.ts`                  | Static           | Search crawler rules (disallowing `/preview/*` and `/api/*`).                                                                                                                       |
+| `/api/revalidate`    | `src/app/api/revalidate/route.ts`    | API Route        | Webhook receiver for instant cache invalidation triggered by outbox publishing events.                                                                                              |
 
 ---
 

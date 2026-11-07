@@ -38,6 +38,11 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: repositoryRoot,
   },
+  // Search and browsing are one page. Old links, bookmarks and indexed URLs keep working;
+  // Next forwards the query string (?q=, ?category=, ...) to the destination.
+  async redirects() {
+    return [{ source: '/search', destination: '/articles', permanent: true }];
+  },
   async headers() {
     return [
       {

@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { ArticleCard } from '@/components/cards/ArticleCard';
 import { EmptyState } from '@/components/ui/EmptyState';
 import type { PublicArticle } from '@/lib/api';
-import { BROWSE_PATH, isFiltered, type BrowseState } from '@/lib/browse-params';
+import { BROWSE_PATH, isFiltered, type BrowseState } from '@multi-site-cms/ui';
 
 interface PortalArticleGridProps {
   readonly articles: PublicArticle[];

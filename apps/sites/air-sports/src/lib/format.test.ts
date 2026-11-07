@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { PublicEventSummary } from '@multi-site-cms/types';
 
-import { formatEventWindow, formatPublishedDate, upcomingEvents } from './format';
+import { formatDateTile, formatEventWindow, formatPublishedDate, upcomingEvents } from './format';
 
 function event(overrides: Partial<PublicEventSummary>): PublicEventSummary {
   return {
@@ -47,5 +47,15 @@ describe('upcomingEvents', () => {
     ];
     expect(upcomingEvents(events, 3).map((e) => e.id)).toEqual(['live', 'soon', 'late']);
     expect(upcomingEvents(events, 1).map((e) => e.id)).toEqual(['live']);
+  });
+});
+
+describe('formatDateTile', () => {
+  it('splits a date into a day number and an upper-case month', () => {
+    expect(formatDateTile('2027-01-14T12:00:00.000Z')).toEqual({ day: '14', month: 'JAN' });
+  });
+
+  it('is empty for an unparseable date', () => {
+    expect(formatDateTile('nope')).toEqual({ day: '', month: '' });
   });
 });

@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 
 import { fetchArticlesResult } from '@/lib/api';
-import { nextToken, parseFeedRequest } from '@/lib/feed-request';
+import { nextToken, parseFeedRequest } from '@multi-site-cms/ui';
 
 export const dynamic = 'force-dynamic';
 

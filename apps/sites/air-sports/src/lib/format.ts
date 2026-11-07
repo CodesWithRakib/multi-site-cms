@@ -44,3 +44,12 @@ export function upcomingEvents(
     .sort((a, b) => rank(a) - rank(b) || a.startsAt.localeCompare(b.startsAt))
     .slice(0, limit);
 }
+
+const monthFormatter = new Intl.DateTimeFormat('en-US', { month: 'short' });
+
+/** "14" and "JAN" for a calendar tile; empty strings when the timestamp cannot be parsed. */
+export function formatDateTile(iso: string): { day: string; month: string } {
+  const date = parse(iso);
+  if (!date) return { day: '', month: '' };
+  return { day: String(date.getDate()), month: monthFormatter.format(date).toUpperCase() };
+}

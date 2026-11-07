@@ -26,7 +26,7 @@ Unlike the long-form editorial magazine style of the Travel Blog, Air Sports req
 1. **Independent Next.js 16 App Router Architecture**:
    - Built inside `apps/sites/air-sports` using Next.js 16.4.3, React 19.3.1, and Tailwind CSS v4.
    - Distinct aviation typography utilizing `Inter` for prose and `JetBrains Mono` for telemetric data, wind readings, and timestamps.
-   - Dedicated routes: `/`, `/articles/[slug]`, `/events`, `/events/[slug]`, `/categories/*`, `/tags/*`, `/search`, `/preview/[postId]`, `/sitemap.xml`, `/robots.txt`.
+   - Dedicated routes: `/`, `/articles/[slug]`, `/events`, `/events/[slug]`, `/categories/*`, `/tags/*`, `/preview/[postId]` (search is part of `/articles`; `/search` redirects there), `/sitemap.xml`, `/robots.txt`.
 
 2. **Server-Sent Events (SSE) Real-Time Integration**:
    - Connects to the NestJS real-time broadcast stream at `/api/v1/realtime/air-sports/stream`.

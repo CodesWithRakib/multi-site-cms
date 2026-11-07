@@ -126,6 +126,41 @@ export { breadcrumbJsonLd, serializeJsonLd, type BreadcrumbTrailItem } from './l
 export { buildLlmsTxt, type LlmsLink, type LlmsTxtInput } from './lib/llms-txt';
 export { buildRssFeed, escapeXml, type RssFeedInput, type RssItem } from './lib/rss';
 export { collectAuthors, type AuthorSummary } from './lib/authors';
+export { assignTopicImages } from './lib/topic-images';
+export {
+  BROWSE_PATH,
+  BROWSE_SORTS,
+  browseHref,
+  browseParams,
+  isFiltered,
+  parseBrowseParams,
+  type BrowseState,
+} from './lib/browse';
+export {
+  FEED_PAGE_SIZE,
+  feedQueryString,
+  nextToken,
+  parseFeedRequest,
+  type FeedBatch,
+  type FeedNext,
+  type FeedRequest,
+} from './lib/feed';
+export {
+  useInfiniteFeed,
+  type FeedStatus,
+  type InfiniteFeed,
+  type UseInfiniteFeedOptions,
+} from './lib/use-infinite-feed';
+export { FeedFooter, type FeedFooterProps } from './components/feed-footer';
+export { SearchHighlight } from './components/search-highlight';
+export {
+  BrowseSearchForm,
+  BrowseSortTabs,
+  BrowseTopicChips,
+  type BrowseLink,
+  type BrowseLinkProps,
+  type BrowseTopic,
+} from './components/browse-controls';
 export { SkipLink, type SkipLinkProps } from './components/skip-link';
 export { Skeleton, type SkeletonProps } from './components/skeleton';
 export { StatusPage, type StatusPageProps } from './components/status-page';

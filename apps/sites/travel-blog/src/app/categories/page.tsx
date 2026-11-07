@@ -3,12 +3,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowUpRight, FolderKanban } from 'lucide-react';
 
+import { assignTopicImages } from '@multi-site-cms/ui';
+
 import { ScenicArt, sceneFor } from '@/components/illustrations/ScenicArt';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { siteConfig } from '@/config/site';
 import { fetchArticles, fetchCategories } from '@/lib/api';
-import { assignTopicImages } from '@/lib/topic-images';
 
 export const revalidate = 300;
 

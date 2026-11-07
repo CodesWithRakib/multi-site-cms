@@ -3,12 +3,11 @@ import Link from 'next/link';
 import { ArrowUpRight, Clock, MapPin } from 'lucide-react';
 
 import type { PublicArticleSummary } from '@multi-site-cms/types';
-import { cn } from '@multi-site-cms/ui';
+import { cn, SearchHighlight } from '@multi-site-cms/ui';
 
 import { StoryPlaceholder } from '@/components/illustrations/StoryPlaceholder';
 import { AuthorAvatar } from '@/components/ui/AuthorAvatar';
 import { CategoryBadge } from '@/components/ui/CategoryBadge';
-import { SearchHighlight } from '@/components/ui/SearchHighlight';
 import { formatShortDate } from '@/lib/format';
 
 export interface ArticleCardProps {

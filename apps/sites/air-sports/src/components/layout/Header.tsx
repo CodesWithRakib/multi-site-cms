@@ -55,7 +55,7 @@ export function Header() {
 
         <div className="flex items-center gap-2">
           <Link
-            href="/search"
+            href="/articles#search"
             aria-label="Search dispatches"
             className="hidden size-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground md:inline-flex"
           >
