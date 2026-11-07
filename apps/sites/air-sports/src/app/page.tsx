@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { JsonLd } from '@multi-site-cms/ui';
 
 import { AirSportsNewsletter } from '@/components/home/AirSportsNewsletter';
 import { FlightDeckHero } from '@/components/home/FlightDeckHero';
@@ -13,6 +14,8 @@ export const revalidate = 30; // ISR 30s
 export const metadata: Metadata = {
   title: `${siteConfig.name} — ${siteConfig.tagline}`,
   description: siteConfig.description,
+  alternates: { canonical: '/' },
+  openGraph: { url: '/' },
 };
 
 /** Hero (1) + top card (1) + wire (6) + grid (8). */
@@ -45,10 +48,7 @@ export default async function AirSportsHomePage() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
-      />
+      <JsonLd data={websiteJsonLd} />
 
       <FlightDeckHero
         lead={lead}

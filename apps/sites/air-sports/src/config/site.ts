@@ -13,3 +13,9 @@ export const siteConfig = {
     'Kites, drones and flying in Bangladesh: festivals, rules, weather and the people who take to the sky.',
   url: publicConfig.appUrl,
 } as const;
+
+/**
+ * Share card used when a page has no image of its own. A page that sets its own
+ * `openGraph` replaces the root one entirely, so it must pass this explicitly.
+ */
+export const defaultOgImage = { url: '/opengraph-image', width: 1200, height: 630 } as const;

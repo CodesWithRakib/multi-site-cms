@@ -1,11 +1,12 @@
 import React from 'react';
+import { JsonLd } from '@multi-site-cms/ui';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Calendar, Radio, Trophy, Zap } from 'lucide-react';
 
 import { LiveTimelineItem } from '@/components/timeline/LiveTimelineItem';
-import { siteConfig } from '@/config/site';
+import { siteConfig, defaultOgImage } from '@/config/site';
 import { fetchEventBySlug } from '@/lib/api';
 
 interface EventPageProps {
@@ -34,6 +35,7 @@ export async function generateMetadata({ params }: EventPageProps): Promise<Meta
       canonical: `/events/${event.slug}`,
     },
     openGraph: {
+      images: [defaultOgImage],
       type: 'website',
       url: `/events/${event.slug}`,
       siteName: siteConfig.name,
@@ -121,10 +123,7 @@ export default async function EventDetailPage({ params }: EventPageProps) {
 
   return (
     <div className="min-h-screen py-10 sm:py-14">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(eventJsonLd) }}
-      />
+      <JsonLd data={eventJsonLd} />
 
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb */}

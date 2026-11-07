@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Calendar, Radio, Trophy } from 'lucide-react';
 
 import { EventCard } from '@/components/events/EventCard';
-import { siteConfig } from '@/config/site';
+import { siteConfig, defaultOgImage } from '@/config/site';
 import { fetchEvents } from '@/lib/api';
 
 export const revalidate = 60;
@@ -17,6 +17,7 @@ export const metadata: Metadata = {
     canonical: '/events',
   },
   openGraph: {
+    images: [defaultOgImage],
     title: `Events & Festivals | ${siteConfig.name}`,
     description:
       'Upcoming and past air sports events, festivals and meets, with every related dispatch.',

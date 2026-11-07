@@ -5,7 +5,7 @@ import { Newspaper, Radio } from 'lucide-react';
 import { PaginationLinks, pageHref, parsePageParam } from '@multi-site-cms/ui';
 
 import { AirSportsCard } from '@/components/cards/AirSportsCard';
-import { siteConfig } from '@/config/site';
+import { siteConfig, defaultOgImage } from '@/config/site';
 import { fetchArticles } from '@/lib/api';
 
 const PAGE_SIZE = 12;
@@ -22,7 +22,11 @@ export async function generateMetadata({ searchParams }: ArticlesPageProps): Pro
     title: page > 1 ? `All Dispatches — Page ${page}` : 'All Dispatches',
     description: `Every published news story, race report, and live dispatch from ${siteConfig.name}.`,
     alternates: { canonical },
-    openGraph: { title: `All Dispatches | ${siteConfig.name}`, url: canonical },
+    openGraph: {
+      images: [defaultOgImage],
+      title: `All Dispatches | ${siteConfig.name}`,
+      url: canonical,
+    },
   };
 }
 

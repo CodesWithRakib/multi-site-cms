@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { JsonLd, breadcrumbJsonLd } from '@multi-site-cms/ui';
 import { notFound } from 'next/navigation';
 import { documentOutline } from '@multi-site-cms/config/doc-outline';
 import { ArticleAuthorCard } from '@/components/article/ArticleAuthorCard';
@@ -103,16 +104,34 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
         dateModified: article.updatedAt,
         mainEntityOfPage: articleUrl,
         image: article.featuredImage?.url,
+        author: article.author
+          ? { '@type': 'Person', name: article.author.displayName }
+          : undefined,
+        publisher: { '@type': 'Organization', name: siteConfig.name, url: siteConfig.url },
+        keywords: article.tags.length > 0 ? article.tags.map((t) => t.name).join(', ') : undefined,
       },
     ],
   };
 
+  const primaryCategory = article.categories[0];
+  const breadcrumbLd = breadcrumbJsonLd([
+    { name: 'Home', url: siteConfig.url },
+    { name: 'Blog', url: `${siteConfig.url}/articles` },
+    ...(primaryCategory
+      ? [
+          {
+            name: primaryCategory.name,
+            url: `${siteConfig.url}/categories/${primaryCategory.slug}`,
+          },
+        ]
+      : []),
+    { name: article.title, url: articleUrl },
+  ]);
+
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd data={jsonLd} />
+      <JsonLd data={breadcrumbLd} />
 
       <article className="mx-auto max-w-6xl px-4 sm:px-6 py-8 sm:py-14 space-y-10">
         {/* Header with Title, Breadcrumbs, Category Badges, Bookmark & Share */}

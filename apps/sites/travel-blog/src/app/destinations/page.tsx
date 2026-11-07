@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { MapPin } from 'lucide-react';
 import { DestinationsClientContainer } from '@/components/destinations/DestinationsClientContainer';
-import { siteConfig } from '@/config/site';
+import { siteConfig, defaultOgImage } from '@/config/site';
 import { fetchArticles, fetchCategories } from '@/lib/api';
 
 export const revalidate = 60;
@@ -14,6 +14,7 @@ export const metadata: Metadata = {
     canonical: '/destinations',
   },
   openGraph: {
+    images: [defaultOgImage],
     title: `Destination Guides | ${siteConfig.name}`,
     description: 'In-depth itineraries and practical orientation for your next route.',
     url: '/destinations',

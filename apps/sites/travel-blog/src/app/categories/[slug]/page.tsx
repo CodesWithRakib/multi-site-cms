@@ -6,7 +6,7 @@ import { PaginationLinks, pageHref, parsePageParam } from '@multi-site-cms/ui';
 import { ArticleCard } from '@/components/cards/ArticleCard';
 import { NewsletterBanner } from '@/components/home/NewsletterBanner';
 import { CategoryBadge } from '@/components/ui/CategoryBadge';
-import { siteConfig } from '@/config/site';
+import { siteConfig, defaultOgImage } from '@/config/site';
 import { fetchArticles, fetchCategories } from '@/lib/api';
 
 /** Articles per archive page; further pages are `?page=N`. */
@@ -44,6 +44,7 @@ export async function generateMetadata({
       canonical: pageHref(`/categories/${category.slug}`, page),
     },
     openGraph: {
+      images: [defaultOgImage],
       title: `${category.name} | ${siteConfig.name}`,
       description: category.description || `Browse articles filed under ${category.name}.`,
       url: `/categories/${category.slug}`,

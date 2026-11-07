@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Layers, Radio } from 'lucide-react';
 
-import { siteConfig } from '@/config/site';
+import { siteConfig, defaultOgImage } from '@/config/site';
 import { fetchCategories } from '@/lib/api';
 
 export const revalidate = 300;
@@ -16,6 +16,7 @@ export const metadata: Metadata = {
     canonical: '/categories',
   },
   openGraph: {
+    images: [defaultOgImage],
     title: `Categories & Disciplines | ${siteConfig.name}`,
     description: 'Browse news, records, and dispatches sorted by aviation discipline.',
     url: '/categories',

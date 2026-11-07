@@ -1,4 +1,5 @@
 import React from 'react';
+import { JsonLd } from '@multi-site-cms/ui';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
@@ -150,14 +151,8 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
   return (
     <article className="min-h-screen py-8 sm:py-12">
       {/* Schema.org Structured Data */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-      />
+      <JsonLd data={articleJsonLd} />
+      <JsonLd data={breadcrumbJsonLd} />
 
       <div
         className={

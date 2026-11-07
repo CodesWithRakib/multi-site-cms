@@ -7,7 +7,7 @@ import { Layers, Radio } from 'lucide-react';
 import { PaginationLinks, pageHref, parsePageParam } from '@multi-site-cms/ui';
 
 import { AirSportsCard } from '@/components/cards/AirSportsCard';
-import { siteConfig } from '@/config/site';
+import { siteConfig, defaultOgImage } from '@/config/site';
 import { fetchArticles, fetchCategories } from '@/lib/api';
 
 /** Articles per archive page; further pages are `?page=N`. */
@@ -38,6 +38,7 @@ export async function generateMetadata({
       canonical: pageHref(`/categories/${slug}`, page),
     },
     openGraph: {
+      images: [defaultOgImage],
       title: `${title} | ${siteConfig.name}`,
       description,
       url: `/categories/${slug}`,

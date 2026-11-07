@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Radio, Tag as TagIcon } from 'lucide-react';
 
-import { siteConfig } from '@/config/site';
+import { siteConfig, defaultOgImage } from '@/config/site';
 import { fetchTags } from '@/lib/api';
 
 export const revalidate = 300;
@@ -15,6 +15,7 @@ export const metadata: Metadata = {
     canonical: '/tags',
   },
   openGraph: {
+    images: [defaultOgImage],
     title: `Tags Index | ${siteConfig.name}`,
     description: 'Explore air sports topics, tags, and pilots.',
     url: '/tags',

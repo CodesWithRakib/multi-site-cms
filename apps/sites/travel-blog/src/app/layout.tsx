@@ -57,16 +57,13 @@ export const metadata: Metadata = {
     template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,
-  alternates: {
-    canonical: '/',
-  },
   openGraph: {
     type: 'website',
-    url: '/',
     siteName: siteConfig.name,
     title: siteConfig.name,
     description: siteConfig.description,
   },
+  twitter: { card: 'summary_large_image' },
 };
 
 export const viewport: Viewport = {

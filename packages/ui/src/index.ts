@@ -121,6 +121,9 @@ export {
 } from './components/pagination-links';
 export { getPageWindow, type PageWindowItem } from './lib/page-window';
 export { pageHref, parsePageParam } from './lib/page-param';
+export { JsonLd, type JsonLdProps } from './components/json-ld';
+export { breadcrumbJsonLd, serializeJsonLd, type BreadcrumbTrailItem } from './lib/json-ld';
+export { buildLlmsTxt, type LlmsLink, type LlmsTxtInput } from './lib/llms-txt';
 export { SkipLink, type SkipLinkProps } from './components/skip-link';
 export { Skeleton, type SkeletonProps } from './components/skeleton';
 export { StatusPage, type StatusPageProps } from './components/status-page';
@@ -159,4 +162,5 @@ export {
 } from './theme/theme-provider';
 export { themeInitScript } from './theme/theme-script';
 export { appIconElement } from './theme/app-icon';
+export { SOCIAL_IMAGE_SIZE, socialImageElement } from './theme/social-image';
 export { cn } from './lib/cn';

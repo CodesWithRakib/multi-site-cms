@@ -7,7 +7,7 @@ import { Radio, Tag as TagIcon } from 'lucide-react';
 import { PaginationLinks, pageHref, parsePageParam } from '@multi-site-cms/ui';
 
 import { AirSportsCard } from '@/components/cards/AirSportsCard';
-import { siteConfig } from '@/config/site';
+import { siteConfig, defaultOgImage } from '@/config/site';
 import { fetchArticles, fetchTags } from '@/lib/api';
 
 /** Articles per archive page; further pages are `?page=N`. */
@@ -34,6 +34,7 @@ export async function generateMetadata({ params, searchParams }: TagPageProps): 
       canonical: pageHref(`/tags/${slug}`, page),
     },
     openGraph: {
+      images: [defaultOgImage],
       title: `${title} | ${siteConfig.name}`,
       description,
       url: `/tags/${slug}`,

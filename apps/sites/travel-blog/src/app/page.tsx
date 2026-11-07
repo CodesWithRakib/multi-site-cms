@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { JsonLd } from '@multi-site-cms/ui';
 
 import { HeroCarousel } from '@/components/home/HeroCarousel';
 import { KeepReading } from '@/components/home/KeepReading';
@@ -14,6 +15,8 @@ export const revalidate = 60; // ISR revalidation every 60 seconds
 export const metadata: Metadata = {
   title: `${siteConfig.name} — ${siteConfig.tagline}`,
   description: siteConfig.description,
+  alternates: { canonical: '/' },
+  openGraph: { url: '/' },
 };
 
 /** Enough stories for every slot: hero slides, latest grid, keep-reading. */
@@ -48,10 +51,7 @@ export default async function TravelHomePage() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd data={jsonLd} />
 
       <HeroCarousel slides={feed.slides} />
 

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
-import { pageHref, parsePageParam } from '@multi-site-cms/ui';
+import { pageHref, parsePageParam, JsonLd } from '@multi-site-cms/ui';
 
 import { PortalContentContainer } from '@/components/portal/PortalContentContainer';
 import { siteConfig } from '@/config/site';
@@ -62,10 +62,7 @@ export default async function ArticlesPortalPage({ searchParams }: ArticlesPageP
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd data={jsonLd} />
       <PortalContentContainer
         articles={articlesData.items}
         categories={categories}
