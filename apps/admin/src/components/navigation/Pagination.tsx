@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 import { NativeSelect } from '@multi-site-cms/ui';
 
@@ -82,15 +82,6 @@ export function Pagination({
         <div className="flex items-center gap-1.5 self-start sm:self-auto">
           <button
             type="button"
-            className={`${BUTTON} hidden sm:inline-flex`}
-            disabled={page <= 1}
-            onClick={() => onPageChange(1)}
-            aria-label={t.content.firstPage}
-          >
-            <ChevronsLeft aria-hidden="true" className="size-4" />
-          </button>
-          <button
-            type="button"
             className={BUTTON}
             disabled={page <= 1}
             onClick={() => onPageChange(page - 1)}
@@ -138,15 +129,6 @@ export function Pagination({
             aria-label={t.content.next}
           >
             <ChevronRight aria-hidden="true" className="size-4" />
-          </button>
-          <button
-            type="button"
-            className={`${BUTTON} hidden sm:inline-flex`}
-            disabled={page >= totalPages}
-            onClick={() => onPageChange(totalPages)}
-            aria-label={t.content.lastPage}
-          >
-            <ChevronsRight aria-hidden="true" className="size-4" />
           </button>
         </div>
       )}

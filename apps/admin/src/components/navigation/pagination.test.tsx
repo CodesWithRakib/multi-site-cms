@@ -49,7 +49,12 @@ describe('Pagination', () => {
     // Current page is marked, distant pages collapse.
     expect(html).toContain('aria-current="page"');
     expect(html).toContain('…');
-    expect(html).toContain('aria-label="Last page"');
+    // The last page number is always in the window; no separate "last" button.
+    expect(html).toContain('aria-label="Page 20"');
+    expect(html).toContain('aria-label="Previous"');
+    expect(html).toContain('aria-label="Next"');
+    // Single chevrons only (lucide renders the double ones as chevrons-left/right).
+    expect(html).not.toContain('lucide-chevrons');
   });
 
   it('renders nothing for an empty list, or one short page with no size choice', () => {
@@ -91,7 +96,7 @@ describe('Pagination', () => {
       />,
     );
     expect(html).toContain('Rows per page');
-    expect(html).not.toContain('aria-label="Last page"');
+    expect(html).not.toContain('aria-label="Next"');
   });
 });
 

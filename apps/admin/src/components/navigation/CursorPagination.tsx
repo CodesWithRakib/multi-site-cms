@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronLeft, ChevronRight, ChevronsLeft } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 import { NativeSelect } from '@multi-site-cms/ui';
 
@@ -78,10 +78,8 @@ export function CursorPagination({
           className={BUTTON}
           disabled={!hasNewer || isLoading}
           onClick={onLatest}
-          aria-label={t.content.latest}
         >
-          <ChevronsLeft aria-hidden="true" className="size-4" />
-          <span className="hidden sm:inline">{t.content.latest}</span>
+          {t.content.latest}
         </button>
         <button
           type="button"
