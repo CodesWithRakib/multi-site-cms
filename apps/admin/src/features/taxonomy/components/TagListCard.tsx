@@ -28,7 +28,7 @@ export function TagListCard({ tags, onEdit, onDelete }: TagListCardProps) {
       {tags.map((tag) => (
         <div
           key={tag.id}
-          className="rounded-2xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-2xs hover:shadow-xs transition-all flex flex-col justify-between gap-3 group"
+          className="rounded-2xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-2xs hover:shadow-xs transition flex flex-col justify-between gap-3 group"
         >
           <div>
             <div className="flex items-center justify-between gap-2">

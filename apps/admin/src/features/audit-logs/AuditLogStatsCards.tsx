@@ -83,7 +83,7 @@ export function AuditLogStatsCards({
             type="button"
             key={card.category}
             onClick={() => onSelectCategory?.(card.category)}
-            className={`flex flex-col justify-between p-4.5 rounded-xl border text-left bg-white dark:bg-neutral-900 shadow-xs transition-all cursor-pointer ${
+            className={`flex flex-col justify-between p-4.5 rounded-xl border text-left bg-white dark:bg-neutral-900 shadow-xs transition cursor-pointer ${
               isSelected
                 ? 'ring-2 ring-emerald-500 border-emerald-500/40 bg-emerald-50/20 dark:bg-emerald-950/20'
                 : 'border-neutral-200 dark:border-neutral-800 hover:border-emerald-500/40 hover:shadow-sm'

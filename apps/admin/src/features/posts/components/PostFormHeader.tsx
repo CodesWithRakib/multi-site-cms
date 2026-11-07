@@ -116,7 +116,7 @@ export function PostFormHeader({
           type="submit"
           disabled={isSubmitting}
           onClick={onSaveShortcut}
-          className="flex items-center gap-2 whitespace-nowrap px-4 sm:px-5 py-2.5 sm:py-2 text-xs font-bold text-white bg-brand-600 hover:brightness-105 active:scale-95 disabled:opacity-50 rounded-xl shadow-xs transition-all cursor-pointer"
+          className="flex items-center gap-2 whitespace-nowrap px-4 sm:px-5 py-2.5 sm:py-2 text-xs font-bold text-white bg-brand-600 hover:brightness-105 active:scale-95 disabled:opacity-50 rounded-xl shadow-xs transition cursor-pointer"
         >
           {isSubmitting ? (
             <>

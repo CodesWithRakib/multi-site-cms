@@ -35,7 +35,7 @@ export function MediaFilterBar({
           <button
             type="button"
             onClick={() => onSiteChange(null)}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
               !activeSiteId
                 ? 'bg-brand-900 dark:bg-slate-800 text-white shadow-xs ring-1 ring-brand-400/30'
                 : 'bg-slate-100 dark:bg-slate-800/50 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
@@ -51,7 +51,7 @@ export function MediaFilterBar({
                 key={site.id}
                 type="button"
                 onClick={() => onSiteChange(site.id)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
                   isActive
                     ? 'bg-brand-900 dark:bg-slate-800 text-white shadow-xs ring-1 ring-brand-400/30'
                     : 'bg-slate-100 dark:bg-slate-800/50 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
@@ -75,7 +75,7 @@ export function MediaFilterBar({
               key={fmt.value}
               type="button"
               onClick={() => onMimeFilterChange(fmt.value)}
-              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${
                 mimeFilter === fmt.value
                   ? 'bg-white dark:bg-slate-900 text-brand-950 dark:text-emerald-400 shadow-xs'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'

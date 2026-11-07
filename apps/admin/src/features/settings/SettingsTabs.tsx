@@ -36,7 +36,7 @@ export function SettingsTabs({ activeTab, onSelectTab }: SettingsTabsProps) {
               key={tab.id}
               type="button"
               onClick={() => onSelectTab(tab.id)}
-              className={`flex items-center gap-2 px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all whitespace-nowrap cursor-pointer ${
+              className={`flex items-center gap-2 px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-lg transition whitespace-nowrap cursor-pointer ${
                 isActive
                   ? 'bg-emerald-600 text-white shadow-xs'
                   : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-800'

@@ -104,7 +104,7 @@ export function AuditLogFilterBar({
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder={t('auditLogs.searchPlaceholder')}
-            className="w-full pl-9 pr-8 py-2 text-sm bg-neutral-50 dark:bg-neutral-800/80 border border-neutral-200 dark:border-neutral-700 rounded-lg text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all"
+            className="w-full pl-9 pr-8 py-2 text-sm bg-neutral-50 dark:bg-neutral-800/80 border border-neutral-200 dark:border-neutral-700 rounded-lg text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition"
           />
           {searchTerm && (
             <button
@@ -177,7 +177,7 @@ export function AuditLogFilterBar({
             <button
               type="button"
               onClick={() => onViewModeChange('table')}
-              className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-md transition-all cursor-pointer ${
+              className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-md transition cursor-pointer ${
                 viewMode === 'table'
                   ? 'bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-50 shadow-xs'
                   : 'text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200'
@@ -189,7 +189,7 @@ export function AuditLogFilterBar({
             <button
               type="button"
               onClick={() => onViewModeChange('timeline')}
-              className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-md transition-all cursor-pointer ${
+              className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-md transition cursor-pointer ${
                 viewMode === 'timeline'
                   ? 'bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-50 shadow-xs'
                   : 'text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200'
@@ -204,7 +204,7 @@ export function AuditLogFilterBar({
           <button
             type="button"
             onClick={onToggleLiveStream}
-            className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold rounded-lg border transition-all cursor-pointer ${
+            className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold rounded-lg border transition cursor-pointer ${
               isLiveStream
                 ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/30'
                 : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-neutral-700 hover:bg-neutral-200'

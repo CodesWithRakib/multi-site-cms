@@ -23,7 +23,7 @@ export function TaxonomyTabs({
       <button
         type="button"
         onClick={() => onTabChange('categories')}
-        className={`pb-3.5 text-xs font-bold flex items-center gap-2 border-b-2 transition-all cursor-pointer ${
+        className={`pb-3.5 text-xs font-bold flex items-center gap-2 border-b-2 transition cursor-pointer ${
           activeTab === 'categories'
             ? 'border-emerald-500 text-emerald-700 dark:text-emerald-400'
             : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
@@ -46,7 +46,7 @@ export function TaxonomyTabs({
       <button
         type="button"
         onClick={() => onTabChange('tags')}
-        className={`pb-3.5 text-xs font-bold flex items-center gap-2 border-b-2 transition-all cursor-pointer ${
+        className={`pb-3.5 text-xs font-bold flex items-center gap-2 border-b-2 transition cursor-pointer ${
           activeTab === 'tags'
             ? 'border-emerald-500 text-emerald-700 dark:text-emerald-400'
             : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'

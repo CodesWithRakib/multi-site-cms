@@ -158,7 +158,7 @@ export function ContentActivityChart({
                 key={tab.label}
                 type="button"
                 onClick={() => handleRangeClick(tab.value)}
-                className={`px-2.5 py-1 text-[11px] font-bold rounded-lg transition-all ${
+                className={`px-2.5 py-1 text-[11px] font-bold rounded-lg transition ${
                   isActive
                     ? 'bg-brand-600 text-white shadow-2xs'
                     : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
@@ -336,7 +336,7 @@ export function ContentActivityChart({
               {[3, 5, 7, 4, 6, 8, 5, 3].map((h, i) => (
                 <span
                   key={i}
-                  className="w-1.5 bg-emerald-400 dark:bg-emerald-500 rounded-full transition-all"
+                  className="w-1.5 bg-emerald-400 dark:bg-emerald-500 rounded-full transition"
                   style={{
                     height: `${Math.min(32, Math.max(8, totalVolume > 0 ? ((i % 3) + 1) * 7 : h * 3))}px`,
                   }}

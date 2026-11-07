@@ -52,3 +52,5 @@ To enable Google Rich Snippets for sports coverage and live news, structured JSO
     },
   };
   ```
+
+> Shared rules for both public sites (safe JSON-LD, canonical and Open Graph, sitemap, `llms.txt`): [SEO conventions](../seo-conventions.md).

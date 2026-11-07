@@ -49,7 +49,7 @@ export function PostSitePublicationCard({
 
   return (
     <div
-      className={`flex min-w-0 flex-col p-4 sm:p-5 rounded-2xl border transition-all ${
+      className={`flex min-w-0 flex-col p-4 sm:p-5 rounded-2xl border transition ${
         config.enabled
           ? 'border-emerald-500/70 bg-emerald-50/20 dark:bg-emerald-950/20 shadow-2xs'
           : 'border-slate-200/90 dark:border-slate-800 bg-slate-50/40 dark:bg-slate-900/40'

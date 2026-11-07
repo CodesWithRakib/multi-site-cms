@@ -17,7 +17,7 @@ interface SiteDetailHeaderProps {
 }
 
 const TAB =
-  'px-3 py-1.5 rounded-lg transition-all cursor-pointer focus-visible:outline-2 focus-visible:outline-emerald-600';
+  'px-3 py-1.5 rounded-lg transition cursor-pointer focus-visible:outline-2 focus-visible:outline-emerald-600';
 
 /** Title, identifiers, live link (only for a verified primary domain), tabs. */
 export function SiteDetailHeader({

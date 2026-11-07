@@ -103,7 +103,7 @@ export function AuditLogTimeline({ logs, onSelectLog, isLoading }: AuditLogTimel
                 </div>
 
                 {/* Event Details Card */}
-                <div className="flex-1 p-4 rounded-xl border border-neutral-200/80 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-800/30 hover:border-emerald-500/40 hover:bg-neutral-50 dark:hover:bg-neutral-800/60 transition-all">
+                <div className="flex-1 p-4 rounded-xl border border-neutral-200/80 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-800/30 hover:border-emerald-500/40 hover:bg-neutral-50 dark:hover:bg-neutral-800/60 transition">
                   <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span

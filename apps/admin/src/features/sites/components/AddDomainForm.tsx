@@ -81,7 +81,7 @@ export function AddDomainForm({ isAdding, onAdd }: AddDomainFormProps) {
         <button
           type="submit"
           disabled={isAdding}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand-600 text-white text-xs font-bold shadow-xs hover:brightness-105 active:scale-95 transition-all disabled:opacity-50 cursor-pointer"
+          className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand-600 text-white text-xs font-bold shadow-xs hover:brightness-105 active:scale-95 transition disabled:opacity-50 cursor-pointer"
         >
           {isAdding ? (
             <Loader2 className="size-4 animate-spin" aria-hidden="true" />

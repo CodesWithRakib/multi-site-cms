@@ -275,7 +275,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                         href={item.href}
                         onClick={onClose}
                         aria-current={item.active ? 'page' : undefined}
-                        className={`flex items-center gap-3.5 rounded-xl px-4 py-2.5 text-[13px] font-semibold transition-all ${
+                        className={`flex items-center gap-3.5 rounded-xl px-4 py-2.5 text-[13px] font-semibold transition ${
                           item.active
                             ? 'bg-white/15 text-white font-bold ring-1 ring-white/25 shadow-md shadow-black/20 backdrop-blur-sm'
                             : 'text-white hover:bg-white/10'

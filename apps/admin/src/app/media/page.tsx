@@ -286,7 +286,7 @@ export default function MediaPage() {
                 <button
                   type="button"
                   onClick={() => setActiveTab('upload')}
-                  className="mt-5 px-5 py-2.5 bg-brand-600 text-white rounded-xl text-xs font-bold hover:brightness-105 shadow-md shadow-emerald-500/20 cursor-pointer transition-all"
+                  className="mt-5 px-5 py-2.5 bg-brand-600 text-white rounded-xl text-xs font-bold hover:brightness-105 shadow-md shadow-emerald-500/20 cursor-pointer transition"
                 >
                   + {t.media.uploadFirst || 'Upload First Asset'}
                 </button>

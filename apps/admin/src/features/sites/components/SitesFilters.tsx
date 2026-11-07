@@ -51,7 +51,7 @@ export function SitesFilters({
               type="button"
               aria-pressed={isActive}
               onClick={() => onStatusChange(tab.id)}
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
                 isActive
                   ? 'bg-brand-600 text-white font-bold shadow-xs'
                   : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'

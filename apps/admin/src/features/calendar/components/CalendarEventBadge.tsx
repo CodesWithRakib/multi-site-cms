@@ -60,7 +60,7 @@ export function CalendarEventBadge({ event, onClick, timezone = 'UTC' }: Calenda
         e.stopPropagation();
         onClick(event);
       }}
-      className={`group w-full text-left p-1.5 rounded-lg text-[11px] font-medium border shadow-2xs transition-all duration-150 flex items-center gap-1.5 ${getStatusStyle()}`}
+      className={`group w-full text-left p-1.5 rounded-lg text-[11px] font-medium border shadow-2xs transition duration-150 flex items-center gap-1.5 ${getStatusStyle()}`}
       title={`${event.title} • ${event.status.toUpperCase()} • ${timeFormatted} (${event.siteName})`}
     >
       {getStatusIcon()}

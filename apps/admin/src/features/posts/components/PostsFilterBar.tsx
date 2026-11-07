@@ -7,7 +7,7 @@ import { NativeSelect } from '@multi-site-cms/ui';
 import { useAdmin } from '@/lib/admin-context';
 
 const SELECT_CLASS =
-  'w-full h-10 px-3 text-xs font-medium rounded-xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 focus:outline-hidden focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 transition-all cursor-pointer';
+  'w-full h-10 px-3 text-xs font-medium rounded-xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 focus:outline-hidden focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 transition cursor-pointer';
 
 const CONTENT_TYPES = [
   { value: 'travel_guide', label: 'Travel Guide' },
@@ -53,7 +53,7 @@ export function PostsFilterBar({
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder={t.actions.search || 'Search posts...'}
           aria-label={t.actions.search || 'Search posts'}
-          className="w-full h-10 pl-10 pr-9 text-xs rounded-xl border border-slate-200/90 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 focus:outline-hidden focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 transition-all"
+          className="w-full h-10 pl-10 pr-9 text-xs rounded-xl border border-slate-200/90 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 focus:outline-hidden focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 transition"
         />
         {searchTerm && (
           <button

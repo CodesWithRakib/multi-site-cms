@@ -65,7 +65,7 @@ export function MediaHeader({
           onClick={onRefresh}
           disabled={isFetching}
           title="Refresh media library"
-          className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-all cursor-pointer shadow-xs disabled:opacity-50"
+          className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition cursor-pointer shadow-xs disabled:opacity-50"
         >
           <RefreshCw
             className={`size-4 ${isFetching ? 'animate-spin text-emerald-600 dark:text-emerald-400' : ''}`}
@@ -78,7 +78,7 @@ export function MediaHeader({
             type="button"
             onClick={() => onViewModeChange('grid')}
             title="Grid View"
-            className={`p-2 rounded-lg transition-all cursor-pointer ${
+            className={`p-2 rounded-lg transition cursor-pointer ${
               viewMode === 'grid'
                 ? 'bg-white dark:bg-slate-900 text-brand-950 dark:text-emerald-400 shadow-xs'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
@@ -90,7 +90,7 @@ export function MediaHeader({
             type="button"
             onClick={() => onViewModeChange('list')}
             title="List View"
-            className={`p-2 rounded-lg transition-all cursor-pointer ${
+            className={`p-2 rounded-lg transition cursor-pointer ${
               viewMode === 'list'
                 ? 'bg-white dark:bg-slate-900 text-brand-950 dark:text-emerald-400 shadow-xs'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
@@ -105,7 +105,7 @@ export function MediaHeader({
           <button
             type="button"
             onClick={() => onTabChange('browse')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
               activeTab === 'browse'
                 ? 'bg-white dark:bg-slate-900 text-brand-950 dark:text-emerald-400 shadow-xs'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
@@ -117,7 +117,7 @@ export function MediaHeader({
           <button
             type="button"
             onClick={() => onTabChange('upload')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
               activeTab === 'upload'
                 ? 'bg-white dark:bg-slate-900 text-brand-950 dark:text-emerald-400 shadow-xs'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'

@@ -112,3 +112,5 @@ To maximize rich snippet appearance in search engine results pages (SERPs), sema
     },
   };
   ```
+
+> Shared rules for both public sites (safe JSON-LD, canonical and Open Graph, sitemap, `llms.txt`): [SEO conventions](../seo-conventions.md).

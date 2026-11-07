@@ -58,7 +58,7 @@ export function CommentsStatusTabs({
             key={tab.key}
             type="button"
             onClick={() => onStatusChange(tab.key)}
-            className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+            className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs sm:text-sm font-semibold transition cursor-pointer ${
               isActive
                 ? 'bg-emerald-600 text-white shadow-xs'
                 : 'bg-card text-muted-foreground hover:bg-muted hover:text-foreground border border-border/60'

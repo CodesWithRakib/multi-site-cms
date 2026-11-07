@@ -88,7 +88,7 @@ export function YourWebsites({ sitePerformance }: YourWebsitesProps) {
             return (
               <div
                 key={site.id}
-                className="flex flex-col justify-between gap-3 p-3.5 rounded-xl border border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-800/30 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-all group"
+                className="flex flex-col justify-between gap-3 p-3.5 rounded-xl border border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-800/30 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition group"
               >
                 {/* Left Thumbnail + Info */}
                 <div className="flex items-center gap-3.5 min-w-0">

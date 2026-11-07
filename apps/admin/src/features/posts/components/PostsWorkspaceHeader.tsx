@@ -64,7 +64,7 @@ export function PostsWorkspaceHeader({ isFetching, onRefresh }: PostsWorkspaceHe
 
         <Link
           href="/posts/new"
-          className="px-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition-all cursor-pointer"
+          className="px-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs flex items-center gap-2 shadow-xs transition cursor-pointer"
         >
           <Plus className="size-4 stroke-[2.5]" aria-hidden="true" />
           <span>{t.content.newPost}</span>

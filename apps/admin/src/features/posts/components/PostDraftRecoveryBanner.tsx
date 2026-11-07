@@ -41,7 +41,7 @@ export function PostDraftRecoveryBanner({
         <button
           type="button"
           onClick={onRestore}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-500 active:scale-95 text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-500 active:scale-95 text-white text-xs font-bold transition shadow-xs cursor-pointer"
         >
           <RotateCcw className="size-3.5" />
           <span>Restore Draft</span>

@@ -72,7 +72,7 @@ export function PostFeaturedImagePicker({
         <button
           type="button"
           onClick={onSelectClick}
-          className="w-full flex flex-col items-center justify-center gap-2.5 p-6 border-2 border-dashed rounded-xl border-slate-200 dark:border-slate-700 hover:border-emerald-500 hover:bg-slate-50/50 dark:hover:bg-slate-800/40 text-slate-500 dark:text-slate-400 text-xs font-semibold transition-all cursor-pointer group"
+          className="w-full flex flex-col items-center justify-center gap-2.5 p-6 border-2 border-dashed rounded-xl border-slate-200 dark:border-slate-700 hover:border-emerald-500 hover:bg-slate-50/50 dark:hover:bg-slate-800/40 text-slate-500 dark:text-slate-400 text-xs font-semibold transition cursor-pointer group"
         >
           <div className="p-3 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 group-hover:scale-110 transition-transform">
             <ImageIcon className="w-5 h-5" />

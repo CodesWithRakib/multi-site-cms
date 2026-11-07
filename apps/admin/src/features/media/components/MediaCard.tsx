@@ -50,7 +50,7 @@ export function MediaCard({
           onSelect(asset);
         }
       }}
-      className={`group relative flex flex-col rounded-2xl overflow-hidden border transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 ${
+      className={`group relative flex flex-col rounded-2xl overflow-hidden border transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 ${
         isBatchSelected
           ? 'border-emerald-500 ring-2 ring-emerald-500/40 bg-emerald-50/20 dark:bg-emerald-950/20 shadow-md'
           : isSelected
@@ -66,7 +66,7 @@ export function MediaCard({
             e.stopPropagation();
             onToggleBatchSelect(asset.id, !isBatchSelected);
           }}
-          className={`absolute top-2 left-2 z-10 size-5 rounded-md border flex items-center justify-center transition-all ${
+          className={`absolute top-2 left-2 z-10 size-5 rounded-md border flex items-center justify-center transition ${
             isBatchSelected
               ? 'bg-emerald-600 border-emerald-600 text-white shadow-xs'
               : 'border-white/80 bg-black/40 hover:bg-black/60 text-white opacity-0 group-hover:opacity-100 backdrop-blur-xs'

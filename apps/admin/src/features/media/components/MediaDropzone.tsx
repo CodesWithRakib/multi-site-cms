@@ -135,7 +135,7 @@ export function MediaDropzone({ siteId, onUploaded, onFinishedAll }: MediaDropzo
         onDragOver={handleDrag}
         onDrop={handleDrop}
         onClick={() => fileInputRef.current?.click()}
-        className={`flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-2xl cursor-pointer transition-all ${
+        className={`flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-2xl cursor-pointer transition ${
           isDragOver
             ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/20 shadow-inner ring-4 ring-emerald-500/10'
             : 'border-slate-300 dark:border-slate-700 hover:border-emerald-400 dark:hover:border-emerald-500 bg-slate-50/50 dark:bg-slate-900/50'
@@ -222,7 +222,7 @@ export function MediaDropzone({ siteId, onUploaded, onFinishedAll }: MediaDropzo
                 type="button"
                 onClick={handleUploadAll}
                 disabled={pendingCount === 0 || isUploadingAll}
-                className="flex items-center gap-2 px-5 py-2.5 bg-brand-600 text-white font-bold rounded-xl hover:brightness-105 disabled:opacity-50 disabled:cursor-not-allowed transition-all text-xs shadow-md shadow-emerald-500/20 cursor-pointer"
+                className="flex items-center gap-2 px-5 py-2.5 bg-brand-600 text-white font-bold rounded-xl hover:brightness-105 disabled:opacity-50 disabled:cursor-not-allowed transition text-xs shadow-md shadow-emerald-500/20 cursor-pointer"
               >
                 {isUploadingAll ? (
                   <Loader2 className="w-4 h-4 animate-spin" />

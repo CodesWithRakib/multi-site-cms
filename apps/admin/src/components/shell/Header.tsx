@@ -72,7 +72,7 @@ export function Header({ onMenuToggle, isMenuOpen = false }: HeaderProps) {
             onChange={(event) => setQuery(event.target.value)}
             aria-label={t('dashboard.searchPlaceholder')}
             placeholder={t('dashboard.searchPlaceholder')}
-            className="w-full min-w-0 h-11 pl-11 pr-4 sm:pr-20 rounded-full bg-white dark:bg-slate-900/90 border border-slate-200/90 dark:border-slate-800 text-xs text-slate-700 dark:text-slate-200 placeholder:text-slate-500 shadow-2xs focus:outline-hidden focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 transition-all"
+            className="w-full min-w-0 h-11 pl-11 pr-4 sm:pr-20 rounded-full bg-white dark:bg-slate-900/90 border border-slate-200/90 dark:border-slate-800 text-xs text-slate-700 dark:text-slate-200 placeholder:text-slate-500 shadow-2xs focus:outline-hidden focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 transition"
           />
           <div className="absolute right-3.5 hidden sm:flex items-center gap-1 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-[10px] font-mono font-semibold text-slate-500 dark:text-slate-400">
             <span>Ctrl</span>

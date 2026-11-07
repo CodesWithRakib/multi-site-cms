@@ -73,7 +73,7 @@ export function AnalyticsMetricsCards({ summary, isLoading }: AnalyticsMetricsCa
         return (
           <div
             key={idx}
-            className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col justify-between relative overflow-hidden transition-all hover:shadow-md"
+            className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col justify-between relative overflow-hidden transition hover:shadow-md"
           >
             {/* Header row */}
             <div className="flex items-center justify-between gap-2 mb-3">

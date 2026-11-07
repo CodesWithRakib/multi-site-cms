@@ -80,7 +80,7 @@ export function CommentModerationCard({
 
   return (
     <div
-      className={`group relative rounded-2xl border p-4 sm:p-5 transition-all ${
+      className={`group relative rounded-2xl border p-4 sm:p-5 transition ${
         isSelected
           ? 'border-emerald-500 bg-emerald-500/[0.03] shadow-xs'
           : 'border-border/80 bg-card hover:border-border'

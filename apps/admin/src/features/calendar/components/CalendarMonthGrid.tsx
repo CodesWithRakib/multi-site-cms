@@ -81,7 +81,7 @@ export function CalendarMonthGrid({
                       e.stopPropagation();
                       onDateClick(cell.date);
                     }}
-                    className="hidden sm:block opacity-0 group-hover:opacity-100 focus-visible:opacity-100 p-1 rounded-md text-slate-500 dark:text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 transition-all"
+                    className="hidden sm:block opacity-0 group-hover:opacity-100 focus-visible:opacity-100 p-1 rounded-md text-slate-500 dark:text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 transition"
                     title="Schedule post on this date"
                   >
                     <Plus className="w-3.5 h-3.5" />

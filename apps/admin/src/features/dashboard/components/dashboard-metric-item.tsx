@@ -32,7 +32,7 @@ export function DashboardMetricItem({
   const TrendIcon = isDown ? ArrowDown : ArrowUp;
 
   return (
-    <div className="rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-5 shadow-xs flex items-center gap-3 sm:gap-4 transition-all hover:shadow-sm min-w-0">
+    <div className="rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-5 shadow-xs flex items-center gap-3 sm:gap-4 transition hover:shadow-sm min-w-0">
       <div
         className={`size-10 sm:size-12 rounded-xl flex items-center justify-center text-white shrink-0 shadow-xs ${iconGradient}`}
       >

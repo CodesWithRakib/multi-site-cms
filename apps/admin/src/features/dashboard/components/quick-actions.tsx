@@ -33,7 +33,7 @@ export function QuickActions() {
         {/* 1. Primary Action: Write New Post */}
         <Link
           href="/posts/new"
-          className="w-full py-3.5 px-4 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-all"
+          className="w-full py-3.5 px-4 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition"
         >
           <Pencil className="size-4 stroke-[2.5]" />
           <span>{t('dashboard.writeNewPost')}</span>
@@ -43,7 +43,7 @@ export function QuickActions() {
         {/* 2. Video Guide */}
         <Link
           href="/tutorials"
-          className="w-full py-3 px-4 rounded-xl bg-brand-50 dark:bg-brand-950/40 border border-brand-200 dark:border-brand-800 text-brand-900 dark:text-brand-300 hover:bg-brand-100 dark:hover:bg-brand-900/60 font-bold text-xs flex items-center justify-center gap-2.5 shadow-2xs transition-all"
+          className="w-full py-3 px-4 rounded-xl bg-brand-50 dark:bg-brand-950/40 border border-brand-200 dark:border-brand-800 text-brand-900 dark:text-brand-300 hover:bg-brand-100 dark:hover:bg-brand-900/60 font-bold text-xs flex items-center justify-center gap-2.5 shadow-2xs transition"
         >
           <PlayCircle className="size-4 text-brand-600 dark:text-brand-400" />
           <span>Watch Video Guide</span>
@@ -53,7 +53,7 @@ export function QuickActions() {
         {isSuperAdmin && (
           <Link
             href="/sites"
-            className="w-full py-3 px-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 font-semibold text-xs flex items-center justify-center gap-2.5 shadow-2xs transition-all"
+            className="w-full py-3 px-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 font-semibold text-xs flex items-center justify-center gap-2.5 shadow-2xs transition"
           >
             <Globe className="size-4 text-slate-500 dark:text-slate-400" />
             <span>{t('dashboard.manageWebsites')}</span>
@@ -63,7 +63,7 @@ export function QuickActions() {
         {/* 3. View Analytics */}
         <Link
           href="/analytics"
-          className="w-full py-3 px-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 font-semibold text-xs flex items-center justify-center gap-2.5 shadow-2xs transition-all"
+          className="w-full py-3 px-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 font-semibold text-xs flex items-center justify-center gap-2.5 shadow-2xs transition"
         >
           <BarChart2 className="size-4 text-slate-500 dark:text-slate-400" />
           <span>{t('dashboard.viewAnalytics')}</span>
@@ -76,7 +76,7 @@ export function QuickActions() {
             href={site.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full py-3 px-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 font-semibold text-xs flex items-center justify-center gap-2.5 shadow-2xs transition-all"
+            className="w-full py-3 px-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 font-semibold text-xs flex items-center justify-center gap-2.5 shadow-2xs transition"
           >
             <ExternalLink
               className="size-4 text-slate-500 dark:text-slate-400"

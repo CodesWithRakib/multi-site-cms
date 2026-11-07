@@ -104,7 +104,7 @@ export function MediaSettingsForm({ initialData, onSave, isSaving }: MediaSettin
               const mb = Number.parseInt(e.target.value, 10) || 10;
               setFormData({ ...formData, maxUploadSizeBytes: mb * 1024 * 1024 });
             }}
-            className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50/70 dark:bg-neutral-800/80 text-neutral-900 dark:text-neutral-100 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all"
+            className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50/70 dark:bg-neutral-800/80 text-neutral-900 dark:text-neutral-100 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition"
           />
         </div>
 
@@ -117,7 +117,7 @@ export function MediaSettingsForm({ initialData, onSave, isSaving }: MediaSettin
             type="text"
             value={mimeString}
             onChange={(e) => setMimeString(e.target.value)}
-            className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50/70 dark:bg-neutral-800/80 text-neutral-900 dark:text-neutral-100 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all font-mono text-xs"
+            className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50/70 dark:bg-neutral-800/80 text-neutral-900 dark:text-neutral-100 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition font-mono text-xs"
           />
         </div>
       </div>

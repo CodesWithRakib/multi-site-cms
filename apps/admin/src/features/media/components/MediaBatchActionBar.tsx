@@ -49,7 +49,7 @@ export function MediaBatchActionBar({
           type="button"
           disabled={isDeleting}
           onClick={onDeleteSelected}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-600 hover:bg-red-500 active:scale-95 disabled:opacity-50 text-white text-xs font-semibold transition-all cursor-pointer shadow-sm shadow-red-900/40"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-600 hover:bg-red-500 active:scale-95 disabled:opacity-50 text-white text-xs font-semibold transition cursor-pointer shadow-sm shadow-red-900/40"
         >
           {isDeleting ? (
             <Loader2 className="size-3.5 animate-spin" />
