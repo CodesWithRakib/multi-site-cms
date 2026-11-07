@@ -60,10 +60,13 @@ export async function Footer() {
             <h2 id="footer-explore" className="text-sm font-bold text-white">
               Explore
             </h2>
-            <ul className="mt-4 space-y-2.5 text-sm">
+            <ul className="mt-3 text-sm">
               {FOOTER_LINKS.map((link) => (
                 <li key={link.href}>
-                  <Link href={link.href} className="transition-colors hover:text-white">
+                  <Link
+                    href={link.href}
+                    className="block py-2.5 transition-colors hover:text-white"
+                  >
                     {link.label}
                   </Link>
                 </li>
@@ -75,12 +78,12 @@ export async function Footer() {
             <h2 id="footer-topics" className="text-sm font-bold text-white">
               Topics
             </h2>
-            <ul className="mt-4 space-y-2.5 text-sm">
+            <ul className="mt-3 text-sm">
               {topics.map((category) => (
                 <li key={category.id}>
                   <Link
                     href={`/categories/${category.slug}`}
-                    className="transition-colors hover:text-white"
+                    className="block py-2.5 transition-colors hover:text-white"
                   >
                     {category.name}
                   </Link>
@@ -88,7 +91,10 @@ export async function Footer() {
               ))}
               {topics.length === 0 && (
                 <li>
-                  <Link href="/categories" className="transition-colors hover:text-white">
+                  <Link
+                    href="/categories"
+                    className="block py-2.5 transition-colors hover:text-white"
+                  >
                     Browse all
                   </Link>
                 </li>

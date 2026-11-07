@@ -36,7 +36,7 @@ function WidgetHeader({ icon, title, href, linkLabel }: WidgetHeaderProps) {
       </div>
       <Link
         href={href}
-        className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
+        className="touch-target inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
       >
         <span>{linkLabel}</span>
         <ArrowRight aria-hidden="true" className="h-3 w-3" />

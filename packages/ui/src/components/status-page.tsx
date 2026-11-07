@@ -9,6 +9,8 @@ export interface StatusPageProps {
   readonly description: string;
   /** Primary and secondary actions, typically `Button` elements or links. */
   readonly actions?: ReactNode;
+  /** Decorative artwork shown above the code; the title and description carry the meaning. */
+  readonly illustration?: ReactNode;
   readonly className?: string;
 }
 
@@ -18,7 +20,14 @@ export interface StatusPageProps {
  * Server and Client Components alike. Colors come from semantic tokens, so
  * each site keeps its own branding.
  */
-export function StatusPage({ code, title, description, actions, className }: StatusPageProps) {
+export function StatusPage({
+  code,
+  title,
+  description,
+  actions,
+  illustration,
+  className,
+}: StatusPageProps) {
   return (
     <section
       className={cn(
@@ -26,6 +35,7 @@ export function StatusPage({ code, title, description, actions, className }: Sta
         className,
       )}
     >
+      {illustration ? <div className="mb-6">{illustration}</div> : null}
       {code ? (
         <p className="font-mono text-sm font-semibold tracking-widest text-primary">{code}</p>
       ) : null}

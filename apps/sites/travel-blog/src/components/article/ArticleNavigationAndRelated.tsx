@@ -28,7 +28,7 @@ export function ArticleNavigationAndRelated({
               <Link
                 key={tag.id}
                 href={`/tags/${tag.slug}`}
-                className="rounded-full border border-border bg-card px-3.5 py-1.5 text-xs font-semibold text-foreground/80 hover:border-emerald-500/50 hover:bg-emerald-500/10 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors"
+                className="rounded-full border border-border bg-card px-3.5 py-2.5 text-xs font-semibold text-foreground/80 hover:border-emerald-500/50 hover:bg-emerald-500/10 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors"
               >
                 #{tag.name}
               </Link>
@@ -98,7 +98,7 @@ export function ArticleNavigationAndRelated({
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {relatedArticles.map((rel) => (
-              <ArticleCard key={rel.id} article={rel} variant="standard" />
+              <ArticleCard key={rel.id} article={rel} />
             ))}
           </div>
         </section>

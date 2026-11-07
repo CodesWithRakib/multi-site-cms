@@ -1,10 +1,10 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { ImageOff } from 'lucide-react';
 
 import type { PublicArticleSummary } from '@multi-site-cms/types';
 import { cn } from '@multi-site-cms/ui';
 
+import { StoryPlaceholder } from '@/components/illustrations/StoryPlaceholder';
 import { formatPublishedDate } from '@/lib/format';
 
 interface StoryCardProps {
@@ -30,9 +30,7 @@ export function StoryCard({ article, size = 'default' }: StoryCardProps) {
             className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
           />
         ) : (
-          <div className="flex size-full items-center justify-center text-muted-foreground">
-            <ImageOff aria-hidden="true" className="size-8" />
-          </div>
+          <StoryPlaceholder seed={article.slug} />
         )}
       </div>
 

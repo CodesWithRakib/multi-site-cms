@@ -1,11 +1,13 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, FolderKanban } from 'lucide-react';
 import { PaginationLinks, pageHref, parsePageParam } from '@multi-site-cms/ui';
 import { ArticleCard } from '@/components/cards/ArticleCard';
 import { NewsletterBanner } from '@/components/home/NewsletterBanner';
-import { CategoryBadge } from '@/components/ui/CategoryBadge';
+import { EmptyState } from '@/components/ui/EmptyState';
+import { PageHeader } from '@/components/ui/PageHeader';
+import { sceneFor } from '@/components/illustrations/ScenicArt';
 import { siteConfig, defaultOgImage } from '@/config/site';
 import { fetchArticles, fetchCategories } from '@/lib/api';
 
@@ -90,40 +92,38 @@ export default async function CategoryDetailPage({ params, searchParams }: Categ
         <span className="text-foreground font-medium">{category.name}</span>
       </nav>
 
-      {/* Header */}
-      <header className="border-b border-border/60 pb-8 space-y-3">
-        <CategoryBadge label={category.name} slug={category.slug} size="md" />
-        <h1 className="font-serif text-3xl sm:text-5xl font-extrabold tracking-tight text-foreground">
-          {category.name}
-        </h1>
-        {category.description && (
-          <p className="text-base sm:text-lg text-muted-foreground max-w-2xl leading-relaxed">
-            {category.description}
-          </p>
-        )}
-      </header>
+      <PageHeader
+        eyebrow={
+          <>
+            <FolderKanban aria-hidden="true" className="size-3.5" /> Topic
+          </>
+        }
+        title={category.name}
+        description={category.description || undefined}
+        meta={`${articlesData.total} ${articlesData.total === 1 ? 'story' : 'stories'}`}
+        scene={sceneFor(category.slug)}
+      />
 
-      {/* Articles Grid */}
       {articles.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 gap-3 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
           {articles.map((article, idx) => (
-            <ArticleCard
-              key={article.id}
-              article={article}
-              variant="standard"
-              priority={idx === 0}
-            />
+            <ArticleCard key={article.id} article={article} priority={idx < 2} />
           ))}
         </div>
       ) : (
-        <div className="rounded-3xl border border-dashed border-border p-16 text-center space-y-2">
-          <h2 className="font-serif text-xl font-bold text-foreground">
-            No Articles in This Category
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Check back soon for new dispatches filed under {category.name}.
-          </p>
-        </div>
+        <EmptyState
+          art="no-stories"
+          title="No stories in this topic yet"
+          description={`Check back soon for new stories filed under ${category.name}.`}
+          actions={
+            <Link
+              href="/articles"
+              className="inline-flex min-h-11 items-center rounded-full bg-primary px-5 text-sm font-bold text-primary-foreground hover:opacity-90"
+            >
+              Browse all stories
+            </Link>
+          }
+        />
       )}
 
       <PaginationLinks

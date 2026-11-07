@@ -1,8 +1,8 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Compass, MapPin } from 'lucide-react';
 
+import { EmptyState } from '@/components/ui/EmptyState';
 import { ArticleCard } from '@/components/cards/ArticleCard';
 import { NewsletterBanner } from '@/components/home/NewsletterBanner';
 import type { PublicArticle, PublicCategory } from '@/lib/api';
@@ -43,7 +43,7 @@ export function DestinationsClientContainer({
   );
 
   const tabClass = (active: boolean) =>
-    `rounded-full px-4 py-2 text-xs font-semibold transition-all ${
+    `inline-flex min-h-10 items-center rounded-full px-4 py-2 text-xs font-semibold transition-all ${
       active
         ? 'bg-primary text-primary-foreground shadow-sm'
         : 'border border-border bg-card text-muted-foreground hover:bg-muted hover:text-foreground'
@@ -80,32 +80,32 @@ export function DestinationsClientContainer({
       )}
 
       {filteredGuides.length > 0 ? (
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
           {filteredGuides.map((guide, idx) => (
-            <ArticleCard key={guide.id} article={guide} variant="standard" priority={idx === 0} />
+            <ArticleCard key={guide.id} article={guide} priority={idx === 0} />
           ))}
         </div>
       ) : (
-        <div className="space-y-3 rounded-3xl border border-dashed border-border p-10 text-center sm:p-16">
-          <Compass aria-hidden="true" className="mx-auto size-10 text-muted-foreground" />
-          <h3 className="font-serif text-xl font-bold text-foreground">
-            {activeTab ? `No guides in ${activeTab.name} yet` : 'No guides published yet'}
-          </h3>
-          <p className="mx-auto max-w-md text-sm text-muted-foreground">
-            {activeTab
+        <EmptyState
+          art="no-stories"
+          title={activeTab ? `No guides in ${activeTab.name} yet` : 'No guides published yet'}
+          description={
+            activeTab
               ? 'Try another topic, or browse every guide.'
-              : 'New destination guides will appear here as soon as they are published.'}
-          </p>
-          {activeTab && (
-            <button
-              type="button"
-              onClick={() => setActiveSlug(null)}
-              className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground transition hover:opacity-90"
-            >
-              <MapPin aria-hidden="true" className="size-3.5" /> View All Destinations
-            </button>
-          )}
-        </div>
+              : 'New destination guides will appear here as soon as they are published.'
+          }
+          actions={
+            activeTab ? (
+              <button
+                type="button"
+                onClick={() => setActiveSlug(null)}
+                className="inline-flex min-h-11 items-center rounded-full bg-primary px-5 text-sm font-bold text-primary-foreground hover:opacity-90"
+              >
+                Show all guides
+              </button>
+            ) : undefined
+          }
+        />
       )}
 
       <div className="pt-8">

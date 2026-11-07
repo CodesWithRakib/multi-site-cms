@@ -1,8 +1,11 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowUpRight, Compass, FolderKanban } from 'lucide-react';
+import { ArrowUpRight, FolderKanban } from 'lucide-react';
 
+import { ScenicArt, sceneFor } from '@/components/illustrations/ScenicArt';
+import { EmptyState } from '@/components/ui/EmptyState';
+import { PageHeader } from '@/components/ui/PageHeader';
 import { siteConfig } from '@/config/site';
 import { fetchArticles, fetchCategories } from '@/lib/api';
 import { assignTopicImages } from '@/lib/topic-images';
@@ -34,17 +37,17 @@ export default async function CategoriesPage() {
 
   return (
     <div className="mx-auto max-w-7xl space-y-10 px-4 py-8 sm:px-6 sm:py-14 lg:px-8">
-      <header className="space-y-3 border-b border-border/60 pb-8">
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
-          <FolderKanban aria-hidden="true" className="size-3.5" /> Topics
-        </span>
-        <h1 className="font-serif text-3xl font-extrabold tracking-tight text-foreground sm:text-5xl">
-          Categories & Topics
-        </h1>
-        <p className="max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-          Browse stories and dispatches by topic and travel style.
-        </p>
-      </header>
+      <PageHeader
+        eyebrow={
+          <>
+            <FolderKanban aria-hidden="true" className="size-3.5" /> Topics
+          </>
+        }
+        title="Categories & topics"
+        description="Browse stories by topic and travel style."
+        meta={`${topics.length} ${topics.length === 1 ? 'topic' : 'topics'}`}
+        scene="mountains"
+      />
 
       {topics.length > 0 ? (
         <ul className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3">
@@ -56,6 +59,12 @@ export default async function CategoriesPage() {
                   href={`/categories/${topic.slug}`}
                   className="group relative flex aspect-4/5 flex-col justify-end overflow-hidden rounded-3xl bg-linear-to-br from-brand-700 via-brand-900 to-brand-950 p-4 text-white sm:aspect-4/3 sm:p-6"
                 >
+                  {!image && (
+                    <ScenicArt
+                      variant={sceneFor(topic.slug)}
+                      className="absolute inset-0 size-full opacity-60"
+                    />
+                  )}
                   {image && (
                     <Image
                       src={image.url}
@@ -91,13 +100,11 @@ export default async function CategoriesPage() {
           })}
         </ul>
       ) : (
-        <div className="space-y-2 rounded-3xl border border-dashed border-border p-10 text-center sm:p-16">
-          <Compass aria-hidden="true" className="mx-auto size-10 text-muted-foreground" />
-          <h2 className="font-serif text-xl font-bold text-foreground">No topics yet</h2>
-          <p className="text-sm text-muted-foreground">
-            Topics with published stories will appear here.
-          </p>
-        </div>
+        <EmptyState
+          art="no-stories"
+          title="No topics yet"
+          description="Topics with published stories will appear here."
+        />
       )}
     </div>
   );

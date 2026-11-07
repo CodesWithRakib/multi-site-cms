@@ -28,7 +28,7 @@ export function TopicShowcase({ topics }: TopicShowcaseProps) {
         </div>
         <Link
           href="/categories"
-          className="group inline-flex shrink-0 items-center gap-1.5 text-sm font-semibold text-foreground hover:text-primary"
+          className="touch-target group inline-flex shrink-0 items-center gap-1.5 text-sm font-semibold text-foreground hover:text-primary"
         >
           All topics
           <ArrowRight

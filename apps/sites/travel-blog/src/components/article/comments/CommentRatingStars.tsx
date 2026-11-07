@@ -53,7 +53,7 @@ export function CommentRatingStars({
               onMouseLeave={() => interactive && setHoverRating(null)}
               className={`${
                 interactive
-                  ? 'cursor-pointer p-0.5 rounded transition-transform hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500'
+                  ? 'cursor-pointer p-2 rounded transition-transform hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500'
                   : 'cursor-default pointer-events-none'
               }`}
               aria-label={interactive ? `${star} star${star > 1 ? 's' : ''}` : undefined}

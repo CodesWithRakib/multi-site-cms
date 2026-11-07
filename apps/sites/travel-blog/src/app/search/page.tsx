@@ -1,10 +1,11 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import { BookOpen, Compass, Search, SearchX } from 'lucide-react';
+import { BookOpen, Compass, Search } from 'lucide-react';
 
 import { cn } from '@multi-site-cms/ui';
 
+import { EmptyState } from '@/components/ui/EmptyState';
 import { MobileFilterSheet } from '@/components/search/MobileFilterSheet';
 import { SearchFilters } from '@/components/search/SearchFilters';
 import { SearchPagination } from '@/components/search/SearchPagination';
@@ -189,13 +190,11 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             </p>
 
             {results.items.length === 0 ? (
-              <div className="flex flex-col items-center gap-3 rounded-3xl border border-dashed border-border px-6 py-16 text-center">
-                <SearchX aria-hidden="true" className="size-10 text-muted-foreground" />
-                <p className="font-semibold text-foreground">Nothing matches yet</p>
-                <p className="max-w-sm text-sm text-muted-foreground">
-                  Try a shorter word, another category, or clear the filters.
-                </p>
-              </div>
+              <EmptyState
+                art="no-results"
+                title="Nothing matches yet"
+                description="Try a shorter word, another category, or clear the filters."
+              />
             ) : (
               <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
                 {results.items.map((article) => (

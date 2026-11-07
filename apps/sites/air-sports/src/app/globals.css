@@ -10,31 +10,3 @@
 .font-handwriting {
   font-family: var(--font-handwriting), 'Caveat', cursive;
 }
-
-/*
- * Enlarges the tap area of a small inline link to at least 44px without
- * changing layout or appearance (WCAG 2.5.5 / mobile guidelines).
- */
-@utility touch-target {
-  position: relative;
-
-  &::after {
-    content: '';
-    position: absolute;
-    inset-inline: -0.5rem;
-    inset-block: 50%;
-    min-height: 2.75rem;
-    transform: translateY(-50%);
-  }
-}
-
-/* Breadcrumb links are small text; give them a comfortable hit area. */
-nav[aria-label='Breadcrumb'] a {
-  position: relative;
-}
-nav[aria-label='Breadcrumb'] a::after {
-  content: '';
-  position: absolute;
-  inset-inline: -0.5rem;
-  inset-block: -0.75rem;
-}

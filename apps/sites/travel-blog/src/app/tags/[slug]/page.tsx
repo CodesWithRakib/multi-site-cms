@@ -5,6 +5,9 @@ import { ChevronRight, Tag as TagIcon } from 'lucide-react';
 import { PaginationLinks, pageHref, parsePageParam } from '@multi-site-cms/ui';
 import { ArticleCard } from '@/components/cards/ArticleCard';
 import { NewsletterBanner } from '@/components/home/NewsletterBanner';
+import { sceneFor } from '@/components/illustrations/ScenicArt';
+import { EmptyState } from '@/components/ui/EmptyState';
+import { PageHeader } from '@/components/ui/PageHeader';
 import { siteConfig } from '@/config/site';
 import { fetchArticles, fetchTags } from '@/lib/api';
 
@@ -79,38 +82,38 @@ export default async function TagDetailPage({ params, searchParams }: TagPagePro
         <span className="text-foreground font-medium">#{tag.name}</span>
       </nav>
 
-      <header className="border-b border-border/60 pb-8 space-y-3">
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3.5 py-1 text-xs font-bold text-emerald-700 dark:text-emerald-300">
-          <TagIcon className="h-3.5 w-3.5" /> Tag Archive
-        </span>
-        <h1 className="font-serif text-3xl sm:text-5xl font-extrabold tracking-tight text-foreground">
-          #{tag.name}
-        </h1>
-        {tag.description && (
-          <p className="text-base sm:text-lg text-muted-foreground max-w-2xl leading-relaxed">
-            {tag.description}
-          </p>
-        )}
-      </header>
+      <PageHeader
+        eyebrow={
+          <>
+            <TagIcon aria-hidden="true" className="size-3.5" /> Tag
+          </>
+        }
+        title={`#${tag.name}`}
+        description={tag.description || undefined}
+        meta={`${articlesData.total} ${articlesData.total === 1 ? 'story' : 'stories'}`}
+        scene={sceneFor(tag.slug)}
+      />
 
       {articles.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 gap-3 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
           {articles.map((article, idx) => (
-            <ArticleCard
-              key={article.id}
-              article={article}
-              variant="standard"
-              priority={idx === 0}
-            />
+            <ArticleCard key={article.id} article={article} priority={idx < 2} />
           ))}
         </div>
       ) : (
-        <div className="rounded-3xl border border-dashed border-border p-16 text-center space-y-2">
-          <h2 className="font-serif text-xl font-bold text-foreground">
-            No Articles Tagged #{tag.name}
-          </h2>
-          <p className="text-sm text-muted-foreground">Check back soon for new dispatches.</p>
-        </div>
+        <EmptyState
+          art="no-stories"
+          title="No stories with this tag yet"
+          description="Stories that use this tag will show up here once they are published."
+          actions={
+            <Link
+              href="/articles"
+              className="inline-flex min-h-11 items-center rounded-full bg-primary px-5 text-sm font-bold text-primary-foreground hover:opacity-90"
+            >
+              Browse all stories
+            </Link>
+          }
+        />
       )}
 
       <PaginationLinks

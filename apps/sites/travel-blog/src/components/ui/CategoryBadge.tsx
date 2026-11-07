@@ -61,7 +61,7 @@ export function CategoryBadge({
 
   if (slug && linked) {
     return (
-      <Link href={`/categories/${slug}`} className="inline-block">
+      <Link href={`/categories/${slug}`} className="touch-target inline-block">
         {content}
       </Link>
     );

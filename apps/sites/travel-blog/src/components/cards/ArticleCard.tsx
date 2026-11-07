@@ -1,201 +1,126 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import type { PublicArticleSummary } from '@multi-site-cms/types';
-import { ArrowUpRight, Calendar, Clock, ImageOff, MapPin } from 'lucide-react';
-import { CategoryBadge } from '@/components/ui/CategoryBadge';
-import { AuthorAvatar } from '@/components/ui/AuthorAvatar';
+import { ArrowRight, Clock, MapPin } from 'lucide-react';
 
-/** Shown when a story has no featured image (no stock photo stand-ins). */
-function ImagePlaceholder() {
+import type { PublicArticleSummary } from '@multi-site-cms/types';
+import { cn } from '@multi-site-cms/ui';
+
+import { StoryPlaceholder } from '@/components/illustrations/StoryPlaceholder';
+import { AuthorAvatar } from '@/components/ui/AuthorAvatar';
+import { CategoryBadge } from '@/components/ui/CategoryBadge';
+import { formatPublishedDate } from '@/lib/format';
+
+export interface ArticleCardProps {
+  readonly article: PublicArticleSummary;
+  /** Load the cover eagerly; set for the first card above the fold. */
+  readonly priority?: boolean;
+}
+
+function Cover({
+  article,
+  sizes,
+  priority,
+}: {
+  readonly article: PublicArticleSummary;
+  readonly sizes: string;
+  readonly priority: boolean;
+}) {
+  if (!article.featuredImage) return <StoryPlaceholder seed={article.slug} />;
   return (
-    <div className="flex size-full items-center justify-center bg-muted text-muted-foreground">
-      <ImageOff aria-hidden="true" className="size-6" />
-    </div>
+    <Image
+      src={article.featuredImage.url}
+      alt={article.featuredImage.altText || ''}
+      fill
+      preload={priority}
+      sizes={sizes}
+      className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
+    />
   );
 }
 
-export interface ArticleCardProps {
-  article: PublicArticleSummary;
-  variant?: 'hero' | 'standard' | 'compact';
-  priority?: boolean;
-}
-
-export function ArticleCard({ article, variant = 'standard', priority = false }: ArticleCardProps) {
-  const publishedDate = article.publishedAt
-    ? new Date(article.publishedAt).toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-      })
-    : 'Recent';
-
+/**
+ * One story in a list. On phones it is a compact row (thumbnail beside the
+ * title) so many stories are visible at once; from `sm` up it is a card with
+ * the excerpt and byline. The whole card is one link (the title's stretched
+ * link), with the topic badge lifted above it as its own link.
+ */
+export function ArticleCard({ article, priority = false }: ArticleCardProps) {
   const category = article.categories[0];
-  const categoryLabel = category?.name ?? 'Travel';
   const isGuide = article.type === 'travel_guide';
+  const href = `/articles/${article.slug}`;
 
-  if (variant === 'hero') {
-    return (
-      <article className="group relative overflow-hidden rounded-3xl border border-border/80 bg-card shadow-sm transition-all duration-300 hover:shadow-xl hover:border-emerald-500/40">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-0">
-          <div className="lg:col-span-7 relative aspect-[16/10] lg:aspect-auto min-h-[320px] lg:min-h-[460px] overflow-hidden bg-muted">
-            {article.featuredImage ? (
-              <Image
-                src={article.featuredImage.url}
-                alt={article.featuredImage?.altText || article.title}
-                fill
-                preload={priority}
-                sizes="(max-width: 1024px) 100vw, 60vw"
-                className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-              />
-            ) : (
-              <ImagePlaceholder />
-            )}
-            <div className="absolute left-4 top-4 z-10">
-              <CategoryBadge label={categoryLabel} slug={category?.slug} variant="overlay" />
-            </div>
-          </div>
-
-          <div className="lg:col-span-5 p-6 sm:p-8 lg:p-10 flex flex-col justify-between">
-            <div className="space-y-4">
-              {isGuide && (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-700 dark:text-emerald-300">
-                  <MapPin className="h-3.5 w-3.5" /> Destination Guide
-                </span>
-              )}
-
-              <h2 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-foreground group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors leading-tight">
-                <Link href={`/articles/${article.slug}`}>{article.title}</Link>
-              </h2>
-
-              {article.excerpt && (
-                <p className="text-muted-foreground text-sm sm:text-base line-clamp-3 leading-relaxed">
-                  {article.excerpt}
-                </p>
-              )}
-            </div>
-
-            <div className="pt-6 mt-6 border-t border-border/70 flex items-center justify-between text-xs text-muted-foreground">
-              <div className="flex items-center gap-2.5">
-                {article.author && (
-                  <>
-                    <AuthorAvatar
-                      name={article.author.displayName}
-                      avatarUrl={article.author.avatarUrl}
-                      className="size-7 text-[10px]"
-                    />
-                    <span className="font-semibold text-foreground/80">
-                      {article.author.displayName}
-                    </span>
-                  </>
-                )}
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="inline-flex items-center gap-1">
-                  <Calendar className="h-3.5 w-3.5 text-muted-foreground/70" />
-                  {publishedDate}
-                </span>
-                <span>•</span>
-                <span className="inline-flex items-center gap-1">
-                  <Clock className="h-3.5 w-3.5 text-muted-foreground/70" />
-                  {article.readingTimeMinutes} min
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </article>
-    );
-  }
-
-  if (variant === 'compact') {
-    return (
-      <article className="group relative flex gap-3.5 items-center rounded-xl p-2 transition hover:bg-muted/50">
-        <div className="relative h-18 w-22 shrink-0 overflow-hidden rounded-xl bg-muted border border-border/80">
-          {article.featuredImage ? (
-            <Image
-              src={article.featuredImage.url}
-              alt={article.featuredImage?.altText || article.title}
-              fill
-              sizes="88px"
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
-            />
-          ) : (
-            <ImagePlaceholder />
-          )}
-        </div>
-        <div className="flex-1 min-w-0 space-y-1">
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
-              {categoryLabel}
-            </span>
-          </div>
-          <h4 className="line-clamp-2 text-xs font-bold text-foreground group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors leading-snug">
-            <Link href={`/articles/${article.slug}`}>{article.title}</Link>
-          </h4>
-          <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
-            <span>{publishedDate}</span>
-            <span>•</span>
-            <span>{article.readingTimeMinutes}m read</span>
-          </div>
-        </div>
-      </article>
-    );
-  }
-
-  // Standard Grid Card
   return (
-    <article className="group flex flex-col justify-between overflow-hidden rounded-2xl border border-border/80 bg-card transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
-      <div>
-        <div className="relative aspect-[16/10] w-full overflow-hidden bg-muted">
-          {article.featuredImage ? (
-            <Image
-              src={article.featuredImage.url}
-              alt={article.featuredImage?.altText || article.title}
-              fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-            />
-          ) : (
-            <ImagePlaceholder />
-          )}
-          <div className="absolute left-3 top-3 z-10">
-            <CategoryBadge label={categoryLabel} slug={category?.slug} variant="overlay" />
+    <article
+      className={cn(
+        'group relative flex gap-4 overflow-hidden rounded-3xl border border-border/80 bg-card p-3 transition-[box-shadow,transform,border-color] duration-300',
+        'hover:border-primary/40 hover:shadow-lg motion-safe:hover:-translate-y-0.5',
+        'sm:flex-col sm:gap-0 sm:p-0',
+      )}
+    >
+      <div className="relative size-28 shrink-0 overflow-hidden rounded-2xl bg-muted sm:aspect-16/10 sm:size-auto sm:w-full sm:rounded-none">
+        <Cover
+          article={article}
+          priority={priority}
+          sizes="(max-width: 640px) 112px, (max-width: 1200px) 50vw, 33vw"
+        />
+        {category && (
+          <div className="absolute left-3 top-3 z-20 hidden sm:block">
+            <CategoryBadge label={category.name} slug={category.slug} variant="overlay" />
           </div>
-        </div>
-
-        <div className="p-5 space-y-2.5">
-          {isGuide && (
-            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-              <MapPin className="h-3 w-3" /> Field Guide
-            </span>
-          )}
-          <h3 className="line-clamp-2 text-base sm:text-lg font-bold tracking-tight text-foreground group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-            <Link href={`/articles/${article.slug}`}>{article.title}</Link>
-          </h3>
-          {article.excerpt && (
-            <p className="text-muted-foreground text-xs sm:text-sm line-clamp-2 leading-relaxed">
-              {article.excerpt}
-            </p>
-          )}
-        </div>
+        )}
       </div>
 
-      <div className="flex items-center justify-between border-t border-border/60 px-5 py-3 text-xs text-muted-foreground">
-        <div className="flex items-center gap-2">
-          <Calendar className="h-3.5 w-3.5 text-muted-foreground/70" />
-          <span>{publishedDate}</span>
-          <span>•</span>
-          <Clock className="h-3.5 w-3.5 text-muted-foreground/70" />
-          <span>{article.readingTimeMinutes} min</span>
-        </div>
+      <div className="flex min-w-0 flex-1 flex-col justify-center gap-2 sm:justify-start sm:p-5">
+        <p className="flex flex-wrap items-center gap-x-2 text-[11px] font-bold uppercase tracking-[0.14em] text-primary sm:hidden">
+          {category && <span>{category.name}</span>}
+          {isGuide && (
+            <span className="inline-flex items-center gap-1">
+              <MapPin aria-hidden="true" className="size-3" /> Guide
+            </span>
+          )}
+        </p>
+        {isGuide && (
+          <p className="hidden items-center gap-1 text-[11px] font-bold uppercase tracking-[0.14em] text-primary sm:inline-flex">
+            <MapPin aria-hidden="true" className="size-3" /> Field guide
+          </p>
+        )}
 
-        <Link
-          href={`/articles/${article.slug}`}
-          aria-label={`Read article: ${article.title}`}
-          className="flex h-7 w-7 items-center justify-center rounded-full bg-muted/80 text-foreground transition group-hover:bg-emerald-600 group-hover:text-white"
-        >
-          <ArrowUpRight className="h-3.5 w-3.5" />
-        </Link>
+        <h3 className="line-clamp-3 font-serif text-base font-bold leading-snug tracking-tight text-foreground transition-colors group-hover:text-primary sm:text-xl">
+          <Link href={href} className="after:absolute after:inset-0 after:z-10">
+            {article.title}
+          </Link>
+        </h3>
+
+        {article.excerpt && (
+          <p className="hidden line-clamp-3 text-sm leading-relaxed text-muted-foreground sm:block">
+            {article.excerpt}
+          </p>
+        )}
+
+        <div className="mt-auto flex flex-wrap items-center gap-x-3 gap-y-1 pt-1 text-xs text-muted-foreground sm:pt-3">
+          {article.author && (
+            <span className="hidden items-center gap-2 sm:inline-flex">
+              <AuthorAvatar
+                name={article.author.displayName}
+                avatarUrl={article.author.avatarUrl}
+                className="size-6 text-[10px]"
+              />
+              <span className="font-semibold text-foreground/80">{article.author.displayName}</span>
+            </span>
+          )}
+          <span>{formatPublishedDate(article.publishedAt)}</span>
+          <span className="inline-flex items-center gap-1">
+            <Clock aria-hidden="true" className="size-3.5" />
+            {article.readingTimeMinutes} min
+          </span>
+          <span className="ml-auto hidden items-center gap-1 font-semibold text-primary sm:inline-flex">
+            Read story
+            <ArrowRight
+              aria-hidden="true"
+              className="size-3.5 transition-transform duration-200 group-hover:translate-x-0.5"
+            />
+          </span>
+        </div>
       </div>
     </article>
   );

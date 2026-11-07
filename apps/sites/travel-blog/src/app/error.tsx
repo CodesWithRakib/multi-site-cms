@@ -5,6 +5,8 @@ import { useEffect } from 'react';
 
 import { Button, StatusPage } from '@multi-site-cms/ui';
 
+import { EmptyStateArt } from '@/components/illustrations/EmptyStateArt';
+
 interface RouteErrorProps {
   readonly error: Error & { digest?: string };
   readonly reset: () => void;
@@ -21,6 +23,7 @@ export default function RouteError({ error, reset }: RouteErrorProps) {
 
   return (
     <StatusPage
+      illustration={<EmptyStateArt name="lost" className="mx-auto h-36 w-auto" />}
       title="Something went wrong"
       description="This page could not be loaded right now. Please try again in a moment."
       actions={

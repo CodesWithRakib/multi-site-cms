@@ -104,7 +104,7 @@ export function HeroCarousel({ slides }: HeroCarouselProps) {
                   {category && (
                     <Link
                       href={`/categories/${category.slug}`}
-                      className="underline-offset-4 hover:underline"
+                      className="touch-target underline-offset-4 hover:underline"
                     >
                       {category.name}
                     </Link>
@@ -171,7 +171,7 @@ export function HeroCarousel({ slides }: HeroCarouselProps) {
                     type="button"
                     onClick={() => setPaused((value) => !value)}
                     aria-label={paused ? 'Play slideshow' : 'Pause slideshow'}
-                    className="inline-flex size-7 items-center justify-center rounded-full text-white/80 hover:bg-white/15 hover:text-white"
+                    className="inline-flex size-10 items-center justify-center rounded-full text-white/80 hover:bg-white/15 hover:text-white"
                   >
                     {paused ? <Play className="size-3.5" /> : <Pause className="size-3.5" />}
                   </button>

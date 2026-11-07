@@ -36,7 +36,7 @@ export function PortalCategoryChips({ categories, activeSlug }: PortalCategoryCh
               href={chip.slug ? `/articles?category=${chip.slug}` : '/articles'}
               aria-current={isActive ? 'true' : undefined}
               scroll={false}
-              className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-all ${
+              className={`inline-flex min-h-10 items-center rounded-full px-4 py-1.5 text-xs font-semibold transition-all ${
                 isActive
                   ? 'bg-primary text-primary-foreground shadow-sm'
                   : 'border border-border bg-card text-muted-foreground hover:bg-muted hover:text-foreground'
@@ -50,7 +50,7 @@ export function PortalCategoryChips({ categories, activeSlug }: PortalCategoryCh
 
       <Link
         href="/categories"
-        className="inline-flex items-center gap-1 text-xs font-bold text-primary hover:underline"
+        className="touch-target inline-flex items-center gap-1 text-xs font-bold text-primary hover:underline"
       >
         <span>View All</span>
         <ArrowRight aria-hidden="true" className="h-3.5 w-3.5" />

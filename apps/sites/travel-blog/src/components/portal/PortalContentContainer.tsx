@@ -1,12 +1,14 @@
 import Link from 'next/link';
+import { BookOpen } from 'lucide-react';
 
 import { PaginationLinks, pageHref } from '@multi-site-cms/ui';
 
 import type { PublicArticle, PublicCategory } from '@/lib/api';
 
+import { PageHeader } from '@/components/ui/PageHeader';
+
 import { PortalArticleGrid } from './PortalArticleGrid';
 import { PortalCategoryChips } from './PortalCategoryChips';
-import { PortalHeroBanner } from './PortalHeroBanner';
 import { PortalRightSidebar } from './PortalRightSidebar';
 
 interface PortalContentContainerProps {
@@ -33,37 +35,45 @@ export function PortalContentContainer({
   totalPages,
   total,
 }: PortalContentContainerProps) {
+  const activeCategory = categories.find((c) => c.slug === activeCategorySlug);
   const base = activeCategorySlug ? `/articles?category=${activeCategorySlug}` : '/articles';
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-10">
-      {/* Panoramic Hero Banner */}
-      <PortalHeroBanner />
+      <PageHeader
+        eyebrow={
+          <>
+            <BookOpen aria-hidden="true" className="size-3.5" /> The Explorer Journal
+          </>
+        }
+        title={
+          activeCategory ? (
+            activeCategory.name
+          ) : (
+            <>
+              Travel stories &amp;{' '}
+              <span className="font-handwriting text-4xl font-bold text-primary sm:text-6xl">
+                guides
+              </span>
+            </>
+          )
+        }
+        description={
+          activeCategory?.description ||
+          'Firsthand itineraries, practical field notes and the people and places behind them.'
+        }
+        meta={`${total} ${total === 1 ? 'story' : 'stories'}`}
+        scene="mountains"
+      />
 
-      {/* 2-Column Content Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pt-2" id="blogs-grid">
-        {/* Left 8-Column Articles Section */}
-        <div className="lg:col-span-8 space-y-6">
-          {/* Section Header */}
-          <div className="flex items-center justify-between border-l-4 border-emerald-500 pl-3">
-            <div>
-              <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight text-foreground">
-                Latest Travel Blogs
-              </h2>
-              <p className="text-xs sm:text-sm text-muted-foreground">
-                Read our latest travel stories, tips and guides.
-              </p>
-            </div>
-            <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400">
-              {total} {total === 1 ? 'Article' : 'Articles'}
-            </span>
-          </div>
-
+      {/* Stories first on phones; the topic sidebar follows below them. */}
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-12" id="blogs-grid">
+        <div className="space-y-6 lg:col-span-8">
           {/* Filter Chips */}
           <PortalCategoryChips categories={categories} activeSlug={activeCategorySlug} />
 
           {/* Article Grid */}
-          <PortalArticleGrid articles={articles} />
+          <PortalArticleGrid articles={articles} filtered={Boolean(activeCategorySlug)} />
 
           <PaginationLinks
             page={page}

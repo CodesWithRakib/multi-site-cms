@@ -47,7 +47,7 @@ export function LatestStories({ articles }: LatestStoriesProps) {
         </div>
         <Link
           href="/articles"
-          className="group inline-flex shrink-0 items-center gap-1.5 text-sm font-semibold text-foreground hover:text-primary"
+          className="touch-target group inline-flex shrink-0 items-center gap-1.5 text-sm font-semibold text-foreground hover:text-primary"
         >
           All stories
           <ArrowRight

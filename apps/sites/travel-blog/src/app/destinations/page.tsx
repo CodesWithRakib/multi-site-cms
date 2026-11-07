@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { MapPin } from 'lucide-react';
+import { PageHeader } from '@/components/ui/PageHeader';
 import { DestinationsClientContainer } from '@/components/destinations/DestinationsClientContainer';
 import { siteConfig, defaultOgImage } from '@/config/site';
 import { fetchArticles, fetchCategories } from '@/lib/api';
@@ -27,19 +28,17 @@ export default async function DestinationsPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 sm:py-14 space-y-10">
-      {/* Page Header */}
-      <header className="border-b border-border/60 pb-8 space-y-3">
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-700 dark:text-emerald-300">
-          <MapPin className="h-3.5 w-3.5" /> Curated Field Notes & Routes
-        </span>
-        <h1 className="font-serif text-3xl sm:text-5xl font-extrabold tracking-tight text-foreground">
-          Destination Guides
-        </h1>
-        <p className="text-base sm:text-lg text-muted-foreground max-w-2xl leading-relaxed">
-          Comprehensive, field-tested guides covering route planning, cultural etiquette, transit
-          logistics, and local insights for your next trip.
-        </p>
-      </header>
+      <PageHeader
+        eyebrow={
+          <>
+            <MapPin aria-hidden="true" className="size-3.5" /> Field notes &amp; routes
+          </>
+        }
+        title="Destination guides"
+        description="Field-tested guides covering route planning, cultural etiquette, transit and local insight for your next trip."
+        meta={`${guides.length} ${guides.length === 1 ? 'guide' : 'guides'}`}
+        scene="coast"
+      />
 
       {/* Interactive Destination Explorer Container */}
       <DestinationsClientContainer initialGuides={guides} categories={categories} />

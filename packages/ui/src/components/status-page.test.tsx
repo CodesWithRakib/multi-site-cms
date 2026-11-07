@@ -26,4 +26,19 @@ describe('StatusPage', () => {
     expect(container.querySelectorAll('p')).toHaveLength(1);
     expect(container.querySelector('div')).toBeNull();
   });
+
+  it('renders an optional illustration above the code', () => {
+    render(
+      <StatusPage
+        code="404"
+        title="Page not found"
+        description="Moved."
+        illustration={<svg data-testid="art" />}
+      />,
+    );
+
+    const art = screen.getByTestId('art');
+    const code = screen.getByText('404');
+    expect(art.compareDocumentPosition(code) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
 });

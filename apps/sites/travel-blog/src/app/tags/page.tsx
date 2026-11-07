@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Tag as TagIcon } from 'lucide-react';
+import { EmptyState } from '@/components/ui/EmptyState';
+import { PageHeader } from '@/components/ui/PageHeader';
 import { siteConfig } from '@/config/site';
 import { fetchTags } from '@/lib/api';
 
@@ -15,21 +17,22 @@ export const metadata: Metadata = {
 };
 
 export default async function TagsPage() {
-  const tags = await fetchTags();
+  // Only tags that are on published stories; an empty tag is a dead end for readers.
+  const tags = (await fetchTags()).filter((tag) => tag.postCount > 0);
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 sm:py-14 space-y-10">
-      <header className="border-b border-border/60 pb-8 space-y-3">
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-700 dark:text-emerald-300">
-          <TagIcon className="h-3.5 w-3.5" /> Topic Index
-        </span>
-        <h1 className="font-serif text-3xl sm:text-5xl font-extrabold tracking-tight text-foreground">
-          Tags & Topics
-        </h1>
-        <p className="text-base sm:text-lg text-muted-foreground max-w-2xl leading-relaxed">
-          Keywords, regions, and activities connecting stories across borders and disciplines.
-        </p>
-      </header>
+      <PageHeader
+        eyebrow={
+          <>
+            <TagIcon aria-hidden="true" className="size-3.5" /> Topic index
+          </>
+        }
+        title="Tags & topics"
+        description="Keywords, regions and activities that connect stories across the journal."
+        meta={`${tags.length} ${tags.length === 1 ? 'tag' : 'tags'} in use`}
+        scene="forest"
+      />
 
       {tags.length > 0 ? (
         <div className="flex flex-wrap gap-3">
@@ -50,13 +53,11 @@ export default async function TagsPage() {
           ))}
         </div>
       ) : (
-        <div className="rounded-3xl border border-dashed border-border p-16 text-center space-y-2">
-          <TagIcon className="h-10 w-10 text-muted-foreground mx-auto" />
-          <h2 className="font-serif text-xl font-bold text-foreground">No Tags Found</h2>
-          <p className="text-sm text-muted-foreground">
-            Tags attached to published articles will appear here.
-          </p>
-        </div>
+        <EmptyState
+          art="no-stories"
+          title="No tags yet"
+          description="Tags attached to published stories will appear here."
+        />
       )}
     </div>
   );

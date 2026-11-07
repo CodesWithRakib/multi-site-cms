@@ -7,6 +7,7 @@ import { resolveAboutContent } from '@multi-site-cms/validation/site-about';
 
 import { NewsletterBanner } from '@/components/home/NewsletterBanner';
 import { AuthorAvatar } from '@/components/ui/AuthorAvatar';
+import { PageHeader } from '@/components/ui/PageHeader';
 import { siteConfig } from '@/config/site';
 import { fetchArticles, fetchSiteConfig } from '@/lib/api';
 
@@ -46,27 +47,33 @@ export default async function AboutPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 sm:py-16 space-y-16">
       {/* Editorial hero: all text is written by the site owner in the admin. */}
-      <header className="max-w-3xl space-y-4">
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3.5 py-1 text-xs font-bold text-emerald-700 dark:text-emerald-300">
-          <Sparkles className="h-3.5 w-3.5" /> {about.eyebrow}
-        </span>
-        <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground leading-[1.12] text-balance">
-          {about.headline}
-          {about.highlight && (
-            <>
-              {' '}
-              <span className="font-handwriting text-emerald-500 dark:text-emerald-400 text-4xl sm:text-6xl font-bold">
-                {about.highlight}
-              </span>
-            </>
-          )}
-        </h1>
-        <div className="space-y-4 text-base sm:text-lg text-muted-foreground leading-relaxed">
+      <PageHeader
+        eyebrow={
+          <>
+            <Sparkles aria-hidden="true" className="size-3.5" /> {about.eyebrow}
+          </>
+        }
+        title={
+          <>
+            {about.headline}
+            {about.highlight && (
+              <>
+                {' '}
+                <span className="font-handwriting text-4xl font-bold text-primary sm:text-6xl">
+                  {about.highlight}
+                </span>
+              </>
+            )}
+          </>
+        }
+        scene="coast"
+      >
+        <div className="space-y-4 pt-1 text-base leading-relaxed text-muted-foreground sm:text-lg">
           {about.paragraphs.map((paragraph, index) => (
             <p key={index}>{paragraph}</p>
           ))}
         </div>
-      </header>
+      </PageHeader>
 
       {/* Hero visual: the newest real cover story (CMS), never a stock photo. */}
       {cover?.featuredImage && (

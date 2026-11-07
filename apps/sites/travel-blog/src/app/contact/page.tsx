@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Mail, Phone } from 'lucide-react';
 
 import { ContactForm } from '@/components/contact/ContactForm';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { NewsletterBanner } from '@/components/home/NewsletterBanner';
 import { siteConfig } from '@/config/site';
 import { parseContactEmail, parseContactPhone } from '@/lib/contact';
@@ -42,18 +43,12 @@ export default function ContactPage() {
           {contactEmail ? (
             <ContactForm contactEmail={contactEmail} />
           ) : (
-            <div className="flex flex-col items-center gap-3 py-6 text-center">
-              <span className="flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                <Mail aria-hidden="true" className="size-6" />
-              </span>
-              <h2 className="font-serif text-xl font-bold text-foreground">
-                Our editorial inbox is being set up
-              </h2>
-              <p className="max-w-md text-sm text-muted-foreground">
-                Contact details will appear here soon. In the meantime, subscribe below to follow
-                new stories.
-              </p>
-            </div>
+            <EmptyState
+              art="mail"
+              title="Our editorial inbox is being set up"
+              description="Contact details will appear here soon. In the meantime, subscribe below to follow new stories."
+              className="border-0 bg-transparent py-4"
+            />
           )}
         </div>
 
