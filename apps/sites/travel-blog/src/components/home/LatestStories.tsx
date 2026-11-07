@@ -4,32 +4,31 @@ import { ArrowRight } from 'lucide-react';
 import type { PublicArticleSummary } from '@multi-site-cms/types';
 import { cn } from '@multi-site-cms/ui';
 
-import { StoryCard } from './StoryCard';
+import { Reveal } from '@/components/ui/Reveal';
+
+import { CompactStoryRow } from './CompactStoryRow';
+import { FeatureStoryCard } from './FeatureStoryCard';
 
 interface LatestStoriesProps {
   readonly articles: readonly PublicArticleSummary[];
 }
 
-type GridLayout = 'quad' | 'stack' | 'pair';
+/** Large stories on the left, compact rows on the right. */
+const FEATURED = 2;
+const COMPACT = 4;
 
 /**
- * Picks a layout that leaves no empty cells next to the feature tile:
- * 4+ stories → 2×2 beside it, 2–3 → a column of two, 0–1 → side by side.
+ * Editorial split: the two newest stories as large cover tiles on the left and
+ * the next four as a compact list on the right. With fewer stories the page
+ * still fills out: one or two stories span the full width, and three or more
+ * fill the right column as stories arrive. On phones the large tiles come
+ * first, then the list.
  */
-function chooseLayout(secondaryCount: number): GridLayout {
-  if (secondaryCount >= 4) return 'quad';
-  if (secondaryCount >= 2) return 'stack';
-  return 'pair';
-}
-
-const VISIBLE: Record<GridLayout, number> = { quad: 4, stack: 2, pair: 1 };
-
-/** Editorial grid: one feature tile plus up to four regular stories. */
 export function LatestStories({ articles }: LatestStoriesProps) {
   if (articles.length === 0) return null;
-  const [feature, ...rest] = articles;
-  const layout = chooseLayout(rest.length);
-  const secondary = rest.slice(0, VISIBLE[layout]);
+  const featured = articles.slice(0, FEATURED);
+  const compact = articles.slice(FEATURED, FEATURED + COMPACT);
+  const hasList = compact.length > 0;
 
   return (
     <section aria-labelledby="latest-heading" className="space-y-6">
@@ -57,27 +56,35 @@ export function LatestStories({ articles }: LatestStoriesProps) {
         </Link>
       </div>
 
-      <div
-        className={cn(
-          'grid gap-x-5 gap-y-8 sm:grid-cols-2',
-          layout === 'quad' && 'lg:grid-cols-4',
-          layout === 'stack' && 'lg:grid-cols-3',
-        )}
-      >
-        {feature && (
-          <div
+      <div className={cn('grid gap-5', hasList && 'lg:grid-cols-12 lg:gap-6')}>
+        <div
+          className={cn('grid gap-5', hasList ? 'lg:col-span-7 lg:grid-rows-2' : 'sm:grid-cols-2')}
+        >
+          {featured.map((article, index) => (
+            <Reveal key={article.id} delay={index * 100} className="flex">
+              <div className="flex w-full">
+                <FeatureStoryCard article={article} priority={index === 0} />
+              </div>
+            </Reveal>
+          ))}
+        </div>
+
+        {hasList && (
+          <ul
             className={cn(
-              'flex',
-              secondary.length !== 1 && 'sm:col-span-2',
-              layout !== 'pair' && 'lg:row-span-2',
+              'grid overflow-hidden rounded-3xl border border-border/80 bg-card shadow-xs lg:col-span-5',
+              // A short list keeps its natural height instead of stretching into an empty card.
+              compact.length < 3 && 'lg:self-start',
             )}
+            style={{ gridTemplateRows: `repeat(${compact.length}, minmax(0, 1fr))` }}
           >
-            <StoryCard article={feature} size="feature" />
-          </div>
+            {compact.map((article, index) => (
+              <li key={article.id} className={cn(index > 0 && 'border-t border-border/70')}>
+                <CompactStoryRow article={article} />
+              </li>
+            ))}
+          </ul>
         )}
-        {secondary.map((article) => (
-          <StoryCard key={article.id} article={article} />
-        ))}
       </div>
     </section>
   );

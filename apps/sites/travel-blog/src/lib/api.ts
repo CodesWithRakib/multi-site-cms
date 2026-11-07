@@ -1,7 +1,7 @@
 import type {
   ApiSuccess,
   ListPublicPostsQuery,
-  PaginatedResult,
+  CursorPage,
   PublicArticleDetail,
   PublicArticleSummary,
   PublicCategoryItem,
@@ -64,12 +64,28 @@ async function fetchFromApi<T>(
   }
 }
 
+export type ArticlesResult =
+  { readonly ok: true; readonly data: CursorPage<PublicArticleSummary> } | { readonly ok: false };
+
+function emptyPage(query: ListPublicPostsQuery): CursorPage<PublicArticleSummary> {
+  return {
+    items: [],
+    total: 0,
+    page: query.page ?? 1,
+    limit: query.limit ?? 12,
+    totalPages: 1,
+    nextCursor: null,
+  };
+}
+
 /**
- * Fetch published articles for the Travel Blog with optional filters and pagination.
+ * Published articles with optional filters, page or cursor. Unlike
+ * `fetchArticles` it says whether the CMS answered, so a caller that appends to
+ * an existing list (infinite scroll) can tell "no more stories" from "failed".
  */
-export async function fetchArticles(
+export async function fetchArticlesResult(
   query: ListPublicPostsQuery = {},
-): Promise<PaginatedResult<PublicArticleSummary>> {
+): Promise<ArticlesResult> {
   const searchParams = new URLSearchParams();
 
   if (query.page) searchParams.set('page', String(query.page));
@@ -80,6 +96,7 @@ export async function fetchArticles(
   if (query.search) searchParams.set('search', query.search);
   if (query.featured) searchParams.set('featured', 'true');
   if (query.sort) searchParams.set('sort', query.sort);
+  if (query.cursor) searchParams.set('cursor', query.cursor);
 
   const queryString = searchParams.toString();
   const endpoint = `/public/sites/${SITE_KEY}/posts${queryString ? `?${queryString}` : ''}`;
@@ -96,37 +113,44 @@ export async function fetchArticles(
     });
 
     if (!res.ok) {
-      return {
-        items: [],
-        total: 0,
-        page: query.page ?? 1,
-        limit: query.limit ?? 12,
-        totalPages: 1,
-      };
+      // An unknown site is simply empty; anything else is a failure.
+      return res.status === 404 ? { ok: true, data: emptyPage(query) } : { ok: false };
     }
 
     const payload = (await res.json()) as {
       data: PublicArticleSummary[];
-      pagination: { total: number; page: number; limit: number; totalPages: number };
+      pagination: {
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+        nextCursor?: string | null;
+      };
     };
 
     return {
-      items: payload.data ?? [],
-      total: payload.pagination?.total ?? 0,
-      page: payload.pagination?.page ?? 1,
-      limit: payload.pagination?.limit ?? 12,
-      totalPages: payload.pagination?.totalPages ?? 1,
+      ok: true,
+      data: {
+        items: payload.data ?? [],
+        total: payload.pagination?.total ?? 0,
+        page: payload.pagination?.page ?? 1,
+        limit: payload.pagination?.limit ?? 12,
+        totalPages: payload.pagination?.totalPages ?? 1,
+        nextCursor: payload.pagination?.nextCursor ?? null,
+      },
     };
   } catch (error) {
     console.warn(`[CMS API] Failed to fetch articles from ${endpoint}:`, error);
-    return {
-      items: [],
-      total: 0,
-      page: query.page ?? 1,
-      limit: query.limit ?? 12,
-      totalPages: 1,
-    };
+    return { ok: false };
   }
+}
+
+/** Published articles, or an empty page when the CMS cannot be reached. */
+export async function fetchArticles(
+  query: ListPublicPostsQuery = {},
+): Promise<CursorPage<PublicArticleSummary>> {
+  const result = await fetchArticlesResult(query);
+  return result.ok ? result.data : emptyPage(query);
 }
 
 /**
@@ -147,7 +171,8 @@ export async function fetchArticleBySlug(slug: string): Promise<PublicArticleDet
  */
 export async function fetchCategories(): Promise<PublicCategoryItem[]> {
   const data = await fetchFromApi<PublicCategoryItem[]>(`/public/sites/${SITE_KEY}/categories`, {
-    revalidate: 300,
+    // Same freshness as the story list, so a topic's count and its stories agree.
+    revalidate: 60,
     tags: ['travel-blog-content', 'travel-blog-categories'],
   });
   return data ?? [];

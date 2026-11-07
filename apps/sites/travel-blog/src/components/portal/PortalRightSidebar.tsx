@@ -1,21 +1,16 @@
-'use client';
-
-import { useState, type FormEvent, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { ArrowRight, Clock, Compass, Newspaper, Search, Send } from 'lucide-react';
+import { ArrowRight, Clock, Newspaper, Send } from 'lucide-react';
 
 import { NewsletterForm } from '@/components/home/NewsletterForm';
-import type { PublicArticle, PublicCategory } from '@/lib/api';
+import type { PublicArticle } from '@/lib/api';
 
 interface PortalRightSidebarProps {
-  readonly categories: readonly PublicCategory[];
-  /** Newest published stories, already sorted by the API. */
+  /** Newest published stories overall (not the filtered list), sorted by the API. */
   readonly latestArticles: readonly PublicArticle[];
 }
 
-const CATEGORY_LIMIT = 5;
 const LATEST_LIMIT = 3;
 
 const WIDGET = 'space-y-3.5 rounded-2xl border border-border/70 bg-card p-5 shadow-2xs';
@@ -45,71 +40,9 @@ function WidgetHeader({ icon, title, href, linkLabel }: WidgetHeaderProps) {
   );
 }
 
-export function PortalRightSidebar({ categories, latestArticles }: PortalRightSidebarProps) {
-  const router = useRouter();
-  const [searchQuery, setSearchQuery] = useState('');
-
-  const handleSearch = (event: FormEvent) => {
-    event.preventDefault();
-    const query = searchQuery.trim();
-    if (query) router.push(`/search?q=${encodeURIComponent(query)}`);
-  };
-
-  // Only real CMS topics: busiest first, empty ones hidden.
-  const topics = categories
-    .filter((category) => category.postCount > 0)
-    .sort((a, b) => b.postCount - a.postCount || a.name.localeCompare(b.name))
-    .slice(0, CATEGORY_LIMIT);
-
+export function PortalRightSidebar({ latestArticles }: PortalRightSidebarProps) {
   return (
     <aside className="space-y-6">
-      <div className="rounded-2xl border border-border/70 bg-card p-4 shadow-2xs">
-        <form onSubmit={handleSearch} role="search" className="relative flex items-center">
-          <input
-            name="q"
-            type="search"
-            value={searchQuery}
-            onChange={(event) => setSearchQuery(event.target.value)}
-            placeholder="Search stories, tips & places..."
-            aria-label="Search the archive"
-            className="w-full rounded-full border border-border/80 bg-background px-4 py-2.5 pr-11 text-xs text-foreground placeholder:text-muted-foreground transition focus:border-primary focus:outline-hidden focus:ring-1 focus:ring-primary"
-          />
-          <button
-            type="submit"
-            aria-label="Search"
-            className="absolute right-1 flex size-8 items-center justify-center rounded-full bg-primary text-primary-foreground transition hover:opacity-90"
-          >
-            <Search aria-hidden="true" className="size-3.5" />
-          </button>
-        </form>
-      </div>
-
-      {topics.length > 0 && (
-        <div className={WIDGET}>
-          <WidgetHeader
-            icon={<Compass aria-hidden="true" className="size-4 text-primary" />}
-            title="Explore Categories"
-            href="/categories"
-            linkLabel="All"
-          />
-          <ul className="space-y-1.5">
-            {topics.map((category) => (
-              <li key={category.id}>
-                <Link
-                  href={`/categories/${category.slug}`}
-                  className="flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold text-foreground/80 transition hover:bg-primary/10 hover:text-primary"
-                >
-                  <span>{category.name}</span>
-                  <span className="rounded-full bg-muted px-2 py-0.5 font-mono text-[11px] text-muted-foreground">
-                    {category.postCount}
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
       {latestArticles.length > 0 && (
         <div className={WIDGET}>
           <WidgetHeader

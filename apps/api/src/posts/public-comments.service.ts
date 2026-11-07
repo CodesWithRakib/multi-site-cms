@@ -2,6 +2,7 @@ import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import type {
   PublicCommentItem,
   PublicCommentsResult,
+  RatingBreakdown,
   SubmittedPublicComment,
 } from '@multi-site-cms/types';
 import { DataSource } from 'typeorm';
@@ -60,14 +61,19 @@ export class PublicCommentsService {
       order: { createdAt: 'ASC' },
     });
 
-    // Compute average rating
-    const rated = comments.filter((c) => typeof c.rating === 'number' && c.rating > 0);
-    const averageRating =
-      rated.length > 0
-        ? Math.round(
-            (rated.reduce((acc, curr) => acc + (curr.rating ?? 0), 0) / rated.length) * 10,
-          ) / 10
-        : null;
+    // Star ratings only: a comment or reply without one must not dilute the average.
+    const ratingBreakdown: RatingBreakdown = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    let ratingSum = 0;
+    let ratingCount = 0;
+    for (const c of comments) {
+      const stars = c.rating;
+      if (typeof stars === 'number' && stars >= 1 && stars <= 5) {
+        ratingBreakdown[stars as keyof RatingBreakdown] += 1;
+        ratingSum += stars;
+        ratingCount += 1;
+      }
+    }
+    const averageRating = ratingCount > 0 ? Math.round((ratingSum / ratingCount) * 10) / 10 : null;
 
     // Nest threaded replies
     const rootComments: PublicCommentItem[] = [];
@@ -105,6 +111,8 @@ export class PublicCommentsService {
       items: rootComments,
       total: comments.length,
       averageRating,
+      ratingCount,
+      ratingBreakdown,
     };
   }
 

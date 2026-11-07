@@ -1,6 +1,6 @@
 import { HttpStatus, Inject, Injectable, forwardRef } from '@nestjs/common';
 import type {
-  PaginatedResult,
+  CursorPage,
   PublicArticleDetail,
   PublicArticleAuthor,
   PublicArticleImage,
@@ -15,6 +15,7 @@ import type {
 import { DataSource, In } from 'typeorm';
 
 import { ApiException } from '../common/exceptions/api.exception';
+import { decodeTimeCursor, encodeTimeCursor } from '../common/pagination/cursor';
 import { env } from '../config/env';
 import { DATA_SOURCE } from '../database/database.tokens';
 import { Category } from '../database/entities/category.entity';
@@ -134,12 +135,21 @@ export class PublicContentService {
   async listPublishedPosts(
     siteKey: string,
     query: ListPublicPostsQueryDto,
-  ): Promise<PaginatedResult<PublicArticleSummary>> {
+  ): Promise<CursorPage<PublicArticleSummary>> {
     const site = await this.resolveSite(siteKey);
+
+    const sort = query.sort ?? 'newest';
+    if (query.cursor && sort !== 'newest') {
+      throw new ApiException(HttpStatus.BAD_REQUEST, 'VALIDATION_ERROR', 'validation.failed', {
+        details: [{ field: 'cursor', code: 'INVALID_CURSOR', messageKey: 'validation.failed' }],
+      });
+    }
+    const cursor = query.cursor ? decodeTimeCursor(query.cursor) : null;
 
     const page = Math.max(1, query.page ?? 1);
     const limit = Math.min(50, Math.max(1, query.limit ?? 12));
-    const skip = (page - 1) * limit;
+    // A cursor replaces the offset: it already says where to continue.
+    const skip = cursor ? 0 : (page - 1) * limit;
 
     const pubRepo = await getInitializedRepository(this.dataSource, PostPublication);
     const now = new Date();
@@ -207,6 +217,17 @@ export class PublicContentService {
       });
     }
 
+    // The total always means "stories matching the filters", so it is counted before the
+    // cursor narrows the rows (a client shows it as "N stories" on every page).
+    const totalMatching = cursor ? await qb.clone().getCount() : null;
+
+    if (cursor) {
+      qb.andWhere('(pub.published_at, pub.id) < (:cursorAt, :cursorId)', {
+        cursorAt: cursor.at,
+        cursorId: cursor.id,
+      });
+    }
+
     // Dynamic sorting
     switch (query.sort) {
       case 'oldest':
@@ -228,25 +249,39 @@ export class PublicContentService {
         break;
       case 'newest':
       default:
-        qb.orderBy('pub.published_at', 'DESC');
+        // The id breaks ties so equal timestamps keep a stable order across pages.
+        qb.orderBy('pub.published_at', 'DESC').addOrderBy('pub.id', 'DESC');
         break;
     }
 
-    qb.skip(skip).take(limit);
+    // One extra row tells us whether another page exists without a second query.
+    qb.skip(skip).take(limit + 1);
 
-    const [publications, total] = await qb.getManyAndCount();
+    const [fetched, countedTotal] = cursor
+      ? [await qb.getMany(), totalMatching ?? 0]
+      : await qb.getManyAndCount();
+    const total = countedTotal;
+    const hasMore = fetched.length > limit;
+    const publications = hasMore ? fetched.slice(0, limit) : fetched;
 
     if (publications.length === 0) {
       return {
         items: [],
-        total: 0,
+        total: cursor ? total : 0,
         page,
         limit,
         totalPages: 1,
+        nextCursor: null,
       };
     }
 
     const items = await this.toArticleSummaries(site.id, publications);
+    const last = publications[publications.length - 1];
+    // Only the default newest-first order is keyset-sortable.
+    const nextCursor =
+      hasMore && sort === 'newest' && last?.publishedAt
+        ? encodeTimeCursor(last.publishedAt, last.id)
+        : null;
 
     return {
       items,
@@ -254,6 +289,7 @@ export class PublicContentService {
       page,
       limit,
       totalPages: Math.ceil(total / limit) || 1,
+      nextCursor,
     };
   }
 

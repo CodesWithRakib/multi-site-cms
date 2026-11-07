@@ -26,7 +26,7 @@ The Travel Blog must:
 
 1. **Next.js App Router Architecture with React Server Components**:
    - Implemented within `apps/sites/travel-blog` using Next.js 16.4.3, React 19, and Tailwind CSS v4.
-   - All page routes (`/`, `/articles/[slug]`, `/destinations`, `/categories/*`, `/tags/*`, `/search`) are React Server Components by default, emitting zero JavaScript bundles for editorial article bodies.
+   - All page routes (`/`, `/articles/[slug]`, `/destinations`, `/categories/*`, `/tags/*`; search is part of `/articles`, and `/search` permanently redirects there) are React Server Components by default, emitting zero JavaScript bundles for editorial article bodies.
    - Client Component boundaries (`'use client'`) are strictly restricted to minimal interactive leaves: `Header.tsx` (mobile navigation drawer) and `ShareButtons.tsx` (Web Share API).
 
 2. **Backend as Sole Authority via Public Content Discovery API**:

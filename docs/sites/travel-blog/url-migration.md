@@ -11,7 +11,7 @@ The Travel Blog follows a clean, predictable, and search-friendly URL hierarchy:
 | Destinations Hub  | `/destinations`       | `/destinations`                     |
 | Category Archive  | `/categories/:slug`   | `/categories/solo-travel`           |
 | Tag Archive       | `/tags/:slug`         | `/tags/scandinavia`                 |
-| Search Page       | `/search?q=:query`    | `/search?q=fjords`                  |
+| Search            | `/articles?q=:query`  | `/articles?q=fjords`                |
 
 ---
 

@@ -163,7 +163,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
             )}
 
             {/* Rich Document Content */}
-            <div className="prose prose-emerald dark:prose-invert max-w-none font-serif text-foreground/90 leading-relaxed [&_h2]:scroll-mt-24 [&_h3]:scroll-mt-24">
+            <div className="prose prose-emerald dark:prose-invert max-w-none font-reading text-lg text-foreground/90 leading-[1.75] [&_h2]:scroll-mt-24 [&_h3]:scroll-mt-24">
               <DocRenderer document={article.body} />
             </div>
 

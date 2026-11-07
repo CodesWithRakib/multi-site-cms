@@ -1,13 +1,18 @@
 import type { Metadata } from 'next';
-import { JsonLd } from '@multi-site-cms/ui';
+import { collectAuthors, JsonLd } from '@multi-site-cms/ui';
+import { hasSiteAboutContent } from '@multi-site-cms/validation/site-about';
 
 import { HeroCarousel } from '@/components/home/HeroCarousel';
-import { KeepReading } from '@/components/home/KeepReading';
+import { GuidesRail } from '@/components/home/GuidesRail';
 import { LatestStories } from '@/components/home/LatestStories';
+import { MoreStories } from '@/components/home/MoreStories';
 import { NewsletterBanner } from '@/components/home/NewsletterBanner';
+import { PhotoMosaic } from '@/components/home/PhotoMosaic';
+import { SpotlightStory } from '@/components/home/SpotlightStory';
 import { TopicShowcase } from '@/components/home/TopicShowcase';
+import { TrustAndWriters } from '@/components/home/TrustAndWriters';
 import { siteConfig, feedAlternates } from '@/config/site';
-import { fetchArticles, fetchCategories } from '@/lib/api';
+import { fetchArticles, fetchCategories, fetchSiteConfig } from '@/lib/api';
 import { buildHomeFeed } from '@/lib/home-feed';
 
 export const revalidate = 60; // ISR revalidation every 60 seconds
@@ -19,16 +24,19 @@ export const metadata: Metadata = {
   openGraph: { url: '/' },
 };
 
-/** Enough stories for every slot: hero slides, latest grid, keep-reading. */
-const HOME_ARTICLE_LIMIT = 20;
+/** The most the public API serves in one page: enough for every section below. */
+const HOME_ARTICLE_LIMIT = 50;
 
 export default async function TravelHomePage() {
-  const [articlesData, categories] = await Promise.all([
+  const [articlesData, categories, config] = await Promise.all([
     fetchArticles({ limit: HOME_ARTICLE_LIMIT }),
     fetchCategories(),
+    fetchSiteConfig(),
   ]);
 
   const feed = buildHomeFeed(articlesData.items, categories);
+  const writers = collectAuthors(articlesData.items);
+  const pillars = hasSiteAboutContent(config?.about) ? config.about.pillars : [];
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -55,10 +63,14 @@ export default async function TravelHomePage() {
 
       <HeroCarousel slides={feed.slides} />
 
-      <div className="mx-auto max-w-7xl space-y-14 px-4 py-12 sm:space-y-16 sm:px-6 sm:py-14 lg:px-8">
+      <div className="mx-auto max-w-7xl space-y-14 px-4 pb-12 pt-6 sm:space-y-20 sm:px-6 sm:pb-16 sm:pt-8 lg:px-8">
         <LatestStories articles={feed.latest} />
         <TopicShowcase topics={feed.topics} />
-        <KeepReading articles={feed.more} />
+        <SpotlightStory article={feed.spotlight} />
+        <GuidesRail guides={feed.guides} />
+        <PhotoMosaic stories={feed.photos} />
+        <MoreStories articles={feed.more} total={articlesData.total} />
+        <TrustAndWriters pillars={pillars} writers={writers} />
         <NewsletterBanner />
       </div>
     </>

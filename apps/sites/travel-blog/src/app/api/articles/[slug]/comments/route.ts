@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import type { CreatePublicCommentPayload } from '@multi-site-cms/types';
-import { fetchArticleComments, submitArticleComment } from '@/lib/comments';
+import { EMPTY_COMMENTS, fetchArticleComments, submitArticleComment } from '@/lib/comments';
 import { clientKeyFromHeaders, createRateLimiter } from '@/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
@@ -23,7 +23,7 @@ export async function GET(_request: NextRequest, context: { params: Promise<{ sl
     });
   } catch (error) {
     console.error('[Comments API Route] Error fetching comments:', error);
-    return NextResponse.json({ items: [], total: 0, averageRating: null }, { status: 500 });
+    return NextResponse.json(EMPTY_COMMENTS, { status: 500 });
   }
 }
 

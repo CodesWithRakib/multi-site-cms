@@ -140,6 +140,11 @@ export interface PaginatedResult<T> {
   totalPages: number;
 }
 
+/** A page of public stories plus the cursor for the next one (null at the end). */
+export interface CursorPage<T> extends PaginatedResult<T> {
+  nextCursor: string | null;
+}
+
 export type SiteStatus = 'active' | 'paused' | 'archived' | 'suspended';
 export type DomainStatus = 'active' | 'disabled';
 export type NavigationVisibility = 'public' | 'authenticated' | 'hidden';
@@ -682,6 +687,8 @@ export interface ListPublicPostsQuery {
   search?: string;
   featured?: boolean;
   sort?: PublicPostSort;
+  /** Continue after this opaque cursor (`nextCursor` of the previous page); newest sort only. */
+  cursor?: string;
 }
 
 // ==========================================
@@ -1029,10 +1036,18 @@ export interface CreatePublicCommentPayload {
   website_url?: string;
 }
 
+/** How many reviews gave each star rating. */
+export type RatingBreakdown = Record<1 | 2 | 3 | 4 | 5, number>;
+
 export interface PublicCommentsResult {
   items: PublicCommentItem[];
+  /** Every approved comment, replies included. */
   total: number;
+  /** Mean of the star ratings only (comments without a rating do not count), or null. */
   averageRating: number | null;
+  /** Comments that carry a star rating; the base of `averageRating`. */
+  ratingCount: number;
+  ratingBreakdown: RatingBreakdown;
 }
 
 export interface AdminCommentItem {

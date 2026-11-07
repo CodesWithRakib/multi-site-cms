@@ -11,7 +11,6 @@ const FOOTER_TOPIC_LIMIT = 5;
 const FOOTER_LINKS = [
   { label: 'Stories', href: '/articles' },
   { label: 'Topics', href: '/categories' },
-  { label: 'Search', href: '/search' },
   { label: 'About', href: '/about' },
   { label: 'Contact', href: '/contact' },
 ] as const;

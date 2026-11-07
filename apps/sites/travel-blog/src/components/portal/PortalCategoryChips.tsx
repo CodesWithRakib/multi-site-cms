@@ -1,60 +1,66 @@
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
+import { X } from 'lucide-react';
 
 import type { PublicCategory } from '@/lib/api';
+import { browseHref, type BrowseState } from '@/lib/browse-params';
 
 interface PortalCategoryChipsProps {
-  /** Real CMS topics that have published stories. */
+  /** Real CMS topics; ones without published stories are hidden. */
   readonly categories: readonly PublicCategory[];
-  readonly activeSlug: string | null;
+  readonly state: BrowseState;
 }
 
-const MAX_CHIPS = 6;
+const CHIP =
+  'inline-flex min-h-10 items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-semibold transition-colors';
+const CHIP_ON = 'bg-primary text-primary-foreground shadow-sm';
+const CHIP_OFF =
+  'border border-border bg-card text-muted-foreground hover:bg-muted hover:text-foreground';
 
 /**
- * Topic filters as links (`/articles?category=slug`): the filter runs on the
- * server across every story, is shareable, and works without JavaScript.
+ * The page's one topic filter, as links: it runs on the server across every
+ * story, is shareable, and works without JavaScript. Choosing a topic keeps the
+ * search text and sort.
  */
-export function PortalCategoryChips({ categories, activeSlug }: PortalCategoryChipsProps) {
-  const chips = [
-    { label: 'All', slug: null },
-    ...categories
-      .filter((category) => category.postCount > 0)
-      .sort((a, b) => b.postCount - a.postCount || a.name.localeCompare(b.name))
-      .slice(0, MAX_CHIPS)
-      .map((category) => ({ label: category.name, slug: category.slug })),
-  ];
+export function PortalCategoryChips({ categories, state }: PortalCategoryChipsProps) {
+  const topics = categories
+    .filter((category) => category.postCount > 0)
+    .sort((a, b) => b.postCount - a.postCount || a.name.localeCompare(b.name));
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
-      <nav aria-label="Filter by topic" className="flex flex-wrap items-center gap-2">
-        {chips.map((chip) => {
-          const isActive = activeSlug === chip.slug;
-          return (
-            <Link
-              key={chip.label}
-              href={chip.slug ? `/articles?category=${chip.slug}` : '/articles'}
-              aria-current={isActive ? 'true' : undefined}
-              scroll={false}
-              className={`inline-flex min-h-10 items-center rounded-full px-4 py-1.5 text-xs font-semibold transition-all ${
-                isActive
-                  ? 'bg-primary text-primary-foreground shadow-sm'
-                  : 'border border-border bg-card text-muted-foreground hover:bg-muted hover:text-foreground'
-              }`}
-            >
-              {chip.label}
-            </Link>
-          );
-        })}
-      </nav>
-
+    <nav aria-label="Filter by topic" className="flex flex-wrap items-center gap-2">
       <Link
-        href="/categories"
-        className="touch-target inline-flex items-center gap-1 text-xs font-bold text-primary hover:underline"
+        href={browseHref(state, { category: '' })}
+        aria-current={state.category === '' ? 'true' : undefined}
+        scroll={false}
+        className={`${CHIP} ${state.category === '' ? CHIP_ON : CHIP_OFF}`}
       >
-        <span>View All</span>
-        <ArrowRight aria-hidden="true" className="h-3.5 w-3.5" />
+        All
       </Link>
-    </div>
+      {topics.map((topic) => {
+        const active = state.category === topic.slug;
+        return (
+          <Link
+            key={topic.id}
+            href={browseHref(state, { category: topic.slug })}
+            aria-current={active ? 'true' : undefined}
+            scroll={false}
+            className={`${CHIP} ${active ? CHIP_ON : CHIP_OFF}`}
+          >
+            {topic.name}
+          </Link>
+        );
+      })}
+      {state.tag && (
+        <Link
+          href={browseHref(state, { tag: '' })}
+          scroll={false}
+          aria-label={`Remove tag filter: ${state.tag}`}
+          className={`${CHIP} ${CHIP_ON}`}
+        >
+          #{state.tag}
+          <X aria-hidden="true" className="size-3.5" />
+        </Link>
+      )}
+    </nav>
   );
 }

@@ -19,7 +19,7 @@ const image: PublicArticleImage = {
 
 function article(
   id: string,
-  opts: { image?: boolean; categoryIds?: string[] } = {},
+  opts: { image?: boolean; type?: PublicArticleSummary['type']; categoryIds?: string[] } = {},
 ): PublicArticleSummary {
   return {
     id,
@@ -28,7 +28,7 @@ function article(
     slug: id,
     title: id,
     excerpt: null,
-    type: 'article',
+    type: opts.type ?? 'article',
     templateKey: null,
     eventId: null,
     sourceLocale: 'en',
@@ -56,18 +56,64 @@ describe('buildHomeFeed', () => {
 
     expect(feed.slides.map((a) => a.id)).toEqual(['a0', 'a1', 'a2', 'a3']);
     expect(feed.latest[0]?.id).toBe('no-image');
-    expect(feed.latest).toHaveLength(5);
-    expect(feed.more).toHaveLength(6);
+    expect(feed.latest).toHaveLength(6);
+    expect(feed.spotlight).not.toBeNull();
 
-    const ids = [...feed.slides, ...feed.latest, ...feed.more].map((a) => a.id);
+    const ids = [
+      ...feed.slides,
+      ...feed.latest,
+      ...(feed.spotlight ? [feed.spotlight] : []),
+      ...feed.more,
+    ].map((a) => a.id);
     expect(new Set(ids).size).toBe(ids.length);
+    expect(ids).toHaveLength(16);
+  });
+
+  it('fills the more-stories grid up to its limit when there is plenty of content', () => {
+    const feed = buildHomeFeed(
+      Array.from({ length: 40 }, (_, i) => article(`s${i}`)),
+      [],
+    );
+    expect(feed.slides).toHaveLength(4);
+    expect(feed.latest).toHaveLength(6);
+    expect(feed.spotlight).not.toBeNull();
+    expect(feed.more).toHaveLength(9);
+    expect(feed.photos).toHaveLength(7);
+  });
+
+  it('prefers a story with an image for the spotlight', () => {
+    const feed = buildHomeFeed(
+      [
+        ...Array.from({ length: 9 }, (_, i) => article(`h${i}`)),
+        article('plain', { image: false }),
+        article('pretty'),
+      ],
+      [],
+    );
+    expect(feed.spotlight?.id).toBe('pretty');
+  });
+
+  it('collects destination guides separately and may repeat them from other sections', () => {
+    const guide = article('guide', { type: 'travel_guide' });
+    const feed = buildHomeFeed([guide, article('plain')], []);
+    expect(feed.guides.map((a) => a.id)).toEqual(['guide']);
+    expect(feed.slides.map((a) => a.id)).toContain('guide');
+  });
+
+  it('builds the photo mosaic only from stories that have a cover image', () => {
+    const feed = buildHomeFeed([article('a', { image: false }), article('b'), article('c')], []);
+    expect(feed.photos.map((a) => a.id)).toEqual(['b', 'c']);
   });
 
   it('falls back to the first story when none has an image, and handles no stories', () => {
     expect(buildHomeFeed([article('x', { image: false })], []).slides.map((a) => a.id)).toEqual([
       'x',
     ]);
-    expect(buildHomeFeed([], []).slides).toEqual([]);
+
+    const empty = buildHomeFeed([], []);
+    expect(empty.slides).toEqual([]);
+    expect(empty.spotlight).toBeNull();
+    expect(empty.more).toEqual([]);
   });
 
   it('picks the busiest topics and pairs each with an image from its stories', () => {

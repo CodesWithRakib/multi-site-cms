@@ -1,55 +1,57 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
-import { pageHref, parsePageParam, JsonLd } from '@multi-site-cms/ui';
+import { JsonLd } from '@multi-site-cms/ui';
 
 import { PortalContentContainer } from '@/components/portal/PortalContentContainer';
 import { siteConfig } from '@/config/site';
 import { fetchArticles, fetchCategories } from '@/lib/api';
+import { browseHref, isFiltered, parseBrowseParams } from '@/lib/browse-params';
+import { FEED_PAGE_SIZE, nextToken } from '@/lib/feed-request';
 
-export const revalidate = 60; // ISR cache revalidation every 60s
+export const revalidate = 60; // ISR revalidation every 60s
 
-/** Stories per page; further pages are `?page=N`, and `?category=slug` filters on the server. */
-const PAGE_SIZE = 12;
-const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const LATEST_COUNT = 3;
 
 interface ArticlesPageProps {
-  searchParams: Promise<{ page?: string | string[]; category?: string | string[] }>;
-}
-
-/** A valid category slug from the URL, or '' (untrusted input never reaches the API as-is). */
-function parseCategory(value: string | string[] | undefined): string {
-  const raw = (Array.isArray(value) ? value[0] : value)?.trim().toLowerCase() ?? '';
-  return SLUG.test(raw) ? raw : '';
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
 export async function generateMetadata({ searchParams }: ArticlesPageProps): Promise<Metadata> {
-  const params = await searchParams;
-  const page = parsePageParam(params.page);
-  const category = parseCategory(params.category);
-  const base = category ? `/articles?category=${category}` : '/articles';
+  const state = parseBrowseParams(await searchParams);
+  const description =
+    'Discover breathtaking destinations, get expert travel tips, and read inspiring travel stories from around the globe.';
 
   return {
-    title: `Travel Blog & Explorer Portal — ${siteConfig.name}`,
-    description:
-      'Discover breathtaking destinations, get expert travel tips, and read inspiring travel stories from around the globe.',
-    alternates: { canonical: pageHref(base, page) },
+    title: state.q ? `Search: ${state.q}` : `Travel Blog & Explorer Portal — ${siteConfig.name}`,
+    description,
+    alternates: { canonical: browseHref(state, { page: state.page }) },
+    // Search results are thin, endless variations of the same list: keep them out of the index.
+    robots:
+      state.q || state.tag || state.sort !== 'newest' ? { index: false, follow: true } : undefined,
   };
 }
 
 export default async function ArticlesPortalPage({ searchParams }: ArticlesPageProps) {
-  const params = await searchParams;
-  const page = parsePageParam(params.page);
-  const category = parseCategory(params.category);
+  const state = parseBrowseParams(await searchParams);
 
-  const [articlesData, categories] = await Promise.all([
-    fetchArticles({ page, limit: PAGE_SIZE, categorySlug: category || undefined }),
+  const [articlesData, categories, overall] = await Promise.all([
+    fetchArticles({
+      page: state.page,
+      limit: FEED_PAGE_SIZE,
+      search: state.q || undefined,
+      categorySlug: state.category || undefined,
+      tagSlug: state.tag || undefined,
+      sort: state.sort,
+    }),
     fetchCategories(),
+    // The newest stories overall, for the sidebar's latest reads even while filtering.
+    fetchArticles({ limit: LATEST_COUNT }),
   ]);
 
   // A stale or crafted page past the end goes back to the first page.
-  if (page > 1 && articlesData.items.length === 0) {
-    redirect(category ? `/articles?category=${category}` : '/articles');
+  if (state.page > 1 && articlesData.items.length === 0) {
+    redirect(browseHref(state, { page: 1 }));
   }
 
   const jsonLd = {
@@ -62,14 +64,15 @@ export default async function ArticlesPortalPage({ searchParams }: ArticlesPageP
 
   return (
     <>
-      <JsonLd data={jsonLd} />
+      {!isFiltered(state) && <JsonLd data={jsonLd} />}
       <PortalContentContainer
+        state={state}
         articles={articlesData.items}
+        next={nextToken(articlesData, state.sort)}
         categories={categories}
-        activeCategorySlug={category || null}
-        page={page}
         totalPages={Math.max(1, articlesData.totalPages)}
         total={articlesData.total}
+        latest={overall.items}
       />
     </>
   );

@@ -416,6 +416,76 @@ describe('Public Content Discovery API (/api/v1/public/sites/:siteKey/*)', () =>
       expect(body.data[0]?.slug).toBe('hidden-fjords-norway');
     });
 
+    describe('cursor pagination', () => {
+      type Page = {
+        data: PublicArticleSummary[];
+        pagination: { total: number; limit: number; nextCursor: string | null };
+      };
+      const list = async (qs: string, status = 200): Promise<Page> =>
+        (
+          await request(app.getHttpServer())
+            .get(`/api/v1/public/sites/travel-blog/posts?${qs}`)
+            .expect(status)
+        ).body as Page;
+
+      it('walks the whole list one cursor at a time without gaps or repeats', async () => {
+        const first = await list('limit=1');
+        expect(first.data).toHaveLength(1);
+        expect(first.pagination.total).toBe(2);
+        expect(first.pagination.nextCursor).toBeTruthy();
+
+        const second = await list(`limit=1&cursor=${first.pagination.nextCursor}`);
+        expect(second.data).toHaveLength(1);
+        expect(second.pagination.total).toBe(2);
+        expect(second.pagination.nextCursor).toBeNull();
+
+        const slugs = [first.data[0]?.slug, second.data[0]?.slug];
+        expect(new Set(slugs).size).toBe(2);
+        // Newest first: the post published "just now" comes before the older one.
+        expect(slugs).toEqual(['kyoto-temples-guide', 'hidden-fjords-norway']);
+      });
+
+      it('reports no next cursor when everything fits on one page', async () => {
+        const all = await list('limit=50');
+        expect(all.data).toHaveLength(2);
+        expect(all.pagination.nextCursor).toBeNull();
+      });
+
+      it('keeps the filter (and an accurate total) while paging with a cursor', async () => {
+        const res = await list('limit=1&categorySlug=adventure-escapes');
+        expect(res.pagination.total).toBe(1);
+        expect(res.data).toHaveLength(1);
+        expect(res.pagination.nextCursor).toBeNull();
+      });
+
+      it('does not skip or repeat stories published in the same instant', async () => {
+        const repo = dataSource.getRepository(PostPublication);
+        const pubs = await repo.find({ where: { siteId: siteTravelId, status: 'published' } });
+        const original = new Map(pubs.map((pub) => [pub.id, pub.publishedAt]));
+        const instant = new Date(Date.now() - 60_000);
+        try {
+          for (const pub of pubs) await repo.update({ id: pub.id }, { publishedAt: instant });
+
+          const first = await list('limit=1');
+          const second = await list(`limit=1&cursor=${first.pagination.nextCursor}`);
+          const seen = [first.data[0]?.id, second.data[0]?.id];
+          expect(new Set(seen).size).toBe(2);
+          expect(second.pagination.nextCursor).toBeNull();
+        } finally {
+          for (const [id, at] of original) await repo.update({ id }, { publishedAt: at });
+        }
+      });
+
+      it('rejects a tampered cursor and a cursor combined with another sort order', async () => {
+        const bad = await list('cursor=not-a-real-cursor', 400);
+        expect(bad).toBeDefined();
+        await list('cursor=eyJ0IjoiMjAyNi0wMS0wMVQwMDowMDowMC4wMDBaIiwiaWQiOiInIE9SIDE9MSJ9', 400);
+
+        const first = await list('limit=1');
+        await list(`sort=oldest&cursor=${first.pagination.nextCursor}`, 400);
+      });
+    });
+
     it('sorts by real readership with sort=popular (page views, last 30 days)', async () => {
       // The older Norway post gets the views; newest-first would list Kyoto first.
       for (let i = 0; i < 3; i++) {
@@ -699,6 +769,34 @@ describe('Public Content Discovery API (/api/v1/public/sites/:siteKey/*)', () =>
 
       const list = await listComments();
       expect(list.items.some((item) => item.id === created.id)).toBe(true);
+    });
+
+    it('reports the rating count and star breakdown from rated reviews only', async () => {
+      const publication = await dataSource
+        .getRepository(PostPublication)
+        .findOneByOrFail({ siteId: siteTravelId, slug: 'hidden-fjords-norway' });
+      const comments = dataSource.getRepository(PostComment);
+      const base = {
+        siteId: siteTravelId,
+        publicationId: publication.id,
+        authorEmail: 'rater@example.com',
+        status: 'approved' as const,
+      };
+      // Isolate from the comments the other tests created.
+      await comments.update({ publicationId: publication.id }, { status: 'rejected' });
+      await comments.insert([
+        { ...base, authorName: 'A', content: 'Five stars.', rating: 5 },
+        { ...base, authorName: 'B', content: 'Four stars.', rating: 4 },
+        { ...base, authorName: 'C', content: 'Four again.', rating: 4 },
+        { ...base, authorName: 'D', content: 'No rating at all.', rating: null },
+      ]);
+
+      const list = await listComments();
+      expect(list.total).toBe(4);
+      expect(list.ratingCount).toBe(3);
+      expect(list.ratingBreakdown).toEqual({ 1: 0, 2: 0, 3: 0, 4: 2, 5: 1 });
+      // (5 + 4 + 4) / 3, not divided by the unrated comment too.
+      expect(list.averageRating).toBe(4.3);
     });
 
     it('rejects a comment whose site does not match its publication (composite FK)', async () => {

@@ -1,6 +1,12 @@
 import type { Metadata, Viewport } from 'next';
 import Script from 'next/script';
-import { Caveat, JetBrains_Mono, Playfair_Display, Plus_Jakarta_Sans } from 'next/font/google';
+import {
+  Caveat,
+  JetBrains_Mono,
+  Playfair_Display,
+  Plus_Jakarta_Sans,
+  Source_Serif_4,
+} from 'next/font/google';
 import type { ReactNode } from 'react';
 
 import { AppTabBar } from '@/components/layout/AppTabBar';
@@ -31,6 +37,22 @@ const serifFont = Playfair_Display({
   display: 'swap',
   variable: '--font-serif',
   weight: ['400', '500', '600', '700', '800', '900'],
+});
+
+/**
+ * Type roles (one font per job):
+ *  - sans (Plus Jakarta Sans): interface, body copy, metadata, buttons.
+ *  - serif (Playfair Display): display headlines only (hero, page and card titles).
+ *  - reading (Source Serif 4): long-form article text, built for reading at length.
+ *  - handwriting (Caveat): one accent word in a headline.
+ *  - mono (JetBrains Mono): code and tabular counters.
+ */
+const readingFont = Source_Serif_4({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-reading',
+  weight: ['400', '500', '600', '700'],
+  style: ['normal', 'italic'],
 });
 
 const handwritingFont = Caveat({
@@ -87,7 +109,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         </Script>
       </head>
       <body
-        className={`${sansFont.variable} ${serifFont.variable} ${handwritingFont.variable} ${monoFont.variable} min-h-dvh flex flex-col bg-background pb-tabbar md:pb-0 font-sans antialiased text-foreground`}
+        className={`${sansFont.variable} ${serifFont.variable} ${readingFont.variable} ${handwritingFont.variable} ${monoFont.variable} min-h-dvh flex flex-col bg-background pb-tabbar md:pb-0 font-sans antialiased text-foreground`}
       >
         <ThemeProvider storageKey="travel_blog_theme">
           <SkipLink />

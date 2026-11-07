@@ -1,12 +1,13 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
-import { BookOpen, Compass, Globe, Heart, Shield, Sparkles, type LucideIcon } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { collectAuthors } from '@multi-site-cms/ui';
 import { resolveAboutContent } from '@multi-site-cms/validation/site-about';
 
 import { NewsletterBanner } from '@/components/home/NewsletterBanner';
 import { AuthorAvatar } from '@/components/ui/AuthorAvatar';
+import { pillarIcon } from '@/components/illustrations/pillar-icons';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { siteConfig } from '@/config/site';
 import { fetchArticles, fetchSiteConfig } from '@/lib/api';
@@ -15,9 +16,6 @@ export const revalidate = 300;
 
 /** Enough recent stories to find a cover image and every active author. */
 const ABOUT_ARTICLE_LIMIT = 30;
-
-/** Decorative icons for the owner's value cards, cycled in order. */
-const PILLAR_ICONS: readonly LucideIcon[] = [Compass, Globe, Shield, Sparkles, BookOpen, Heart];
 
 async function loadAbout() {
   const config = await fetchSiteConfig();
@@ -105,7 +103,7 @@ export default async function AboutPage() {
       {about.pillars.length > 0 && (
         <section className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
           {about.pillars.map((pillar, index) => {
-            const Icon = PILLAR_ICONS[index % PILLAR_ICONS.length] ?? Sparkles;
+            const Icon = pillarIcon(index);
             return (
               <div
                 key={index}

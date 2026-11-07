@@ -1,47 +1,53 @@
 'use client';
 
-import React from 'react';
-import { MessageSquareQuote, Sparkles } from 'lucide-react';
+import { useState } from 'react';
+import { ChevronDown } from 'lucide-react';
+
 import type { PublicCommentItem } from '@multi-site-cms/types';
+
 import { CommentItem } from './CommentItem';
 
 interface CommentListProps {
-  comments: PublicCommentItem[];
+  readonly comments: readonly PublicCommentItem[];
 }
 
+/** Reviews shown at first, and how many each "show more" adds. */
+const FIRST_BATCH = 5;
+const NEXT_BATCH = 10;
+
+/** Newest first. A long thread is revealed in steps instead of one very long page. */
 export function CommentList({ comments }: CommentListProps) {
-  if (comments.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-border/80 bg-muted/20 p-10 text-center">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-          <MessageSquareQuote className="h-6 w-6" />
-        </div>
-        <h4 className="mt-4 font-serif text-lg font-semibold text-foreground">
-          No reflections yet
-        </h4>
-        <p className="mt-1.5 max-w-sm text-sm text-muted-foreground">
-          Be the pioneer wanderer to share your insights, recommendations, or questions on this
-          dispatch.
-        </p>
-      </div>
-    );
-  }
+  const [visible, setVisible] = useState(FIRST_BATCH);
+  const shown = comments.slice(0, visible);
+  const remaining = comments.length - shown.length;
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between pb-2">
-        <h4 className="flex items-center gap-2 text-sm font-semibold tracking-wide uppercase text-muted-foreground">
-          <Sparkles className="h-4 w-4 text-emerald-600" />
-          Community Reviews ({comments.length})
-        </h4>
+      <div className="flex items-baseline justify-between gap-3">
+        <h3 className="text-sm font-bold text-foreground">
+          {comments.length} {comments.length === 1 ? 'review' : 'reviews'}
+        </h3>
         <span className="text-xs text-muted-foreground">Newest first</span>
       </div>
 
-      <div className="space-y-4">
-        {comments.map((comment) => (
-          <CommentItem key={comment.id} comment={comment} />
+      <ul className="space-y-3">
+        {shown.map((comment) => (
+          <li key={comment.id}>
+            <CommentItem comment={comment} />
+          </li>
         ))}
-      </div>
+      </ul>
+
+      {remaining > 0 && (
+        <button
+          type="button"
+          onClick={() => setVisible((n) => n + NEXT_BATCH)}
+          className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full border border-border bg-card px-5 text-sm font-semibold text-foreground transition-colors hover:bg-muted"
+        >
+          <ChevronDown aria-hidden="true" className="size-4" />
+          Show {Math.min(remaining, NEXT_BATCH)} more {remaining === 1 ? 'review' : 'reviews'}
+        </button>
+      )}
     </div>
   );
 }

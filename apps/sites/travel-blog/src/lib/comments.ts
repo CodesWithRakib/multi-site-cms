@@ -5,6 +5,7 @@ import type {
 } from '@multi-site-cms/types';
 import { siteConfig } from '@/config/site';
 import { apiTimeoutSignal } from './api-timeout';
+import { EMPTY_BREAKDOWN } from './review';
 
 const API_BASE_URL = (
   process.env.INTERNAL_API_URL ||
@@ -13,6 +14,15 @@ const API_BASE_URL = (
 ).replace(/\/+$/, '');
 
 const SITE_KEY = siteConfig.key;
+
+/** No reviews (or the CMS could not be reached). */
+export const EMPTY_COMMENTS: PublicCommentsResult = {
+  items: [],
+  total: 0,
+  averageRating: null,
+  ratingCount: 0,
+  ratingBreakdown: EMPTY_BREAKDOWN,
+};
 
 /**
  * Fetch approved comments for a specific article.
@@ -29,13 +39,13 @@ export async function fetchArticleComments(slug: string): Promise<PublicComments
     });
 
     if (!res.ok) {
-      return { items: [], total: 0, averageRating: null };
+      return EMPTY_COMMENTS;
     }
 
     const payload = (await res.json()) as { data: PublicCommentsResult };
     return payload.data ?? { items: [], total: 0, averageRating: null };
   } catch {
-    return { items: [], total: 0, averageRating: null };
+    return EMPTY_COMMENTS;
   }
 }
 

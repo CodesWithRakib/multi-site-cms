@@ -1,6 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsBoolean, IsIn, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import { IsBoolean, IsIn, IsInt, IsOptional, IsString, Max, MaxLength, Min } from 'class-validator';
 
 import { POST_TYPES, type PostType } from '../../database/entities/types';
 
@@ -49,6 +49,15 @@ export class ListPublicPostsQueryDto {
   @IsOptional()
   @IsIn(['newest', 'oldest', 'popular', 'title_asc'])
   sort?: 'newest' | 'oldest' | 'popular' | 'title_asc';
+
+  @ApiPropertyOptional({
+    description:
+      'Opaque cursor from a previous response (`pagination.nextCursor`); returns the stories after it. Only valid with sort=newest.',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
+  cursor?: string;
 
   @ApiPropertyOptional({ description: 'Page number', default: 1 })
   @IsOptional()

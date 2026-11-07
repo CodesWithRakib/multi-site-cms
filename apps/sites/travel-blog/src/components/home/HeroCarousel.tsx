@@ -58,14 +58,14 @@ export function HeroCarousel({ slides }: HeroCarouselProps) {
     <section
       aria-roledescription="carousel"
       aria-label="Cover stories"
-      className="px-3 pt-3 sm:px-4 sm:pt-4"
+      className="w-full"
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => setHovering(false)}
       onFocusCapture={() => setHovering(true)}
       onBlurCapture={() => setHovering(false)}
     >
       <h1 className="sr-only">{siteConfig.name}</h1>
-      <div className="relative isolate flex min-h-[min(44rem,calc(100svh-6rem))] flex-col overflow-hidden rounded-[2rem] bg-emerald-950 text-white">
+      <div className="relative isolate flex min-h-[min(46rem,calc(100svh-4rem))] flex-col overflow-hidden bg-emerald-950 text-white">
         {slides.map((slide, index) =>
           slide.featuredImage ? (
             <Image

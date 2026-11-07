@@ -39,3 +39,37 @@ export function decodeIdCursor(cursor: string): string {
   if (typeof id !== 'string' || !ID_PATTERN.test(id)) throw invalidCursor();
   return id;
 }
+
+/**
+ * Keyset cursor for lists ordered by (timestamp DESC, uuid DESC), such as the
+ * public stories feed. The timestamp is the sort key and the id breaks ties, so
+ * two stories published in the same instant are neither skipped nor repeated.
+ */
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+export interface TimeCursor {
+  readonly at: Date;
+  readonly id: string;
+}
+
+export function encodeTimeCursor(at: Date, id: string): string {
+  return Buffer.from(JSON.stringify({ t: at.toISOString(), id }), 'utf8').toString('base64url');
+}
+
+/** Decodes a time cursor; throws a 400 when it is malformed or tampered with. */
+export function decodeTimeCursor(cursor: string): TimeCursor {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(Buffer.from(cursor, 'base64url').toString('utf8'));
+  } catch {
+    throw invalidCursor();
+  }
+
+  const { t, id } = (parsed ?? {}) as { t?: unknown; id?: unknown };
+  if (typeof t !== 'string' || typeof id !== 'string' || !UUID_PATTERN.test(id)) {
+    throw invalidCursor();
+  }
+  const at = new Date(t);
+  if (Number.isNaN(at.getTime()) || at.toISOString() !== t) throw invalidCursor();
+  return { at, id };
+}

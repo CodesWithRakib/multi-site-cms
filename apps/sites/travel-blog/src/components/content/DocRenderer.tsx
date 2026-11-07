@@ -113,7 +113,7 @@ function renderTextWithMarks(text: string, marks?: TiptapMark[], key = 0): React
 }
 
 function renderHeading(level: number, anchorId: string, children: React.ReactNode, key: string) {
-  const cls = 'font-sans font-bold tracking-tight text-foreground scroll-mt-24 group';
+  const cls = 'font-serif font-bold tracking-tight text-foreground scroll-mt-24 group';
   if (level === 1) {
     return (
       <h1 key={key} id={anchorId} className={`text-3xl sm:text-4xl mt-10 mb-4 ${cls}`}>
@@ -180,7 +180,7 @@ function renderNode(node: TiptapNode, index: number): React.ReactNode {
       return (
         <p
           key={key}
-          className="text-foreground/90 font-serif text-lg leading-relaxed"
+          className="text-foreground/90 font-reading text-lg leading-relaxed"
           style={alignStyle(node)}
         >
           {children && children.length > 0 ? children : <br />}
@@ -194,7 +194,7 @@ function renderNode(node: TiptapNode, index: number): React.ReactNode {
       return (
         <blockquote
           key={key}
-          className="border-l-4 border-emerald-500 pl-5 py-2 my-6 italic text-foreground/80 bg-muted/30 rounded-r-lg font-serif text-lg"
+          className="border-l-4 border-emerald-500 pl-5 py-2 my-6 italic text-foreground/80 bg-muted/30 rounded-r-lg font-reading text-lg"
         >
           {children}
         </blockquote>
@@ -203,7 +203,7 @@ function renderNode(node: TiptapNode, index: number): React.ReactNode {
       return (
         <ul
           key={key}
-          className="list-disc pl-6 space-y-2 my-4 text-foreground/90 font-serif text-lg"
+          className="list-disc pl-6 space-y-2 my-4 text-foreground/90 font-reading text-lg"
         >
           {children}
         </ul>
@@ -212,7 +212,7 @@ function renderNode(node: TiptapNode, index: number): React.ReactNode {
       return (
         <ol
           key={key}
-          className="list-decimal pl-6 space-y-2 my-4 text-foreground/90 font-serif text-lg"
+          className="list-decimal pl-6 space-y-2 my-4 text-foreground/90 font-reading text-lg"
         >
           {children}
         </ol>

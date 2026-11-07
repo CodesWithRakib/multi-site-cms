@@ -77,6 +77,16 @@
     Times,
     serif
   );
+  --font-reading: var(
+    --font-reading,
+    'Source Serif 4',
+    Charter,
+    'Bitstream Charter',
+    Georgia,
+    Cambria,
+    'Times New Roman',
+    serif
+  );
   --font-mono: var(
     --font-mono,
     'JetBrains Mono',

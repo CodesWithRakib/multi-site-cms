@@ -66,7 +66,7 @@ To maximize rich snippet appearance in search engine results pages (SERPs), sema
 
 ### 3.1 Homepage Schema
 
-- **`WebSite`**: Declares site search potential (`potentialAction: SearchAction`) pointing to `/search?q={search_term_string}`.
+- **`WebSite`**: Declares site search potential (`potentialAction: SearchAction`) pointing to `/articles?q={search_term_string}`.
 - **`Organization`**: Declares the editorial brand, logo, and social profile links.
 
 ### 3.2 Article & Travel Guide Schema (`BlogPosting`)
@@ -88,7 +88,7 @@ To maximize rich snippet appearance in search engine results pages (SERPs), sema
 
 - Generated dynamically by `src/app/sitemap.ts`.
 - Fetches all published article slugs and timestamps from `/api/v1/public/sites/travel-blog/sitemap`.
-- Includes static core routes (`/`, `/destinations`, `/categories`, `/tags`, `/search`).
+- Includes static core routes (`/`, `/articles`, `/destinations`, `/categories`, `/tags`).
 - Populates `<lastmod>`, `<changefreq>`, and `<priority>` attributes accurately.
 
 ### 4.2 Robots Directives (`/robots.txt`)

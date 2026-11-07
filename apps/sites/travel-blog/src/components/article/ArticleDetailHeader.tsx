@@ -61,13 +61,13 @@ export function ArticleDetailHeader({
       </div>
 
       {/* Headline */}
-      <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground leading-[1.12] text-balance wrap-break-word">
+      <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-[1.12] text-balance wrap-break-word">
         {article.title}
       </h1>
 
       {/* Subtitle / Excerpt */}
       {article.excerpt && (
-        <p className="text-base sm:text-xl text-muted-foreground leading-relaxed font-normal">
+        <p className="font-reading text-lg sm:text-xl text-muted-foreground leading-relaxed font-normal">
           {article.excerpt}
         </p>
       )}

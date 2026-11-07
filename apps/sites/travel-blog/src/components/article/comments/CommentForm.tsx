@@ -1,226 +1,271 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Send, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
-import type {
-  CreatePublicCommentPayload,
-  PublicCommentItem,
-  SubmittedPublicComment,
-} from '@multi-site-cms/types';
-import { CommentRatingStars } from './CommentRatingStars';
+import { useEffect, useId, useRef, useState, type FormEvent, type ReactNode } from 'react';
+import { AlertCircle, Loader2, Send } from 'lucide-react';
+
+import type { CreatePublicCommentPayload, SubmittedPublicComment } from '@multi-site-cms/types';
+import { cn } from '@multi-site-cms/ui';
+
+import { REVIEW_LIMITS, validateReview, type ReviewErrors } from '@/lib/review';
+
+import { RatingInput } from './RatingInput';
 
 interface CommentFormProps {
-  slug: string;
-  onCommentSubmitted: (comment: PublicCommentItem) => void;
+  readonly slug: string;
+  /** Called once the review was accepted; `comment.status` says whether it is live yet. */
+  readonly onSubmitted: (comment: SubmittedPublicComment) => void;
 }
 
-export function CommentForm({ slug, onCommentSubmitted }: CommentFormProps) {
-  const [authorName, setAuthorName] = useState('');
-  const [authorEmail, setAuthorEmail] = useState('');
+const INPUT =
+  'w-full rounded-xl border bg-background px-4 py-3 text-base text-foreground placeholder:text-muted-foreground/70 transition-colors focus:outline-hidden focus:ring-2 focus:ring-primary/30 sm:text-sm';
+
+interface FieldProps {
+  readonly id: string;
+  readonly label: string;
+  readonly error?: string;
+  readonly hint?: ReactNode;
+  readonly children: (describedBy: string | undefined) => ReactNode;
+}
+
+/** Label, control, optional hint and an inline error that is announced when it appears. */
+function Field({ id, label, error, hint, children }: FieldProps) {
+  const noteId = `${id}-note`;
+  const describedBy = error || hint ? noteId : undefined;
+  return (
+    <div className="space-y-1.5">
+      <label htmlFor={id} className="block text-sm font-semibold text-foreground">
+        {label}
+      </label>
+      {children(describedBy)}
+      {error ? (
+        <p id={noteId} role="alert" className="flex items-start gap-1.5 text-xs text-destructive">
+          <AlertCircle aria-hidden="true" className="mt-px size-3.5 shrink-0" />
+          {error}
+        </p>
+      ) : hint ? (
+        <p id={noteId} className="text-xs text-muted-foreground">
+          {hint}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+/**
+ * The review form. Plain-language, per-field validation (not a browser
+ * tooltip), the first problem gets focus, and the server's own refusal is shown
+ * next to the button. Comments are pre-moderated, so success may mean "waiting
+ * for review"; the parent explains which.
+ */
+export function CommentForm({ slug, onSubmitted }: CommentFormProps) {
+  const uid = useId();
+  const ids = { name: `${uid}-name`, email: `${uid}-email`, content: `${uid}-content` };
+  const nameRef = useRef<HTMLInputElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const contentRef = useRef<HTMLTextAreaElement>(null);
+
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
   const [content, setContent] = useState('');
-  const [rating, setRating] = useState<number | null>(5);
-  const [websiteUrl, setWebsiteUrl] = useState(''); // Honeypot
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [rating, setRating] = useState<number | null>(null);
+  const [honeypot, setHoneypot] = useState('');
+  const [errors, setErrors] = useState<ReviewErrors>({});
+  const [serverError, setServerError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setErrorMessage(null);
-    setSuccessMessage(null);
+  // The form opens on demand, so put the cursor where the reader will type.
+  useEffect(() => {
+    nameRef.current?.focus();
+  }, []);
 
-    if (!authorName.trim() || !authorEmail.trim() || !content.trim()) {
-      setErrorMessage('Please fill in your name, email, and comment thoughts.');
+  const clearError = (field: keyof ReviewErrors) =>
+    setErrors((current) => (current[field] ? { ...current, [field]: undefined } : current));
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (submitting) return;
+    setServerError(null);
+
+    const found = validateReview({ name, email, content });
+    if (Object.keys(found).length > 0) {
+      setErrors(found);
+      if (found.name) nameRef.current?.focus();
+      else if (found.email) emailRef.current?.focus();
+      else contentRef.current?.focus();
       return;
     }
 
-    setIsSubmitting(true);
-
+    setSubmitting(true);
     try {
       const payload: CreatePublicCommentPayload = {
-        authorName: authorName.trim(),
-        authorEmail: authorEmail.trim(),
+        authorName: name.trim(),
+        authorEmail: email.trim(),
         content: content.trim(),
         rating,
-        website_url: websiteUrl, // Honeypot trap
+        website_url: honeypot,
       };
-
       const res = await fetch(`/api/articles/${encodeURIComponent(slug)}/comments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-
-      const data = (await res.json()) as {
+      const body = (await res.json().catch(() => null)) as {
         success?: boolean;
         data?: SubmittedPublicComment;
         message?: string;
-      };
+      } | null;
 
-      if (!res.ok || data.success === false || !data.data) {
-        setErrorMessage(data.message || 'Unable to post your reflection. Please try again.');
+      if (!res.ok || !body || body.success === false || !body.data) {
+        setServerError(body?.message || 'We could not post your review. Please try again.');
         return;
       }
-
-      // Comments are pre-moderated: only an approved comment joins the list.
-      if (data.data.status === 'approved') {
-        setSuccessMessage('Thank you! Your reflection has been published.');
-        onCommentSubmitted(data.data);
-      } else {
-        setSuccessMessage(
-          'Thank you! Your reflection was received and will appear after a quick review.',
-        );
-      }
-      setContent('');
-      setRating(5);
+      onSubmitted(body.data);
     } catch {
-      setErrorMessage('Network connection lost. Please try again.');
+      setServerError('The connection dropped. Check your network and try again.');
     } finally {
-      setIsSubmitting(false);
+      setSubmitting(false);
     }
   };
 
   return (
-    <div className="rounded-3xl border border-border/80 bg-gradient-to-br from-card via-card to-emerald-500/[0.03] p-6 sm:p-8 shadow-sm">
-      <div className="mb-6">
-        <h3 className="font-serif text-xl sm:text-2xl font-bold text-foreground">
-          Leave a Reader Review
-        </h3>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Have you traveled here or planning a trip? Share your experiences and tips with our global
-          community.
-        </p>
+    <form
+      onSubmit={handleSubmit}
+      noValidate
+      className="space-y-5 rounded-3xl border border-border/80 bg-card p-5 shadow-sm sm:p-7"
+      aria-label="Write a review"
+    >
+      <RatingInput value={rating} onChange={setRating} />
+
+      <div className="grid gap-5 sm:grid-cols-2">
+        <Field id={ids.name} label="Your name" error={errors.name}>
+          {(describedBy) => (
+            <input
+              ref={nameRef}
+              id={ids.name}
+              type="text"
+              autoComplete="name"
+              maxLength={REVIEW_LIMITS.name.max}
+              placeholder="e.g. Maya Lin"
+              value={name}
+              onChange={(e) => {
+                setName(e.target.value);
+                clearError('name');
+              }}
+              aria-invalid={Boolean(errors.name)}
+              aria-describedby={describedBy}
+              className={cn(INPUT, errors.name ? 'border-destructive' : 'border-input')}
+            />
+          )}
+        </Field>
+
+        <Field
+          id={ids.email}
+          label="Email"
+          error={errors.email}
+          hint="Used only to follow up. It is never shown."
+        >
+          {(describedBy) => (
+            <input
+              ref={emailRef}
+              id={ids.email}
+              type="email"
+              inputMode="email"
+              autoComplete="email"
+              maxLength={REVIEW_LIMITS.email.max}
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                clearError('email');
+              }}
+              aria-invalid={Boolean(errors.email)}
+              aria-describedby={describedBy}
+              className={cn(INPUT, errors.email ? 'border-destructive' : 'border-input')}
+            />
+          )}
+        </Field>
       </div>
 
-      {successMessage && (
-        <div className="mb-6 flex items-center gap-3 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-sm text-emerald-800 dark:text-emerald-200">
-          <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-600 dark:text-emerald-400" />
-          <p className="font-medium">{successMessage}</p>
-        </div>
-      )}
-
-      {errorMessage && (
-        <div className="mb-6 flex items-center gap-3 rounded-2xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-800 dark:text-red-200">
-          <AlertCircle className="h-5 w-5 shrink-0 text-red-600 dark:text-red-400" />
-          <p className="font-medium">{errorMessage}</p>
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} className="space-y-5">
-        {/* Rating Selector */}
-        <div>
-          <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
-            Rate This Expedition
-          </label>
-          <CommentRatingStars
-            rating={rating}
-            interactive={true}
-            onChange={(r) => setRating(r)}
-            size="lg"
-          />
-        </div>
-
-        {/* Name and Email Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label
-              htmlFor="commenter-name"
-              className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5"
-            >
-              Your Name <span className="text-emerald-600">*</span>
-            </label>
-            <input
-              id="commenter-name"
-              type="text"
-              required
-              placeholder="e.g. Maya Lin"
-              value={authorName}
-              onChange={(e) => setAuthorName(e.target.value)}
-              className="w-full rounded-xl border border-input bg-background/80 px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 transition-colors focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+      <Field id={ids.content} label="Your review" error={errors.content}>
+        {(describedBy) => (
+          <>
+            <textarea
+              ref={contentRef}
+              id={ids.content}
+              rows={5}
+              maxLength={REVIEW_LIMITS.content.max}
+              placeholder="What stood out? Any tips for the next traveller?"
+              value={content}
+              onChange={(e) => {
+                setContent(e.target.value);
+                clearError('content');
+              }}
+              aria-invalid={Boolean(errors.content)}
+              aria-describedby={describedBy}
+              className={cn(
+                INPUT,
+                'min-h-32 resize-y',
+                errors.content ? 'border-destructive' : 'border-input',
+              )}
             />
-          </div>
-
-          <div>
-            <label
-              htmlFor="commenter-email"
-              className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5"
+            <p
+              aria-hidden="true"
+              className={cn(
+                'text-right text-xs tabular-nums',
+                content.length > REVIEW_LIMITS.content.max * 0.9
+                  ? 'font-semibold text-amber-600'
+                  : 'text-muted-foreground',
+              )}
             >
-              Email Address <span className="text-emerald-600">*</span>
-            </label>
-            <input
-              id="commenter-email"
-              type="email"
-              required
-              placeholder="e.g. maya@wanderlust.com"
-              value={authorEmail}
-              onChange={(e) => setAuthorEmail(e.target.value)}
-              className="w-full rounded-xl border border-input bg-background/80 px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 transition-colors focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
-            />
-            <p className="mt-1 text-[11px] text-muted-foreground/70">
-              Kept strictly confidential; never published.
+              {content.length} / {REVIEW_LIMITS.content.max}
             </p>
-          </div>
-        </div>
+          </>
+        )}
+      </Field>
 
-        {/* Comment Content */}
-        <div>
-          <label
-            htmlFor="commenter-content"
-            className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5"
-          >
-            Your Thoughts & Tips <span className="text-emerald-600">*</span>
-          </label>
-          <textarea
-            id="commenter-content"
-            required
-            rows={4}
-            minLength={3}
-            maxLength={1000}
-            placeholder="Share what captivated you, packing tips, or local hidden gems..."
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            className="w-full rounded-xl border border-input bg-background/80 p-4 text-sm text-foreground placeholder:text-muted-foreground/60 transition-colors focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 resize-y"
-          />
-          <div className="flex justify-between items-center mt-1 text-[11px] text-muted-foreground">
-            <span>Markdown formatting supported</span>
-            <span>{content.length} / 1000</span>
-          </div>
-        </div>
+      {/* Spam trap: real readers never see or fill it. */}
+      <div className="hidden" aria-hidden="true">
+        <label htmlFor={`${uid}-website`}>Website (leave empty)</label>
+        <input
+          id={`${uid}-website`}
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+          value={honeypot}
+          onChange={(e) => setHoneypot(e.target.value)}
+        />
+      </div>
 
-        {/* Honeypot Field (invisible to normal users) */}
-        <div className="hidden" aria-hidden="true">
-          <label htmlFor="website-trap">Website (leave empty)</label>
-          <input
-            id="website-trap"
-            type="text"
-            tabIndex={-1}
-            autoComplete="off"
-            value={websiteUrl}
-            onChange={(e) => setWebsiteUrl(e.target.value)}
-          />
-        </div>
+      {serverError && (
+        <p
+          role="alert"
+          className="flex items-start gap-2 rounded-xl border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive"
+        >
+          <AlertCircle aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
+          {serverError}
+        </p>
+      )}
 
-        {/* Submit Button */}
-        <div>
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow-md transition-all hover:bg-emerald-700 hover:shadow-emerald-600/20 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                <span>Publishing Review...</span>
-              </>
-            ) : (
-              <>
-                <Send className="h-4 w-4" />
-                <span>Post Reflection</span>
-              </>
-            )}
-          </button>
-        </div>
-      </form>
-    </div>
+      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-xs text-muted-foreground">Reviews are checked before they appear.</p>
+        <button
+          type="submit"
+          disabled={submitting}
+          className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-primary px-7 text-sm font-bold text-primary-foreground shadow-sm transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+        >
+          {submitting ? (
+            <>
+              <Loader2 aria-hidden="true" className="size-4 animate-spin" />
+              Sending…
+            </>
+          ) : (
+            <>
+              <Send aria-hidden="true" className="size-4" />
+              Submit review
+            </>
+          )}
+        </button>
+      </div>
+    </form>
   );
 }

@@ -69,7 +69,13 @@ export class PublicContentController {
     this.sendWithEtag(
       req,
       res,
-      { items: result.items, total: result.total, page: result.page, limit: result.limit },
+      {
+        items: result.items,
+        total: result.total,
+        page: result.page,
+        limit: result.limit,
+        nextCursor: result.nextCursor,
+      },
       (requestId) => ({
         data: result.items,
         pagination: {
@@ -77,6 +83,7 @@ export class PublicContentController {
           page: result.page,
           limit: result.limit,
           totalPages: result.totalPages,
+          nextCursor: result.nextCursor,
         },
         meta: {
           requestId,

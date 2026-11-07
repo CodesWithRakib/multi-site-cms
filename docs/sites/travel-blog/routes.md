@@ -6,20 +6,20 @@
 
 ### Routing Table
 
-| Route Pattern        | Component Path                       | Rendering Mode   | Purpose & Content                                                                                                            |
-| -------------------- | ------------------------------------ | ---------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| `/`                  | `src/app/page.tsx`                   | ISR (60s)        | Editorial homepage: Hero feature, Destination Guides spotlight, Latest Stories grid, Category badges.                        |
-| `/articles/[slug]`   | `src/app/articles/[slug]/page.tsx`   | Dynamic / ISR    | Long-form story or destination guide, rich-text body, author attribution, reading time, adjacent prev/next, related stories. |
-| `/destinations`      | `src/app/destinations/page.tsx`      | ISR (60s)        | Dedicated hub for travel guides and field notes (`type = 'travel_guide'`).                                                   |
-| `/categories`        | `src/app/categories/page.tsx`        | ISR (300s)       | Taxonomy hub listing active categories with published article counts.                                                        |
-| `/categories/[slug]` | `src/app/categories/[slug]/page.tsx` | Dynamic / ISR    | Filtered chronological archive of published articles in a category.                                                          |
-| `/tags`              | `src/app/tags/page.tsx`              | ISR (300s)       | Tag cloud / index listing tags with published article counts.                                                                |
-| `/tags/[slug]`       | `src/app/tags/[slug]/page.tsx`       | Dynamic / ISR    | Filtered chronological archive of published articles bearing a specific tag.                                                 |
-| `/search`            | `src/app/search/page.tsx`            | Dynamic SSR      | Server-rendered keyword search across published article titles and excerpts.                                                 |
-| `/preview/[postId]`  | `src/app/preview/[postId]/page.tsx`  | SSR (No-Store)   | Authenticated editorial preview for drafts and scheduled revisions using HMAC token verification.                            |
-| `/sitemap.xml`       | `src/app/sitemap.ts`                 | Dynamic / Cached | Complete XML sitemap generated from backend public content endpoints.                                                        |
-| `/robots.txt`        | `src/app/robots.ts`                  | Static           | Search crawler rules (disallows `/preview/*` and `/api/*`).                                                                  |
-| `/api/revalidate`    | `src/app/api/revalidate/route.ts`    | API Route        | Webhook receiver for instant cache invalidation triggered by outbox publishing events.                                       |
+| Route Pattern        | Component Path                       | Rendering Mode   | Purpose & Content                                                                                                                   |
+| -------------------- | ------------------------------------ | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `/`                  | `src/app/page.tsx`                   | ISR (60s)        | Editorial homepage: Hero feature, Destination Guides spotlight, Latest Stories grid, Category badges.                               |
+| `/articles`          | `src/app/articles/page.tsx`          | ISR (60s)        | The one page for finding stories: search (`?q=`), topic (`?category=`), tag, sort, infinite scroll. `/search` redirects here (308). |
+| `/articles/[slug]`   | `src/app/articles/[slug]/page.tsx`   | Dynamic / ISR    | Long-form story or destination guide, rich-text body, author attribution, reading time, adjacent prev/next, related stories.        |
+| `/destinations`      | `src/app/destinations/page.tsx`      | ISR (60s)        | Dedicated hub for travel guides and field notes (`type = 'travel_guide'`).                                                          |
+| `/categories`        | `src/app/categories/page.tsx`        | ISR (300s)       | Taxonomy hub listing active categories with published article counts.                                                               |
+| `/categories/[slug]` | `src/app/categories/[slug]/page.tsx` | Dynamic / ISR    | Filtered chronological archive of published articles in a category.                                                                 |
+| `/tags`              | `src/app/tags/page.tsx`              | ISR (300s)       | Tag cloud / index listing tags with published article counts.                                                                       |
+| `/tags/[slug]`       | `src/app/tags/[slug]/page.tsx`       | Dynamic / ISR    | Filtered chronological archive of published articles bearing a specific tag.                                                        |
+| `/preview/[postId]`  | `src/app/preview/[postId]/page.tsx`  | SSR (No-Store)   | Authenticated editorial preview for drafts and scheduled revisions using HMAC token verification.                                   |
+| `/sitemap.xml`       | `src/app/sitemap.ts`                 | Dynamic / Cached | Complete XML sitemap generated from backend public content endpoints.                                                               |
+| `/robots.txt`        | `src/app/robots.ts`                  | Static           | Search crawler rules (disallows `/preview/*` and `/api/*`).                                                                         |
+| `/api/revalidate`    | `src/app/api/revalidate/route.ts`    | API Route        | Webhook receiver for instant cache invalidation triggered by outbox publishing events.                                              |
 
 ---
 

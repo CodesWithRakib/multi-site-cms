@@ -1,86 +1,55 @@
-'use client';
-
-import React from 'react';
 import type { PublicCommentItem } from '@multi-site-cms/types';
-import { CommentRatingStars } from './CommentRatingStars';
+import { cn } from '@multi-site-cms/ui';
+
+import { AuthorAvatar } from '@/components/ui/AuthorAvatar';
+import { formatPublishedDate } from '@/lib/format';
+
+import { RatingStars } from './RatingStars';
 
 interface CommentItemProps {
-  comment: PublicCommentItem;
-  level?: number;
+  readonly comment: PublicCommentItem;
+  /** 0 for a review, 1+ for a reply to one. */
+  readonly level?: number;
 }
 
-function getInitials(name: string): string {
-  const parts = name.trim().split(/\s+/);
-  const first = parts[0];
-  const last = parts[parts.length - 1];
-  if (parts.length >= 2 && first && last && first[0] && last[0]) {
-    return `${first[0]}${last[0]}`.toUpperCase();
-  }
-  if (first && first.length > 0) {
-    return first.slice(0, 2).toUpperCase();
-  }
-  return '??';
-}
-
-function formatCommentDate(isoDate: string): string {
-  try {
-    const d = new Date(isoDate);
-    return d.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
-  } catch {
-    return 'Recent';
-  }
-}
-
+/**
+ * One review and its replies. Stars sit under the name on phones and beside the
+ * date from `sm`, so a long name never squeezes them. No badge is invented for
+ * the writer: readers are shown exactly what they submitted.
+ */
 export function CommentItem({ comment, level = 0 }: CommentItemProps) {
-  const initials = getInitials(comment.authorName);
-  const formattedDate = formatCommentDate(comment.createdAt);
+  const isReply = level > 0;
+  const hasRating = typeof comment.rating === 'number' && comment.rating > 0;
 
   return (
-    <div
-      className={`group relative rounded-2xl border border-border/60 bg-card p-5 transition-all hover:border-emerald-500/30 hover:shadow-sm ${
-        level > 0 ? 'ml-6 sm:ml-12 mt-3 border-l-2 border-l-emerald-500/60' : ''
-      }`}
+    <article
+      aria-label={`${isReply ? 'Reply' : 'Review'} by ${comment.authorName}`}
+      className={cn(
+        'rounded-2xl border border-border/70 bg-card p-4 sm:p-5',
+        isReply && 'ml-4 border-l-2 border-l-primary/50 bg-muted/30 sm:ml-10',
+      )}
     >
-      <div className="flex items-start justify-between gap-4">
-        {/* Author Avatar and Info */}
-        <div className="flex items-center gap-3">
-          <div
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-teal-700 text-sm font-semibold text-white shadow-sm ring-2 ring-emerald-500/20"
-            aria-hidden="true"
-          >
-            {initials}
+      <header className="flex items-start gap-3">
+        <AuthorAvatar name={comment.authorName} className="size-10 text-sm" />
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+            <h3 className="truncate text-sm font-bold text-foreground sm:text-base">
+              {comment.authorName}
+            </h3>
+            <time dateTime={comment.createdAt} className="text-xs text-muted-foreground">
+              {formatPublishedDate(comment.createdAt)}
+            </time>
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h4 className="font-semibold text-foreground text-sm sm:text-base">
-                {comment.authorName}
-              </h4>
-              <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
-                Wanderer
-              </span>
-            </div>
-            <p className="text-xs text-muted-foreground">{formattedDate}</p>
-          </div>
+          {hasRating && comment.rating !== null && (
+            <RatingStars rating={comment.rating} size="sm" className="mt-1" />
+          )}
         </div>
+      </header>
 
-        {/* Rating Stars */}
-        {typeof comment.rating === 'number' && comment.rating > 0 && (
-          <div className="shrink-0">
-            <CommentRatingStars rating={comment.rating} size="sm" />
-          </div>
-        )}
-      </div>
-
-      {/* Comment Content */}
-      <p className="mt-3.5 text-sm text-foreground/90 whitespace-pre-line leading-relaxed pl-0 sm:pl-13">
+      <p className="mt-3 whitespace-pre-line break-words text-sm leading-relaxed text-foreground/90 sm:pl-13">
         {comment.content}
       </p>
 
-      {/* Render Nested Replies */}
       {comment.replies && comment.replies.length > 0 && (
         <div className="mt-4 space-y-3">
           {comment.replies.map((reply) => (
@@ -88,6 +57,6 @@ export function CommentItem({ comment, level = 0 }: CommentItemProps) {
           ))}
         </div>
       )}
-    </div>
+    </article>
   );
 }
