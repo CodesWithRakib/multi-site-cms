@@ -16,6 +16,7 @@
     "@multi-site-cms/redux": "workspace:*",
     "@multi-site-cms/types": "workspace:*",
     "@multi-site-cms/ui": "workspace:*",
+    "@multi-site-cms/validation": "workspace:*",
     "@tiptap/core": "^3.32.2",
     "@tiptap/extension-bubble-menu": "^3.32.2",
     "@tiptap/extension-character-count": "^3.32.2",

@@ -202,6 +202,9 @@ importers:
       '@multi-site-cms/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      '@multi-site-cms/validation':
+        specifier: workspace:*
+        version: link:../../packages/validation
       '@tiptap/core':
         specifier: ^3.32.2
         version: 3.32.2(@tiptap/pm@3.32.2)
@@ -472,6 +475,9 @@ importers:
       '@multi-site-cms/ui':
         specifier: workspace:*
         version: link:../../../packages/ui
+      '@multi-site-cms/validation':
+        specifier: workspace:*
+        version: link:../../../packages/validation
       lucide-react:
         specifier: ^1.16.0
         version: 1.66.0(@types/react@19.3.0)(react@19.3.1)

@@ -50,15 +50,16 @@ Legend: ✅ allowed, ➖ not applicable, 🔒 requires explicit Super Admin acti
 The admin hides what a caller cannot use; this is cosmetic, the API enforces
 every rule above. The sidebar and route guards use these checks:
 
-| Screen / control                          | Shown when                  |
-| ----------------------------------------- | --------------------------- |
-| Content, Engagement, Help sections        | any signed-in user          |
-| Websites (`/sites`)                       | Super Admin                 |
-| User Management (`/users`)                | `user:read`                 |
-| Settings (`/settings`)                    | `platform:configure`        |
-| Activity Logs (`/audit-logs`)             | `audit:read`                |
-| Delete post / delete comment              | `post:delete` (Super Admin) |
-| Dashboard "System Status", `/sites` links | Super Admin                 |
+| Screen / control                          | Shown when                                |
+| ----------------------------------------- | ----------------------------------------- |
+| Content, Engagement, Help sections        | any signed-in user                        |
+| Websites (`/sites`)                       | Super Admin                               |
+| About page (`/pages/about`)               | `site:update_settings` on the active site |
+| User Management (`/users`)                | `user:read`                               |
+| Settings (`/settings`)                    | `platform:configure`                      |
+| Activity Logs (`/audit-logs`)             | `audit:read`                              |
+| Delete post / delete comment              | `post:delete` (Super Admin)               |
+| Dashboard "System Status", `/sites` links | Super Admin                               |
 
 `GET /publishing/health` needs `publication:publish`, and its queue sizes
 (scheduled, outbox backlog, dead letters) are scoped to the caller's authorized

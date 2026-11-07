@@ -18,6 +18,7 @@ import {
   Calendar,
   MessageSquare,
   CalendarClock,
+  Info,
   PlayCircle,
   type LucideIcon,
 } from 'lucide-react';
@@ -31,6 +32,8 @@ interface NavItem {
   readonly badge?: number;
   readonly superAdminOnly?: boolean;
   readonly requiredPermission?: string;
+  /** Needs this permission on the site being managed (site owners hold it per site). */
+  readonly requiredSitePermission?: string;
 }
 
 interface NavSection {
@@ -46,7 +49,7 @@ interface SidebarProps {
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
-  const { t, isSuperAdmin, can } = useAdmin();
+  const { t, isSuperAdmin, can, activeSiteId } = useAdmin();
   const { data: commentsData } = useListCommentsQuery({ limit: 1 });
   const pendingCommentsCount = commentsData?.counts.pending ?? 0;
 
@@ -83,6 +86,13 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           label: t('nav.mediaLibrary'),
           icon: ImageIcon,
           active: pathname.startsWith('/media'),
+        },
+        {
+          href: '/pages/about',
+          requiredSitePermission: 'site:update_settings',
+          label: t('nav.aboutPage'),
+          icon: Info,
+          active: pathname.startsWith('/pages/about'),
         },
         {
           href: '/events',
@@ -170,7 +180,9 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           ? isSuperAdmin
           : item.requiredPermission
             ? can(item.requiredPermission)
-            : true,
+            : item.requiredSitePermission
+              ? Boolean(activeSiteId) && can(item.requiredSitePermission, activeSiteId ?? undefined)
+              : true,
       ),
     }))
     .filter((section) => section.items.length > 0);

@@ -140,6 +140,11 @@ const ACTIONS: Readonly<Record<string, AuditActionInfo>> = {
   'site.create': { en: 'Site created', bn: 'সাইট তৈরি', category: 'site' },
   'site.update': { en: 'Site updated', bn: 'সাইট আপডেট', category: 'site' },
   'site.delete': { en: 'Site deleted', bn: 'সাইট মুছে ফেলা হয়েছে', category: 'site' },
+  'site.update_about': {
+    en: 'About page updated',
+    bn: 'আমাদের সম্পর্কে পেজ আপডেট',
+    category: 'site',
+  },
   'site.update_branding': {
     en: 'Site branding updated',
     bn: 'সাইটের ব্র্যান্ডিং আপডেট',

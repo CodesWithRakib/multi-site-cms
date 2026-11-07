@@ -26,6 +26,7 @@ import {
   CreateDomainDto,
   CreateSiteDto,
   ListSitesQueryDto,
+  UpdateAboutDto,
   UpdateBrandingDto,
   UpdateDomainDto,
   UpdateLocalesDto,
@@ -130,6 +131,22 @@ export class SitesAdminController {
   ): Promise<SiteItem> {
     const reqContext = req as RequestContext;
     return this.sitesService.updateBranding(authContext, siteId, dto, {
+      requestId: reqContext.requestId,
+      ipAddress: req.ip,
+    });
+  }
+
+  @Patch(':siteId/about')
+  @RequireSiteContext()
+  @RequirePermissions('site:update_settings')
+  async updateAbout(
+    @CurrentUser() authContext: EffectiveAuthContext,
+    @Param('siteId', new ParseUUIDPipe({ version: '4' })) siteId: string,
+    @Body() dto: UpdateAboutDto,
+    @Req() req: Request,
+  ): Promise<SiteItem> {
+    const reqContext = req as RequestContext;
+    return this.sitesService.updateAbout(authContext, siteId, dto, {
       requestId: reqContext.requestId,
       ipAddress: req.ip,
     });

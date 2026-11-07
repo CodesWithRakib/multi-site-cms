@@ -96,6 +96,7 @@ describe('OpenAPI document', () => {
       `/${env.API_PREFIX}/settings/public`,
       `/${env.API_PREFIX}/sites`,
       `/${env.API_PREFIX}/sites/{siteId}`,
+      `/${env.API_PREFIX}/sites/{siteId}/about`,
       `/${env.API_PREFIX}/sites/{siteId}/branding`,
       `/${env.API_PREFIX}/sites/{siteId}/categories`,
       `/${env.API_PREFIX}/sites/{siteId}/categories/{categoryId}`,

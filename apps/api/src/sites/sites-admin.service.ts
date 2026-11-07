@@ -8,6 +8,7 @@ import type {
   SiteStatus,
 } from '@multi-site-cms/types';
 import { normalizeHostname } from '@multi-site-cms/validation';
+import { normalizeSiteAbout } from '@multi-site-cms/validation/site-about';
 import { type DataSource, type Repository } from 'typeorm';
 
 import { AuditService } from '../common/audit/audit.service';
@@ -22,6 +23,7 @@ import type {
   CreateDomainDto,
   CreateSiteDto,
   ListSitesQueryDto,
+  UpdateAboutDto,
   UpdateBrandingDto,
   UpdateDomainDto,
   UpdateLocalesDto,
@@ -402,6 +404,46 @@ export class SitesAdminService {
       requestId: reqInfo?.requestId,
       ipAddress: reqInfo?.ipAddress,
       metadata: { branding: updatedBranding },
+    });
+
+    return this.toSiteItem(saved);
+  }
+
+  /**
+   * Replaces the owner-written About page content. Text is normalized (trimmed,
+   * bounded, blank pillars dropped) and stored as plain text only.
+   */
+  async updateAbout(
+    authContext: EffectiveAuthContext,
+    siteId: string,
+    dto: UpdateAboutDto,
+    reqInfo?: RequestInfo,
+  ): Promise<SiteItem> {
+    const siteRepo = await this.getSiteRepo();
+    const site = await siteRepo.findOne({
+      where: { id: siteId },
+      relations: { domains: true },
+    });
+
+    if (!site) {
+      throw new ApiException(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'sites.notFound');
+    }
+
+    const about = normalizeSiteAbout(dto);
+    site.settings = { ...((site.settings ?? {}) as SiteSettings), about };
+
+    const saved = await siteRepo.save(site);
+
+    await this.auditService.record({
+      actorId: authContext.user.id,
+      actorType: 'user',
+      siteId: saved.id,
+      action: 'site.update_about',
+      entityType: 'site',
+      entityId: saved.id,
+      requestId: reqInfo?.requestId,
+      ipAddress: reqInfo?.ipAddress,
+      metadata: { pillars: about.pillars.length, showWriters: about.showWriters },
     });
 
     return this.toSiteItem(saved);

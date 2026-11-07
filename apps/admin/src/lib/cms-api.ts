@@ -43,6 +43,7 @@ import type {
   ReschedulePublicationRequest,
   SchedulePublicationRequest,
   SiteDomainItem,
+  SiteAbout,
   SiteItem,
   TagItem,
   UpdateCategoryPayload,
@@ -254,6 +255,19 @@ export const cmsApi = platformApi.injectEndpoints({
     updateSite: build.mutation<SiteItem, { siteId: string; data: UpdateSitePayload }>({
       query: ({ siteId, data }) => ({
         path: `/sites/${siteId}`,
+        method: 'PATCH',
+        body: data,
+      }),
+      transformResponse: (response: ApiSuccess<unknown>) => response.data as SiteItem,
+      invalidatesTags: (_res, _err, { siteId }) => [
+        { type: 'Site' as const, id: siteId },
+        { type: 'Site' as const, id: 'LIST' },
+      ],
+    }),
+
+    updateSiteAbout: build.mutation<SiteItem, { siteId: string; data: SiteAbout }>({
+      query: ({ siteId, data }) => ({
+        path: `/sites/${siteId}/about`,
         method: 'PATCH',
         body: data,
       }),
@@ -1129,6 +1143,7 @@ export const {
   useGetSiteQuery,
   useCreateSiteMutation,
   useUpdateSiteMutation,
+  useUpdateSiteAboutMutation,
   useDeleteSiteMutation,
   useListDomainsQuery,
   useAddDomainMutation,

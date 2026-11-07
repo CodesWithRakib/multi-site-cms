@@ -610,6 +610,64 @@ describe('Multi-Site CMS Core (Sites, Domains, Config, IDOR & Public API)', () =
       expect((res.body as ApiErrorResponse).error.code).toBe('VALIDATION_ERROR');
     });
 
+    it('lets the site owner update the About page and normalizes the content', async () => {
+      const res = await request(app.getHttpServer())
+        .patch(`/api/v1/sites/${siteTravelId}/about`)
+        .set('Cookie', travelAdminCookie)
+        .set('X-CSRF-Token', travelAdminCsrf)
+        .send({
+          eyebrow: '  Our Mission ',
+          headline: 'Travel that <b>matters</b>',
+          highlight: 'for everyone',
+          intro: 'First paragraph.\n\nSecond paragraph.',
+          pillars: [
+            { title: 'Depth', body: 'Long-form stories.' },
+            { title: '   ', body: 'dropped: no title' },
+          ],
+          showWriters: false,
+        })
+        .expect(200);
+
+      const about = (res.body as ApiSuccess<SiteItem>).data.settings.about;
+      expect(about?.eyebrow).toBe('Our Mission');
+      // Stored as inert plain text; the public site renders it as text.
+      expect(about?.headline).toBe('Travel that <b>matters</b>');
+      expect(about?.pillars).toEqual([{ title: 'Depth', body: 'Long-form stories.' }]);
+      expect(about?.showWriters).toBe(false);
+    });
+
+    it('rejects an About payload with too many pillars or oversized text', async () => {
+      const tooMany = await request(app.getHttpServer())
+        .patch(`/api/v1/sites/${siteTravelId}/about`)
+        .set('Cookie', travelAdminCookie)
+        .set('X-CSRF-Token', travelAdminCsrf)
+        .send({
+          eyebrow: '',
+          headline: '',
+          highlight: '',
+          intro: '',
+          pillars: Array.from({ length: 7 }, () => ({ title: 't', body: 'b' })),
+          showWriters: true,
+        })
+        .expect(400);
+      expect((tooMany.body as ApiErrorResponse).error.code).toBe('VALIDATION_ERROR');
+
+      const oversized = await request(app.getHttpServer())
+        .patch(`/api/v1/sites/${siteTravelId}/about`)
+        .set('Cookie', travelAdminCookie)
+        .set('X-CSRF-Token', travelAdminCsrf)
+        .send({
+          eyebrow: '',
+          headline: 'x'.repeat(121),
+          highlight: '',
+          intro: '',
+          pillars: [],
+          showWriters: true,
+        })
+        .expect(400);
+      expect((oversized.body as ApiErrorResponse).error.code).toBe('VALIDATION_ERROR');
+    });
+
     it('updates SEO settings', async () => {
       const res = await request(app.getHttpServer())
         .patch(`/api/v1/sites/${siteTravelId}/seo`)
@@ -678,6 +736,22 @@ describe('Multi-Site CMS Core (Sites, Domains, Config, IDOR & Public API)', () =
         .expect(404);
 
       expect((patchRes.body as ApiErrorResponse).error.code).toBe('NOT_FOUND');
+
+      // Attempting to modify another site's About page
+      const aboutRes = await request(app.getHttpServer())
+        .patch(`/api/v1/sites/${siteAirSportsId}/about`)
+        .set('Cookie', travelAdminCookie)
+        .set('X-CSRF-Token', travelAdminCsrf)
+        .send({
+          eyebrow: '',
+          headline: 'Hacked',
+          highlight: '',
+          intro: '',
+          pillars: [],
+          showWriters: true,
+        })
+        .expect(404);
+      expect((aboutRes.body as ApiErrorResponse).error.code).toBe('NOT_FOUND');
 
       // Attempting to list another site's domains
       const domainRes = await request(app.getHttpServer())
@@ -779,6 +853,20 @@ describe('Multi-Site CMS Core (Sites, Domains, Config, IDOR & Public API)', () =
 
       const config = (res.body as ApiSuccess<PublicSiteConfig>).data;
       expect(config.key).toBe('travel-blog');
+    });
+
+    it('exposes the owner-written About content publicly, and null when never saved', async () => {
+      const travel = await request(app.getHttpServer())
+        .get('/api/v1/public/sites/travel-blog/config')
+        .expect(200);
+      const about = (travel.body as ApiSuccess<PublicSiteConfig>).data.about;
+      expect(about?.headline).toBe('Travel that <b>matters</b>');
+      expect(about?.showWriters).toBe(false);
+
+      const air = await request(app.getHttpServer())
+        .get('/api/v1/public/sites/air-sports/config')
+        .expect(200);
+      expect((air.body as ApiSuccess<PublicSiteConfig>).data.about).toBeNull();
     });
   });
 

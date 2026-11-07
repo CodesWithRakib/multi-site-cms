@@ -8,6 +8,10 @@
     ".": {
       "types": "./src/index.ts",
       "default": "./src/index.ts"
+    },
+    "./site-about": {
+      "types": "./src/site-about.ts",
+      "default": "./src/site-about.ts"
     }
   },
   "scripts": {

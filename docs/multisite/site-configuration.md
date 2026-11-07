@@ -69,7 +69,28 @@ Managed via `PATCH /api/v1/sites/:siteId/settings/locales`.
 
 ---
 
-## 6. Public Site Configuration API
+## 6. About Page Content
+
+The owner of a site writes the content of its public About page in the admin
+(**Content → About page**, `/pages/about`). Managed via
+`PATCH /api/v1/sites/:siteId/about` (requires `site:update_settings`, which a
+Site Admin holds for their own site only; another site's id returns 404).
+
+The body is a full replacement: `eyebrow`, `headline`, `highlight`, `intro`,
+`pillars[]` (`title`, `body`) and `showWriters`. Limits live in
+`SITE_ABOUT_LIMITS` (`packages/validation`): 60 / 120 / 60 / 2000 characters,
+pillar title 60 and body 400, at most 6 pillars. The API rejects anything over a
+limit with `VALIDATION_ERROR`, then normalizes (trim, drop pillars without a
+title). Content is **plain text**: it is stored as typed and rendered by React as
+text, never as HTML or Markdown, so markup typed by an owner is shown literally.
+
+Until an owner saves, `about` is `null` in the public config and the page shows
+neutral text built from the site name and description (`resolveAboutContent`).
+Only the travel-blog has an About page; air-sports ignores the field.
+
+---
+
+## 7. Public Site Configuration API
 
 The public API allows client applications (`apps/sites/travel-blog`, `apps/sites/air-sports`) and CDNs to fetch site metadata without administrative credentials:
 
@@ -82,7 +103,7 @@ The public configuration endpoint strictly returns:
 
 - `id`, `key`, `name`, `status`, `defaultLocale`
 - `primaryDomain`, `domains` (verified only)
-- Public settings: `branding`, `navigation`, `seo`, `locales`
+- Public settings: `branding`, `navigation`, `seo`, `locales`, `about` (`null` until saved)
 
 **Excluded Elements**:
 
@@ -96,3 +117,4 @@ The public configuration endpoint strictly returns:
 1. **SHA-256 ETag**: Computed over the deterministic JSON stringification of the public response payload.
 2. **Headers**: Emits `ETag: "<hash>"` and `Cache-Control: public, max-age=300, stale-while-revalidate=600`.
 3. **Conditional Requests**: If the client provides an `If-None-Match` header matching the current ETag, the API responds with **HTTP 304 Not Modified** and an empty body, avoiding data re-transmission.
+4. **Freshness**: the public sites revalidate the config every 5 minutes, so an About page edit can take up to that long to appear.

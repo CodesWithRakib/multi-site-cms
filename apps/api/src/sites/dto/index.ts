@@ -8,3 +8,4 @@ export * from './update-seo.dto';
 export * from './update-locales.dto';
 export * from './list-sites-query.dto';
 export * from './update-site-settings.dto';
+export * from './update-about.dto';

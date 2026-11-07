@@ -1,3 +1,4 @@
+import { normalizeSiteAbout } from '@multi-site-cms/validation/site-about';
 import { Inject, Injectable } from '@nestjs/common';
 import type {
   PublicNavigationItem,
@@ -126,6 +127,7 @@ export class SitesPublicService {
         canonicalHost: seo.canonicalHost || primaryHostname || undefined,
       },
       navigation: publicNav,
+      about: settings.about ? normalizeSiteAbout(settings.about) : null,
     };
   }
 }

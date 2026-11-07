@@ -16,6 +16,7 @@
     "@multi-site-cms/config": "workspace:*",
     "@multi-site-cms/types": "workspace:*",
     "@multi-site-cms/ui": "workspace:*",
+    "@multi-site-cms/validation": "workspace:*",
     "lucide-react": "^1.16.0",
     "next": "16.4.3",
     "react": "19.3.1",
