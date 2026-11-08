@@ -6,6 +6,7 @@ import type { EffectiveAuthContext } from '../auth/services/authorization.servic
 import { AuditService } from '../common/audit/audit.service';
 import { ApiException } from '../common/exceptions/api.exception';
 import { DATA_SOURCE } from '../database/database.tokens';
+import { ensureInitialized } from '../database/ensure-connected';
 import { Event } from '../database/entities/event.entity';
 import { OutboxEvent } from '../database/entities/outbox-event.entity';
 import { PostPublication } from '../database/entities/post-publication.entity';
@@ -187,9 +188,7 @@ export class EventsService {
 
   /** ADR-0015: the DataSource connects lazily on first use. */
   private async ready(): Promise<void> {
-    if (!this.dataSource.isInitialized) {
-      await this.dataSource.initialize();
-    }
+    await ensureInitialized(this.dataSource);
   }
 
   private checkSiteAccess(actor: EffectiveAuthContext, siteId: string): void {

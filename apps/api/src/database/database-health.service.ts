@@ -3,6 +3,7 @@ import type { ReadinessCheck } from '@multi-site-cms/types';
 import type { DataSource } from 'typeorm';
 
 import { DATA_SOURCE } from './database.tokens';
+import { ensureInitialized } from './ensure-connected';
 
 /** Readiness must answer quickly; a slow probe is a failed probe. */
 const CHECK_TIMEOUT_MS = 2_000;
@@ -26,9 +27,7 @@ export class DatabaseHealthService {
     const startedAt = Date.now();
 
     try {
-      if (!this.dataSource.isInitialized) {
-        await this.withTimeout(this.dataSource.initialize());
-      }
+      await this.withTimeout(ensureInitialized(this.dataSource));
 
       await this.withTimeout(this.dataSource.query('SELECT 1'));
 
